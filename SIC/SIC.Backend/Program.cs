@@ -1,4 +1,7 @@
 
+using Microsoft.EntityFrameworkCore;
+using SIC.Backend.Data;
+
 namespace SIC.Backend
 {
     public class Program
@@ -13,6 +16,7 @@ namespace SIC.Backend
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer("name=LocalConnection"));
 
             var app = builder.Build();
 
