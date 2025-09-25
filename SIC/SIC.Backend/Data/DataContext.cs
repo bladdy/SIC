@@ -10,10 +10,26 @@ public class DataContext: DbContext
     }
     public DbSet<EventType> EventTypes { get; set; }
     public DbSet<Item> Items { get; set; }
+    public DbSet<Plan> Plans { get; set; }
+    public DbSet<PlanItem> PlanItems { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.Entity<Item>().HasIndex(x => x.Name).IsUnique();
         modelBuilder.Entity<EventType>().HasIndex(x => x.Name).IsUnique();
+        modelBuilder.Entity<Item>().HasIndex(x => x.Name).IsUnique();
+        modelBuilder.Entity<Plan>().HasIndex(x => x.Name).IsUnique();
+        modelBuilder.Entity<PlanItem>().HasIndex(x => new { x.PlanId, x.ItemId }).IsUnique();
+
+
+        DisableCascadingDelete(modelBuilder);
+    }
+
+    private void DisableCascadingDelete(ModelBuilder modelBuilder)
+    {
+        var relationships = modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys());
+        foreach (var relationship in relationships)
+        {
+            relationship.DeleteBehavior = DeleteBehavior.Restrict;
+        }
     }
 }

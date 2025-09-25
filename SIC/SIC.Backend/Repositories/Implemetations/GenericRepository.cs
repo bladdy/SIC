@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SIC.Backend.Data;
+using SIC.Backend.Helpers;
 using SIC.Backend.Repositories.Interfaces;
+using SIC.Shared.DTOs;
 using SIC.Shared.Response;
 using System;
 
@@ -15,6 +17,26 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         _context = context;
         _entity = _context.Set<T>();
+    }
+
+    public virtual async Task<ActionResponse<IEnumerable<T>>> GetAsync(PaginationDTO pagination)
+    {
+        var queryable = _entity.AsQueryable();
+        return new ActionResponse<IEnumerable<T>>
+        {
+            Success = true,
+            Result = await queryable.Paginate(pagination).ToListAsync()
+        };
+    }
+
+    public virtual async Task<ActionResponse<int>> GetTotalRecordAsync(PaginationDTO pagination)
+    {
+        var queryable = _entity.AsQueryable();
+        double count = await queryable.CountAsync();
+        return new ActionResponse<int> {
+            Success = true,
+            Result = (int)count
+        };
     }
 
     public virtual async Task<ActionResponse<T>> AddAsync(T entity)
@@ -113,6 +135,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
             return ExceptionActionResponse(exception);
         }
     }
+    
 
     private ActionResponse<T> ExceptionActionResponse(Exception exception) => new()
     {
@@ -123,4 +146,5 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         Message = "El registro ya existe."
     };
+
 }

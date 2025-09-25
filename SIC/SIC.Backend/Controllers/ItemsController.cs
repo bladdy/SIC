@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using SIC.Backend.Data;
 using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.Entities;
 
