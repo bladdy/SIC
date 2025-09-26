@@ -1,4 +1,4 @@
-
+//Zulu 72 y 76
 
 using Microsoft.EntityFrameworkCore;
 using SIC.Backend.Data;
@@ -45,7 +45,7 @@ SeedData(app);
 void SeedData(WebApplication app)
 {
     var scopeFactory = app.Services.GetService<IServiceScopeFactory>();
-    using(var scope = scopeFactory!.CreateScope())
+    using (var scope = scopeFactory!.CreateScope())
     {
         var service = scope.ServiceProvider.GetService<SeedDb>();
         service!.SeedAsync().Wait();
@@ -66,7 +66,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-
 
 app.MapControllers();
 

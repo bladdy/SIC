@@ -1,7 +1,8 @@
-﻿using System.Text;
+﻿using SIC.Frontend.Repositories;
+using System.Text;
 using System.Text.Json;
 
-namespace SIC.Frontend.Repository;
+namespace SIC.Frontend.Repositories;
 
 public class Repository : IRepository
 {
