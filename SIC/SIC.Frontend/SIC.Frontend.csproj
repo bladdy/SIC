@@ -10,4 +10,9 @@
   <ItemGroup>
     <PackageReference Include="MudBlazor" Version="8.*" />
   </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\SIC.Shared\SIC.Shared.csproj" />
+  </ItemGroup>
 </Project>

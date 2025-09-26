@@ -14,15 +14,16 @@ public class Event : IEntityWithName
     public int Id { get; set; }
     public string? Code { get; set; }//Auto generado
 
-    [Display(Name = "Nombre")]
+    [Display(Name = "Titulo")]
     [MaxLength(100, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres.")]
     [Required(ErrorMessage = "El campo {0} es obligatorio.")]
     public string Name { get; set; } = null!;
 
-    [Display(Name = "Nombre")]
+    [Display(Name = "Sub-Titulo")]
     [MaxLength(100, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres.")]
     [Required(ErrorMessage = "El campo {0} es obligatorio.")]
     public string SubTitle { get; set; } = null!;
+
     public DateTime Date { get; set; }// Español
     public TimeSpan Time { get; set; }
     public string Url { get; set; } = null!;
@@ -31,6 +32,7 @@ public class Event : IEntityWithName
     public string? Planner { get; set; }
     public string? PlannerPhone { get; set; }
     public string? EventType { get; set; }
+
     [Display(Name = "Estado")]
     public Status Status { get; set; }
 }

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35931.197 d17.13
+VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIC.Backend", "SIC.Backend\SIC.Backend.csproj", "{1EB74F2B-4E09-4386-B0C5-407640CEB48C}"
 EndProject

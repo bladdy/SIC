@@ -1,0 +1,25 @@
+﻿@page "/plans"
+
+
+<h3>Planes</h3>
+
+@if (Plans == null)
+{
+    <Loading/>
+}
+else
+{
+    <MudTable Items="Plans" Hover="true" Bordered="true" Striped="true">
+        <HeaderContent>
+            <MudTh>Id</MudTh>
+            <MudTh>Nombre</MudTh>
+            <MudTh>Precio</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Id">@context.Id</MudTd>
+            <MudTd DataLabel="Nombre">@context.Name</MudTd>
+            <MudTd DataLabel="Precio">@context.Price.ToString("C")</MudTd>
+        </RowTemplate>
+    </MudTable>
+    
+}
