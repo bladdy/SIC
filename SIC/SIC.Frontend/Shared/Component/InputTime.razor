@@ -1,0 +1,24 @@
+﻿<input type="time"
+       class="@CssClass"
+       value="@BindValue"
+       @oninput="OnInput" />
+
+@code {
+    [Parameter] public TimeSpan Value { get; set; }
+    [Parameter] public EventCallback<TimeSpan> ValueChanged { get; set; }
+    [Parameter] public string CssClass { get; set; } = "form-control";
+
+    private string BindValue
+    {
+        get => Value.ToString(@"hh\:mm");   // TimeSpan → "HH:mm"
+    }
+
+    private async Task OnInput(ChangeEventArgs e)
+    {
+        if (TimeSpan.TryParse(e.Value?.ToString(), out var time))
+        {
+            Value = time;
+            await ValueChanged.InvokeAsync(time);
+        }
+    }
+}

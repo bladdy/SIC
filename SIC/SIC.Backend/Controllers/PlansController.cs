@@ -7,11 +7,11 @@ namespace SIC.Backend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class PlanController : GenericController<Plan>
+public class PlansController : GenericController<Plan>
 {
     private readonly IPlanUnitOfWork _planUnitOfWork;
 
-    public PlanController(IGenericUnitOfWork<Plan> unitOfWork, IPlanUnitOfWork planUnitOfWork) : base(unitOfWork)
+    public PlansController(IGenericUnitOfWork<Plan> unitOfWork, IPlanUnitOfWork planUnitOfWork) : base(unitOfWork)
     {
         _planUnitOfWork = planUnitOfWork;
     }

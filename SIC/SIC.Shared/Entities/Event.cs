@@ -24,8 +24,14 @@ public class Event : IEntityWithName
     [Required(ErrorMessage = "El campo {0} es obligatorio.")]
     public string SubTitle { get; set; } = null!;
 
-    public DateTime Date { get; set; }// Español
+    [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd hh:mm tt}")]
+    [Display(Name = "Fecha")]
+    public DateTime Date { get; set; } = DateTime.Now;
+
+    [DisplayFormat(DataFormatString = "{0:hh:mm}")]
+    [Display(Name = "Hora")]
     public TimeSpan Time { get; set; }
+
     public string Url { get; set; } = null!;
     public string Host { get; set; } = null!;
     public string HostPhone { get; set; } = null!;

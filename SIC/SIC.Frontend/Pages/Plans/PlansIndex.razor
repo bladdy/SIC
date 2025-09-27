@@ -1,0 +1,78 @@
+﻿@page "/plans"
+
+
+<h3>Planes</h3>
+
+<div class="mb-3">
+    <button class="btn btn-primary" @onclick="ShowCreateModal">Crear Plan</button>
+</div>
+
+<GenericList MyList="Plans">
+    <Body>
+        <table class="table table-striped table-hover table-bordered align-middle">
+            <thead class="table-dark">
+                <tr class="text-center">
+                    <th>Planes</th>
+                    <th>Servicios</th>
+                    <th>Precios</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var plan in Plans!)
+                {
+                    <tr class="align-middle">
+                        <td>@plan.Name</td>
+                        <td class="text-center">@plan.ItemsNumbers</td>
+                        <td class="text-end">@plan.Price.ToString("C2")</td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-warning me-2" @onclick="() => ShowEditModal(plan)">
+                                <i class="bi bi-pencil-fill"></i> Editar
+                            </button>
+                            <button class="btn btn-sm btn-danger" @onclick="() => ConfirmDelete(plan)">
+                                <i class="bi bi-trash-fill"></i> Borrar
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </Body>
+</GenericList>
+
+<!-- Modal -->
+@if (IsModalVisible)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@((IsEditMode ? "Editar Plan" : "Crear Plan"))</h5>
+                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                </div>
+                <div class="modal-body">
+                    <EditForm Model="@NewPlan" OnValidSubmit="@SavePlan">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+
+                        <div class="mb-3">
+                            <label class="form-label">Nombre</label>
+                            <InputText class="form-control" @bind-Value="NewPlan.Name" />
+                            <ValidationMessage For="@(() => NewPlan.Name)" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Precio</label>
+                            <InputNumber @bind-Value="NewPlan.Price" step="0.01" class="form-control" />
+                            <ValidationMessage For="@(() => NewPlan.Price)" />
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Guardar</button>
+                            <button type="button" class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+}
