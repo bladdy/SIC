@@ -10,6 +10,7 @@ namespace SIC.Frontend.Pages.Events
         [Inject] private IRepository repository { get; set; } = default!;
         [Inject] private SweetAlertService sweetAlertService { get; set; } = default!;
         public List<Event>? Events { get; set; }
+        public List<EventType>? EventTypes { get; set; }
         private Event NewEvent = new();
         private bool IsModalVisible = false;
         private bool IsEditMode = false;
@@ -18,6 +19,7 @@ namespace SIC.Frontend.Pages.Events
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
+            await LoadEventTypes();
             await LoadEvents();
         }
 
@@ -25,6 +27,15 @@ namespace SIC.Frontend.Pages.Events
         {
             var responseHttp = await repository.GetAsync<List<Event>>("api/Events") ?? null;
             Events = responseHttp?.Response;
+        }
+
+        private async Task LoadEventTypes()
+        {
+            var responseHttp = await repository.GetAsync<List<EventType>>("api/EventTypes");
+            if (!responseHttp.Error && responseHttp.Response != null)
+            {
+                EventTypes = responseHttp.Response;
+            }
         }
 
         private void ShowCreateModal()
@@ -41,6 +52,7 @@ namespace SIC.Frontend.Pages.Events
                 Id = evnt.Id,
                 Name = evnt.Name,
                 SubTitle = evnt.SubTitle,
+                EventTypeId = evnt.EventTypeId,
                 Date = evnt.Date,
                 Time = evnt.Time,
                 Url = evnt.Url,

@@ -14,8 +14,10 @@
         <table class="table table-striped table-hover table-bordered align-middle">
             <thead class="table-dark">
                 <tr class="text-center">
+                    <th>Codigo</th>
                     <th>Título</th>
                     <th>Sub-Título</th>
+                    <th>Evento</th>
                     <th>Fecha</th>
                     <th>Hora</th>
                     <th>Url</th>
@@ -31,13 +33,15 @@
                     @foreach (var even in Events)
                     {
                         <tr class="align-middle">
+                            <td>@even.Code</td>
                             <td>@even.Name</td>
                             <td>@even.SubTitle</td>
+                            <td>@even.EventType.Name</td>
                             <td>@even.Date.ToString("dd/MM/yyyy")</td>
-                            <td>@even.Time</td>
+                            <td>@DateTime.Today.Add(even.Time).ToString("hh:mm tt")</td>
                             <td>
                                 <a href="@even.Url" target="_blank">
-                                    <i class="bi bi-link-45deg"></i>
+                                    <i class="bi bi-link-45deg">Invitacion</i>
                                 </a>
                             </td>
                             <td>@even.Host</td>
@@ -91,61 +95,76 @@
                             <InputText class="form-control" @bind-Value="NewEvent.SubTitle" />
                             <ValidationMessage For="@(() => NewEvent.SubTitle)" />
                         </div>
-
                         <div class="mb-3">
-                            <label class="form-label">Fecha</label>
-                            <InputDate class="form-control" @bind-Value="NewEvent.Date" />
-                            <ValidationMessage For="@(() => NewEvent.Date)" />
+                            <label class="form-label">Tipo de Evento</label>
+                            <InputSelect class="form-select" @bind-Value="NewEvent.EventTypeId">
+                                <option value="">-- Selecciona un tipo de Evento --</option>
+                                @if (EventTypes != null)
+                                {
+                                    @foreach (var type in EventTypes)
+                                    {
+                                        <option value="@type.Id">@type.Name</option>
+                                    }
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => NewEvent.EventTypeId)" />
                         </div>
+                        <div class=" mb-3 row">
+                            <div class="col-auto">
+                                <label class="form-label">Fecha</label>
+                                <InputDate class="form-control" @bind-Value="NewEvent.Date" />
+                                <ValidationMessage For="@(() => NewEvent.Date)" />
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Hora</label>
-                            <InputTime CssClass="form-control" @bind-Value="NewEvent.Time" />
+                            <div class="col-auto">
+                                <label class="form-label">Hora</label>
+                                <InputTime CssClass="form-control" @bind-Value="NewEvent.Time" />
+                            </div>
+
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">URL</label>
                             <InputText class="form-control" @bind-Value="NewEvent.Url" />
                         </div>
+                        <div class=" mb-3 row">
 
-                        <div class="mb-3">
-                            <label class="form-label">Anfitrión</label>
-                            <InputText class="form-control" @bind-Value="NewEvent.Host" />
+                            <div class="col-auto">
+                                <label class="form-label">Anfitrión</label>
+                                <InputText class="form-control" @bind-Value="NewEvent.Host" />
+                            </div>
+
+                            <div class="col-auto">
+                                <label class="form-label">Teléfono Anfitrión</label>
+                                <InputText class="form-control" @bind-Value="NewEvent.HostPhone" />
+                            </div>
                         </div>
+                        <div class=" mb-3 row">
+                            <div class="col-auto">
+                                <label class="form-label">Planner</label>
+                                <InputText class="form-control" @bind-Value="NewEvent.Planner" />
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Teléfono anfitrión</label>
-                            <InputText class="form-control" @bind-Value="NewEvent.HostPhone" />
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Planner</label>
-                            <InputText class="form-control" @bind-Value="NewEvent.Planner" />
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Teléfono Planner</label>
-                            <InputText class="form-control" @bind-Value="NewEvent.PlannerPhone" />
+                            <div class="col-auto">
+                                <label class="form-label">Teléfono Planner</label>
+                                <InputText class="form-control" @bind-Value="NewEvent.PlannerPhone" />
+                            </div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Estado</label>
                             <InputSelect class="form-select" @bind-Value="NewEvent.Status">
+                                <option value="">-- Selecciona un Estado --</option>
                                 @foreach (var status in Enum.GetValues<Status>())
                                 {
-                                    <option value="@status">@status</option>
+                                    <option value="@status">@status.GetDescription()</option>
                                 }
                             </InputSelect>
+                            <ValidationMessage For="@(() => NewEvent.Status)" />
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Tipo de Evento</label>
-                            <InputSelect class="form-select" @bind-Value="NewEvent.Status">
-                                @foreach (var status in Enum.GetValues<Status>())
-                                {
-                                    <option value="@status">@status</option>
-                                }
-                            </InputSelect>
-                        </div>
+                        
+
+
 
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-primary">
@@ -161,5 +180,3 @@
         </div>
     </div>
 }
-
-

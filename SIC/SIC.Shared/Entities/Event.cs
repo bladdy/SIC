@@ -37,7 +37,8 @@ public class Event : IEntityWithName
     public string HostPhone { get; set; } = null!;
     public string? Planner { get; set; }
     public string? PlannerPhone { get; set; }
-    public string? EventType { get; set; }
+    public int? EventTypeId { get; set; }
+    public EventType EventType { get; set; } = null!;
 
     [Display(Name = "Estado")]
     public Status Status { get; set; }
