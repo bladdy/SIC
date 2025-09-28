@@ -13,7 +13,7 @@ public partial class MyEventsDetails
     [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
 
-    [Parameter] public int Id { get; set; }
+    [Parameter] public string? Code { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -23,7 +23,7 @@ public partial class MyEventsDetails
 
     private async Task LoadEvent()
     {
-        var responseHttp = await Repository.GetAsync<Event>($"api/Events/{Id}");
+        var responseHttp = await Repository.GetAsync<Event>($"api/Events/byCode/{Code}");
         if (responseHttp.Error)
         {
             if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)

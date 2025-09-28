@@ -2,6 +2,7 @@ using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Components;
 using SIC.Frontend.Repositories;
 using SIC.Shared.Entities;
+using SIC.Shared.Helpers;
 
 namespace SIC.Frontend.Pages.Events
 {
@@ -50,6 +51,7 @@ namespace SIC.Frontend.Pages.Events
             NewEvent = new Event
             {
                 Id = evnt.Id,
+                Code = evnt.Code,
                 Name = evnt.Name,
                 SubTitle = evnt.SubTitle,
                 EventTypeId = evnt.EventTypeId,
@@ -72,30 +74,6 @@ namespace SIC.Frontend.Pages.Events
             IsModalVisible = false;
         }
 
-        private async Task SaveEvent()
-        {
-            HttpResponseWrapper<object>? responseHttp;
-            if (IsEditMode)
-            {
-                responseHttp = await repository.PutAsync<Event>($"api/Events/{NewEvent.Id}", NewEvent);
-            }
-            else
-            {
-                responseHttp = await repository.PostAsync<Event>("api/Events", NewEvent);
-            }
-            if (!responseHttp.Error)
-            {
-                await sweetAlertService.FireAsync("Éxito", "El evento se ha guardado correctamente.", SweetAlertIcon.Success);
-                IsModalVisible = false;
-                await LoadEvents();
-            }
-            else
-            {
-                var errorMessage = await responseHttp.GetErrorMessageAsync();
-                await sweetAlertService.FireAsync("Error", errorMessage ?? "Ha ocurrido un error inesperado.", SweetAlertIcon.Error);
-            }
-        }
-
         private async Task ConfirmDelete(Event events)
         {
             var result = await sweetAlertService.FireAsync(new SweetAlertOptions
@@ -110,13 +88,13 @@ namespace SIC.Frontend.Pages.Events
 
             if (!string.IsNullOrEmpty(result.Value))
             {
-                await DeletePlan(events);
+                await DeleteEvents(events);
             }
         }
 
-        private async Task DeletePlan(Event events)
+        private async Task DeleteEvents(Event events)
         {
-            var responseHttp = await repository.DeleteAsync<Event>($"api/Event/{events.Id}");
+            var responseHttp = await repository.DeleteAsync<Event>($"api/Events/{events.Id}");
 
             if (responseHttp.Error)
             {
@@ -134,6 +112,48 @@ namespace SIC.Frontend.Pages.Events
                 TimerProgressBar = true,
             });
             await toast.FireAsync("Eliminado", "El Evento fue borrado correctamente.", SweetAlertIcon.Success);
+
+            await LoadEvents();
+        }
+
+        private async Task SaveEvent()
+        {
+            HttpResponseWrapper<object>? responseHttp;
+
+            if (IsEditMode)
+            {
+                // PUT -> Editar
+                responseHttp = await repository.PutAsync("api/events/full", NewEvent);
+            }
+            else
+            {
+                // POST -> Crear
+                responseHttp = await repository.PostAsync("api/events/full", NewEvent);
+            }
+
+            if (responseHttp.Error)
+            {
+                var message = await responseHttp.GetErrorMessageAsync() ?? "No se pudo guardar el plan.";
+                await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
+            }
+
+            CloseModal();
+
+            // Luego mostrar la notificación
+            var toast = sweetAlertService.Mixin(new SweetAlertOptions
+            {
+                Toast = true,
+                Position = SweetAlertPosition.TopEnd,
+                ShowConfirmButton = false,
+                Timer = 3000,
+                TimerProgressBar = true,
+            });
+            await toast.FireAsync(
+                "Éxito",
+                IsEditMode ? "Plan actualizado con éxito." : "Plan creado con éxito.",
+                SweetAlertIcon.Success
+            );
 
             await LoadEvents();
         }

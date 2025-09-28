@@ -26,14 +26,36 @@ public class EventsController : GenericController<Event>
         return NotFound();
     }
 
-    [HttpGet("{id}")]
-    public override async Task<IActionResult> GetAsync(int id)
+    [HttpGet("byCode/{code}")]
+    public async Task<IActionResult> GetByCodeAsync(string code)
     {
-        var response = await _eventsUnitOfWork.GetAsync(id);
+        var response = await _eventsUnitOfWork.GetByCodeAsync(code);
         if (response.Success)
         {
             return Ok(response.Result);
         }
         return NotFound();
+    }
+
+    [HttpPost("full")]
+    public async Task<IActionResult> PostFullAsync(Event events)
+    {
+        var action = await _eventsUnitOfWork.AddFullAsync(events);
+        if (action.Success)
+        {
+            return Ok(action.Result);
+        }
+        return NotFound(action.Message);
+    }
+
+    [HttpPut("full")]
+    public async Task<IActionResult> PutFullAsync(Event events)
+    {
+        var action = await _eventsUnitOfWork.UpdateFullAsync(events);
+        if (action.Success)
+        {
+            return Ok(action.Result);
+        }
+        return NotFound(action.Message);
     }
 }

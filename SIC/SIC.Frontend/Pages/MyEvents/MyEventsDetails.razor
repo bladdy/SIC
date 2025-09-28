@@ -1,7 +1,7 @@
-﻿@page "/my-events/details/{Id:int}"
+﻿@page "/my-events/details/{Code}"
 
-
-<h3 class="mb-2">Detalle del Evento</h3>
+<!--
+<h3 class="mb-2">Detalle del Evento</h3>-->
 
 @if (EventDetail is null)
 {
@@ -60,6 +60,8 @@ else
                     <p><strong>Invitados:</strong> 100</p>
                     <p><strong>Confirmados:</strong> 67</p>
                     <p><strong>Pendientes:</strong> 33</p>
+                    <p><strong>Adultos:</strong> 33</p>
+                    <p><strong>Niños:</strong> 67</p>
                 </div>
             </div>
         </div>

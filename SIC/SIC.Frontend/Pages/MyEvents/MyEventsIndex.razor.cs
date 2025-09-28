@@ -47,13 +47,13 @@ public partial class MyEventsIndex
 
     private void ShowEditModal(Event evnt)
     {
-        IsEditMode = true;
         NewEvent = new Event
         {
             Id = evnt.Id,
+            Code = evnt.Code,
             Name = evnt.Name,
             SubTitle = evnt.SubTitle,
-            EventTypeId = evnt.EventTypeId,   // aquí se asigna
+            EventTypeId = evnt.EventTypeId,
             Date = evnt.Date,
             Time = evnt.Time,
             Url = evnt.Url,
@@ -64,6 +64,7 @@ public partial class MyEventsIndex
             EventType = evnt.EventType,
             Status = evnt.Status
         };
+        IsEditMode = true;
         IsModalVisible = true;
     }
 
@@ -75,25 +76,43 @@ public partial class MyEventsIndex
     private async Task SaveEvent()
     {
         HttpResponseWrapper<object>? responseHttp;
+
         if (IsEditMode)
         {
-            responseHttp = await repository.PutAsync<Event>($"api/Events/{NewEvent.Id}", NewEvent);
+            // PUT -> Editar
+            responseHttp = await repository.PutAsync("api/events/full", NewEvent);
         }
         else
         {
-            responseHttp = await repository.PostAsync<Event>("api/Events", NewEvent);
+            // POST -> Crear
+            responseHttp = await repository.PostAsync("api/events/full", NewEvent);
         }
-        if (!responseHttp.Error)
+
+        if (responseHttp.Error)
         {
-            await sweetAlertService.FireAsync("Éxito", "El evento se ha guardado correctamente.", SweetAlertIcon.Success);
-            IsModalVisible = false;
-            await LoadEvents();
+            var message = await responseHttp.GetErrorMessageAsync() ?? "No se pudo guardar el plan.";
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
         }
-        else
+
+        CloseModal();
+
+        // Luego mostrar la notificación
+        var toast = sweetAlertService.Mixin(new SweetAlertOptions
         {
-            var errorMessage = await responseHttp.GetErrorMessageAsync();
-            await sweetAlertService.FireAsync("Error", errorMessage ?? "Ha ocurrido un error inesperado.", SweetAlertIcon.Error);
-        }
+            Toast = true,
+            Position = SweetAlertPosition.TopEnd,
+            ShowConfirmButton = false,
+            Timer = 3000,
+            TimerProgressBar = true,
+        });
+        await toast.FireAsync(
+            "Éxito",
+            IsEditMode ? "Plan actualizado con éxito." : "Plan creado con éxito.",
+            SweetAlertIcon.Success
+        );
+
+        await LoadEvents();
     }
 
     private async Task ConfirmDelete(Event events)

@@ -16,7 +16,11 @@ public class EventsUnitOfWork : GenericUnitOfWork<Event>, IEventsUnitOfWork
         _eventstRepository = eventstRepository;
     }
 
-    public override async Task<ActionResponse<Event>> GetAsync(int id) => await _eventstRepository.GetAsync(id);
+    public async Task<ActionResponse<Event>> GetByCodeAsync(string code) => await _eventstRepository.GetByCodeAsync(code);
 
     public override async Task<ActionResponse<IEnumerable<Event>>> GetAsync() => await _eventstRepository.GetAsync();
+
+    public async Task<ActionResponse<Event>> AddFullAsync(Event events) => await _eventstRepository.AddFullAsync(events);
+
+    public async Task<ActionResponse<Event>> UpdateFullAsync(Event events) => await _eventstRepository.UpdateFullAsync(events);
 }

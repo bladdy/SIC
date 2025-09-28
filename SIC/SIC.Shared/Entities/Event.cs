@@ -12,7 +12,7 @@ namespace SIC.Shared.Entities;
 public class Event : IEntityWithName
 {
     public int Id { get; set; }
-    public string? Code { get; set; }//Auto generado
+    public string Code { get; set; } = null!;
 
     [Display(Name = "Titulo")]
     [MaxLength(100, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres.")]
@@ -38,7 +38,7 @@ public class Event : IEntityWithName
     public string? Planner { get; set; }
     public string? PlannerPhone { get; set; }
     public int? EventTypeId { get; set; }
-    public EventType EventType { get; set; } = null!;
+    public EventType? EventType { get; set; } = null!;
 
     [Display(Name = "Estado")]
     public Status Status { get; set; }
