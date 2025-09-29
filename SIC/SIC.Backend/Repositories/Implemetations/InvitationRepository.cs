@@ -2,6 +2,7 @@
 using SIC.Backend.Data;
 using SIC.Backend.Helpers;
 using SIC.Backend.Repositories.Interfaces;
+using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using SIC.Shared.Response;
 
@@ -18,7 +19,7 @@ namespace SIC.Backend.Repositories.Implemetations
 
         public async Task<ActionResponse<Invitation>> GetByCodeAsync(string code)
         {
-            var invitations = await _context.Invitations.Include(e => e.Event).ThenInclude(e => e.EventType).FirstOrDefaultAsync(x => x.Code.Contains(code));
+            var invitations = await _context.Invitations.Include(e => e.Event).ThenInclude(e => e.EventType).FirstOrDefaultAsync(x => x.Code!.Contains(code));
             if (invitations == null)
             {
                 return new ActionResponse<Invitation>
@@ -31,6 +32,42 @@ namespace SIC.Backend.Repositories.Implemetations
             {
                 Success = true,
                 Result = invitations
+            };
+        }
+
+        public override async Task<ActionResponse<IEnumerable<Invitation>>> GetAsync(PaginationDTO pagination)
+        {
+            var queryable = _context.Invitations.AsQueryable();
+            queryable = queryable.Where(x => x.EventId == pagination.Id);
+
+            if (!string.IsNullOrWhiteSpace(pagination.Filter))
+            {
+                queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
+            }
+            return new ActionResponse<IEnumerable<Invitation>>
+            {
+                Success = true,
+                Result = await queryable
+                    .OrderBy(x => x.Name)
+                    .Paginate(pagination)
+                    .ToListAsync()
+            };
+        }
+
+        public override async Task<ActionResponse<int>> GetTotalRecordAsync(PaginationDTO pagination)
+        {
+            var queryable = _context.Invitations.AsQueryable();
+            queryable = queryable.Where(x => x.EventId == pagination.Id);
+            if (!string.IsNullOrWhiteSpace(pagination.Filter))
+            {
+                queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
+            }
+            double count = await queryable.CountAsync();
+            int totalPages = (int)Math.Ceiling(count / pagination.PageSize);
+            return new ActionResponse<int>
+            {
+                Success = true,
+                Result = totalPages
             };
         }
 

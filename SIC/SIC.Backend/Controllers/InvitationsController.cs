@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SIC.Backend.UnitOfWork.Implemetations;
 using SIC.Backend.UnitOfWork.Interfaces;
+using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 
 namespace SIC.Backend.Controllers;
@@ -25,6 +26,28 @@ public class InvitationsController : GenericController<Invitation>
             return Ok(response.Result);
         }
         return NotFound();
+    }
+
+    [HttpGet("paginated")]
+    public override async Task<IActionResult> GetAsync(PaginationDTO pagination)
+    {
+        var response = await _invitationUnitOfWork.GetAsync(pagination);
+        if (response.Success)
+        {
+            return Ok(response.Result);
+        }
+        return NotFound();
+    }
+
+    [HttpGet("totalRecords")]
+    public override async Task<IActionResult> GetTotalRecordsAsync([FromQuery] PaginationDTO pagination)
+    {
+        var action = await _invitationUnitOfWork.GetTotalRecordAsync(pagination);
+        if (action.Success)
+        {
+            return Ok(action.Result);
+        }
+        return BadRequest();
     }
 
     [HttpGet("byCode/{code}")]

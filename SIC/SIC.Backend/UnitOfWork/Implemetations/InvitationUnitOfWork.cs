@@ -2,6 +2,7 @@
 using SIC.Backend.Repositories.Implemetations;
 using SIC.Backend.Repositories.Interfaces;
 using SIC.Backend.UnitOfWork.Interfaces;
+using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using SIC.Shared.Response;
 
@@ -19,6 +20,10 @@ namespace SIC.Backend.UnitOfWork.Implemetations
         public async Task<ActionResponse<Invitation>> GetByCodeAsync(string code) => await _invitationstRepository.GetByCodeAsync(code);
 
         public override async Task<ActionResponse<IEnumerable<Invitation>>> GetAsync() => await _invitationstRepository.GetAsync();
+
+        public override async Task<ActionResponse<IEnumerable<Invitation>>> GetAsync(PaginationDTO pagination) => await _invitationstRepository.GetAsync(pagination);
+
+        public override async Task<ActionResponse<int>> GetTotalRecordAsync(PaginationDTO pagination) => await _invitationstRepository.GetTotalRecordAsync(pagination);
 
         public async Task<ActionResponse<Invitation>> AddFullAsync(Invitation invitation) => await _invitationstRepository.AddFullAsync(invitation);
 

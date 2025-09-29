@@ -1,24 +1,111 @@
-using CurrieTechnologies.Razor.SweetAlert2;
+Ôªøusing CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Components;
 using SIC.Frontend.Repositories;
 using SIC.Shared.Entities;
+using System.Collections.Generic;
 using System.Net;
 
 namespace SIC.Frontend.Pages.Events;
 
 public partial class EventsDetails
 {
+    private int currentPage = 1;
+    private int totalPages;
+
     public Event? EventDetail { get; set; }
+    public List<Invitation>? Invitations { get; set; }
     [Inject] private IRepository Repository { get; set; } = default!;
     [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+
+    [Parameter, SupplyParameterFromQuery] public string Page { get; set; } = string.Empty;
+    [Parameter, SupplyParameterFromQuery] public string Filter { get; set; } = string.Empty;
+    [Parameter, SupplyParameterFromQuery] public int RecordsNumber { get; set; } = 10;
 
     [Parameter] public string? Code { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
         await LoadEvent();
+        await LoadInvitations();
+    }
+
+    private async Task SelectedPageAsync(int page)
+    {
+        currentPage = page;
+        await LoadInvitations(currentPage);
+    }
+
+    private async Task LoadInvitations(int page = 4)
+    {
+        if (!string.IsNullOrWhiteSpace(Page))
+        {
+            page = Convert.ToInt32(Page);
+        }
+        var ok = await LoadListAsync(page);
+        if (ok)
+        {
+            await LoadPagesAsync();
+        }
+    }
+
+    private async Task CleanFilterAsync()
+    {
+        Filter = string.Empty;
+        await ApplyFilterAsync();
+    }
+
+    private async Task ApplyFilterAsync()
+    {
+        int page = 1;
+        await LoadInvitations(page);
+        await SelectedPageAsync(page);
+    }
+
+    private async Task<bool> LoadListAsync(int page)
+    {
+        var url = $"api/Invitations/paginated?Id={EventDetail!.Id}&PageNumber={page}&RecordsNumber={RecordsNumber}";
+
+        if (!string.IsNullOrWhiteSpace(Filter))
+        {
+            url += $"&Filter={Filter}";
+        }
+
+        var responseHttp = await Repository.GetAsync<List<Invitation>>(url);
+
+        if (responseHttp.Error)
+        {
+            if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+            {
+                NavigationManager.NavigateTo("/events");
+                var message = await responseHttp.GetErrorMessageAsync();
+                await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return false;
+            }
+        }
+
+        Invitations = responseHttp?.Response ?? new List<Invitation>();
+        return true;
+    }
+
+    private async Task LoadPagesAsync()
+    {
+        var url = $"api/Invitations/totalRecords?Id={EventDetail!.Id}";
+
+        if (!string.IsNullOrWhiteSpace(Filter))
+        {
+            url += $"&Filter={Filter}";
+        }
+        var responseHttp = await Repository.GetAsync<int>(url);
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        // ‚ö° Backend ya devuelve total de p√°ginas, no de registros
+        totalPages = responseHttp.Response;
     }
 
     private async Task LoadEvent()
@@ -38,58 +125,12 @@ public partial class EventsDetails
         EventDetail = responseHttp?.Response;
     }
 
-    private List<Guest> Guests = new List<Guest>
+    private async Task FilterCallBack(string filter)
     {
-        new Guest { Name="Juan PÈrez", Mobile="5512345678", Adults=2, Children=1, ConfirmedAdults=2, ConfirmedChildren=1, Table="M1", Email="juan@mail.com", Status="Confirmado" },
-        new Guest { Name="MarÌa LÛpez", Mobile="5598765432", Adults=1, Children=0, ConfirmedAdults=1, ConfirmedChildren=0, Table="M2", Email="maria@mail.com", Status="Pendiente" },
-        new Guest { Name="Carlos GarcÌa", Mobile="5522334455", Adults=3, Children=2, ConfirmedAdults=3, ConfirmedChildren=2, Table="M3", Email="carlos@mail.com", Status="Cancelado" },
-        new Guest { Name="Ana Fern·ndez", Mobile="5511223344", Adults=2, Children=0, ConfirmedAdults=2, ConfirmedChildren=0, Table="M4", Email="ana@mail.com", Status="Confirmado" },
-        new Guest { Name="Juan PÈrez", Mobile="5512345678", Adults=2, Children=1, ConfirmedAdults=2, ConfirmedChildren=1, Table="M1", Email="juan@mail.com", Status="Confirmado" },
-        new Guest { Name="MarÌa LÛpez", Mobile="5598765432", Adults=1, Children=0, ConfirmedAdults=1, ConfirmedChildren=0, Table="M2", Email="maria@mail.com", Status="Pendiente" },
-        new Guest { Name="Carlos GarcÌa", Mobile="5522334455", Adults=3, Children=2, ConfirmedAdults=3, ConfirmedChildren=2, Table="M3", Email="carlos@mail.com", Status="Cancelado" },
-        new Guest { Name="Ana Fern·ndez", Mobile="5511223344", Adults=2, Children=0, ConfirmedAdults=2, ConfirmedChildren=0, Table="M4", Email="ana@mail.com", Status="Confirmado" },
-        new Guest { Name="Juan PÈrez", Mobile="5512345678", Adults=2, Children=1, ConfirmedAdults=2, ConfirmedChildren=1, Table="M1", Email="juan@mail.com", Status="Confirmado" },
-        new Guest { Name="MarÌa LÛpez", Mobile="5598765432", Adults=1, Children=0, ConfirmedAdults=1, ConfirmedChildren=0, Table="M2", Email="maria@mail.com", Status="Pendiente" },
-        new Guest { Name="Carlos GarcÌa", Mobile="5522334455", Adults=3, Children=2, ConfirmedAdults=3, ConfirmedChildren=2, Table="M3", Email="carlos@mail.com", Status="Cancelado" },
-        new Guest { Name="Ana Fern·ndez", Mobile="5511223344", Adults=2, Children=0, ConfirmedAdults=2, ConfirmedChildren=0, Table="M4", Email="ana@mail.com", Status="Confirmado" },
-        new Guest { Name="MarÌa LÛpez", Mobile="5598765432", Adults=1, Children=0, ConfirmedAdults=1, ConfirmedChildren=0, Table="M2", Email="maria@mail.com", Status="Pendiente" },
-        new Guest { Name="Carlos GarcÌa", Mobile="5522334455", Adults=3, Children=2, ConfirmedAdults=3, ConfirmedChildren=2, Table="M3", Email="carlos@mail.com", Status="Cancelado" },
-        new Guest { Name="Ana Fern·ndez", Mobile="5511223344", Adults=2, Children=0, ConfirmedAdults=2, ConfirmedChildren=0, Table="M4", Email="ana@mail.com", Status="Confirmado" },
-        new Guest { Name="Juan PÈrez", Mobile="5512345678", Adults=2, Children=1, ConfirmedAdults=2, ConfirmedChildren=1, Table="M1", Email="juan@mail.com", Status="Confirmado" },
-        new Guest { Name="MarÌa LÛpez", Mobile="5598765432", Adults=1, Children=0, ConfirmedAdults=1, ConfirmedChildren=0, Table="M2", Email="maria@mail.com", Status="Pendiente" },
-        new Guest { Name="Carlos GarcÌa", Mobile="5522334455", Adults=3, Children=2, ConfirmedAdults=3, ConfirmedChildren=2, Table="M3", Email="carlos@mail.com", Status="Cancelado" },
-        new Guest { Name="Ana Fern·ndez", Mobile="5511223344", Adults=2, Children=0, ConfirmedAdults=2, ConfirmedChildren=0, Table="M4", Email="ana@mail.com", Status="Confirmado" }
-    };
+        Filter = filter;
+        await ApplyFilterAsync();
+        StateHasChanged();
 
-    private bool AreAllSelected
-    {
-        get => Guests.All(g => g.IsSelected);
-        set
-        {
-            foreach (var guest in Guests)
-            {
-                guest.IsSelected = value;
-            }
-        }
-    }
-
-    private void ToggleSelectAll(ChangeEventArgs e)
-    {
-        bool isChecked = (bool)e.Value!;
-        AreAllSelected = isChecked;
-    }
-
-    public class Guest
-    {
-        public string Name { get; set; } = "";
-        public string Mobile { get; set; } = "";
-        public int Adults { get; set; }
-        public int Children { get; set; }
-        public int ConfirmedAdults { get; set; }
-        public int ConfirmedChildren { get; set; }
-        public string Table { get; set; } = "";
-        public string Email { get; set; } = "";
-        public string Status { get; set; } = "";
-        public bool IsSelected { get; set; } = false;
+        Filter = filter;
     }
 }

@@ -33,9 +33,10 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         var queryable = _entity.AsQueryable();
         double count = await queryable.CountAsync();
+        int totalPages = (int)Math.Ceiling((double)count / pagination.PageSize);
         return new ActionResponse<int> {
             Success = true,
-            Result = (int)count
+            Result = totalPages
         };
     }
 
