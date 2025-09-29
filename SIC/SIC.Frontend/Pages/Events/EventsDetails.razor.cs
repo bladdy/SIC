@@ -4,9 +4,9 @@ using SIC.Frontend.Repositories;
 using SIC.Shared.Entities;
 using System.Net;
 
-namespace SIC.Frontend.Pages.MyEvents;
+namespace SIC.Frontend.Pages.Events;
 
-public partial class MyEventsDetails
+public partial class EventsDetails
 {
     public Event? EventDetail { get; set; }
     [Inject] private IRepository Repository { get; set; } = default!;
@@ -28,7 +28,7 @@ public partial class MyEventsDetails
         {
             if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
             {
-                NavigationManager.NavigateTo("/my-events");
+                NavigationManager.NavigateTo("/events");
                 return;
             }
             var message = await responseHttp.GetErrorMessageAsync();

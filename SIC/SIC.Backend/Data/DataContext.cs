@@ -10,6 +10,7 @@ public class DataContext : DbContext
     }
 
     public DbSet<EventType> EventTypes { get; set; }
+    public DbSet<Invitation> Invitations { get; set; }
     public DbSet<Item> Items { get; set; }
     public DbSet<Plan> Plans { get; set; }
     public DbSet<PlanItem> PlanItems { get; set; }

@@ -40,6 +40,24 @@ public class Event : IEntityWithName
     public int? EventTypeId { get; set; }
     public EventType? EventType { get; set; } = null!;
 
+    public ICollection<Invitation> Invitations { get; set; } = new List<Invitation>();
+
     [Display(Name = "Estado")]
     public Status Status { get; set; }
+
+    [Display(Name = "Camtidad de invitados")]
+    public int Guests => Invitations == null || Invitations.Count == 0 ? 0 : Invitations.Count;
+
+    //[Display(Name = "Confirmaciones")]
+    //public int StatesNumber => States == null || States.Count == 0 ? 0 : States.Count;
+    //[Display(Name = "Pendientes")]
+    //public int StatesNumber => States == null || States.Count == 0 ? 0 : States.Count;
+    //[Display(Name = "Adultos")]
+    //public int StatesNumber => States == null || States.Count == 0 ? 0 : States.Count;
+    //[Display(Name = "Niños")]
+    //public int StatesNumber => States == null || States.Count == 0 ? 0 : States.Count;
+    //[Display(Name = "Adultos Confirmados")]
+    //public int StatesNumber => States == null || States.Count == 0 ? 0 : States.Count;
+    //[Display(Name = "Niños Confirmados")]
+    //public int StatesNumber => States == null || States.Count == 0 ? 0 : States.Count;
 }

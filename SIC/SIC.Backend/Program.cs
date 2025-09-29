@@ -41,6 +41,8 @@ builder.Services.AddScoped<IPlanItemRepository, PlanItemRepository>();
 builder.Services.AddScoped<IEventsUnitOfWork, EventsUnitOfWork>();
 builder.Services.AddScoped<IEventsRepository, EventsRepository>();
 
+builder.Services.AddScoped<IInvitationUnitOfWork, InvitationUnitOfWork>();
+builder.Services.AddScoped<IInvitationRepository, InvitationRepository>();
 var app = builder.Build();
 
 SeedData(app);

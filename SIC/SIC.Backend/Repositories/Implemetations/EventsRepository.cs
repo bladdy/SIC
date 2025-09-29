@@ -18,7 +18,9 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
 
     public async Task<ActionResponse<Event>> GetByCodeAsync(string code)
     {
-        var events = await _context.Events.Include(et => et.EventType).FirstOrDefaultAsync(x => x.Code.Contains(code));
+        var events = await _context.Events
+            .Include(i => i.Invitations)
+            .Include(et => et.EventType).FirstOrDefaultAsync(x => x.Code.Contains(code));
         if (events == null)
         {
             return new ActionResponse<Event>
@@ -36,7 +38,7 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
 
     public override async Task<ActionResponse<IEnumerable<Event>>> GetAsync()
     {
-        var events = await _context.Events.Include(et => et.EventType).ToListAsync();
+        var events = await _context.Events.Include(i => i.Invitations).Include(et => et.EventType).ToListAsync();
         return new ActionResponse<IEnumerable<Event>>
         {
             Success = true,
