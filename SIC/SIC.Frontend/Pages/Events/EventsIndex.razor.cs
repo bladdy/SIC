@@ -1,4 +1,5 @@
 using CurrieTechnologies.Razor.SweetAlert2;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using SIC.Frontend.Repositories;
 using SIC.Shared.Entities;
@@ -6,6 +7,7 @@ using SIC.Shared.Helpers;
 
 namespace SIC.Frontend.Pages.Events
 {
+    [Authorize(Roles = "Admin")]
     public partial class EventsIndex
     {
         [Inject] private IRepository repository { get; set; } = default!;

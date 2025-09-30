@@ -1,4 +1,5 @@
 ﻿using CurrieTechnologies.Razor.SweetAlert2;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using SIC.Frontend.Repositories;
 using SIC.Shared.Entities;
@@ -7,6 +8,7 @@ using System.Net;
 
 namespace SIC.Frontend.Pages.Events;
 
+[Authorize(Roles = "Admin")]
 public partial class EventsDetails
 {
     private int currentPage = 1;

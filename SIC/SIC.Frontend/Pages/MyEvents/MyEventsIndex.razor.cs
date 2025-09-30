@@ -1,10 +1,12 @@
 using CurrieTechnologies.Razor.SweetAlert2;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using SIC.Frontend.Repositories;
 using SIC.Shared.Entities;
 
 namespace SIC.Frontend.Pages.MyEvents;
 
+[Authorize(Roles = "Admin,WeddingPlanner,User")]
 public partial class MyEventsIndex
 {
     [Inject] private IRepository repository { get; set; } = default!;

@@ -1,24 +1,56 @@
-﻿
+﻿using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.Entities;
+using SIC.Shared.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace SIC.Backend.Data;
 
 public class SeedDb
 {
     private readonly DataContext _context;
+    private readonly IUserUnitOfWork _userUnitOfWork;
 
-    public SeedDb(DataContext context)
+    public SeedDb(DataContext context, IUserUnitOfWork userUnitOfWork)
     {
         _context = context;
+        _userUnitOfWork = userUnitOfWork;
     }
+
     public async Task SeedAsync()
     {
         await _context.Database.EnsureCreatedAsync();
         await CheckEventTypesAsync();
         await CheckItemsAsync();
-        /*
         await CheckRolesAsync();
-        await CheckUserAsync("1010", "Admin", "User", "admin@localhost", "Admin123*");*/
+        await CheckUserAsync("8949","Bladimir", "Almanzar", "bladdy@yopmail.com", "8661425258", "Calle luna Calle sol", UserType.Admin);
+    }
+
+    private async Task CheckUserAsync(string document,string firstName, string lastName, string email, string phone, string address, UserType admin)
+    {
+        var user = await _userUnitOfWork.GetUserAsync(email);
+        if (user == null)
+        {
+            user = new User
+            {
+                Document = document,
+                FirstName = firstName,
+                LastName = lastName,
+                Email = email,
+                PhoneNumber = phone,
+                Address = address,
+                UserType = admin,
+                UserName = phone,
+            };
+            await _userUnitOfWork.AddUserAsync(user, phone);
+            await _userUnitOfWork.AddUserToRoleAsync(user, user.UserType.ToString());
+        }
+    }
+
+    private async Task CheckRolesAsync()
+    {
+        await _userUnitOfWork.CheckRoleAsync(UserType.Admin.ToString());
+        await _userUnitOfWork.CheckRoleAsync(UserType.WeddingPlanner.ToString());
+        await _userUnitOfWork.CheckRoleAsync(UserType.User.ToString());
     }
 
     private async Task CheckItemsAsync()
