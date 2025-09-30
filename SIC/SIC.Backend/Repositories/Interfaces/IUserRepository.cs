@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 
 namespace SIC.Backend.Repositories.Interfaces
@@ -14,5 +15,9 @@ namespace SIC.Backend.Repositories.Interfaces
         Task AddUserToRoleAsync(User user, string roleName);
 
         Task<bool> IsUserInRoleAsync(User user, string roleName);
+
+        Task<SignInResult> LogInAsync(LoginDTO model);
+
+        Task LogOutAsync();
     }
 }

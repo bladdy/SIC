@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SIC.Backend.Data;
 using SIC.Backend.Repositories.Interfaces;
+using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 
 namespace SIC.Backend.Repositories.Implemetations
@@ -11,12 +12,14 @@ namespace SIC.Backend.Repositories.Implemetations
         private readonly DataContext _context;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly SignInManager<User> _signInManager;
 
-        public UserRepository(DataContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
+        public UserRepository(DataContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager, SignInManager<User> signInManager)
         {
             _context = context;
             _userManager = userManager;
             _roleManager = roleManager;
+            _signInManager = signInManager;
         }
 
         public async Task<IdentityResult> AddUserAsync(User user, string password)
@@ -47,6 +50,16 @@ namespace SIC.Backend.Repositories.Implemetations
         public async Task<bool> IsUserInRoleAsync(User user, string roleName)
         {
             return await _userManager.IsInRoleAsync(user, roleName);
+        }
+
+        public async Task<SignInResult> LogInAsync(LoginDTO model)
+        {
+            return await _signInManager.PasswordSignInAsync(model.Email, model.Password, isPersistent: false, lockoutOnFailure: false);
+        }
+
+        public async Task LogOutAsync()
+        {
+            await _signInManager.SignOutAsync();
         }
     }
 }
