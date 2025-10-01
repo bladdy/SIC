@@ -42,6 +42,7 @@ namespace SIC.Backend.Controllers
             if (result.Succeeded)
             {
                 var user = await _userUnitOfWork.GetUserAsync(model.Email);
+                if (user == null) return BadRequest("Usuario no encontrado.");
                 return Ok(BuildToken(user));
             }
             return BadRequest("Email o Contraseña incorrectos.");
@@ -51,15 +52,16 @@ namespace SIC.Backend.Controllers
         {
             var claims = new List<Claim>()
             {
-                new Claim(ClaimTypes.Name, user.Email!),
+                new Claim(ClaimTypes.Name, user.FullName!),
                 new Claim(ClaimTypes.Role, user.UserType.ToString()),
                 new Claim("Document", user.Document),
-                 new Claim("FirstName", user.FirstName),
-                 new Claim("LastName", user.LastName),
-                 new Claim("Address", user.Address),
+                new Claim("FirstName", user.FirstName),
+                new Claim("LastName", user.LastName),
+                new Claim("Address", user.Address),
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Key"]!));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["jwtKey"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var expiration = DateTime.UtcNow.AddDays(30);
             var token = new JwtSecurityToken(

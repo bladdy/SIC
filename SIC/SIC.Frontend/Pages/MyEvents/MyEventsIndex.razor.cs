@@ -1,8 +1,10 @@
 using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using SIC.Frontend.Repositories;
 using SIC.Shared.Entities;
+using System.Security.Claims;
 
 namespace SIC.Frontend.Pages.MyEvents;
 
@@ -11,6 +13,7 @@ public partial class MyEventsIndex
 {
     [Inject] private IRepository repository { get; set; } = default!;
     [Inject] private SweetAlertService sweetAlertService { get; set; } = default!;
+    [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
     public List<Event>? Events { get; set; }
     public List<EventType>? EventTypes { get; set; }
     private Event NewEvent = new();
@@ -21,13 +24,20 @@ public partial class MyEventsIndex
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            NewEvent.UserId = userId ?? string.Empty;
+        }
         await LoadEventTypes();
         await LoadEvents();
     }
 
     private async Task LoadEvents()
     {
-        var responseHttp = await repository.GetAsync<List<Event>>("api/Events") ?? null;
+        var responseHttp = await repository.GetAsync<List<Event>>($"api/Events/byUserId/{NewEvent.UserId}") ?? null;
         Events = responseHttp?.Response;
     }
 
@@ -40,9 +50,25 @@ public partial class MyEventsIndex
         }
     }
 
-    private void ShowCreateModal()
+    private async Task ShowCreateModal()
     {
-        NewEvent = new Event();
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            NewEvent = new Event
+            {
+                UserId = userId ?? string.Empty
+            };
+        }
+        else
+        {
+            NewEvent = new Event();
+        }
+
         IsEditMode = false;
         IsModalVisible = true;
     }

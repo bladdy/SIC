@@ -23,4 +23,6 @@ public class EventsUnitOfWork : GenericUnitOfWork<Event>, IEventsUnitOfWork
     public async Task<ActionResponse<Event>> AddFullAsync(Event events) => await _eventstRepository.AddFullAsync(events);
 
     public async Task<ActionResponse<Event>> UpdateFullAsync(Event events) => await _eventstRepository.UpdateFullAsync(events);
+
+    public async Task<ActionResponse<IEnumerable<Event>>> GetByUserIdAsync(string userId) => await _eventstRepository.GetByUserIdAsync(userId);
 }

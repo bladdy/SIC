@@ -73,7 +73,7 @@ else
             <button class="btn btn-sm btn-danger">
                 Cargar Lista de Invitados
             </button>
-            <button class="btn btn-sm btn-danger">
+            <button class="btn btn-sm btn-danger" @onclick="ShowCreateModal">
                 Agregar Invitado
             </button>
             <button class="btn btn-sm btn-danger">
@@ -101,6 +101,7 @@ else
                 <th>
                     <input type="checkbox" checked="@false" />
                 </th>
+                <th>Codigo</th>
                 <th>Nombre</th>
                 <th>Móvil</th>
                 <th>Adultos</th>
@@ -118,6 +119,11 @@ else
                 <tr>
                     <td>
                         <input type="checkbox" />
+                    </td>
+                    <td>
+                        <a class="link-primary" style="cursor: pointer;" @onclick="() => ShowEditModal(invitation)">
+                            @invitation.Code
+                        </a>
                     </td>
                     <td>@invitation.Name</td>
                     <td>@invitation.PhoneNumber</td>
@@ -142,21 +148,88 @@ else
                     SelectedPage="SelectedPageAsync" />
 
     </div>
-    
-    @*@if (EventDetail.Participants is not null && EventDetail.Participants.Any())
-    {
-        <ul class="list-group">
-            @foreach (var p in EventDetail.Participants)
-            {
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    @p.Name
-                    <span class="badge bg-primary rounded-pill">@p.Role</span>
-                </li>
-            }
-        </ul>
-    }
-    else
-    {
-        <p>No hay participantes registrados.</p>
-    }*@
+}
+<!-- Modal -->
+@if (IsModalVisible)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        @((IsEditMode ? $"Editar Invitacion: {@NewInvitation.Code}" : "Crear Invitacion"))
+                    </h5>
+                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                </div>
+                <div class="modal-body">
+                    <EditForm Model="@NewInvitation" OnValidSubmit="@SaveInvitation">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+
+
+                        <div class="mb-3">
+                            <label class="form-label">Nombre</label>
+                            <InputText class="form-control" @bind-Value="NewInvitation.Name" />
+                            <ValidationMessage For="@(() => NewInvitation.Name)" />
+                        </div>
+                        <div class="mb-3 row">
+                            <div class="col-auto">
+                                <label class="form-label">Email</label>
+                                <InputText class="form-control" @bind-Value="NewInvitation.Email" />
+                                <ValidationMessage For="@(() => NewInvitation.Email)" />
+                            </div>
+                            <div class="col-auto">
+                                <label class="form-label">Telefono</label>
+                                <InputText class="form-control" @bind-Value="NewInvitation.PhoneNumber" />
+                                <ValidationMessage For="@(() => NewInvitation.PhoneNumber)" />
+                            </div>
+                        </div>
+                        <div class="mb-3 row col-12">
+                            <div class="col-3">
+                                <label class="form-label">Numero de adultos</label>
+                                <InputNumber class="form-control" @bind-Value="NewInvitation.NumberAdults" />
+                                <ValidationMessage For="@(() => NewInvitation.NumberAdults)" />
+                            </div>
+                            <div class="col-3">
+                                <label class="form-label">Numero de Niños</label>
+                                <InputNumber class="form-control" @bind-Value="NewInvitation.NumberChildren" />
+                                <ValidationMessage For="@(() => NewInvitation.NumberChildren)" />
+                            </div>
+                            <div class="col-3">
+                                <label class="form-label">N° adultos Confirmados</label>
+                                <InputNumber class="form-control" @bind-Value="NewInvitation.NumberConfirmedAdults" />
+                                <ValidationMessage For="@(() => NewInvitation.NumberConfirmedAdults)" />
+                            </div>
+                            <div class="col-3">
+                                <label class="form-label">N° Niños Confirmados</label>
+                                <InputNumber class="form-control" @bind-Value="NewInvitation.NumberConfirmedChildren" />
+                                <ValidationMessage For="@(() => NewInvitation.NumberConfirmedChildren)" />
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Mesa</label>
+                            <InputText class="form-control" @bind-Value="NewInvitation.Table" />
+                            <ValidationMessage For="@(() => NewInvitation.Table)" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Comentarios</label>
+                            <InputTextArea class="form-control" @bind-Value="NewInvitation.Comments" />
+                            <ValidationMessage For="@(() => NewInvitation.Comments)" />
+                        </div>
+
+                        <!--Inhabilitar los botones hasta que termine de enviar-->
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">
+                                Guardar
+                            </button>
+                            <button type="button" class="btn btn-secondary" @onclick="CloseModal">
+                                Cancelar
+                            </button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
 }

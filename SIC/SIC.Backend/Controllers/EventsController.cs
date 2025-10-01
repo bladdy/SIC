@@ -26,6 +26,17 @@ public class EventsController : GenericController<Event>
         return NotFound();
     }
 
+    [HttpGet("byUserId/{userId}")]
+    public async Task<IActionResult> GetByUserIdAsync(string userId)
+    {
+        var response = await _eventsUnitOfWork.GetByUserIdAsync(userId);
+        if (response.Success)
+        {
+            return Ok(response.Result);
+        }
+        return NotFound();
+    }
+
     [HttpGet("byCode/{code}")]
     public async Task<IActionResult> GetByCodeAsync(string code)
     {

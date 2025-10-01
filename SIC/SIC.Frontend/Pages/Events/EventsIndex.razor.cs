@@ -1,17 +1,22 @@
 using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using SIC.Frontend.Repositories;
 using SIC.Shared.Entities;
 using SIC.Shared.Helpers;
+using System.Security.Claims;
 
 namespace SIC.Frontend.Pages.Events
 {
     [Authorize(Roles = "Admin")]
     public partial class EventsIndex
     {
+        private string? _userId;
         [Inject] private IRepository repository { get; set; } = default!;
         [Inject] private SweetAlertService sweetAlertService { get; set; } = default!;
+        [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
+
         public List<Event>? Events { get; set; }
         public List<EventType>? EventTypes { get; set; }
         private Event NewEvent = new();
@@ -41,9 +46,25 @@ namespace SIC.Frontend.Pages.Events
             }
         }
 
-        private void ShowCreateModal()
+        private async Task ShowCreateModal()
         {
-            NewEvent = new Event();
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            if (user.Identity is not null && user.Identity.IsAuthenticated)
+            {
+                var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                NewEvent = new Event
+                {
+                    UserId = userId ?? string.Empty
+                };
+            }
+            else
+            {
+                NewEvent = new Event();
+            }
+
             IsEditMode = false;
             IsModalVisible = true;
         }
@@ -57,6 +78,7 @@ namespace SIC.Frontend.Pages.Events
                 Name = evnt.Name,
                 SubTitle = evnt.SubTitle,
                 EventTypeId = evnt.EventTypeId,
+                UserId = evnt.UserId,
                 Date = evnt.Date,
                 Time = evnt.Time,
                 Url = evnt.Url,

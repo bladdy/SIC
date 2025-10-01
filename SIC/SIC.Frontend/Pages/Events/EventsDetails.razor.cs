@@ -1,10 +1,12 @@
 ﻿using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using SIC.Frontend.Repositories;
 using SIC.Shared.Entities;
 using System.Collections.Generic;
 using System.Net;
+using System.Security.Claims;
 
 namespace SIC.Frontend.Pages.Events;
 
@@ -14,6 +16,10 @@ public partial class EventsDetails
     private int currentPage = 1;
     private int totalPages;
 
+    private Invitation NewInvitation = new();
+    private bool IsModalVisible = false;
+    private bool IsEditMode = false;
+    private DateTime MinAllowedDate { get; set; } = new DateTime(2023, 1, 1); // Sets January 1, 2023 as the minimum
     public Event? EventDetail { get; set; }
     public List<Invitation>? Invitations { get; set; }
     [Inject] private IRepository Repository { get; set; } = default!;
@@ -38,7 +44,84 @@ public partial class EventsDetails
         await LoadInvitations(currentPage);
     }
 
-    private async Task LoadInvitations(int page = 4)
+    private async Task ShowCreateModal()
+    {
+        NewInvitation = new Invitation();
+        IsEditMode = false;
+        IsModalVisible = true;
+    }
+
+    private void ShowEditModal(Invitation invitation)
+    {
+        NewInvitation = new Invitation
+        {
+            Id = invitation.Id,
+            Code = invitation.Code,
+            Email = invitation.Email,
+            PhoneNumber = invitation.PhoneNumber,
+            NumberAdults = invitation.NumberAdults,
+            NumberChildren = invitation.NumberChildren,
+            NumberConfirmedAdults = invitation.NumberConfirmedAdults,
+            NumberConfirmedChildren = invitation.NumberConfirmedChildren,
+            Table = invitation.Table,
+            Comments = invitation.Comments,
+            SentDate = invitation.SentDate,
+            ConfirmationDate = invitation.ConfirmationDate,
+            Name = invitation.Name,
+            Status = invitation.Status
+        };
+        IsEditMode = true;
+        IsModalVisible = true;
+    }
+
+    private void CloseModal()
+    {
+        IsModalVisible = false;
+    }
+
+    private async Task SaveInvitation()
+    {
+        HttpResponseWrapper<object>? responseHttp;
+
+        if (IsEditMode)
+        {
+            // PUT -> Editar
+            responseHttp = await Repository.PutAsync("api/events/full", NewInvitation);
+        }
+        else
+        {
+            // POST -> Crear
+            responseHttp = await Repository.PostAsync("api/events/full", NewInvitation);
+        }
+
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync() ?? "No se pudo guardar el plan.";
+            await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        CloseModal();
+
+        // Luego mostrar la notificación
+        var toast = SweetAlertService.Mixin(new SweetAlertOptions
+        {
+            Toast = true,
+            Position = SweetAlertPosition.TopEnd,
+            ShowConfirmButton = false,
+            Timer = 3000,
+            TimerProgressBar = true,
+        });
+        await toast.FireAsync(
+            "Éxito",
+            IsEditMode ? "Plan actualizado con éxito." : "Plan creado con éxito.",
+            SweetAlertIcon.Success
+        );
+
+        await LoadInvitations();
+    }
+
+    private async Task LoadInvitations(int page = 1)
     {
         if (!string.IsNullOrWhiteSpace(Page))
         {
@@ -106,7 +189,7 @@ public partial class EventsDetails
             return;
         }
 
-        // ⚡ Backend ya devuelve total de páginas, no de registros
+        // Backend ya devuelve total de páginas, no de registros
         totalPages = responseHttp.Response;
     }
 

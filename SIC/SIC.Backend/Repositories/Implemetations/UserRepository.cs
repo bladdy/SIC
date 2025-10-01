@@ -43,7 +43,7 @@ namespace SIC.Backend.Repositories.Implemetations
 
         public async Task<User> GetUserAsync(string email)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.PhoneNumber == email);
             return user!;
         }
 

@@ -9,44 +9,47 @@
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Inicio
-            </NavLink>
-        </div>
-        
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="events" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Eventos
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="my-events" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Mis Eventos
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="users" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Usuarios
-            </NavLink>
-        </div>
+        <AuthorizeView Roles="Admin">
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                        <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Inicio
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="events" Match="NavLinkMatch.All">
+                        <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Eventos
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="my-events" Match="NavLinkMatch.All">
+                        <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Mis Eventos
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="users" Match="NavLinkMatch.All">
+                        <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Usuarios
+                    </NavLink>
+                </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="dropdown-item" href="services" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu"></span> Servicios
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="dropdown-item" href="events-types" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu"></span> Tipos de Eventos
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="dropdown-item" href="plans" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu"></span> Planes
-            </NavLink>
-        </div>
-       
+                <div class="nav-item px-3">
+                    <NavLink class="dropdown-item" href="services" Match="NavLinkMatch.All">
+                        <span class="bi bi-house-door-fill-nav-menu"></span> Servicios
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="dropdown-item" href="events-types" Match="NavLinkMatch.All">
+                        <span class="bi bi-house-door-fill-nav-menu"></span> Tipos de Eventos
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="dropdown-item" href="plans" Match="NavLinkMatch.All">
+                        <span class="bi bi-house-door-fill-nav-menu"></span> Planes
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+
 
         @* <div class="nav-item px-3">
             <NavLink class="nav-link" href="services" Match="NavLinkMatch.All">

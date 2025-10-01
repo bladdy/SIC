@@ -12,7 +12,7 @@ namespace SIC.Shared.Entities;
 public class Event : IEntityWithName
 {
     public int Id { get; set; }
-    public string Code { get; set; } = null!;
+    public string? Code { get; set; }
 
     [Display(Name = "Titulo")]
     [MaxLength(100, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres.")]
@@ -45,8 +45,11 @@ public class Event : IEntityWithName
     [Display(Name = "Estado")]
     public Status Status { get; set; }
 
-    [Display(Name = "Camtidad de invitados")]
+    [Display(Name = "Cantidad de invitados")]
     public int Guests => Invitations == null || Invitations.Count == 0 ? 0 : Invitations.Count;
+
+    public User? User { get; set; }
+    public string? UserId { get; set; }
 
     //[Display(Name = "Confirmaciones")]
     //public int StatesNumber => States == null || States.Count == 0 ? 0 : States.Count;

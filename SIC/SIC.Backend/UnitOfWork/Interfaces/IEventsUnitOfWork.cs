@@ -9,6 +9,8 @@ public interface IEventsUnitOfWork
 
     Task<ActionResponse<IEnumerable<Event>>> GetAsync();
 
+    Task<ActionResponse<IEnumerable<Event>>> GetByUserIdAsync(string userId);
+
     Task<ActionResponse<Event>> AddFullAsync(Event events);
 
     Task<ActionResponse<Event>> UpdateFullAsync(Event events);

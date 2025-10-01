@@ -1,5 +1,68 @@
 ﻿@page "/services"
 
-<h3>ServicesIndex</h3>
+<h3>Servicios</h3>
 
+<div class="mb-3">
+    <button class="btn btn-primary" @onclick="ShowCreateModal">Crear Servicio</button>
+</div>
 
+<GenericList MyList="Items">
+    <Body>
+        <table class="table table-striped table-hover table-bordered align-middle">
+            <thead class="table-dark">
+                <tr class="text-center">
+                    <th>Servicios</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var Item in Items!)
+                {
+                    <tr class="align-middle">
+                        <td>@Item.Name</td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-warning me-2" @onclick="() => ShowEditModal(Item)">
+                                <i class="bi bi-pencil-fill"></i> Editar
+                            </button>
+                            <button class="btn btn-sm btn-danger" @onclick="() => ConfirmDelete(Item)">
+                                <i class="bi bi-trash-fill"></i> Borrar
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </Body>
+</GenericList>
+
+<!-- Modal -->
+@if (IsModalVisible)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@((IsEditMode ? "Editar Servicio" : "Crear Servicio"))</h5>
+                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                </div>
+                <div class="modal-body">
+                    <EditForm Model="@NewItem" OnValidSubmit="@SaveItem">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+
+                        <div class="mb-3">
+                            <label class="form-label">Nombre</label>
+                            <InputText class="form-control" @bind-Value="NewItem.Name" />
+                            <ValidationMessage For="@(() => NewItem.Name)" />
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Guardar</button>
+                            <button type="button" class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+}

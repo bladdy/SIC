@@ -20,7 +20,7 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
     {
         var events = await _context.Events
             .Include(i => i.Invitations)
-            .Include(et => et.EventType).FirstOrDefaultAsync(x => x.Code.Contains(code));
+            .Include(et => et.EventType).FirstOrDefaultAsync(x => x.Code!.Contains(code));
         if (events == null)
         {
             return new ActionResponse<Event>
@@ -35,10 +35,23 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
             Result = events
         };
     }
+    public async Task<ActionResponse<IEnumerable<Event>>> GetByUserIdAsync(string userId)
+    {
+        var events = await _context.Events.Include(i => i.Invitations)
+            .Include(et => et.EventType)
+            .OrderBy(e => e.Name)
+            .Where(e => e.UserId!.ToString() == userId)
+            .ToListAsync();
+        return new ActionResponse<IEnumerable<Event>>
+        {
+            Success = true,
+            Result = events
+        };
+    }
 
     public override async Task<ActionResponse<IEnumerable<Event>>> GetAsync()
     {
-        var events = await _context.Events.Include(i => i.Invitations).Include(et => et.EventType).ToListAsync();
+        var events = await _context.Events.Include(i => i.Invitations).Include(et => et.EventType).OrderBy(e => e.Name).ToListAsync();
         return new ActionResponse<IEnumerable<Event>>
         {
             Success = true,
@@ -128,4 +141,6 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
             };
         }
     }
+
+    
 }
