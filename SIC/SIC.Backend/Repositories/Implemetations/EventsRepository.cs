@@ -2,6 +2,7 @@
 using SIC.Backend.Data;
 using SIC.Backend.Helpers;
 using SIC.Backend.Repositories.Interfaces;
+using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using SIC.Shared.Response;
 
@@ -35,6 +36,7 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
             Result = events
         };
     }
+
     public async Task<ActionResponse<IEnumerable<Event>>> GetByUserIdAsync(string userId)
     {
         var events = await _context.Events.Include(i => i.Invitations)
@@ -142,5 +144,40 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
         }
     }
 
-    
+    public override async Task<ActionResponse<int>> GetTotalRecordAsync(PaginationDTO pagination)
+    {
+        var queryable = _context.Events.AsQueryable();
+        if (!string.IsNullOrWhiteSpace(pagination.UserId))
+            queryable = queryable.Where(x => x.UserId == pagination.UserId);
+        if (!string.IsNullOrWhiteSpace(pagination.Filter))
+        {
+            queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
+        }
+        double count = await queryable.CountAsync();
+        int totalPages = (int)Math.Ceiling(count / pagination.PageSize);
+        return new ActionResponse<int>
+        {
+            Success = true,
+            Result = totalPages
+        };
+    }
+
+    public override async Task<ActionResponse<IEnumerable<Event>>> GetAsync(PaginationDTO pagination)
+    {
+        var queryable = _context.Events.AsQueryable();
+        if (!string.IsNullOrWhiteSpace(pagination.UserId))
+            queryable = queryable.Where(x => x.UserId == pagination.UserId);
+        if (!string.IsNullOrWhiteSpace(pagination.Filter))
+        {
+            queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
+        }
+        return new ActionResponse<IEnumerable<Event>>
+        {
+            Success = true,
+            Result = await queryable
+                .OrderBy(x => x.Name)
+                .Paginate(pagination)
+                .ToListAsync()
+        };
+    }
 }
