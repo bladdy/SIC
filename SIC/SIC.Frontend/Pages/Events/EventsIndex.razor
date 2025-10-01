@@ -6,6 +6,11 @@
         Crear Evento
     </button>
 </div>
+<div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center;">
+    <input style="width:400px;" type="text" class="form-control" placeholder="Buscar Invitacion..." @bind-value="Filter">
+    <button type="button" class="btn btn-outline-primary mx-1" @onclick="ApplyFilterAsync"><i class="bi bi-funnel" /> Filtrar</button>
+    <button type="button" class="btn btn-outline-danger" @onclick="CleanFilterAsync"><i class="bi bi-x-circle" /> Limpiar</button>
+</div>
 
 <GenericList MyList="Events">
     <Body>
@@ -71,8 +76,15 @@
         </table>
     </Body>
 </GenericList>
+<!-- paginacion-->
+<div class="d-flex justify-content-center my-3">
+    <Pagination CurrentPage="currentPage"
+                TotalPages="totalPages"
+                SelectedPage="SelectedPageAsync" />
 
-<!-- Modal -->
+</div>
+
+<!-- Modal-->
 @if (IsModalVisible)
 {
     <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">

@@ -146,7 +146,7 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
 
     public override async Task<ActionResponse<int>> GetTotalRecordAsync(PaginationDTO pagination)
     {
-        var queryable = _context.Events.AsQueryable();
+        var queryable = _context.Events.Include(e =>e.EventType).AsQueryable();
         if (!string.IsNullOrWhiteSpace(pagination.UserId))
             queryable = queryable.Where(x => x.UserId == pagination.UserId);
         if (!string.IsNullOrWhiteSpace(pagination.Filter))
@@ -164,7 +164,7 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
 
     public override async Task<ActionResponse<IEnumerable<Event>>> GetAsync(PaginationDTO pagination)
     {
-        var queryable = _context.Events.AsQueryable();
+        var queryable = _context.Events.Include(e => e.EventType).AsQueryable();
         if (!string.IsNullOrWhiteSpace(pagination.UserId))
             queryable = queryable.Where(x => x.UserId == pagination.UserId);
         if (!string.IsNullOrWhiteSpace(pagination.Filter))
