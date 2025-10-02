@@ -86,7 +86,16 @@ namespace SIC.Backend.Repositories.Implemetations
             try
             {
                 invitation.Code = CodeGenerator.GenerateCode();
-
+                var Event = await _context.Events.FirstOrDefaultAsync(x => x.Id == invitation.EventId);
+                if (Event == null)
+                {
+                    return new ActionResponse<Invitation>
+                    {
+                        Success = false,
+                        Message = "El evento no existe"
+                    };
+                }
+                invitation.Event = Event;
                 _context.Add(invitation);
                 await _context.SaveChangesAsync();
                 return new ActionResponse<Invitation>

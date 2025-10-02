@@ -48,5 +48,5 @@ public class Invitation
     public DateTime SentDate { get; set; }
     public DateTime? ConfirmationDate { get; set; }
     public int EventId { get; set; }
-    public Event Event { get; set; } = null!;
+    public Event? Event { get; set; } = null!;
 }

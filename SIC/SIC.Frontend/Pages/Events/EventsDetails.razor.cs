@@ -10,6 +10,8 @@ using System.Security.Claims;
 
 namespace SIC.Frontend.Pages.Events;
 
+//MyEventsDetails
+
 [Authorize(Roles = "Admin")]
 public partial class EventsDetails
 {
@@ -47,6 +49,7 @@ public partial class EventsDetails
     private async Task ShowCreateModal()
     {
         NewInvitation = new Invitation();
+        NewInvitation.EventId = EventDetail!.Id;
         IsEditMode = false;
         IsModalVisible = true;
     }
@@ -58,6 +61,7 @@ public partial class EventsDetails
             Id = invitation.Id,
             Code = invitation.Code,
             Email = invitation.Email,
+            EventId = invitation.EventId,
             PhoneNumber = invitation.PhoneNumber,
             NumberAdults = invitation.NumberAdults,
             NumberChildren = invitation.NumberChildren,
@@ -86,17 +90,17 @@ public partial class EventsDetails
         if (IsEditMode)
         {
             // PUT -> Editar
-            responseHttp = await Repository.PutAsync("api/events/full", NewInvitation);
+            responseHttp = await Repository.PutAsync("api/Invitations/full", NewInvitation);
         }
         else
         {
             // POST -> Crear
-            responseHttp = await Repository.PostAsync("api/events/full", NewInvitation);
+            responseHttp = await Repository.PostAsync("api/Invitations/full", NewInvitation);
         }
 
         if (responseHttp.Error)
         {
-            var message = await responseHttp.GetErrorMessageAsync() ?? "No se pudo guardar el plan.";
+            var message = await responseHttp.GetErrorMessageAsync() ?? "No se pudo guardar el Inivitacion.";
             await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
             return;
         }
@@ -114,7 +118,7 @@ public partial class EventsDetails
         });
         await toast.FireAsync(
             "Éxito",
-            IsEditMode ? "Plan actualizado con éxito." : "Plan creado con éxito.",
+            IsEditMode ? "Inivitacion actualizada con éxito." : "Inivitacion creada con éxito.",
             SweetAlertIcon.Success
         );
 
