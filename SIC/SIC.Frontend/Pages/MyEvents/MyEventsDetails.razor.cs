@@ -1,6 +1,8 @@
 using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+using SIC.Frontend.Helpers;
 using SIC.Frontend.Repositories;
 using SIC.Shared.Entities;
 using System.Net;
@@ -24,6 +26,7 @@ public partial class MyEventsDetails
     [Inject] private IRepository Repository { get; set; } = default!;
     [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] private IJSRuntime JsRuntime { get; set; } = default!;
 
     [Parameter, SupplyParameterFromQuery] public string Page { get; set; } = string.Empty;
     [Parameter, SupplyParameterFromQuery] public string Filter { get; set; } = string.Empty;
@@ -41,6 +44,16 @@ public partial class MyEventsDetails
     {
         currentPage = page;
         await LoadInvitations(currentPage);
+    }
+
+    private async Task DescargarExcel()
+    {
+        var content = await Repository.GetFileAsync("api/excel/GenerarExcel");
+
+        if (content.Length > 0)
+        {
+            await JsRuntime.DownloadFileAsync("reporte.xlsx", content);
+        }
     }
 
     private async Task ShowCreateModal()

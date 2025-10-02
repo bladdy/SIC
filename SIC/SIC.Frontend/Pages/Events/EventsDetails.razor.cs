@@ -1,12 +1,11 @@
 ﻿using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.JSInterop;
+using SIC.Frontend.Helpers;
 using SIC.Frontend.Repositories;
 using SIC.Shared.Entities;
-using System.Collections.Generic;
 using System.Net;
-using System.Security.Claims;
 
 namespace SIC.Frontend.Pages.Events;
 
@@ -27,6 +26,8 @@ public partial class EventsDetails
     [Inject] private IRepository Repository { get; set; } = default!;
     [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+
+    [Inject] private IJSRuntime JsRuntime { get; set; } = default!;
 
     [Parameter, SupplyParameterFromQuery] public string Page { get; set; } = string.Empty;
     [Parameter, SupplyParameterFromQuery] public string Filter { get; set; } = string.Empty;
@@ -123,6 +124,16 @@ public partial class EventsDetails
         );
 
         await LoadInvitations();
+    }
+
+    private async Task DescargarExcel()
+    {
+        var content = await Repository.GetFileAsync("api/excel/GenerarExcel");
+
+        if (content.Length > 0)
+        {
+            await JsRuntime.DownloadFileAsync("reporte.xlsx", content);
+        }
     }
 
     private async Task LoadInvitations(int page = 1)

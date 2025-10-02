@@ -23,5 +23,11 @@ namespace SIC.Frontend.Helpers
         {
             return js.InvokeAsync<object>("localStorage.removeItem", key);
         }
+
+        public static async Task DownloadFileAsync(this IJSRuntime jsRuntime, string fileName, byte[] content)
+        {
+            using var streamRef = new DotNetStreamReference(new MemoryStream(content));
+            await jsRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+        }
     }
 }
