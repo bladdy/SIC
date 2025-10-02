@@ -52,7 +52,7 @@ public partial class MyEventsDetails
         try
         {
             isLoading = true;
-            var content = await Repository.GetFileAsync("api/excel/GenerarExcel");
+            var content = await Repository.GetFileAsync($"api/excel/GenerarExcel/{EventDetail!.Id}");
 
             if (content.Length > 0)
             {

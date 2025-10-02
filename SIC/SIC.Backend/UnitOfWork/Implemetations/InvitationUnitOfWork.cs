@@ -21,6 +21,8 @@ namespace SIC.Backend.UnitOfWork.Implemetations
 
         public override async Task<ActionResponse<IEnumerable<Invitation>>> GetAsync() => await _invitationstRepository.GetAsync();
 
+        public async Task<ActionResponse<IEnumerable<Invitation>>> GetInivtationsByyEventIdAsync(int EventId) => await _invitationstRepository.GetInivtationsByyEventIdAsync(EventId);
+
         public override async Task<ActionResponse<IEnumerable<Invitation>>> GetAsync(PaginationDTO pagination) => await _invitationstRepository.GetAsync(pagination);
 
         public override async Task<ActionResponse<int>> GetTotalRecordAsync(PaginationDTO pagination) => await _invitationstRepository.GetTotalRecordAsync(pagination);

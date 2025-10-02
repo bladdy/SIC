@@ -10,6 +10,8 @@ namespace SIC.Backend.Repositories.Interfaces
 
         Task<ActionResponse<IEnumerable<Invitation>>> GetAsync();
 
+        Task<ActionResponse<IEnumerable<Invitation>>> GetInivtationsByyEventIdAsync(int EventId);
+
         Task<ActionResponse<IEnumerable<Invitation>>> GetAsync(PaginationDTO pagination);
 
         Task<ActionResponse<int>> GetTotalRecordAsync(PaginationDTO pagination);

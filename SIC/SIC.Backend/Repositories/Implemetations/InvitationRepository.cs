@@ -5,6 +5,7 @@ using SIC.Backend.Repositories.Interfaces;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using SIC.Shared.Response;
+using System.Linq;
 
 namespace SIC.Backend.Repositories.Implemetations
 {
@@ -150,6 +151,25 @@ namespace SIC.Backend.Repositories.Implemetations
                     Message = exception.Message
                 };
             }
+        }
+
+        public async Task<ActionResponse<IEnumerable<Invitation>>> GetInivtationsByyEventIdAsync(int EventId)
+        {
+            var invitations = await _context.Invitations.Include(e => e.Event).ThenInclude(e => e!.EventType).Where(x => x.EventId == EventId).ToListAsync();
+            if (invitations == null)
+            {
+                return new ActionResponse<IEnumerable<Invitation>>
+                {
+                    Success = true,
+                    Message = "Evento no existe."
+                };
+            }
+
+            return new ActionResponse<IEnumerable<Invitation>>
+            {
+                Success = true,
+                Result = invitations
+            };
         }
     }
 }

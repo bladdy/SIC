@@ -4,19 +4,21 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using SIC.Frontend.Helpers;
 using SIC.Frontend.Repositories;
+using SIC.Frontend.Shared.Component;
 using SIC.Shared.Entities;
 using System.Net;
 
 namespace SIC.Frontend.Pages.Events;
 
-//MyEventsDetails
+//Todo: Agregar un loading para cuando se genera el excel
+//Todo: Agregar disable cuando se Crea o se actualiza una invitacion
 
 [Authorize(Roles = "Admin")]
 public partial class EventsDetails
 {
     private int currentPage = 1;
     private int totalPages;
-
+    private bool isLoading = false;
     private Invitation NewInvitation = new();
     private bool IsModalVisible = false;
     private bool IsEditMode = false;
@@ -128,11 +130,19 @@ public partial class EventsDetails
 
     private async Task DescargarExcel()
     {
-        var content = await Repository.GetFileAsync("api/excel/GenerarExcel");
-
-        if (content.Length > 0)
+        try
         {
-            await JsRuntime.DownloadFileAsync("reporte.xlsx", content);
+            isLoading = true;
+            var content = await Repository.GetFileAsync($"api/excel/GenerarExcel/{EventDetail!.Id}");
+
+            if (content.Length > 0)
+            {
+                await JsRuntime.DownloadFileAsync("reporte.xlsx", content);
+            }
+        }
+        finally
+        {
+            isLoading = false;
         }
     }
 
