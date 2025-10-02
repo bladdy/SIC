@@ -78,8 +78,20 @@ else
                     <span>Exportar Excel</span>
                 }
             </button>
-            <button class="btn btn-sm btn-danger">
-                Cargar Lista de Invitados
+            <!-- Botón Importar -->
+            <InputFile class="form-control" style="width: 260px;" OnChange="HandleFileSelected" />
+
+            <button class="btn btn-sm btn-danger" 
+            @onclick="SubirExcel" disabled="@(!hasFileSelected || isLoadingImport)">
+                @if (isLoadingImport)
+                {
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span> Cargando... </span>
+                }
+                else
+                {
+                    <span>Cargar Lista de Invitados</span>
+                }
             </button>
             <button class="btn btn-sm btn-danger" @onclick="ShowCreateModal">
                 Agregar Invitado

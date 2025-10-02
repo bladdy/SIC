@@ -1,12 +1,15 @@
 ﻿using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using SIC.Frontend.Helpers;
 using SIC.Frontend.Repositories;
 using SIC.Frontend.Shared.Component;
+using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using System.Net;
+using static System.Net.WebRequestMethods;
 
 namespace SIC.Frontend.Pages.Events;
 
@@ -19,6 +22,12 @@ public partial class EventsDetails
     private int currentPage = 1;
     private int totalPages;
     private bool isLoading = false;
+    private bool hasFileSelected = false;
+
+    private bool isLoadingImport = false;
+    private IBrowserFile? selectedFile;
+    private string? importResult;
+
     private Invitation NewInvitation = new();
     private bool IsModalVisible = false;
     private bool IsEditMode = false;
@@ -143,6 +152,64 @@ public partial class EventsDetails
         finally
         {
             isLoading = false;
+        }
+    }
+
+    private void HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+        hasFileSelected = selectedFile != null;
+    }
+
+    private async Task SubirExcel()
+    {
+        if (selectedFile == null) return;
+        HttpResponseWrapper<ImportExcelResultDTO>? responseHttp;
+
+        try
+        {
+            isLoadingImport = true;
+            importResult = null;
+
+            using var content = new MultipartFormDataContent();
+            using var stream = selectedFile.OpenReadStream(5_000_000); // 5MB max
+            content.Add(new StreamContent(stream), "file", selectedFile.Name);
+            if (content == null)
+            {
+                await SweetAlertService.FireAsync("Error", "Debes de seleccionar un archivo Excel", SweetAlertIcon.Error);
+                return;
+            }
+            else
+            {
+                responseHttp = await Repository.UploadFileAsync<object, ImportExcelResultDTO>(
+                        $"api/excel/ImportarExcel/{EventDetail!.Id}",
+                        stream,
+                        selectedFile.Name
+                    );
+                if (!responseHttp.Error)
+                {
+                    var result = responseHttp.Response;
+                    importResult = $"✅ Archivo procesado: {result}";
+                    await SweetAlertService.FireAsync("Invitaciones",
+                            $"Agregadas: {result!.Agregadas}\n" +
+                            $"Modificadas: {result!.Modificadas}\n" +
+                            $"Errores: {result!.Errores}\n" +
+                            $"Total procesadas: {result!.Total}\n\n" +
+                            "✅ Las invitaciones se actualizaron correctamente",
+                            SweetAlertIcon.Info);
+
+                    await LoadInvitations();
+                }
+                else
+                {
+                    var error = responseHttp.Error;
+                    importResult = $"❌ Error: {error}";
+                }
+            }
+        }
+        finally
+        {
+            isLoadingImport = false;
         }
     }
 

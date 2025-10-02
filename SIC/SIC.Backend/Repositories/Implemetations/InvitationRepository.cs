@@ -26,7 +26,7 @@ namespace SIC.Backend.Repositories.Implemetations
                 return new ActionResponse<Invitation>
                 {
                     Success = true,
-                    Message = "Evento no existe."
+                    Message = "La invitacion no existe."
                 };
             }
             return new ActionResponse<Invitation>

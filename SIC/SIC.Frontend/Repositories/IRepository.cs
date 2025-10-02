@@ -17,5 +17,8 @@
         Task<HttpResponseWrapper<TActionResponse>> PutAsync<T, TActionResponse>(string url, T model);
 
         Task<byte[]> GetFileAsync(string url);
+
+        Task<HttpResponseWrapper<TActionResponse>> UploadFileAsync<T, TActionResponse>(
+        string url, Stream fileStream, string fileName);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
 using SIC.Backend.UnitOfWork.Interfaces;
+using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using SIC.Shared.Enums;
 
@@ -15,6 +16,121 @@ namespace SIC.Backend.Controllers
         public ExcelController(IInvitationUnitOfWork invitationUnitOfWork)
         {
             _invitationUnitOfWork = invitationUnitOfWork;
+        }
+
+        [HttpPost("ImportarExcel/{eventId}")]
+        public async Task<IActionResult> ImportarExcel(int eventId, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("El archivo no es válido.");
+            }
+
+            var invitations = new List<Invitation>();
+
+            using var stream = new MemoryStream();
+            await file.CopyToAsync(stream);
+            using var workbook = new XLWorkbook(stream);
+            var worksheet = workbook.Worksheets.FirstOrDefault();
+
+            if (worksheet == null)
+            {
+                return BadRequest("El archivo Excel no contiene hojas válidas.");
+            }
+
+            var rangeUsed = worksheet.RangeUsed();
+            if (rangeUsed == null)
+            {
+                return BadRequest("El archivo Excel no contiene datos válidos.");
+            }
+
+            var rows = rangeUsed.RowsUsed().Skip(1); // Saltar encabezado
+
+            foreach (var row in rows)
+            {
+                try
+                {
+                    var invitation = new Invitation
+                    {
+                        Code = row.Cell(1).GetString(),
+                        Name = row.Cell(2).GetString(),
+                        Email = row.Cell(3).GetString(),
+                        PhoneNumber = row.Cell(4).GetString(),
+                        EventId = eventId,
+                        NumberAdults = row.Cell(5).GetValue<int>(),
+                        NumberChildren = row.Cell(6).GetValue<int>(),
+                        NumberConfirmedAdults = row.Cell(7).GetValue<int>(),
+                        NumberConfirmedChildren = row.Cell(8).GetValue<int>(),
+                        Status = Status.Active, //Enum.TryParse<Status>(row.Cell(9).GetString(), out var status) ? status : Status.Pending,
+                        Table = row.Cell(10).GetString(),
+                        Comments = row.Cell(11).GetString(),
+                        SentDate = DateTime.Now, //row.Cell(12).GetDateTime(),
+                        ConfirmationDate = null //row.Cell(13).IsEmpty() ? null : row.Cell(13).GetDateTime()
+                    };
+
+                    invitations.Add(invitation);
+                }
+                catch (Exception e)
+                {
+                    return BadRequest($"{e.Message.ToString()}");
+                }
+            }
+
+            int added = 0;
+            int updated = 0;
+            int errors = 0;
+
+            foreach (var inv in invitations)
+            {
+                try
+                {
+                    if (string.IsNullOrWhiteSpace(inv.Code))
+                    {
+                        errors++;
+                        continue; // saltamos esta fila
+                    }
+                    //Verificar que busque la invitacion por
+                    var response = await _invitationUnitOfWork.GetByCodeAsync(inv.Code);
+                    var existing = response.Result;  // ejemplo: búsqueda por código
+
+                    if (existing == null)
+                    {
+                        await _invitationUnitOfWork.AddFullAsync(inv);
+                        added++;
+                    }
+                    else
+                    {
+                        existing.Name = inv.Name;
+                        existing.Email = inv.Email;
+                        existing.PhoneNumber = inv.PhoneNumber;
+                        existing.NumberAdults = inv.NumberAdults;
+                        existing.NumberChildren = inv.NumberChildren;
+                        existing.NumberConfirmedAdults = inv.NumberConfirmedAdults;
+                        existing.NumberConfirmedChildren = inv.NumberConfirmedChildren;
+                        existing.Status = inv.Status;
+                        existing.Table = inv.Table;
+                        existing.Comments = inv.Comments;
+                        existing.SentDate = inv.SentDate;
+                        existing.ConfirmationDate = inv.ConfirmationDate;
+
+                        await _invitationUnitOfWork.UpdateFullAsync(existing);
+                        updated++;
+                    }
+                }
+                catch
+                {
+                    errors++;
+                }
+            }
+
+            return Ok(new ImportExcelResultDTO
+            {
+                Total = invitations.Count,
+                Agregadas = added,
+                Modificadas = updated,
+                Errores = errors,
+                Message = $"Procesadas {invitations.Count} invitaciones. Agregadas: {added}, Modificadas: {updated}, Errores: {errors}"
+            });
         }
 
         [HttpGet("GenerarExcel/{EventId}")]

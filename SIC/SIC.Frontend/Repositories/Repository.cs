@@ -1,4 +1,5 @@
 ﻿using SIC.Frontend.Repositories;
+using SIC.Shared.Response;
 using System.Text;
 using System.Text.Json;
 
@@ -67,7 +68,7 @@ public class Repository : IRepository
         var messageJson = JsonSerializer.Serialize(model);
         var messageContent = new StringContent(messageJson, Encoding.UTF8, "application/json");
         var responseHttp = await _httpClient.PutAsync(url, messageContent);
-        return new HttpResponseWrapper<object>(null, !responseHttp.IsSuccessStatusCode, responseHttp); ;
+        return new HttpResponseWrapper<object>(null, !responseHttp.IsSuccessStatusCode, responseHttp);
     }
 
     public async Task<HttpResponseWrapper<TActionResponse>> PutAsync<T, TActionResponse>(string url, T model)
@@ -97,5 +98,26 @@ public class Repository : IRepository
             return await responseHttp.Content.ReadAsByteArrayAsync();
         }
         return Array.Empty<byte>();
+    }
+
+    public async Task<HttpResponseWrapper<TActionResponse>> UploadFileAsync<T, TActionResponse>(
+     string url, Stream fileStream, string fileName)
+    {
+        using var content = new MultipartFormDataContent();
+        var fileContent = new StreamContent(fileStream);
+        fileContent.Headers.ContentType =
+            new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
+
+        content.Add(fileContent, "file", fileName);
+
+        var responseHttp = await _httpClient.PostAsync(url, content);
+
+        if (responseHttp.IsSuccessStatusCode)
+        {
+            var response = await UnserializeAnswerAsync<TActionResponse>(responseHttp);
+            return new HttpResponseWrapper<TActionResponse>(response, false, responseHttp);
+        }
+
+        return new HttpResponseWrapper<TActionResponse>(default!, true, responseHttp);
     }
 }
