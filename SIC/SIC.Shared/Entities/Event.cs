@@ -51,6 +51,7 @@ public class Event : IEntityWithName
     public User? User { get; set; }
     public string? UserId { get; set; }
 
+    //public DateTime CreatedDate { get; set; } = DateTime.Now;
     //[Display(Name = "Confirmaciones")]
     //public int StatesNumber => States == null || States.Count == 0 ? 0 : States.Count;
     //[Display(Name = "Pendientes")]

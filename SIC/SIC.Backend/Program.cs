@@ -125,7 +125,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "SIC V1");
-        c.RoutePrefix = string.Empty; // Para acceder en la raíz
+        c.RoutePrefix = "swagger";
     });
 }
 

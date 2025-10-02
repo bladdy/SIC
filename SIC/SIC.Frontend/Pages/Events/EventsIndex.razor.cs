@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using SIC.Frontend.Repositories;
+using SIC.Frontend.Shared;
+using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using System.Net;
 using System.Security.Claims;
@@ -23,6 +25,9 @@ namespace SIC.Frontend.Pages.Events
 
         [Parameter, SupplyParameterFromQuery] public string Page { get; set; } = string.Empty;
         [Parameter, SupplyParameterFromQuery] public string Filter { get; set; } = string.Empty;
+        [Parameter, SupplyParameterFromQuery] public DateTime? DateSelectd { get; set; } = null;
+        [Parameter, SupplyParameterFromQuery] public int? SelectedEventType { get; set; }
+        [Parameter, SupplyParameterFromQuery] public string OrderBy { get; set; } = "";
         [Parameter, SupplyParameterFromQuery] public int? RecordsNumber { get; set; }
 
         public List<Event>? Events { get; set; }
@@ -37,7 +42,7 @@ namespace SIC.Frontend.Pages.Events
         {
             await base.OnInitializedAsync();
 
-            // Si RecordsNumber viene null, lo asignamos a 10
+            // Si RecordsNumber viene null, lo asignamos a 15
             RecordsNumber ??= 15;
 
             await LoadEventTypes();
@@ -53,6 +58,9 @@ namespace SIC.Frontend.Pages.Events
         private async Task CleanFilterAsync()
         {
             Filter = string.Empty;
+            SelectedEventType = null;
+            DateSelectd = null;
+            OrderBy = "";
             await ApplyFilterAsync();
         }
 
@@ -83,7 +91,18 @@ namespace SIC.Frontend.Pages.Events
             {
                 url += $"&Filter={Filter}";
             }
-
+            if (DateSelectd != null)
+            {
+                url += $"&Date={DateSelectd}";
+            }
+            if (SelectedEventType != null)
+            {
+                url += $"&EventTypeId={SelectedEventType}";
+            }
+            if (!string.IsNullOrWhiteSpace(OrderBy))
+            {
+                url += $"&OrderBy={OrderBy}";
+            }
             var responseHttp = await repository.GetAsync<List<Event>>(url);
 
             if (responseHttp.Error)
@@ -108,6 +127,14 @@ namespace SIC.Frontend.Pages.Events
             if (!string.IsNullOrWhiteSpace(Filter))
             {
                 url += $"&Filter={Filter}";
+            }
+            if (DateSelectd != null)
+            {
+                url += $"&Date={DateSelectd}";
+            }
+            if (SelectedEventType != null)
+            {
+                url += $"&EventTypeId={SelectedEventType}";
             }
 
             var responseHttp = await repository.GetAsync<int>(url);

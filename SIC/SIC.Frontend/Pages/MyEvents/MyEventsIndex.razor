@@ -6,6 +6,43 @@
         Crear Evento
     </button>
 </div>
+<div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center; gap: 10px;">
+    <!-- Buscar por texto -->
+    <input style="width:400px;" type="text" class="form-control" placeholder="Buscar Evento..." @bind="Filter" />
+
+    <!-- Fecha -->
+    <InputDate class="form-control" @bind-Value="DateSelectd" style="width:150px;" />
+
+    <!-- Tipo de Evento -->
+    <InputSelect class="form-select" @bind-Value="SelectedEventType" style="width:300px;">
+        <option value="">-- Selecciona un tipo de Evento --</option>
+        @if (EventTypes != null)
+        {
+            @foreach (var type in EventTypes)
+            {
+                <option value="@type.Id">@type.Name</option>
+            }
+        }
+    </InputSelect>
+
+    <!-- Orden -->
+    <InputSelect class="form-select" @bind-Value="OrderBy" style="width:200px;">
+        <option value="">-- Ordernar por --</option>
+        <option value="FechaAsc">Fecha Ascendente </option>
+        <option value="FechaDesc">Fecha Descendente</option>
+        <option value="Nombre">Nombre Alfabetico</option>
+        <option value="Evento">Tipo de Evento</option>
+        <option value="Estado">Estado</option>
+    </InputSelect>
+
+    <!-- Botones -->
+    <button type="button" class="btn btn-outline-primary mx-1" @onclick="ApplyFilterAsync">
+        <i class="bi bi-funnel" /> Filtrar
+    </button>
+    <button type="button" class="btn btn-outline-danger" @onclick="CleanFilterAsync">
+        <i class="bi bi-x-circle" /> Limpiar
+    </button>
+</div>
 
 <GenericList MyList="Events">
     <Body>
@@ -70,6 +107,12 @@
         </table>
     </Body>
 </GenericList>
+<!-- paginacion-->
+<div class="d-flex justify-content-center my-3">
+    <Pagination CurrentPage="currentPage"
+                TotalPages="totalPages"
+                SelectedPage="SelectedPageAsync" />
+</div>
 
 <!-- Modal -->
 @if (IsModalVisible)

@@ -13,5 +13,7 @@ public class Item : IEntityWithName
     public string Name { get; set; } = null!;
 
     //public double Price { get; set; } 1 y 2
+    
+    //public double Price { get; set; } 1 y 2
     public ICollection<PlanItem>? PlanItems { get; set; }
 }

@@ -5,6 +5,7 @@ using SIC.Backend.Repositories.Interfaces;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using SIC.Shared.Response;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SIC.Backend.Repositories.Implemetations;
 
@@ -146,12 +147,36 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
 
     public override async Task<ActionResponse<int>> GetTotalRecordAsync(PaginationDTO pagination)
     {
-        var queryable = _context.Events.Include(e =>e.EventType).AsQueryable();
+        var queryable = _context.Events.Include(e => e.EventType).AsQueryable();
         if (!string.IsNullOrWhiteSpace(pagination.UserId))
             queryable = queryable.Where(x => x.UserId == pagination.UserId);
         if (!string.IsNullOrWhiteSpace(pagination.Filter))
         {
-            queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
+            var filter = pagination.Filter.ToLower();
+
+            queryable = queryable.Where(x =>
+                x.Name.ToLower().Contains(filter) ||
+                x.SubTitle.ToLower().Contains(filter) ||
+                x.Host.ToLower().Contains(filter) ||
+                x.Planner!.ToLower().Contains(filter)
+            );
+        }
+
+        if (pagination.Date.HasValue)
+        {
+            queryable = queryable.Where(x => x.Date.Date == pagination.Date.Value.Date);
+        }
+        if (pagination.EventTypeId > 0)
+        {
+            queryable = queryable.Where(x => x.EventTypeId == pagination.EventTypeId);
+        }
+        if (!string.IsNullOrWhiteSpace(pagination.OrderBy))
+        {
+            queryable = queryable.OrderByDescending(x => x.Date);
+        }
+        else
+        {
+            queryable = queryable.OrderBy(x => x.Date);
         }
         double count = await queryable.CountAsync();
         int totalPages = (int)Math.Ceiling(count / pagination.PageSize);
@@ -169,13 +194,64 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
             queryable = queryable.Where(x => x.UserId == pagination.UserId);
         if (!string.IsNullOrWhiteSpace(pagination.Filter))
         {
-            queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
+            var filter = pagination.Filter.ToLower();
+
+            queryable = queryable.Where(x =>
+                x.Name.ToLower().Contains(filter) ||
+                x.SubTitle.ToLower().Contains(filter) ||
+                x.Host.ToLower().Contains(filter) ||
+                x.Planner!.ToLower().Contains(filter)
+            );
+        }
+        if (!string.IsNullOrEmpty(pagination.OrderBy))
+        {
+            switch (pagination.OrderBy)
+            {
+                case "FechaAsc":
+                    queryable = queryable.OrderBy(x => x.Date);
+                    break;
+
+                case "FechaDesc":
+                    queryable = queryable.OrderByDescending(x => x.Date);
+                    break;
+
+                case "Nombre":
+                    queryable = queryable.OrderBy(x => x.Name);
+                    break;
+
+                case "Evento":
+                    queryable = queryable.OrderBy(x => x.EventType!.Name);
+                    break;
+
+                case "Estado":
+                    queryable = queryable.OrderBy(x => x.Status);
+                    queryable = queryable.OrderBy(x => x.Name);
+                    break;
+
+                default:
+                    // Por si no viene nada válido, lo dejas con un orden por defecto
+                    queryable = queryable.OrderBy(x => x.Date);
+                    break;
+            }
+        }
+        else
+        {
+            // Orden por defecto si no selecciona nada
+            queryable = queryable.OrderBy(x => x.Name);
+        }
+
+        if (pagination.Date.HasValue)
+        {
+            queryable = queryable.Where(x => x.Date.Date == pagination.Date.Value.Date);
+        }
+        if (pagination.EventTypeId > 0)
+        {
+            queryable = queryable.Where(x => x.EventTypeId == pagination.EventTypeId);
         }
         return new ActionResponse<IEnumerable<Event>>
         {
             Success = true,
             Result = await queryable
-                .OrderBy(x => x.Name)
                 .Paginate(pagination)
                 .ToListAsync()
         };

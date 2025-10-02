@@ -6,10 +6,42 @@
         Crear Evento
     </button>
 </div>
-<div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center;">
-    <input style="width:400px;" type="text" class="form-control" placeholder="Buscar Invitacion..." @bind-value="Filter">
-    <button type="button" class="btn btn-outline-primary mx-1" @onclick="ApplyFilterAsync"><i class="bi bi-funnel" /> Filtrar</button>
-    <button type="button" class="btn btn-outline-danger" @onclick="CleanFilterAsync"><i class="bi bi-x-circle" /> Limpiar</button>
+<div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center; gap: 10px;">
+    <!-- Buscar por texto -->
+    <input style="width:400px;" type="text" class="form-control" placeholder="Buscar Evento..." @bind="Filter" />
+
+    <!-- Fecha -->
+    <InputDate class="form-control" @bind-Value="DateSelectd" style="width:150px;" />
+
+    <!-- Tipo de Evento -->
+    <InputSelect class="form-select" @bind-Value="SelectedEventType" style="width:300px;">
+        <option value="">-- Selecciona un tipo de Evento --</option>
+        @if (EventTypes != null)
+        {
+            @foreach (var type in EventTypes)
+            {
+                <option value="@type.Id">@type.Name</option>
+            }
+        }
+    </InputSelect>
+
+    <!-- Orden -->
+    <InputSelect class="form-select" @bind-Value="OrderBy" style="width:200px;">
+        <option value="">-- Ordernar por --</option>
+        <option value="FechaAsc">Fecha Ascendente </option>
+        <option value="FechaDesc">Fecha Descendente</option>
+        <option value="Nombre">Nombre Alfabetico</option>
+        <option value="Evento">Tipo de Evento</option>
+        <option value="Estado">Estado</option>
+    </InputSelect>
+
+    <!-- Botones -->
+    <button type="button" class="btn btn-outline-primary mx-1" @onclick="ApplyFilterAsync">
+        <i class="bi bi-funnel" /> Filtrar
+    </button>
+    <button type="button" class="btn btn-outline-danger" @onclick="CleanFilterAsync">
+        <i class="bi bi-x-circle" /> Limpiar
+    </button>
 </div>
 
 <GenericList MyList="Events">
@@ -25,6 +57,8 @@
                     <th>Hora</th>
                     <th>Url</th>
                     <th>Anfitrión</th>
+                    <th>Teléfono</th>
+                    <th>Planner</th>
                     <th>Teléfono</th>
                     <th>Estado</th>
                     <th>Acciones</th>
@@ -53,7 +87,9 @@
                             </td>
                             <td>@even.Host</td>
                             <td>@even.HostPhone</td>
-                            <td>@even.Status</td>
+                            <td>@even.Planner</td>
+                            <td>@even.PlannerPhone</td>
+                            <td>@even.Status.GetDescription()</td>
                             <td class="text-center">
                                 <button class="btn btn-sm btn-warning me-2" @onclick="() => ShowEditModal(even)">
                                     <i class="bi bi-pencil-fill"></i>
