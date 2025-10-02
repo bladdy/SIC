@@ -67,9 +67,18 @@ else
         </div>
         <!--Footer: botones-->
         <div class="card-footer d-flex justify-content-end gap-2">
-            <button class="btn btn-sm btn-danger" @onclick=" DescargarExcel">
-                Exportar Excel
+            <button class="btn btn-sm btn-danger" @onclick="DescargarExcel" disabled="@isLoading">
+                @if (isLoading)
+                {
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span> Generando... </span>
+            }
+                else
+                {
+                    <span>Exportar Excel</span>
+                }
             </button>
+
             <button class="btn btn-sm btn-danger">
                 Cargar Lista de Invitados
             </button>
