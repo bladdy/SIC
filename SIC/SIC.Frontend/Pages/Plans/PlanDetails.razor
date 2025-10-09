@@ -1,0 +1,22 @@
+﻿@page "/Plans/details/{Id}"
+<h3>PlanDetails</h3>
+
+<h3>@Id</h3>
+
+<h3>Seleccionar Ítems para el Plan</h3>
+
+@if (Items != null)
+{
+    <div class="flex flex-col gap-2 max-w-sm">
+        @foreach (var item in Items!)
+        {
+            <div class="flex items-center gap-2">
+                <input type="checkbox" checked="@selectedItems.Contains(item.Id)" @onchange="(e) => ToggleSelection(item.Id, e.Value)" />
+                <label>@item.Name</label>
+            </div>
+        }
+    </div>
+}
+
+<button class="bg-blue-600 text-white px-3 py-1 rounded mt-3" @onclick="AgregarAlPlan">Agregar al Plan</button>
+

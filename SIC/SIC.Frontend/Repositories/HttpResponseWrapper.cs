@@ -39,7 +39,6 @@ public class HttpResponseWrapper<T>
         {
             return "No tienes permisos para hacer esta operación.";
         }
-
         return "Ha ocurrido un error inesperado.";
     }
 }

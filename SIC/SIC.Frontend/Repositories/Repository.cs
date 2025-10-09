@@ -1,5 +1,6 @@
 ﻿using SIC.Frontend.Repositories;
 using SIC.Shared.Response;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 
@@ -28,11 +29,26 @@ public class Repository : IRepository
     public async Task<HttpResponseWrapper<T>> GetAsync<T>(string url)
     {
         var responseHttp = await _httpClient.GetAsync(url);
+
         if (responseHttp.IsSuccessStatusCode)
         {
+            if (responseHttp.StatusCode == HttpStatusCode.NoContent)
+            {
+                return new HttpResponseWrapper<T>(default, false, responseHttp);
+            }
+
+            var content = await responseHttp.Content.ReadAsStringAsync();
+
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                return new HttpResponseWrapper<T>(default, false, responseHttp);
+            }
+
+            // Solo deserializamos si hay contenido
             var response = await UnserializeAnswerAsync<T>(responseHttp);
             return new HttpResponseWrapper<T>(response, false, responseHttp);
         }
+
         return new HttpResponseWrapper<T>(default, true, responseHttp);
     }
 

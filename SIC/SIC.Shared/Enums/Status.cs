@@ -61,6 +61,9 @@ namespace SIC.Shared.Enums
         Archived,
 
         [Description("Pagado")]
-        Paid
+        Paid,
+
+        [Description("Avisado")]
+        Warned
     }
 }

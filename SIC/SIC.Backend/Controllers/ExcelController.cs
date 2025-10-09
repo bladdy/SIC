@@ -18,6 +18,7 @@ namespace SIC.Backend.Controllers
             _invitationUnitOfWork = invitationUnitOfWork;
         }
 
+        //poner un chk para que solo tomen en cuenta el excel y eliminen los demas
         [HttpPost("ImportarExcel/{eventId}")]
         public async Task<IActionResult> ImportarExcel(int eventId, IFormFile file)
         {
@@ -117,7 +118,7 @@ namespace SIC.Backend.Controllers
                         updated++;
                     }
                 }
-                catch
+                catch (Exception e)
                 {
                     errors++;
                 }

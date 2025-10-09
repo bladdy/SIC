@@ -22,7 +22,11 @@
                 @foreach (var plan in Plans!)
                 {
                     <tr class="align-middle">
-                        <td>@plan.Name</td>
+                        <td>
+                            <a href="/Plans/details/@plan.Id">
+                                @plan.Name
+                            </a>
+                        </td>
                         <td class="text-center">@plan.ItemsNumbers</td>
                         <td class="text-end">@plan.Price.ToString("C2")</td>
                         <td class="text-center">

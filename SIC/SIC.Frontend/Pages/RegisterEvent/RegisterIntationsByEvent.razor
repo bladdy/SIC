@@ -1,0 +1,38 @@
+﻿@page "/events/register-intations-by-event/{Code}"
+<h3>Registro de invitaciones</h3>
+
+<button class="btn btn-primary" @onclick="StartScannerAsync" disabled="@isScannerRunning">
+    Iniciar Escáner
+</button>
+
+<div id="reader" style="width:800px; height:800px;"></div>
+
+@if (showModal)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Registrar Asistentes</h5>
+                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>QR: @qrResult</p>
+                    <div class="mb-2">
+                        <label>Adultos:</label>
+                        <input type="number" class="form-control" @bind="adultos" min="0" />
+                    </div>
+                    <div class="mb-2">
+                        <label>Niños:</label>
+                        <input type="number" class="form-control" @bind="ninos" min="0" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CancelModal">Cancelar</button>
+                    <button class="btn btn-primary" @onclick="SubmitModal">Registrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+

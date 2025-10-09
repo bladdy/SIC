@@ -5,6 +5,7 @@ using SIC.Backend.Repositories.Interfaces;
 using SIC.Shared.DTOs;
 using SIC.Shared.Response;
 using System;
+using System.Linq.Expressions;
 
 namespace SIC.Backend.Repositories.Implemetations;
 
@@ -34,7 +35,8 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         var queryable = _entity.AsQueryable();
         double count = await queryable.CountAsync();
         int totalPages = (int)Math.Ceiling((double)count / pagination.PageSize);
-        return new ActionResponse<int> {
+        return new ActionResponse<int>
+        {
             Success = true,
             Result = totalPages
         };
@@ -88,7 +90,6 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
                 Message = "No se puede eliminar, porque tiene registros relacionados."
             };
         }
-
     }
 
     public virtual async Task<ActionResponse<T>> GetAsync(int id)
@@ -136,7 +137,11 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
             return ExceptionActionResponse(exception);
         }
     }
-    
+
+    public async Task<int> CountAsync(Expression<Func<T, bool>> predicate)
+    {
+        return await _context.Set<T>().CountAsync(predicate);
+    }
 
     private ActionResponse<T> ExceptionActionResponse(Exception exception) => new()
     {
@@ -147,5 +152,4 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         Message = "El registro ya existe."
     };
-
 }

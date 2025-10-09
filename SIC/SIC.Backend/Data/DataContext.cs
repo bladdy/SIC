@@ -16,6 +16,11 @@ public class DataContext : IdentityDbContext<User>
     public DbSet<Plan> Plans { get; set; }
     public DbSet<PlanItem> PlanItems { get; set; }
     public DbSet<Event> Events { get; set; }
+    public DbSet<Message> Messages { get; set; }
+    public DbSet<InvitationSendLog> InvitationSendLogs { get; set; }
+    public DbSet<UsuarioWhatsAppConfig> UsuarioWhatsAppConfigs { get; set; }
+    public DbSet<MassiveShippingProgress> MassiveShippingProgresses { get; set; }
+    public DbSet<MessageKey> MessageKeys { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -8,6 +8,7 @@ using Microsoft.OpenApi.Models;
 using SIC.Backend.Data;
 using SIC.Backend.Repositories.Implemetations;
 using SIC.Backend.Repositories.Interfaces;
+using SIC.Backend.Services;
 using SIC.Backend.UnitOfWork.Implemetations;
 using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.Entities;
@@ -56,6 +57,9 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer("name=LocalConnection"));
 builder.Services.AddTransient<SeedDb>();
 
+// Registrar el servicio de WhatsAppService
+builder.Services.AddScoped<WhatsAppService>();
+builder.Services.AddScoped<BoletaService>();
 // Inyección de dependencias genérica
 
 builder.Services.AddScoped(typeof(IGenericUnitOfWork<>), typeof(GenericUnitOfWork<>));
@@ -73,8 +77,14 @@ builder.Services.AddScoped<IEventsRepository, EventsRepository>();
 builder.Services.AddScoped<IInvitationUnitOfWork, InvitationUnitOfWork>();
 builder.Services.AddScoped<IInvitationRepository, InvitationRepository>();
 
+builder.Services.AddScoped<IMessageUnitOfWork, MessageUnitOfWork>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+
 builder.Services.AddScoped<IUserUnitOfWork, UserUnitOfWork>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+builder.Services.AddScoped<IWhatsAppConfigUnitOfWork, WhatsAppConfigUnitOfWork>();
+builder.Services.AddScoped<IWhatsAppConfigRepository, WhatsAppConfigRepository>();
 
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {

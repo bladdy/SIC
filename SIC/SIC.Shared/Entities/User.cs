@@ -31,5 +31,7 @@ public class User : IdentityUser
 
     [Display(Name = "Usuario")]
     public string FullName => $"{FirstName} {LastName}";
+
     public ICollection<Event>? Events { get; set; }
+    public UsuarioWhatsAppConfig? UserWhatsAppConfigs { get; set; }
 }

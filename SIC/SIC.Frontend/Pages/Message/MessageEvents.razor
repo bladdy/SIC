@@ -1,0 +1,69 @@
+﻿@page "/events/message-events/{Code}"
+
+<div class="d-flex justify-content-center align-items-center">
+    @if (NewMessage != null)
+    {
+        <EditForm Model="@NewMessage" OnValidSubmit="HandleValidSubmit" style="width: 50%;">
+            <h3>Datos del Evento</h3>
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="mb-3 row col-12">
+                <div class="form-group col-6 d-flex">
+                    <h5>Codigo: </h5>
+                    <h5 style="padding-left: 5px;">@Code</h5>
+                </div>
+            </div>
+            <div class="mb-3 row col-12">
+                <div class="form-group col-6">
+                    <label for="titulo">Título:</label>
+                    <InputText id="titulo" class="form-control" @bind-Value="NewMessage!.Title" />
+                </div>
+
+                <div class="form-group col-6">
+                    <label for="subtitulo">Subtítulo:</label>
+                    <InputText id="subtitulo" class="form-control" @bind-Value="NewMessage.SubTitle" />
+                </div>
+            </div>
+
+            <h3>Mensajes para WhatsApp</h3>
+            <div class="mb-3 row col-12">
+                <div class="form-group col-6">
+                    <label for="textoInvitacion">Texto de invitación:</label>
+                    <InputTextArea id="textoInvitacion" class="form-control" @bind-Value="NewMessage.MessageInvitation" style="height: 25em;" />
+                </div>
+
+                <div class="form-group col-6">
+                    <label for="mensajeConfirmacion">Mensaje de confirmación:</label>
+                    <InputTextArea id="mensajeConfirmacion" class="form-control" @bind-Value="NewMessage.MessageConfirmation" style="height: 25em;" />
+                </div>
+                
+            </div>
+
+            <h3>Tokens que puede usar en mensajes:</h3>
+            <ul>
+                @foreach (var token in tokens)
+                {
+                    <li>@token</li>
+                }
+            </ul>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary" disabled="@(isLoading)">
+                    @if (isLoading)
+                    {
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        <span> Cargando... </span>
+                    }
+                    else
+                    {
+                        <span>Guardar Mensajes</span>
+                    }
+                </button>
+            </div>
+        </EditForm>
+    }
+    else
+    {
+        <p>Cargando datos...</p>
+    }
+</div>

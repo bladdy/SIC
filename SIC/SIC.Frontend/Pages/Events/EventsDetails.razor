@@ -67,6 +67,10 @@ else
         </div>
         <!--Footer: botones-->
         <div class="card-footer d-flex justify-content-end gap-2">
+
+            <a href="/events/message-events/@EventDetail.Code" class="btn btn-sm btn-danger">
+                Mensajes
+            </a>
             <button class="btn btn-sm btn-danger" @onclick="DescargarExcel" disabled="@isLoading">
                 @if (isLoading)
                 {
@@ -81,8 +85,8 @@ else
             <!-- Botón Importar -->
             <InputFile class="form-control" style="width: 260px;" OnChange="HandleFileSelected" />
 
-            <button class="btn btn-sm btn-danger" 
-            @onclick="SubirExcel" disabled="@(!hasFileSelected || isLoadingImport)">
+            <button class="btn btn-sm btn-danger"
+                    @onclick="SubirExcel" disabled="@(!hasFileSelected || isLoadingImport)">
                 @if (isLoadingImport)
                 {
                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -96,9 +100,9 @@ else
             <button class="btn btn-sm btn-danger" @onclick="ShowCreateModal">
                 Agregar Invitado
             </button>
-            <button class="btn btn-sm btn-danger">
+            <a href="/events/register-intations-by-event/@EventDetail.Code" class="btn btn-sm btn-danger">
                 Scan QR
-            </button>
+            </a>
         </div>
 
     </div>
@@ -226,7 +230,19 @@ else
                                 <ValidationMessage For="@(() => NewInvitation.NumberConfirmedChildren)" />
                             </div>
                         </div>
-                        
+                        <div class="mb-3">
+                            <label class="form-label">Estado</label>
+                            <InputSelect class="form-select" @bind-Value="NewInvitation.Status">
+                                <option value="">-- Selecciona un Estado --</option>
+                                @foreach (var status in Enum.GetValues<Status>()
+                            .Where(s => s == Status.Active || s == Status.Pending || s == Status.Confirmed || s == Status.Warned))
+                                {
+                                    <option value="@status">@status.GetDescription()</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => NewInvitation.Status)" />
+                        </div>
+
                         <div class="mb-3">
                             <label class="form-label">Mesa</label>
                             <InputText class="form-control" @bind-Value="NewInvitation.Table" />

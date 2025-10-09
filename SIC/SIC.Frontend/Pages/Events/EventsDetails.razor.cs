@@ -5,11 +5,9 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using SIC.Frontend.Helpers;
 using SIC.Frontend.Repositories;
-using SIC.Frontend.Shared.Component;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using System.Net;
-using static System.Net.WebRequestMethods;
 
 namespace SIC.Frontend.Pages.Events;
 
@@ -22,10 +20,10 @@ public partial class EventsDetails
     private int currentPage = 1;
     private int totalPages;
     private bool isLoading = false;
-    private bool hasFileSelected = false;
-
     private bool isLoadingImport = false;
+    private bool hasFileSelected = false;
     private IBrowserFile? selectedFile;
+
     private string? importResult;
 
     private Invitation NewInvitation = new();
@@ -112,7 +110,7 @@ public partial class EventsDetails
 
         if (responseHttp.Error)
         {
-            var message = await responseHttp.GetErrorMessageAsync() ?? "No se pudo guardar el Inivitacion.";
+            var message = await responseHttp.GetErrorMessageAsync() ?? "No se pudo guardar la Inivitacion.";
             await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
             return;
         }

@@ -1,8 +1,10 @@
 ﻿﻿<AuthorizeView>
     <Authorized>
-        <span class="d-flex align-items-center">
-            Hola, <a href="EditUser" class="nav-link btn btn-link text-black">@context.User.Identity!.Name</a>
-        </span>
+        <div class="d-flex justify-content-center align-items-center">
+            <p class="m-0 p-0">Hola,</p><a href="EditUser" class="nav-link btn btn-link text-black m-0 p-0">@context.User.Identity!.Name</a>
+        </div>
+
+
         <a href="Logout" class="nav-link btn btn-link">Cerrar Sesión</a>
     </Authorized>
     <NotAuthorized>

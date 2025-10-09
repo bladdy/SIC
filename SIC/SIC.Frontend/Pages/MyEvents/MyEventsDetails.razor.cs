@@ -1,26 +1,35 @@
+//@page "/my-events/details/{Code}"
 using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using SIC.Frontend.Helpers;
 using SIC.Frontend.Repositories;
+using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using System.Net;
 
 namespace SIC.Frontend.Pages.MyEvents;
 
-//Todo: Agregar un loading para cuando se genera el excel
 //Todo: Agregar disable cuando se Crea o se actualiza una invitacion
 
 [Authorize(Roles = "Admin")]
 public partial class MyEventsDetails
 {
+    private bool usarWhatsApp = true;
     private int currentPage = 1;
     private int totalPages;
     private bool isLoading = false;
     private Invitation NewInvitation = new();
     private bool IsModalVisible = false;
     private bool IsEditMode = false;
+
+    private bool isLoadingImport = false;
+    private string? importResult;
+
+    private bool hasFileSelected = false;
+    private IBrowserFile? selectedFile;
     private DateTime MinAllowedDate { get; set; } = new DateTime(2023, 1, 1); // Sets January 1, 2023 as the minimum
     public Event? EventDetail { get; set; }
     public List<Invitation>? Invitations { get; set; }
@@ -65,7 +74,12 @@ public partial class MyEventsDetails
         }
     }
 
-    private async Task ShowCreateModal()
+    private async Task EnviarInvitacion()
+    {
+        await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", "Me");
+    }
+
+    private void ShowCreateModal()
     {
         NewInvitation = new Invitation();
         NewInvitation.EventId = EventDetail!.Id;
@@ -142,6 +156,64 @@ public partial class MyEventsDetails
         );
 
         await LoadInvitations();
+    }
+
+    private void HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+        hasFileSelected = selectedFile != null;
+    }
+
+    private async Task SubirExcel()
+    {
+        if (selectedFile == null) return;
+        HttpResponseWrapper<ImportExcelResultDTO>? responseHttp;
+
+        try
+        {
+            isLoadingImport = true;
+            importResult = null;
+
+            using var content = new MultipartFormDataContent();
+            using var stream = selectedFile.OpenReadStream(5_000_000); // 5MB max
+            content.Add(new StreamContent(stream), "file", selectedFile.Name);
+            if (content == null)
+            {
+                await SweetAlertService.FireAsync("Error", "Debes de seleccionar un archivo Excel", SweetAlertIcon.Error);
+                return;
+            }
+            else
+            {
+                responseHttp = await Repository.UploadFileAsync<object, ImportExcelResultDTO>(
+                        $"api/excel/ImportarExcel/{EventDetail!.Id}",
+                        stream,
+                        selectedFile.Name
+                    );
+                if (!responseHttp.Error)
+                {
+                    var result = responseHttp.Response;
+                    importResult = $"? Archivo procesado: {result}";
+                    await SweetAlertService.FireAsync("Invitaciones",
+                            $"Agregadas: {result!.Agregadas}\n" +
+                            $"Modificadas: {result!.Modificadas}\n" +
+                            $"Errores: {result!.Errores}\n" +
+                            $"Total procesadas: {result!.Total}\n\n" +
+                            "? Las invitaciones se actualizaron correctamente",
+                            SweetAlertIcon.Info);
+
+                    await LoadInvitations();
+                }
+                else
+                {
+                    var error = responseHttp.Error;
+                    importResult = $"? Error: {error}";
+                }
+            }
+        }
+        finally
+        {
+            isLoadingImport = false;
+        }
     }
 
     private async Task LoadInvitations(int page = 1)

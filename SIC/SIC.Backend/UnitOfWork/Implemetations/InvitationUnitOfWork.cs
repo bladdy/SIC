@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using SIC.Backend.Repositories.Implemetations;
-using SIC.Backend.Repositories.Interfaces;
+﻿using SIC.Backend.Repositories.Interfaces;
 using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
