@@ -17,6 +17,11 @@ namespace SIC.Frontend.Pages.MyEvents;
 [Authorize(Roles = "Admin")]
 public partial class MyEventsDetails
 {
+    // Estados dinámicos por ID
+    private int? loadingWhatsappId;
+
+    private int? copyingId;
+    private string copyButtonText = "Copiar Invitación";
     private bool usarWhatsApp = true;
     private int currentPage = 1;
     private int totalPages;
@@ -74,9 +79,33 @@ public partial class MyEventsDetails
         }
     }
 
-    private async Task EnviarInvitacion()
+    private async Task AbrirWhatsapp(string phoneNumber, string code, int invitationId)
     {
-        await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", "Me");
+        loadingWhatsappId = invitationId;
+
+        var mensaje = $"Hola, te comparto tu invitación con el código: {code}";
+        var url = $"https://wa.me/{phoneNumber}?text={Uri.EscapeDataString(mensaje)}";
+
+        await JsRuntime.InvokeVoidAsync("window.open", url, "_blank");
+
+        await Task.Delay(1000); // pequeña pausa solo visual
+        loadingWhatsappId = null;
+    }
+
+    private async Task CopiarInvitacion(string code, int invitationId)
+    {
+        copyingId = invitationId;
+        copyButtonText = "Copiando mensaje...";
+
+        var mensaje = $"Hola, te comparto tu invitación con el código: {code}";
+        await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", mensaje);
+
+        await Task.Delay(1000); // Mostrar el loading
+        copyButtonText = "Mensaje copiado";
+
+        await Task.Delay(1500); // Mostrar el mensaje copiado un momento
+        copyButtonText = "Copiar Invitación";
+        copyingId = null;
     }
 
     private void ShowCreateModal()

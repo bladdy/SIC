@@ -7,8 +7,13 @@ namespace SIC.Backend.Repositories.Interfaces
     public interface IPlanItemRepository
     {
         Task<ActionResponse<IEnumerable<PlanItem>>> GetAsync(PaginationDTO paginations);
+
         Task<ActionResponse<int>> GetTotalRecordAsync(PaginationDTO pagination);
-        Task<ActionResponse<PlanItem>> GetAsync(int id);
+
+        Task<ActionResponse<IEnumerable<PlanItem>>> GetByIdAsync(int id);
+
         Task<ActionResponse<IEnumerable<PlanItem>>> GetAsync();
+
+        Task<ActionResponse<PlanItem>> AddOrUpdateFullAsync(List<int> items, int planId);
     }
 }

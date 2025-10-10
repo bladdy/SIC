@@ -6,7 +6,6 @@ using SIC.Shared.Entities;
 
 namespace SIC.Backend.Controllers;
 
-
 [ApiController]
 [Route("api/[controller]")]
 public class PlanItemController : GenericController<PlanItem>
@@ -17,8 +16,9 @@ public class PlanItemController : GenericController<PlanItem>
     {
         _planItemUnitOfWork = planItemUnitOfWork;
     }
+
     [HttpGet("paginated")]
-    public override async Task<IActionResult> GetAsync([FromQuery]PaginationDTO pagination)
+    public override async Task<IActionResult> GetAsync([FromQuery] PaginationDTO pagination)
     {
         var action = await _planItemUnitOfWork.GetAsync(pagination);
         if (action.Success)
@@ -27,6 +27,7 @@ public class PlanItemController : GenericController<PlanItem>
         }
         return BadRequest(action.Message);
     }
+
     [HttpGet("totalRecordAsync")]
     public override async Task<IActionResult> GetTotalRecordsAsync([FromQuery] PaginationDTO pagination)
     {
@@ -48,14 +49,26 @@ public class PlanItemController : GenericController<PlanItem>
         }
         return BadRequest(action.Message);
     }
-    [HttpGet("{id}")]
-    public override async Task<IActionResult> GetAsync(int id)
+
+    [HttpGet("Item-By-Plan/{id}")]
+    public async Task<IActionResult> GetByIdAsync(int id)
     {
-        var action = await _planItemUnitOfWork.GetAsync(id);
+        var action = await _planItemUnitOfWork.GetByIdAsync(id);
         if (action.Success)
         {
             return Ok(action.Result);
         }
         return BadRequest(action.Message);
+    }
+
+    [HttpPost("full/{planId}")]
+    public async Task<IActionResult> PostFullAsync(List<int> items, int planId)
+    {
+        var action = await _planItemUnitOfWork.AddOrUpdateFullAsync(items, planId);
+        if (action.Success)
+        {
+            return Ok(action.Result);
+        }
+        return NotFound(action.Message);
     }
 }
