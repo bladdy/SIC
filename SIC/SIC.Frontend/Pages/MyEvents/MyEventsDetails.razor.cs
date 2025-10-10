@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using SIC.Frontend.Helpers;
+using SIC.Frontend.Pages.Message;
 using SIC.Frontend.Repositories;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
@@ -81,9 +82,27 @@ public partial class MyEventsDetails
 
     private async Task AbrirWhatsapp(string phoneNumber, string code, int invitationId)
     {
+        string mensaje;
         loadingWhatsappId = invitationId;
+        var responseHttp = await Repository.GetAsync<SIC.Shared.Entities.Message>($"api/Messages/byCode/{Code}/{code}");
 
-        var mensaje = $"Hola, te comparto tu invitación con el código: {code}";
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+        if (responseHttp.Response != null)
+        {
+            mensaje = responseHttp.Response.MessageInvitation;
+        }
+        else
+        {
+            await SweetAlertService.FireAsync("Error", "No se encontró el mensaje de invitación.", SweetAlertIcon.Error);
+            copyingId = null;
+            copyButtonText = "Copiar Invitación";
+            return;
+        }
         var url = $"https://wa.me/{phoneNumber}?text={Uri.EscapeDataString(mensaje)}";
 
         await JsRuntime.InvokeVoidAsync("window.open", url, "_blank");
@@ -92,12 +111,32 @@ public partial class MyEventsDetails
         loadingWhatsappId = null;
     }
 
-    private async Task CopiarInvitacion(string code, int invitationId)
+    private async Task CopiarInvitacion(string codeinvitation, int invitationId)
     {
+        string mensaje;
         copyingId = invitationId;
         copyButtonText = "Copiando mensaje...";
 
-        var mensaje = $"Hola, te comparto tu invitación con el código: {code}";
+        var responseHttp = await Repository.GetAsync<SIC.Shared.Entities.Message>($"api/Messages/byCode/{Code}/{codeinvitation}");
+
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+        if (responseHttp.Response != null)
+        {
+            mensaje = responseHttp.Response.MessageInvitation;
+        }
+        else
+        {
+            await SweetAlertService.FireAsync("Error", "No se encontró el mensaje de invitación.", SweetAlertIcon.Error);
+            copyingId = null;
+            copyButtonText = "Copiar Invitación";
+            return;
+        }
+
         await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", mensaje);
 
         await Task.Delay(1000); // Mostrar el loading
