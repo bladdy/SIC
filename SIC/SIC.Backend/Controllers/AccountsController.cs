@@ -1,5 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using SIC.Backend.Repositories.Interfaces;
+using SIC.Backend.UnitOfWork.Implemetations;
 using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
@@ -14,12 +18,42 @@ namespace SIC.Backend.Controllers
     public class AccountsController : ControllerBase
     {
         private readonly IUserUnitOfWork _userUnitOfWork;
+        private readonly IUserRepository _usersRepository;
         private readonly IConfiguration _configuration;
 
-        public AccountsController(IUserUnitOfWork userUnitOfWork, IConfiguration configuration)
+        public AccountsController(IUserUnitOfWork userUnitOfWork, IConfiguration configuration, IUserRepository usersRepository)
         {
             _userUnitOfWork = userUnitOfWork;
             _configuration = configuration;
+            _usersRepository = usersRepository;
+        }
+
+        [HttpGet("UserById/{id}")]
+        public async Task<IActionResult> GetAsync(string id)
+        {
+            return Ok(await _userUnitOfWork.GetUserByAsync(id));
+        }
+
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAsync([FromQuery] PaginationDTO pagination)
+        {
+            var response = await _usersRepository.GetAsync(pagination);
+            if (response.Success)
+            {
+                return Ok(response.Result);
+            }
+            return BadRequest();
+        }
+
+        [HttpGet("totalPages")]
+        public async Task<IActionResult> GetPagesAsync([FromQuery] PaginationDTO pagination)
+        {
+            var action = await _usersRepository.GetTotalPagesAsync(pagination);
+            if (action.Success)
+            {
+                return Ok(action.Result);
+            }
+            return BadRequest();
         }
 
         [HttpPost("CreateUser")]
@@ -30,6 +64,18 @@ namespace SIC.Backend.Controllers
             if (result.Succeeded)
             {
                 await _userUnitOfWork.AddUserToRoleAsync(user, user.UserType.ToString());
+                return Ok(BuildToken(user));
+            }
+            return BadRequest(result.Errors.FirstOrDefault());
+        }
+
+        [HttpPut("UpdateUser")]
+        public async Task<IActionResult> PutAsync([FromBody] User model)
+        {
+            User user = model;
+            var result = await _userUnitOfWork.UpdateUserAsync(user);
+            if (result.Succeeded)
+            {
                 return Ok(BuildToken(user));
             }
             return BadRequest(result.Errors.FirstOrDefault());

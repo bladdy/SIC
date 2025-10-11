@@ -15,7 +15,7 @@ namespace SIC.Shared.Enums
         [Description("Planificador de Bodas")]
         WeddingPlanner = 2,
 
-        [Description("User")]
+        [Description("Usuario")]
         User = 3
     }
 }

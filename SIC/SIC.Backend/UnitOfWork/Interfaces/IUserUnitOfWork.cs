@@ -8,7 +8,11 @@ namespace SIC.Backend.UnitOfWork.Interfaces
     {
         Task<User> GetUserAsync(string email);
 
+        Task<User> GetUserByAsync(string id);
+
         Task<IdentityResult> AddUserAsync(User user, string password);
+
+        Task<IdentityResult> UpdateUserAsync(User user);
 
         Task CheckRoleAsync(string roleName);
 

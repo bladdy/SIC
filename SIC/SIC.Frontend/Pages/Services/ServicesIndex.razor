@@ -3,13 +3,13 @@
 <h3>Servicios</h3>
 
 <div class="mb-3">
-    <button class="btn btn-primary" @onclick="ShowCreateModal">Crear Servicio</button>
+    <button class="btn btn-custom" @onclick="ShowCreateModal">Crear Servicio</button>
 </div>
 
 <GenericList MyList="Items">
     <Body>
         <table class="table table-striped table-hover table-bordered align-middle">
-            <thead class="table-dark">
+            <thead class="" style="background-color:#3C6A79; color: white;">
                 <tr class="text-center">
                     <th>Servicios</th>
                     <th>Acciones</th>
@@ -21,10 +21,10 @@
                     <tr class="align-middle">
                         <td>@Item.Name</td>
                         <td class="text-center">
-                            <button class="btn btn-sm btn-warning me-2" @onclick="() => ShowEditModal(Item)">
+                            <button class="btn btn-sm btn-custom me-2" @onclick="() => ShowEditModal(Item)">
                                 <i class="bi bi-pencil-fill"></i> Editar
                             </button>
-                            <button class="btn btn-sm btn-danger" @onclick="() => ConfirmDelete(Item)">
+                            <button class="btn btn-sm btn-custom" @onclick="() => ConfirmDelete(Item)">
                                 <i class="bi bi-trash-fill"></i> Borrar
                             </button>
                         </td>
@@ -57,7 +57,7 @@
                             <ValidationMessage For="@(() => NewItem.Name)" />
                         </div>
                         <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">Guardar</button>
+                            <button type="submit" class="btn btn-custom">Guardar</button>
                             <button type="button" class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
                         </div>
                     </EditForm>

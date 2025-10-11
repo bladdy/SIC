@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using SIC.Frontend.Repositories;
-using SIC.Frontend.Shared;
-using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using System.Net;
 using System.Security.Claims;

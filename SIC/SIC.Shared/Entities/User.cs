@@ -27,6 +27,7 @@ public class User : IdentityUser
     public string Address { get; set; } = null!;
 
     [Display(Name = "Tipo de usuario")]
+    [Required(ErrorMessage = "El campo {0} es obligatorio.")]
     public UserType UserType { get; set; }
 
     [Display(Name = "Usuario")]

@@ -1,14 +1,24 @@
-﻿﻿<AuthorizeView>
-    <Authorized>
-        <div class="d-flex justify-content-center align-items-center">
-            <p class="m-0 p-0">Hola,</p><a href="EditUser" class="nav-link btn btn-link text-black m-0 p-0">@context.User.Identity!.Name</a>
-        </div>
+﻿@using System.Security.Claims
 
+<AuthorizeView>
+    <Authorized>
+        @{
+            // Obtener el ID del usuario autenticado
+            var userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userName = context.User.Identity?.Name;
+        }
+
+        <div class="d-flex justify-content-center align-items-center">
+            <p class="m-0 p-0">Hola,</p>
+            <a href="/users/edit/@userId" class="nav-link btn btn-link text-black m-0 p-0">
+                @userName
+            </a>
+        </div>
 
         <a href="Logout" class="nav-link btn btn-link">Cerrar Sesión</a>
     </Authorized>
+
     <NotAuthorized>
-        <a href="register" class="nav-link btn btn-link">Registro</a>
         <a href="login" class="nav-link btn btn-link">Iniciar Sesión</a>
     </NotAuthorized>
 </AuthorizeView>

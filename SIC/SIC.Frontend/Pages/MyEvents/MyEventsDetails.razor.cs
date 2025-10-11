@@ -3,6 +3,7 @@ using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.JSInterop;
 using SIC.Frontend.Helpers;
 using SIC.Frontend.Pages.Message;
@@ -14,14 +15,17 @@ using System.Net;
 namespace SIC.Frontend.Pages.MyEvents;
 
 //Todo: Agregar disable cuando se Crea o se actualiza una invitacion
-
-[Authorize(Roles = "Admin")]
+//ToDo: Cuando se genere el evento que inmediatamente se pueda crea el mensaje de invitacion y confirmacion
+[Authorize(Roles = "Admin,WeddingPlanner,User")]
 public partial class MyEventsDetails
 {
     // Estados dinámicos por ID
-    private int? loadingWhatsappId;
+    private int? loadingWhatsappId1;
 
-    private int? copyingId;
+    private int? loadingWhatsappId2;
+    private int? copyingId1;
+    private int? copyingId2;
+
     private string copyButtonText = "Copiar Invitación";
     private bool usarWhatsApp = true;
     private int currentPage = 1;
@@ -80,10 +84,19 @@ public partial class MyEventsDetails
         }
     }
 
-    private async Task AbrirWhatsapp(string phoneNumber, string code, int invitationId)
+    private async Task AbrirWhatsapp(string phoneNumber, string code, int invitationId, int column)
     {
         string mensaje;
-        loadingWhatsappId = invitationId;
+        if (column == 1)
+        {
+            loadingWhatsappId1 = invitationId;
+            copyingId1 = null;
+        }
+        else
+        {
+            loadingWhatsappId2 = invitationId;
+            copyingId2 = null;
+        }
         var responseHttp = await Repository.GetAsync<SIC.Shared.Entities.Message>($"api/Messages/byCode/{Code}/{code}");
 
         if (responseHttp.Error)
@@ -94,12 +107,22 @@ public partial class MyEventsDetails
         }
         if (responseHttp.Response != null)
         {
-            mensaje = responseHttp.Response.MessageInvitation;
+            if (column == 1)
+            {
+                mensaje = responseHttp.Response.MessageInvitation;
+            }
+            else
+            {
+                mensaje = responseHttp.Response.MessageConfirmation;
+            }
         }
         else
         {
             await SweetAlertService.FireAsync("Error", "No se encontró el mensaje de invitación.", SweetAlertIcon.Error);
-            copyingId = null;
+            if (column == 1)
+                copyingId1 = null;
+            else
+                copyingId2 = null;
             copyButtonText = "Copiar Invitación";
             return;
         }
@@ -108,13 +131,30 @@ public partial class MyEventsDetails
         await JsRuntime.InvokeVoidAsync("window.open", url, "_blank");
 
         await Task.Delay(1000); // pequeña pausa solo visual
-        loadingWhatsappId = null;
+        if (column == 1)
+            loadingWhatsappId1 = null;
+        else
+            loadingWhatsappId2 = null;
     }
 
-    private async Task CopiarInvitacion(string codeinvitation, int invitationId)
+    private void NavegateToMessage()
+    {
+        NavigationManager.NavigateTo($"/events/message-events/{EventDetail!.Code}");
+    }
+
+    private async Task CopiarInvitacion(string codeinvitation, int invitationId, int column)
     {
         string mensaje;
-        copyingId = invitationId;
+        if (column == 1)
+        {
+            loadingWhatsappId1 = invitationId;
+            copyingId1 = null;
+        }
+        else
+        {
+            loadingWhatsappId2 = invitationId;
+            copyingId2 = null;
+        }
         copyButtonText = "Copiando mensaje...";
 
         var responseHttp = await Repository.GetAsync<SIC.Shared.Entities.Message>($"api/Messages/byCode/{Code}/{codeinvitation}");
@@ -127,12 +167,22 @@ public partial class MyEventsDetails
         }
         if (responseHttp.Response != null)
         {
-            mensaje = responseHttp.Response.MessageInvitation;
+            if (column == 1)
+            {
+                mensaje = responseHttp.Response.MessageInvitation;
+            }
+            else
+            {
+                mensaje = responseHttp.Response.MessageConfirmation;
+            }
         }
         else
         {
             await SweetAlertService.FireAsync("Error", "No se encontró el mensaje de invitación.", SweetAlertIcon.Error);
-            copyingId = null;
+            if (column == 1)
+                copyingId1 = null;
+            else
+                copyingId2 = null;
             copyButtonText = "Copiar Invitación";
             return;
         }
@@ -144,7 +194,10 @@ public partial class MyEventsDetails
 
         await Task.Delay(1500); // Mostrar el mensaje copiado un momento
         copyButtonText = "Copiar Invitación";
-        copyingId = null;
+        if (column == 1)
+            copyingId1 = null;
+        else
+            copyingId2 = null;
     }
 
     private void ShowCreateModal()

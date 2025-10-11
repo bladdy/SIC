@@ -64,6 +64,11 @@ public partial class EventsDetails
         IsModalVisible = true;
     }
 
+    private void NavegateToMessage()
+    {
+        NavigationManager.NavigateTo($"/events/message-events{EventDetail!.Code}");
+    }
+
     private void ShowEditModal(Invitation invitation)
     {
         NewInvitation = new Invitation

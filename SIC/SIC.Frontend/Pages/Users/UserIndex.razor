@@ -1,4 +1,68 @@
 ﻿@page "/users"
-<h3>UserIndex</h3>
 
+<span>
+    <a class="btn btn-custom float-end" href="/users/create"><i class="oi oi-plus"></i>Crear Usuario</a>
+</span>
+<div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center;">
+    <div>
+        <input style="width: 400px;" type="text" class="form-control" id="titulo" placeholder="Buscar usuario..." @bind-value="Filter" />
+    </div>
+    <div class="mx-1">
+        <button type="button" class="btn btn-custom" @onclick="ApplyFilterAsync"><i class="oi oi-layers" /> Filtrar</button>
+        <button type="button" class="btn btn-custom" @onclick="CleanFilterAsync"><i class="oi oi-ban" /> Limpiar</button>
+    </div>
+</div>
 
+<GenericList MyList="Users">
+    <Body>
+        <table class="table table-striped table-hover table-bordered align-middle">
+            <thead class="" style="background-color:#3C6A79; color: white;">
+                <tr class="text-center">
+                    <th>Usuario</th>
+                    <th>Documento</th>
+                    <th>Teléfono</th>
+                    <th>Email</th>
+                    <th>Dirección</th>
+                    <th>Confirmado</th>
+                    <th>Tipo Usuario</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Users is null)
+                {
+                    <Loading />
+                }
+                else
+                {
+                    @foreach (var user in Users)
+                    {
+                        <tr>
+
+                            <td>@user.FullName</td>
+                            <td>@user.Document</td>
+                            <td>@user.PhoneNumber</td>
+                            <td>@user.Email</td>
+                            <td>@user.Address</td>
+                            <td>@user.EmailConfirmed</td>
+                            <td>@user.UserType.GetDescription()</td>
+                            <td class="text-center">
+                                <a href="/users/edit/@user.Id" class="btn btn-sm btn-custom me-2">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+        <div class="d-flex justify-content-center my-3">
+            <Pagination CurrentPage="currentPage"
+                        TotalPages="totalPages"
+                        SelectedPage="SelectedPage" />
+
+        </div>
+
+    </Body>
+</GenericList>

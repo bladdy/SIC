@@ -2,7 +2,7 @@
 <h3 class="mb-4">Mis Eventos</h3>
 
 <div class="mb-3">
-    <button class="btn btn-primary" @onclick="ShowCreateModal">
+    <button class="btn btn-custom" @onclick="ShowCreateModal">
         Crear Evento
     </button>
 </div>
@@ -36,10 +36,10 @@
     </InputSelect>
 
     <!-- Botones -->
-    <button type="button" class="btn btn-outline-primary mx-1" @onclick="ApplyFilterAsync">
+    <button type="button" class="btn btn-custom mx-1" @onclick="ApplyFilterAsync">
         <i class="bi bi-funnel" /> Filtrar
     </button>
-    <button type="button" class="btn btn-outline-danger" @onclick="CleanFilterAsync">
+    <button type="button" class="btn btn-custom" @onclick="CleanFilterAsync">
         <i class="bi bi-x-circle" /> Limpiar
     </button>
 </div>
@@ -47,7 +47,7 @@
 <GenericList MyList="Events">
     <Body>
         <table class="table table-striped table-hover table-bordered align-middle">
-            <thead class="table-dark">
+            <thead style="color: white; background-color: #3C6A79;">
                 <tr class="text-center">
                     <th>Codigo</th>
                     <th>Título</th>
@@ -87,10 +87,10 @@
                             <td>@even.HostPhone</td>
                             <td>@even.Status.GetDescription()</td>
                             <td class="text-center">
-                                <button class="btn btn-sm btn-warning me-2" @onclick="() => ShowEditModal(even)">
+                                <button class="btn btn-sm btn-custom me-2" @onclick="() => ShowEditModal(even)">
                                     <i class="bi bi-pencil-fill"></i>
                                 </button>
-                                <button class="btn btn-sm btn-danger" @onclick="() => ConfirmDelete(even)">
+                                <button class="btn btn-sm btn-custom" @onclick="() => ConfirmDelete(even)">
                                     <i class="bi bi-trash-fill"></i>
                                 </button>
                             </td>
@@ -212,7 +212,7 @@
                         </div>
                         <!--Inhabilitar los botones hasta que termine de enviar-->
                         <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">
+                            <button type="submit" class="btn btn-custom">
                                 Guardar
                             </button>
                             <button type="button" class="btn btn-secondary" @onclick="CloseModal">

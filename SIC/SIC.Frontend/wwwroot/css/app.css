@@ -7,8 +7,19 @@ h1:focus {
 }
 
 a, .btn-link {
-    color: #0071c1;
+    color: #3C6A79;
 }
+.btn-custom {
+    background-color: #3C6A79 !important; /* Color de fondo */
+    color: white !important; /* Color del texto */
+    border: none; /* Eliminar borde predeterminado */
+}
+
+    .btn-custom:hover {
+        background-color: #2e4e59 !important; /* Color de fondo al pasar el mouse (opcional) */
+        color: white !important; /* Mantener el color blanco */
+        border-color: #2e4e59; /* Opcional: Añadir color al borde */
+    }
 
 .btn-primary {
     color: #fff;
@@ -16,8 +27,27 @@ a, .btn-link {
     border-color: #1861ac;
 }
 
+/* Cambiar el color de la clase active */
+.pagination .page-item.active .page-link {
+    background-color: #3C6A79 !important; /* Color de fondo del ítem activo */
+    border-color: #3C6A79 !important; /* Color del borde del ítem activo */
+}
+
+    .pagination .page-item.active .page-link:hover {
+        background-color: #3C6A79; /* Color de fondo al pasar el ratón sobre el ítem activo */
+        border-color: #3C6A79; /* Color del borde al pasar el ratón */
+    }
+
+input.form-control:focus {
+    border-color: #3C6A79 !important; /* Cambiar el color del borde */
+    box-shadow: 0 0 5px rgba(60, 106, 121, 0.5); /* Agregar resplandor */
+}
+select.form-control:focus {
+    border-color: #3C6A79 !important; /* Cambiar el color del borde */
+    box-shadow: 0 0 5px rgba(60, 106, 121, 0.5); /* Agregar resplandor */
+}
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #3C6A79;
 }
 
 .content {

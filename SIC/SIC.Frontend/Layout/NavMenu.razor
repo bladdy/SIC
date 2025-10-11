@@ -1,6 +1,9 @@
 ﻿<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand d-block" href="">SIC</a>
+        
+        <a class="navbar-brand d-block" href="/" style="font-size: 2rem; font-weight: bold; color:white;">
+            SIC
+        </a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -9,73 +12,63 @@
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
+        <!-- 🔒 Solo Admin -->
         <AuthorizeView Roles="Admin">
             <Authorized>
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <NavLink class="dropdown-item" href="" Match="NavLinkMatch.All">
                         <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Inicio
                     </NavLink>
                 </div>
+
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="events" Match="NavLinkMatch.All">
+                    <NavLink class="dropdown-item" href="events" Match="NavLinkMatch.All">
                         <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Eventos
                     </NavLink>
                 </div>
+
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="my-events" Match="NavLinkMatch.All">
+                    <NavLink class="dropdown-item" href="my-events" Match="NavLinkMatch.All">
                         <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Mis Eventos
                     </NavLink>
                 </div>
+
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="users" Match="NavLinkMatch.All">
+                    <NavLink class="dropdown-item" href="users" Match="NavLinkMatch.All">
                         <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Usuarios
                     </NavLink>
                 </div>
 
                 <div class="nav-item px-3">
                     <NavLink class="dropdown-item" href="services" Match="NavLinkMatch.All">
-                        <span class="bi bi-house-door-fill-nav-menu"></span> Servicios
+                        <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Servicios
                     </NavLink>
                 </div>
+
                 <div class="nav-item px-3">
                     <NavLink class="dropdown-item" href="events-types" Match="NavLinkMatch.All">
-                        <span class="bi bi-house-door-fill-nav-menu"></span> Tipos de Eventos
+                        <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Tipos de Eventos
                     </NavLink>
                 </div>
+
                 <div class="nav-item px-3">
                     <NavLink class="dropdown-item" href="plans" Match="NavLinkMatch.All">
-                        <span class="bi bi-house-door-fill-nav-menu"></span> Planes
+                        <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Planes
                     </NavLink>
                 </div>
             </Authorized>
         </AuthorizeView>
 
-
-        @* <div class="nav-item px-3">
-            <NavLink class="nav-link" href="services" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Servicios
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="events-types" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Tipos de Eventos
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="plans" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Planes
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div> *@
+        <!-- 🔒 WeddingPlanner y User -->
+        <AuthorizeView Roles="WeddingPlanner,User">
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="dropdown-item" href="my-events" Match="NavLinkMatch.All">
+                        <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Mis Eventos
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
     </nav>
 </div>
 
@@ -90,8 +83,10 @@
     {
         collapseNavMenu = !collapseNavMenu;
     }
+
     private void ToggleNavMenuItem()
     {
         collapseNavMenuItem = !collapseNavMenuItem;
     }
 }
+ 

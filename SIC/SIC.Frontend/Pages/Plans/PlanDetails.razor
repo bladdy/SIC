@@ -1,5 +1,5 @@
 ﻿@page "/Plans/details/{Id}"
-
+<!--chk de seleccionar todo o deshacer todo-->
 @if (_isLoading)
 {
     <p>Cargando información...</p>
@@ -25,7 +25,7 @@ else
         </div>
     }
 
-    <button class="bg-blue-600 text-white px-3 py-1 rounded mt-3"
+    <button class="btn btn-custom text-white px-3 py-1 rounded mt-3"
             @onclick="AgregarAlPlan">
         Agregar al Plan
     </button>

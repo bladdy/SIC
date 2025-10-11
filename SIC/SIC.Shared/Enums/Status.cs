@@ -64,6 +64,12 @@ namespace SIC.Shared.Enums
         Paid,
 
         [Description("Avisado")]
-        Warned
+        Warned,
+
+        [Description("Asistire")]
+        Attend,
+
+        [Description("No Asistire")]
+        NotAttend
     }
 }
