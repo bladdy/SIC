@@ -1,0 +1,42 @@
+version: '3.9'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sic_sqlserver
+    environment:
+      SA_PASSWORD: "Bladdy3434!"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1435:1435" # Changed host port to 1435 to avoid conflicts
+    volumes:
+      - sql_data:/var/opt/mssql
+    restart: always
+
+  backend:
+    build:
+      context: .
+      dockerfile: SIC.Backend/Dockerfile
+    container_name: sic_backend
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Server=sic_sqlserver,1435;Database=SICDB;User Id=sa;Password=Bladdy3434!;TrustServerCertificate=True;
+    depends_on:
+      - sqlserver
+    ports:
+      - "5000:8080"
+    restart: always
+
+  frontend:
+    build:
+      context: .
+      dockerfile: SIC.Frontend/Dockerfile
+    container_name: sic_frontend
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    restart: always
+
+volumes:
+  sql_data:

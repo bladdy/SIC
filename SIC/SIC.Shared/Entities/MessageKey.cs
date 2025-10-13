@@ -14,15 +14,15 @@ namespace SIC.Shared.Entities
 
         [Required]
         [MaxLength(500)]
-        public string Key { get; set; } // La clave del mensaje
+        public string Key { get; set; } = null!; // La clave del mensaje
 
         [Required]
         [MaxLength(500)]
-        public string Description { get; set; } // Descripción de la clave
+        public string Description { get; set; } = null!; // Descripción de la clave
 
         [Required]
         [MaxLength(100)]
-        public string PropertyName { get; set; } // Nombre de la propiedad de Invitation, ej. "Name"
+        public string PropertyName { get; set; } = null!; // Nombre de la propiedad de Invitation, ej. "Name"
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // Fecha de creación
         public DateTime? UpdatedAt { get; set; } // Fecha de última actualización (opcional)
