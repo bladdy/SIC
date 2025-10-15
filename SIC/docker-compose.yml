@@ -8,10 +8,12 @@ services:
       SA_PASSWORD: "Bladdy3434!"
       ACCEPT_EULA: "Y"
     ports:
-      - "1435:1435" # Changed host port to 1435 to avoid conflicts
+      - "1433:1433"  # host:container
     volumes:
       - sql_data:/var/opt/mssql
     restart: always
+    networks:
+      - sic_network
 
   backend:
     build:
@@ -20,12 +22,14 @@ services:
     container_name: sic_backend
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - ConnectionStrings__DefaultConnection=Server=sic_sqlserver,1435;Database=SICDB;User Id=sa;Password=Bladdy3434!;TrustServerCertificate=True;
+      - ConnectionStrings__DefaultConnection=Server=sic_sqlserver,1433;Database=SIC_DB;User Id=sa;Password=Bladdy3434!;TrustServerCertificate=True;Encrypt=False;
     depends_on:
       - sqlserver
     ports:
       - "5000:8080"
     restart: always
+    networks:
+      - sic_network
 
   frontend:
     build:
@@ -37,6 +41,12 @@ services:
     ports:
       - "80:80"
     restart: always
+    networks:
+      - sic_network
 
 volumes:
   sql_data:
+
+networks:
+  sic_network:
+    driver: bridge

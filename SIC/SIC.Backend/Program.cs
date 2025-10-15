@@ -54,13 +54,14 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
-builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer("name=LocalConnection"));
+builder.Services.AddDbContext<DataContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddTransient<SeedDb>();
 
 // Registrar el servicio de WhatsAppService
 builder.Services.AddScoped<WhatsAppService>();
 builder.Services.AddScoped<BoletaService>();
-// Inyección de dependencias genérica
+// Inyecciï¿½n de dependencias genï¿½rica
 
 builder.Services.AddScoped(typeof(IGenericUnitOfWork<>), typeof(GenericUnitOfWork<>));
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
