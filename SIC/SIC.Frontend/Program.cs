@@ -14,8 +14,8 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 // Detectar si estamos corriendo dentro de Docker
 var isDocker = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
 
-string backendUrl;
-if (isDocker)
+string backendUrl = "https://localhost:7141/";
+/*if (isDocker)
 {
     // Contenedores Docker: usar nombre del servicio y puerto interno
     //https://localhost:7141/ local Visual Studio
@@ -25,7 +25,7 @@ else
 {
     // Local: acceder a localhost y puerto expuesto por docker
     backendUrl = "http://localhost:5000/";
-}
+}*/
 
 // Configurar HttpClient con la URL correcta
 builder.Services.AddSingleton(sp => new HttpClient { BaseAddress = new Uri(backendUrl) });

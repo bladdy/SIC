@@ -21,6 +21,7 @@ public class DataContext : IdentityDbContext<User>
     public DbSet<UsuarioWhatsAppConfig> UsuarioWhatsAppConfigs { get; set; }
     public DbSet<MassiveShippingProgress> MassiveShippingProgresses { get; set; }
     public DbSet<MessageKey> MessageKeys { get; set; }
+    public DbSet<Template> Templates { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

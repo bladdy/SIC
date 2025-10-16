@@ -10,5 +10,7 @@ namespace SIC.Backend.UnitOfWork.Interfaces
         Task<ActionResponse<Message>> AddFullAsync(Message message, string eventCode);
 
         Task<ActionResponse<Message>> UpdateFullAsync(Message message, string eventCode);
+
+        Task<ActionResponse<IEnumerable<MessageKey>>> GetKeysAsync();
     }
 }

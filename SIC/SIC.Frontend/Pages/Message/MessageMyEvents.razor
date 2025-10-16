@@ -1,4 +1,4 @@
-﻿@page "/events/message-events/{Code}"
+﻿@page "/events/message-my-events/{Code}"
 
 <div class="d-flex justify-content-center align-items-center">
     @if (NewMessage != null)
@@ -41,14 +41,14 @@
 
             <h3>Tokens que puede usar en mensajes:</h3>
             <ul>
-                @foreach (var token in Tokens!)
+                @foreach (var token in tokens)
                 {
-                    <li>@token.Key - @token.Description</li>
+                    <li>@token</li>
                 }
             </ul>
 
             <div class="form-group">
-                <button type="submit" class="btn btn-custom" disabled="@(isLoading)">
+                <button type="submit" class="btn btn-btn-custom" disabled="@(isLoading)">
                     @if (isLoading)
                     {
                         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>

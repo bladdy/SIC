@@ -19,6 +19,7 @@ namespace SIC.Backend.UnitOfWork.Implemetations
         public async Task<ActionResponse<Message>> AddFullAsync(Message message, string eventCode) => await _messageRepository.AddFullAsync(message, eventCode);
 
         public async Task<ActionResponse<Message>> UpdateFullAsync(Message message, string eventCode) => await _messageRepository.UpdateFullAsync(message, eventCode);
-    }
 
+        public async Task<ActionResponse<IEnumerable<MessageKey>>> GetKeysAsync() => await _messageRepository.GetKeysAsync();
+    }
 }

@@ -47,6 +47,17 @@ namespace SIC.Backend.Controllers
             return NotFound();
         }
 
+        [HttpGet("Keys")]
+        public async Task<IActionResult> GetKeysAsync()
+        {
+            var response = await _messageUnitOfWork.GetKeysAsync();
+            if (response.Success)
+            {
+                return Ok(response.Result);
+            }
+            return NotFound();
+        }
+
         [HttpPost("full")]
         public async Task<IActionResult> PostFullAsync(Message message, string code)
         {

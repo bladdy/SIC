@@ -22,8 +22,19 @@ public class SeedDb
         await CheckEventTypesAsync();
         await CheckItemsAsync();
         await CheckRolesAsync();
+        await CheckTemplatesAsync();
         await CheckMessageKeysAsync(); // Llamada al nuevo método para las claves de mensaje
         await CheckUserAsync("8949", "Bladimir", "Almanzar", "bladdy@yopmail.com", "8661425258", "Calle luna Calle sol", UserType.Admin);
+    }
+
+    private async Task CheckTemplatesAsync()
+    {
+        if (!_context.Templates.Any())
+        {
+            _context.Templates.Add(new Template { Name = "Confirmacion", Content = "Hola {nombre_invitacion},\r\n\r\nCon mucha ilusión queremos compartir contigo un momento muy especial. ✨\r\n\r\n{evento_titulo}\r\n{evento_subtitulo}\r\n\r\nTe invitamos a celebrar una noche llena de alegría, magia y muchos recuerdos por crear. \r\n\r\nHaz clic en el siguiente enlace para ver todos los detalles de tú invitación:\r\n\r\n👉 {linkinvitacion}\r\n\r\n\r\n📅 {evento_fecha}\r\n\r\nTu confirmación de asistencia es muy importante, ya que nos permitirá organizar todo de la mejor manera y disfrutar juntos de este gran día.\r\n\r\nCon cariño,\r\n{evento_titulo}✨\r\n\r\nNota: en caso de que tu enlace se encuentre de color negro, agradeceremos mucho guardes en tus contactos éste número y de esta forma se activará." });
+            _context.Templates.Add(new Template { Name = "Aviso", Content = "Hola {nombre_invitacion},\r\n\r\nEstamos a muy pocos días de este gran evento {evento_subtitulo}. ✨\r\n\r\nSi aún no has confirmado, agradecemos mucho realices tu confirmación dando clic en el siguiente enlace:\r\n\r\n👉 {linkinvitacion}\r\n\r\n\r\n📅 {evento_fecha}\r\n\r\nTu confirmación de asistencia es muy importante, ya que nos permitirá organizar todo de la mejor manera y disfrutar juntos de este gran día.\r\n\r\nCon cariño,\r\n{evento_titulo}✨\r\n\r\nNota: en caso de que tu enlace se encuentre de color negro, agradeceremos mucho guardes en tus contactos éste número y de esta forma se activará." });
+            await _context.SaveChangesAsync();
+        }
     }
 
     private async Task CheckUserAsync(string document, string firstName, string lastName, string email, string phone, string address, UserType admin)
@@ -78,22 +89,22 @@ public class SeedDb
     private async Task CheckMessageKeysAsync()
     {
         var keys_message = new List<MessageKey>
-    {
-        new MessageKey { Key = "{nombre_invitacion}", Description = "Rótulo de la invitación", PropertyName = "Name" },
-        new MessageKey { Key = "{numero_de_lugares}", Description = "Número de lugares para adultos", PropertyName = "NumberAdults" },
-        new MessageKey { Key = "{invitados_menores}", Description = "Número de invitados menores de edad", PropertyName = "NumberChildren" },
-        new MessageKey { Key = "{NumberConfirmedAdults}", Description = "Número de adultos confirmados", PropertyName = "NumberConfirmedAdults" },
-        new MessageKey { Key = "{NumberConfirmedChildren}", Description = "Número de niños confirmados", PropertyName = "NumberConfirmedChildren" },
-        new MessageKey { Key = "{linkinvitacion}", Description = "Link personalizado para el invitado", PropertyName = "LinkInvitation" },
-        new MessageKey { Key = "{mesa_asignada}", Description = "Código de mesa asignada al invitado", PropertyName = "Table" },
-        new MessageKey { Key = "{evento_titulo}", Description = "Título del evento", PropertyName = "EventTitle" },
-        new MessageKey { Key = "{evento_subtitulo}", Description = "Subtítulo del evento", PropertyName = "EventSubtitle" },
-        new MessageKey { Key = "{evento_fecha}", Description = "Fecha del evento", PropertyName = "EventDate" },
-        new MessageKey { Key = "{evento_hora}", Description = "Hora de la recepción", PropertyName = "EventTime" },
-        new MessageKey { Key = "{Email}", Description = "Correo electrónico del invitado", PropertyName = "Email" },
-        new MessageKey { Key = "{PhoneNumber}", Description = "Número de teléfono del invitado", PropertyName = "PhoneNumber" },
-        new MessageKey { Key = "{Comments}", Description = "Comentarios del invitado", PropertyName = "Comments" }
-    };
+        {
+            new MessageKey { Key = "{nombre_invitacion}", Description = "Rótulo de la invitación", PropertyName = "Name" },
+            new MessageKey { Key = "{numero_de_lugares}", Description = "Número de lugares para adultos", PropertyName = "NumberAdults" },
+            new MessageKey { Key = "{invitados_menores}", Description = "Número de invitados menores de edad", PropertyName = "NumberChildren" },
+            new MessageKey { Key = "{NumberConfirmedAdults}", Description = "Número de adultos confirmados", PropertyName = "NumberConfirmedAdults" },
+            new MessageKey { Key = "{NumberConfirmedChildren}", Description = "Número de niños confirmados", PropertyName = "NumberConfirmedChildren" },
+            new MessageKey { Key = "{linkinvitacion}", Description = "Link personalizado para el invitado", PropertyName = "LinkInvitation" },
+            new MessageKey { Key = "{mesa_asignada}", Description = "Código de mesa asignada al invitado", PropertyName = "Table" },
+            new MessageKey { Key = "{evento_titulo}", Description = "Título del evento", PropertyName = "Event.Name" },
+            new MessageKey { Key = "{evento_subtitulo}", Description = "Subtítulo del evento", PropertyName = "Event.Subtitle" },
+            new MessageKey { Key = "{evento_fecha}", Description = "Fecha del evento", PropertyName = "Event.Date" },
+            new MessageKey { Key = "{evento_hora}", Description = "Hora de la recepción", PropertyName = "Event.Time" },
+            new MessageKey { Key = "{Email}", Description = "Correo electrónico del invitado", PropertyName = "Email" },
+            new MessageKey { Key = "{PhoneNumber}", Description = "Número de teléfono del invitado", PropertyName = "PhoneNumber" },
+            new MessageKey { Key = "{Comments}", Description = "Comentarios del invitado", PropertyName = "Comments" }
+        };
 
         foreach (var key in keys_message)
         {

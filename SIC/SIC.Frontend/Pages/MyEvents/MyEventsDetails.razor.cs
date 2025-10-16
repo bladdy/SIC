@@ -139,7 +139,7 @@ public partial class MyEventsDetails
 
     private void NavegateToMessage()
     {
-        NavigationManager.NavigateTo($"/events/message-events/{EventDetail!.Code}");
+        NavigationManager.NavigateTo($"/events/message-my-events/{EventDetail!.Code}");
     }
 
     private async Task CopiarInvitacion(string codeinvitation, int invitationId, int column)

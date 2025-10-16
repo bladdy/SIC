@@ -98,5 +98,15 @@ namespace SIC.Backend.Repositories.Implemetations
                 };
             }
         }
+
+        public async Task<ActionResponse<IEnumerable<MessageKey>>> GetKeysAsync()
+        {
+            var entities = await _context.MessageKeys.ToListAsync();
+            return new ActionResponse<IEnumerable<MessageKey>>
+            {
+                Success = true,
+                Result = entities
+            };
+        }
     }
 }

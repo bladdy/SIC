@@ -6,7 +6,7 @@ using System.Net;
 
 namespace SIC.Frontend.Pages.Message
 {
-    public partial class MessageEvents
+    public partial class MessageMyEvents
     {
         [Parameter] public string? Code { get; set; }
         public Event? EventDetail { get; set; }
@@ -20,30 +20,23 @@ namespace SIC.Frontend.Pages.Message
         private string Title = "No";
         private string SubTitle = "No";
 
-        public List<MessageKey>? Tokens { get; set; }
+        private List<string> tokens = new List<string>
+        {
+            "{nombre_invitacion} - Rótulo de Invitación",
+            "{numero_de_lugares} - Número de lugares adultos",
+            "{invitados_menores} - Número de invitados menores",
+            "{linkinvitacion} - Link particular para el invitado",
+            "{mesa_asignada} - Código de mesa asignada",
+            "{evento_titulo} - Título del evento",
+            "{evento_subtitulo} - Subtítulo del evento",
+            "{evento_fecha} - Fecha del evento",
+            "{evento_hora} - Hora de la recepción"
+        };
 
         protected override async Task OnInitializedAsync()
         {
             await LoadEvent();
             await LoadMessage();
-            await LoadKeys();
-        }
-
-        private async Task LoadKeys()
-        {
-            var responseHttp = await Repository.GetAsync<List<MessageKey>>($"api/Messages/Keys");
-            if (responseHttp.Error)
-            {
-                if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
-                {
-                    NavigationManager.NavigateTo("/events");
-                    return;
-                }
-                var message = await responseHttp.GetErrorMessageAsync();
-                await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
-                return;
-            }
-            Tokens = responseHttp?.Response ?? new List<MessageKey>();
         }
 
         private async Task LoadEvent()
@@ -131,7 +124,7 @@ namespace SIC.Frontend.Pages.Message
                 isEditOrCreate ? "Los mensajes han sido creados con éxito." : "Los mensajes han sido actualizados con éxito.",
                 SweetAlertIcon.Success
             );
-            NavigationManager.NavigateTo($"/events/details/{Code}");
+            NavigationManager.NavigateTo($"/my-events/details/{Code}");
             isLoading = false;
         }
     }

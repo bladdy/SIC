@@ -5,7 +5,6 @@ using SIC.Backend.Repositories.Interfaces;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using SIC.Shared.Response;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SIC.Backend.Repositories.Implemetations;
 
@@ -75,9 +74,18 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
                     Message = "El Tipo de Evento no es valido."
                 };
             }
-
+            var confirmation = await _context.Templates.FirstOrDefaultAsync(e => e.Name.ToLower() == "Confirmacion");
+            var aviso = await _context.Templates.FirstOrDefaultAsync(e => e.Name.ToLower() == "Aviso");
             events.Code = CodeGenerator.GenerateCode();
             events.EventType = eventType;
+            events.Message = new Message
+            {
+                Title = events.Name,
+                SubTitle = events.SubTitle,
+                MessageInvitation = confirmation!.Content,
+                MessageConfirmation = aviso!.Content,
+            };
+
             _context.Add(events);
             await _context.SaveChangesAsync();
             return new ActionResponse<Event>

@@ -56,6 +56,7 @@
                     <th>Fecha</th>
                     <th>Hora</th>
                     <th>Url</th>
+                    <th>Ubicacion</th>
                     <th>Anfitrión</th>
                     <th>Teléfono</th>
                     <th>Planner</th>
@@ -83,6 +84,11 @@
                             <td>
                                 <a href="@even.Url" target="_blank" style="color:#3C6A79;">
                                     <i class="bi bi-link-45deg">Invitacion</i>
+                                </a>
+                            </td>
+                            <td>
+                                <a href="@even.Ubication" target="_blank" style="color:#3C6A79;">
+                                    <i class="bi bi-link-45deg">Ubicacion</i>
                                 </a>
                             </td>
                             <td>@even.Host</td>
@@ -179,6 +185,10 @@
                         <div class="mb-3">
                             <label class="form-label">URL</label>
                             <InputText class="form-control" @bind-Value="NewEvent.Url" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Ubicacion</label>
+                            <InputText class="form-control" @bind-Value="NewEvent.Ubication" />
                         </div>
                         <div class="mb-3 row">
 

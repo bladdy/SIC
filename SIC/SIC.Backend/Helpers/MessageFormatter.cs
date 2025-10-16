@@ -1,4 +1,5 @@
 ﻿using SIC.Shared.Entities;
+using System.Globalization;
 using System.Reflection;
 
 namespace SIC.Backend.Helpers
@@ -10,16 +11,58 @@ namespace SIC.Backend.Helpers
             if (message == null || invitation == null || messageKeys == null)
                 throw new ArgumentNullException("message, invitation o messageKeys no puede ser null");
 
-            // Crear diccionario <PropertyName, valor> desde la invitación
-            var invitationDict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var prop in invitation.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            // 🔹 Método auxiliar para obtener propiedades incluso anidadas (ej: "Event.Name")
+            string GetNestedPropertyValue(object? obj, string propertyPath)
             {
-                var value = prop.GetValue(invitation);
-                invitationDict[prop.Name] = value?.ToString() ?? string.Empty;
-            }
-            //ToDo: chequear el formato de las fechas y horas en los mensajes para que sean legibles EN ESPAÑOL
+                if (obj == null || string.IsNullOrEmpty(propertyPath))
+                    return string.Empty;
 
-            // Método para reemplazar tokens en un texto
+                var parts = propertyPath.Split('.');
+                object? currentValue = obj;
+
+                foreach (var part in parts)
+                {
+                    if (currentValue == null)
+                        return string.Empty;
+
+                    var prop = currentValue.GetType().GetProperty(part, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+                    if (prop == null)
+                        return string.Empty;
+
+                    currentValue = prop.GetValue(currentValue);
+                }
+
+                // 🔸 Formatear valores especiales
+                if (currentValue is DateTime date)
+                    return date.ToString("dddd dd 'de' MMMM 'de' yyyy", new CultureInfo("es-ES"));
+
+                if (currentValue is TimeSpan time)
+                    return DateTime.Today.Add(time).ToString("hh:mm tt", new CultureInfo("es-ES"));
+
+                return currentValue?.ToString() ?? string.Empty;
+            }
+
+            // 🔹 Propiedades calculadas o personalizadas
+            string GetCustomValue(string key)
+            {
+                switch (key.ToLower())
+                {
+                    case "linkinvitation":
+                        {
+                            // Construye la URL dinámica: miapp.com/mievento/codigoevento/codigoinvitacion
+                            var baseUrl = invitation.Event?.Url?.TrimEnd('/') ?? "https://miapp.com";
+                            var eventCode = invitation.Event?.Code ?? string.Empty;
+                            var invitationCode = invitation.Code ?? string.Empty;
+
+                            // Construcción final
+                            return $"{baseUrl}/{eventCode}/{invitationCode}";
+                        }
+                    default:
+                        return string.Empty;
+                }
+            }
+
+            // 🔹 Reemplazar tokens en el texto
             string ReplaceTokens(string text)
             {
                 if (string.IsNullOrEmpty(text))
@@ -27,14 +70,26 @@ namespace SIC.Backend.Helpers
 
                 foreach (var key in messageKeys)
                 {
-                    if (invitationDict.TryGetValue(key.PropertyName, out var replacement))
+                    string replacement;
+
+                    // Si es una propiedad calculada como {linkinvitacion}
+                    if (key.PropertyName.Equals("LinkInvitation", StringComparison.OrdinalIgnoreCase))
                     {
-                        text = text.Replace(key.Key, replacement);
+                        replacement = GetCustomValue("LinkInvitation");
                     }
+                    else
+                    {
+                        // Propiedades normales (incluso anidadas)
+                        replacement = GetNestedPropertyValue(invitation, key.PropertyName);
+                    }
+
+                    text = text.Replace(key.Key, replacement ?? string.Empty);
                 }
 
                 return text;
             }
+
+            // 🔹 Retornar el mensaje formateado
             return new Message
             {
                 Id = message.Id,
