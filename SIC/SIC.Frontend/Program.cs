@@ -28,7 +28,7 @@ else
 }*/
 builder.Services.AddSingleton(sp => new HttpClient
 {
-    BaseAddress = new Uri($"{builder.HostEnvironment.BaseAddress}api/")
+    BaseAddress = new Uri($"{builder.HostEnvironment.BaseAddress}")
 });
 // Configurar HttpClient con la URL correcta
 //builder.Services.AddSingleton(sp => new HttpClient { BaseAddress = new Uri(backendUrl) });
