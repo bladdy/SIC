@@ -26,9 +26,12 @@ else
     // Local: acceder a localhost y puerto expuesto por docker
     backendUrl = "http://localhost:5000/";
 }*/
-
+builder.Services.AddSingleton(sp => new HttpClient
+{
+    BaseAddress = new Uri($"{builder.HostEnvironment.BaseAddress}api/")
+});
 // Configurar HttpClient con la URL correcta
-builder.Services.AddSingleton(sp => new HttpClient { BaseAddress = new Uri(backendUrl) });
+//builder.Services.AddSingleton(sp => new HttpClient { BaseAddress = new Uri(backendUrl) });
 
 // Servicios y autenticación
 builder.Services.AddScoped<IRepository, Repository>();
