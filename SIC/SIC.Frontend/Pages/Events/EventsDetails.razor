@@ -1,6 +1,6 @@
 ﻿@page "/events/details/{Code}"
 @using SIC.Frontend.Shared
-
+<PageTitle>Detalles del Evento</PageTitle>
 <!--
 <h3 class="mb-2">Detalle del Evento</h3>-->
 @if (EventDetail is null)
@@ -36,7 +36,7 @@ else
                 <div class="col-md-4 ">
                     <p><strong>Fecha:</strong> @EventDetail.Date.ToString("dd/MM/yyyy")</p>
                     <p><strong>Hora:</strong> @DateTime.Today.Add(EventDetail.Time).ToString("hh:mm tt")</p>
-                    <p><strong>Ubicación:</strong> <a href="@EventDetail.Ubication" target="_blank">@EventDetail.Ubication</a></p>
+                    <p><strong>Ubicación:</strong> <a href="@EventDetail.Ubication" target="_blank">Ubicación del evento</a></p>
                 </div>
 
                 <!-- Columna 2: Host y Planner -->
@@ -53,7 +53,7 @@ else
                             <em>No asignado</em>
                         }
                     </p>
-                    <p><strong>Url Invitación:</strong> <a href="@EventDetail.Url" target="_blank">@EventDetail.Url</a></p>
+                    <p><strong>Url Invitación:</strong> <a href="@EventDetail.Url" target="_blank">Url de la invitación</a></p>
                 </div>
 
                 <!-- Columna 3: Invitados y Adultos/Niños -->

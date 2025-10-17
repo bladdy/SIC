@@ -1,4 +1,5 @@
 ﻿@page "/events"
+<PageTitle>Eventos</PageTitle>
 <h3 class="mb-2">Eventos</h3>
 
 <div class="mb-3">
@@ -46,78 +47,152 @@
 
 <GenericList MyList="Events">
     <Body>
-        <table class="table table-striped table-hover table-bordered align-middle">
-            <thead class="" style="background-color:#3C6A79; color: white;">
-                <tr class="text-center">
-                    <th>Codigo</th>
-                    <th>Título</th>
-                    <th>Sub-Título</th>
-                    <th>Evento</th>
-                    <th>Fecha</th>
-                    <th>Hora</th>
-                    <th>Url</th>
-                    <th>Ubicacion</th>
-                    <th>Anfitrión</th>
-                    <th>Teléfono</th>
-                    <th>Planner</th>
-                    <th>Teléfono</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Events != null && Events.Any())
-                {
-                    @foreach (var even in Events)
-                    {
-                        <tr class="align-middle">
-                            <td>
-                                <a href="/events/details/@even.Code" style="color:#3C6A79;">
-                                    @even.Code
-                                </a>
-                            </td>
-                            <td>@even.Name</td>
-                            <td>@even.SubTitle</td>
-                            <td>@even.EventType!.Name</td>
-                            <td>@even.Date.ToString("dd/MM/yyyy")</td>
-                            <td>@DateTime.Today.Add(even.Time).ToString("hh:mm tt")</td>
-                            <td>
-                                <a href="@even.Url" target="_blank" style="color:#3C6A79;">
-                                    <i class="bi bi-link-45deg">Invitacion</i>
-                                </a>
-                            </td>
-                            <td>
-                                <a href="@even.Ubication" target="_blank" style="color:#3C6A79;">
-                                    <i class="bi bi-link-45deg">Ubicacion</i>
-                                </a>
-                            </td>
-                            <td>@even.Host</td>
-                            <td>@even.HostPhone</td>
-                            <td>@even.Planner</td>
-                            <td>@even.PlannerPhone</td>
-                            <td>@even.Status.GetDescription()</td>
-                            <td class="text-center">
-                                <button class="btn btn-sm btn-custom" @onclick="() => ShowEditModal(even)">
-                                    <i class="bi bi-pencil-fill"></i>
-                                </button>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead style="background-color:#3C6A79; color:white;">
+                    <tr class="text-center">
+                        <th class="text-start">Detalle del Evento</th>
+                        <th>Estado</th>
+                        <th>Fecha y Hora</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
 
-                                <button class="btn btn-sm btn-custom" @onclick="() => ConfirmDelete(even)">
-                                    <i class="bi bi-trash-fill"></i>
-                                </button>
+                <tbody>
+                    @if (Events != null && Events.Any())
+                    {
+                        @foreach (var even in Events)
+                        {
+                            <tr class="border-top">
+                                <!-- ======== COLUMNA 1: INFORMACIÓN GENERAL ======== -->
+                                <td style="white-space: normal; vertical-align: top;">
+                                    <div class="container-fluid">
+                                        <div class="row g-3 small text-secondary">
+
+                                            <!-- ===== COLUMNA 1 ===== -->
+                                            <div class="col-md-4 d-flex flex-column">
+                                                <div class="fw-bold fs-6 text-dark mb-1">
+                                                    @even.Name
+                                                </div>
+
+                                                @if (!string.IsNullOrWhiteSpace(even.SubTitle))
+                                                {
+                                                    <div class="text-muted small mb-2">
+                                                        @even.SubTitle
+                                                    </div>
+                                                }
+
+                                                <div class="mb-2">
+                                                    <strong>Código:</strong>
+                                                    <a href="/events/details/@even.Code" class="text-decoration-none text-primary">
+                                                        @even.Code
+                                                    </a>
+                                                </div>
+
+                                                <div>
+                                                    <strong>Tipo:</strong> @even.EventType!.Name
+                                                </div>
+                                            </div>
+
+                                            <!-- ===== COLUMNA 2 ===== -->
+                                            <div class="col-md-4 d-flex flex-column">
+                                                <div class="mb-2">
+                                                    <i class="bi bi-geo-alt-fill me-1 text-primary"></i>
+                                                    <a href="@even.Ubication" target="_blank" class="text-decoration-none text-secondary">
+                                                        Ubicación
+                                                    </a>
+                                                </div>
+
+                                                <div class="mb-2">
+                                                    <i class="bi bi-link-45deg me-1 text-primary"></i>
+                                                    <a href="@even.Url" target="_blank" class="text-decoration-none text-secondary">
+                                                        Invitación
+                                                    </a>
+                                                </div>
+
+                                                <div class="mb-2">
+                                                    <i class="bi bi-person-fill me-1 text-primary"></i>
+                                                    <strong>Anfitrión:</strong> @even.Host
+                                                </div>
+
+                                                <div>
+                                                    <i class="bi bi-telephone-fill me-1 text-secondary"></i>
+                                                    @even.HostPhone
+                                                </div>
+                                            </div>
+
+                                            <!-- ===== COLUMNA 3 ===== -->
+                                            <div class="col-md-4 d-flex flex-column">
+                                                <div class="mb-2">
+                                                    <i class="bi bi-person-badge-fill me-1 text-primary"></i>
+                                                    <strong>Planner:</strong> @even.Planner
+                                                </div>
+
+                                                <div class="mb-2">
+                                                    <i class="bi bi-telephone-fill me-1 text-secondary"></i>
+                                                    @even.PlannerPhone
+                                                </div>
+
+                                                <div class="mt-2">
+                                                    <strong>Fecha:</strong> @even.Date.ToString("dd/MM/yyyy")
+                                                </div>
+
+                                                <div>
+                                                    <strong>Hora:</strong> @DateTime.Today.Add(even.Time).ToString("hh:mm tt")
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+
+
+                                <!-- ======== COLUMNA 2: ESTADO ======== -->
+                                <td class="text-center">
+                                    <span class="px-3 py-2 fs-6 badge bg-@(even.Status == Status.Active ? "success" : even.Status == Status.Cancelled ? "danger" : "secondary")">
+                                        @even.Status.GetDescription()
+                                    </span>
+                                </td>
+
+                                <!-- ======== COLUMNA 3: FECHA ======== -->
+                                <td class="text-center">
+                                    <div class="fw-semibold text-dark">
+                                        @even.Date.ToString("dd/MM/yyyy")
+                                    </div>
+                                    <div class="text-muted small">
+                                        @DateTime.Today.Add(even.Time).ToString("hh:mm tt")
+                                    </div>
+                                </td>
+
+                                <!-- ======== COLUMNA 4: ACCIONES ======== -->
+                                <td class="text-center">
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-custom mx-1" title="Editar"
+                                                @onclick="() => ShowEditModal(even)">
+                                            <i class="bi bi-pencil-fill"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-custom" title="Eliminar"
+                                                @onclick="() => ConfirmDelete(even)">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">
+                                No hay eventos registrados.
                             </td>
                         </tr>
                     }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="9" class="text-center text-muted">No hay eventos registrados.</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     </Body>
 </GenericList>
+
 <!-- paginacion-->
 <div class="d-flex justify-content-center my-3">
     <Pagination CurrentPage="currentPage"

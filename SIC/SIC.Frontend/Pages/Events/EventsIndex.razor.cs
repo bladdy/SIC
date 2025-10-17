@@ -191,6 +191,7 @@ namespace SIC.Frontend.Pages.Events
                 Date = evnt.Date,
                 Time = evnt.Time,
                 Url = evnt.Url,
+                Ubication = evnt.Ubication,
                 Host = evnt.Host,
                 HostPhone = evnt.HostPhone,
                 Planner = evnt.Planner,
