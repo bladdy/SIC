@@ -165,16 +165,13 @@
 
                                 <!-- ======== COLUMNA 4: ACCIONES ======== -->
                                 <td class="text-center">
-                                    <div class="btn-group">
-                                        <button class="btn btn-sm btn-custom mx-1" title="Editar"
-                                                @onclick="() => ShowEditModal(even)">
-                                            <i class="bi bi-pencil-fill"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-custom" title="Eliminar"
-                                                @onclick="() => ConfirmDelete(even)">
-                                            <i class="bi bi-trash-fill"></i>
-                                        </button>
-                                    </div>
+                                    <button class="btn btn-sm btn-custom" @onclick="() => ShowEditModal(even)">
+                                        <i class="bi bi-pencil-fill"></i>
+                                    </button>
+
+                                    <button class="btn btn-sm btn-custom" @onclick="() => ConfirmDelete(even)">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </button>
                                 </td>
                             </tr>
                         }
