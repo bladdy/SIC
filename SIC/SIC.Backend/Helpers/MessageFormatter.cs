@@ -55,7 +55,7 @@ namespace SIC.Backend.Helpers
                             var invitationCode = invitation.Code ?? string.Empty;
 
                             // Construcción final
-                            return $"{baseUrl}/{eventCode}/{invitationCode}";
+                            return $"{baseUrl}/?e={eventCode}&i={invitationCode}";
                         }
                     default:
                         return string.Empty;

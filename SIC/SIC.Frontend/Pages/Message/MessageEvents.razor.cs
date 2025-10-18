@@ -134,5 +134,10 @@ namespace SIC.Frontend.Pages.Message
             NavigationManager.NavigateTo($"/events/details/{Code}");
             isLoading = false;
         }
+
+        private void BackToEvent()
+        {
+            NavigationManager.NavigateTo($"/events/details/{Code}");
+        }
     }
 }

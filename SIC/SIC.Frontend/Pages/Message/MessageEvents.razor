@@ -48,8 +48,8 @@
                 }
             </ul>
 
-            <div class="form-group mt-3">
-                <button type="submit" class="btn btn-custom w-100 w-md-auto" disabled="@(isLoading)">
+            <div class="form-group mt-3 d-flex justify-content-end gap-2 flex-wrap">
+                <button type="submit" class="btn btn-custom" disabled="@(isLoading)">
                     @if (isLoading)
                     {
                         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -60,7 +60,12 @@
                         <span>Guardar Mensajes</span>
                     }
                 </button>
+
+                <button type="button" class="btn btn-secondary" @onclick="BackToEvent">
+                    Cancelar
+                </button>
             </div>
+
         </EditForm>
     }
     else

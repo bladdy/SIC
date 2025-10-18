@@ -1,4 +1,3 @@
-
 using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Components;
 using SIC.Frontend.Repositories;
@@ -134,6 +133,11 @@ namespace SIC.Frontend.Pages.Message
             );
             NavigationManager.NavigateTo($"/my-events/details/{Code}");
             isLoading = false;
+        }
+
+        private void BackToEvent()
+        {
+            NavigationManager.NavigateTo($"/my-events/details/{Code}");
         }
     }
 }
