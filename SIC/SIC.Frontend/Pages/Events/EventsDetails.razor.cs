@@ -145,7 +145,7 @@ public partial class EventsDetails
             IsEditMode ? "Inivitacion actualizada con éxito." : "Inivitacion creada con éxito.",
             SweetAlertIcon.Success
         );
-
+        await LoadEvent();
         await LoadInvitations();
     }
 

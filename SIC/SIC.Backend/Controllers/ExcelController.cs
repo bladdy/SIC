@@ -62,7 +62,7 @@ namespace SIC.Backend.Controllers
                         NumberChildren = row.Cell(6).GetValue<int>(),
                         NumberConfirmedAdults = row.Cell(7).GetValue<int>(),
                         NumberConfirmedChildren = row.Cell(8).GetValue<int>(),
-                        Status = Status.Active, //Enum.TryParse<Status>(row.Cell(9).GetString(), out var status) ? status : Status.Pending,
+                        Status = Status.Pending, //Enum.TryParse<Status>(row.Cell(9).GetString(), out var status) ? status : Status.Pending,
                         Table = row.Cell(10).GetString(),
                         Comments = row.Cell(11).GetString(),
                         SentDate = DateTime.Now, //row.Cell(12).GetDateTime(),
@@ -150,14 +150,14 @@ namespace SIC.Backend.Controllers
                         Code = "DUMMY001",
                         Name = "Invitado de Ejemplo",
                         Email = "ejemplo@correo.com",
-                        PhoneNumber = "000-000-0000",
+                        PhoneNumber = "0000000000",
                         NumberAdults = 2,
                         NumberChildren = 1,
-                        NumberConfirmedAdults = 1,
+                        NumberConfirmedAdults = 0,
                         NumberConfirmedChildren = 0,
                         Status = Status.Pending, // 👈 ajusta al enum real que uses
                         Table = "Mesa 1",
-                        Comments = "⚠️ Registro de ejemplo porque no hay invitaciones",
+                        Comments = "Registro de ejemplo porque no hay invitaciones",
                         SentDate = DateTime.Now,
                         ConfirmationDate = null
                     }

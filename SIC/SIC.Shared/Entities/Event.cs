@@ -31,11 +31,10 @@ public class Event : IEntityWithName
     public TimeSpan Time { get; set; }
 
     [Display(Name = "Ubicación")]
-    [Required(ErrorMessage = "El campo {0} es obligatorio.")]
-    public string Ubication { get; set; } = null!;
+    public string? Ubication { get; set; }
 
     [Display(Name = "URL del evento")]
-    public string Url { get; set; } = null!;
+    public string? Url { get; set; }
 
     [Display(Name = "Anfitrión")]
     public string Host { get; set; } = null!;
@@ -78,10 +77,10 @@ public class Event : IEntityWithName
     public int NumberChildren => Invitations?.Sum(a => a.NumberChildren) ?? 0;
 
     // 🔹 Adultos confirmados
-    public int NumberAdultsConfirmed => Invitations?.Sum(a => a.NumberConfirmedAdults) ?? 0;
+    public int NumberAdultsConfirmed => Invitations?.Where(s => s.Status == Status.Attend).Sum(a => a.NumberConfirmedAdults) ?? 0;
 
     // 🔹 Niños confirmados
-    public int NumberChildrenConfirmed => Invitations?.Sum(a => a.NumberConfirmedChildren) ?? 0;
+    public int NumberChildrenConfirmed => Invitations?.Where(s => s.Status == Status.Attend).Sum(a => a.NumberConfirmedChildren) ?? 0;
 
     // 🔹 Adultos pendientes
     public int NumberAdultsPending => Invitations?.Where(s => s.Status == Status.Pending)
@@ -90,4 +89,12 @@ public class Event : IEntityWithName
     // 🔹 Niños pendientes
     public int NumberChildrenPending => Invitations?.Where(s => s.Status == Status.Pending)
                                                    .Sum(a => a.NumberChildren) ?? 0;
+
+    // 🔹 Niños No asistirán
+    public int NumberChildrenNotAttend => Invitations?.Where(s => s.Status == Status.NotAttend)
+                                                   .Sum(a => a.NumberChildren) ?? 0;
+
+    // 🔹 Adultos No asistiran
+    public int NumberAdultsNotAttend => Invitations?.Where(s => s.Status == Status.NotAttend)
+                                                  .Sum(a => a.NumberAdults) ?? 0;
 }

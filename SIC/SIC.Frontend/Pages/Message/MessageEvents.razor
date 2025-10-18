@@ -1,42 +1,43 @@
 ﻿@page "/events/message-events/{Code}"
 <PageTitle>Mensajes del evento</PageTitle>
-<div class="d-flex justify-content-center align-items-center">
+<div class="d-flex justify-content-center align-items-start my-4">
     @if (NewMessage != null)
     {
-        <EditForm Model="@NewMessage" OnValidSubmit="HandleValidSubmit" style="width: 50%;">
+        <EditForm Model="@NewMessage" OnValidSubmit="HandleValidSubmit" class="w-100" style="max-width: 900px;">
             <h3>Datos del Evento</h3>
             <DataAnnotationsValidator />
             <ValidationSummary />
-            <div class="mb-3 row col-12">
-                <div class="form-group col-6 d-flex">
+
+            <div class="mb-3 row">
+                <div class="form-group col-12 col-md-6 d-flex align-items-center">
                     <h5>Codigo: </h5>
-                    <h5 style="padding-left: 5px;">@Code</h5>
+                    <h5 class="ms-2">@Code</h5>
                 </div>
             </div>
-            <div class="mb-3 row col-12">
-                <div class="form-group col-6">
-                    <label for="titulo">Título:</label>
+
+            <div class="mb-3 row">
+                <div class="form-group col-12 col-md-6 mb-3 mb-md-0">
+                    <label for="titulo" class="form-label">Título:</label>
                     <InputText id="titulo" class="form-control" @bind-Value="NewMessage!.Title" />
                 </div>
 
-                <div class="form-group col-6">
-                    <label for="subtitulo">Subtítulo:</label>
+                <div class="form-group col-12 col-md-6">
+                    <label for="subtitulo" class="form-label">Subtítulo:</label>
                     <InputText id="subtitulo" class="form-control" @bind-Value="NewMessage.SubTitle" />
                 </div>
             </div>
 
             <h3>Mensajes para WhatsApp</h3>
-            <div class="mb-3 row col-12">
-                <div class="form-group col-6">
-                    <label for="textoInvitacion">Texto de invitación:</label>
+            <div class="mb-3 row">
+                <div class="form-group col-12 col-md-6 mb-3 mb-md-0">
+                    <label for="textoInvitacion" class="form-label">Texto de invitación:</label>
                     <InputTextArea id="textoInvitacion" class="form-control" @bind-Value="NewMessage.MessageInvitation" style="height: 25em;" />
                 </div>
 
-                <div class="form-group col-6">
-                    <label for="mensajeConfirmacion">Mensaje de confirmación:</label>
+                <div class="form-group col-12 col-md-6">
+                    <label for="mensajeConfirmacion" class="form-label">Mensaje de confirmación:</label>
                     <InputTextArea id="mensajeConfirmacion" class="form-control" @bind-Value="NewMessage.MessageConfirmation" style="height: 25em;" />
                 </div>
-                
             </div>
 
             <h3>Tokens que puede usar en mensajes:</h3>
@@ -47,8 +48,8 @@
                 }
             </ul>
 
-            <div class="form-group">
-                <button type="submit" class="btn btn-custom" disabled="@(isLoading)">
+            <div class="form-group mt-3">
+                <button type="submit" class="btn btn-custom w-100 w-md-auto" disabled="@(isLoading)">
                     @if (isLoading)
                     {
                         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>

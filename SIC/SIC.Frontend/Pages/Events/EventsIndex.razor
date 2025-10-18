@@ -47,7 +47,7 @@
 
 <GenericList MyList="Events">
     <Body>
-        <div class="table-responsive">
+        <div class="table-responsive d-none d-md-block">
             <table class="table table-hover align-middle mb-0">
                 <thead style="background-color:#3C6A79; color:white;">
                     <tr class="text-center">
@@ -64,27 +64,17 @@
                         @foreach (var even in Events)
                         {
                             <tr class="border-top">
+
                                 <!-- ======== COLUMNA 1: INFORMACIÓN GENERAL ======== -->
                                 <td style="white-space: normal; vertical-align: top;">
                                     <div class="container-fluid">
                                         <div class="row g-3 small text-secondary">
 
                                             <!-- ===== COLUMNA 1 ===== -->
-                                            <div class="col-md-4 d-flex flex-column">
-                                                <div class="fw-bold fs-6 text-dark mb-1">
-                                                    @even.Name
-                                                </div>
-
-                                                @if (!string.IsNullOrWhiteSpace(even.SubTitle))
-                                                {
-                                                    <div class="text-muted small mb-2">
-                                                        @even.SubTitle
-                                                    </div>
-                                                }
-
+                                            <div class="col-12 col-md-4 d-flex flex-column">
                                                 <div class="mb-2">
                                                     <strong>Código:</strong>
-                                                    <a href="/events/details/@even.Code" class="text-decoration-none text-primary">
+                                                    <a class="text-decoration-none text-primary">
                                                         @even.Code
                                                     </a>
                                                 </div>
@@ -95,60 +85,40 @@
                                             </div>
 
                                             <!-- ===== COLUMNA 2 ===== -->
-                                            <div class="col-md-4 d-flex flex-column">
-                                                <div class="mb-2">
-                                                    <i class="bi bi-geo-alt-fill me-1 text-primary"></i>
-                                                    <a href="@even.Ubication" target="_blank" class="text-decoration-none text-secondary">
-                                                        Ubicación
-                                                    </a>
+                                            <div class="col-12 col-md-4 d-flex flex-column">
+                                                <div class="fw-bold fs-6 text-dark mb-1">
+                                                    @even.Name
                                                 </div>
 
-                                                <div class="mb-2">
-                                                    <i class="bi bi-link-45deg me-1 text-primary"></i>
-                                                    <a href="@even.Url" target="_blank" class="text-decoration-none text-secondary">
-                                                        Invitación
-                                                    </a>
-                                                </div>
-
-                                                <div class="mb-2">
-                                                    <i class="bi bi-person-fill me-1 text-primary"></i>
-                                                    <strong>Anfitrión:</strong> @even.Host
-                                                </div>
-
-                                                <div>
-                                                    <i class="bi bi-telephone-fill me-1 text-secondary"></i>
-                                                    @even.HostPhone
-                                                </div>
+                                                @if (!string.IsNullOrWhiteSpace(even.SubTitle))
+                                                {
+                                                    <div class="text-muted small mb-2">
+                                                        @even.SubTitle
+                                                    </div>
+                                                }
                                             </div>
 
                                             <!-- ===== COLUMNA 3 ===== -->
-                                            <div class="col-md-4 d-flex flex-column">
-                                                <div class="mb-2">
-                                                    <i class="bi bi-person-badge-fill me-1 text-primary"></i>
-                                                    <strong>Planner:</strong> @even.Planner
+                                            <div class="col-12 col-md-4 d-flex flex-row flex-wrap align-items-center gap-1">
+                                                <div class="mb-2 flex-grow-1">
+                                                    <a href="@even.Url" target="_blank" class="btn btn-custom w-100">
+                                                        Ver Invitación
+                                                    </a>
                                                 </div>
 
-                                                <div class="mb-2">
-                                                    <i class="bi bi-telephone-fill me-1 text-secondary"></i>
-                                                    @even.PlannerPhone
-                                                </div>
-
-                                                <div class="mt-2">
-                                                    <strong>Fecha:</strong> @even.Date.ToString("dd/MM/yyyy")
-                                                </div>
-
-                                                <div>
-                                                    <strong>Hora:</strong> @DateTime.Today.Add(even.Time).ToString("hh:mm tt")
+                                                <div class="mb-2 flex-grow-1">
+                                                    <a href="/events/details/@even.Code" class="btn btn-custom w-100">
+                                                        Invitados
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </td>
 
-
                                 <!-- ======== COLUMNA 2: ESTADO ======== -->
                                 <td class="text-center">
-                                    <span class="px-3 py-2 fs-6 badge bg-@(even.Status == Status.Active ? "success" : even.Status == Status.Cancelled ? "danger" : "secondary")">
+                                    <span class="px-3 py-2 fs-6 badge @(even.Status == Status.Active ? "bg-success" : even.Status == Status.Cancelled ? "bg-danger" : "bg-secondary")">
                                         @even.Status.GetDescription()
                                     </span>
                                 </td>
@@ -165,11 +135,11 @@
 
                                 <!-- ======== COLUMNA 4: ACCIONES ======== -->
                                 <td class="text-center">
-                                    <button class="btn btn-sm btn-custom" @onclick="() => ShowEditModal(even)">
+                                    <button class="btn btn-sm btn-custom mb-1" @onclick="() => ShowEditModal(even)">
                                         <i class="bi bi-pencil-fill"></i>
                                     </button>
 
-                                    <button class="btn btn-sm btn-custom" @onclick="() => ConfirmDelete(even)">
+                                    <button class="btn btn-sm btn-custom mb-1" @onclick="() => ConfirmDelete(even)">
                                         <i class="bi bi-trash-fill"></i>
                                     </button>
                                 </td>
@@ -187,6 +157,44 @@
                 </tbody>
             </table>
         </div>
+        <div class="d-block d-md-none">
+            @if (Events != null && Events.Any())
+            {
+                @foreach (var even in Events)
+                {
+                    <div class="card mb-3 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">@even.Name</h5>
+                            @if (!string.IsNullOrWhiteSpace(even.SubTitle))
+                            {
+                                <p class="card-subtitle text-muted small mb-2">@even.SubTitle</p>
+                            }
+                            <p class="mb-1"><strong>Código:</strong> @even.Code</p>
+                            <p class="mb-1"><strong>Tipo:</strong> @even.EventType!.Name</p>
+                            <p class="mb-1">
+                                <strong>Estado:</strong>
+                                <span class="badge @(even.Status == Status.Active ? "bg-success" : even.Status == Status.Cancelled ? "bg-danger" : "bg-secondary")">
+                                    @even.Status.GetDescription()
+                                </span>
+                            </p>
+                            <p class="mb-2"><strong>Fecha y Hora:</strong> @even.Date.ToString("dd/MM/yyyy") - @DateTime.Today.Add(even.Time).ToString("hh:mm tt")</p>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <button class="btn btn-sm btn-custom flex-grow-1" @onclick="() => ShowEditModal(even)"><i class="bi bi-pencil-fill"></i> Editar</button>
+                                <button class="btn btn-sm btn-custom flex-grow-1" @onclick="() => ConfirmDelete(even)"><i class="bi bi-trash-fill"></i> Borrar</button>
+                                <a href="@even.Url" target="_blank" class="btn btn-sm btn-custom flex-grow-1">Ver Invitación</a>
+                                <a href="/events/details/@even.Code" class="btn btn-sm btn-custom flex-grow-1">Invitados</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="text-center text-muted py-4">No hay eventos registrados.</p>
+            }
+        </div>
+
+
     </Body>
 </GenericList>
 
@@ -206,14 +214,15 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">
-                        @((IsEditMode ? $"Editar Evento: {@NewEvent.Code}": "Crear Evento"))</h5>
+                        @((IsEditMode ? $"Editar Evento: {@NewEvent.Code}" : "Crear Evento"))
+                    </h5>
                     <button type="button" class="btn-close" @onclick="CloseModal"></button>
                 </div>
                 <div class="modal-body">
                     <EditForm Model="@NewEvent" OnValidSubmit="@SaveEvent">
                         <DataAnnotationsValidator />
                         <ValidationSummary />
-                        
+
 
                         <div class="mb-3">
                             <label class="form-label">Título</label>
@@ -300,10 +309,10 @@
                         <!--Inhabilitar los botones hasta que termine de enviar-->
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-custom">
-                                 Guardar
+                                Guardar
                             </button>
                             <button type="button" class="btn btn-secondary" @onclick="CloseModal">
-                                 Cancelar
+                                Cancelar
                             </button>
                         </div>
                     </EditForm>
