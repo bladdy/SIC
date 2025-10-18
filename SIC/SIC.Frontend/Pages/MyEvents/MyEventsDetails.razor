@@ -126,7 +126,7 @@ else
                 </button>
             </div>
 
-            <a href="/my-events/register-intations-by-event/@EventDetail.Code" class="btn btn-sm btn-custom">Scan QR</a>
+            <a href="/my-events/register-intations-by-event/@EventDetail.Code" class="btn btn-sm btn-custom d-none">Scan QR</a>
         </div>
     </div>
 
@@ -145,139 +145,202 @@ else
         </div>
     </div>
 
+    <!-- ====== VERSIÓN DE ESCRITORIO ====== -->
+    <div class="table-responsive d-none d-md-block">
+        <table class="table table-hover align-middle mb-0">
+            <thead style="background-color:#3C6A79; color:white;">
+                <tr class="text-center">
+                    <th class="text-start">Detalle del Invitado</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
 
-    <!--Quitar: Email-->
-    <table class="table table-striped table-hover table-bordered align-middle">
-        <thead class="" style="background-color:#3C6A79; color: white;">
-            <tr>
-                <th>Codigo</th>
-                <th>Nombre</th>
-                <th>Móvil</th>
-                <th>Adultos</th>
-                <th>Niños</th>
-                <th>Conf. Adultos</th>
-                <th>Conf. Niños</th>
-                <th>Mesa</th>
-                <th>Estado</th>
-                <th>Invitar</th>
-                <th>Avisar</th>
-                <th>Editar</th>
-            </tr>
-        </thead>
-        <tbody class="text-center">
-            @foreach (var invitation in Invitations!)
-            {
-                <tr>
-                    <td>
-                        <a style=" color:#3C6A79;cursor: pointer;" @onclick="() => ShowEditModal(invitation)">
-                            @invitation.Code
-                        </a>
-                    </td>
-                    <td>@invitation.Name</td>
-                    <td>@invitation.PhoneNumber</td>
-                    <td>@invitation.NumberAdults</td>
-                    <td>@invitation.NumberChildren</td>
-                    <td>@invitation.NumberConfirmedAdults</td>
-                    <td>@invitation.NumberConfirmedChildren</td>
-                    <td>@invitation.Table</td>
-                    <td>
-                        <!--Nuevos estados: Asistire verde, No Asistire Rojo, Pendiente negro con blanco-->
+            <tbody>
+                @if (Invitations != null && Invitations.Any())
+                {
+                    @foreach (var invitation in Invitations)
+                    {
+                        <tr class="border-top">
+                            <!-- ======== COLUMNA 1: INFORMACIÓN GENERAL ======== -->
+                            <td style="white-space: normal; vertical-align: top;">
+                                <div class="container-fluid">
+                                    <div class="row g-3 small text-secondary">
+
+                                        <!-- ===== COLUMNA 1 ===== -->
+                                        <div class="col-12 col-md-4 d-flex flex-column">
+                                            <div class="mb-2">
+                                                <strong>Código:</strong>
+                                                <a style="color:#3C6A79; cursor:pointer;"
+                                                   @onclick="() => ShowEditModal(invitation)">
+                                                    @invitation.Code
+                                                </a>
+                                            </div>
+                                            <div><strong>Nombre:</strong> @invitation.Name</div>
+                                            <div><strong>Móvil:</strong> @invitation.PhoneNumber</div>
+                                        </div>
+
+                                        <!-- ===== COLUMNA 2 ===== -->
+                                        <div class="col-12 col-md-4 d-flex flex-column">
+                                            <div><strong>Adultos:</strong> @invitation.NumberAdults</div>
+                                            <div><strong>Niños:</strong> @invitation.NumberChildren</div>
+                                            <div><strong>Conf. Adultos:</strong> @invitation.NumberConfirmedAdults</div>
+                                            <div><strong>Conf. Niños:</strong> @invitation.NumberConfirmedChildren</div>
+                                            <div><strong>Mesa:</strong> @invitation.Table</div>
+                                        </div>
+
+                                        <!-- ===== COLUMNA 3 ===== -->
+                                        <div class="col-12 col-md-4 d-flex flex-wrap align-items-center gap-2">
+                                            @if (usarWhatsApp)
+                                            {
+                                                <button class="btn d-inline-flex align-items-center gap-2 text-white"
+                                                        style="background-color:#25d366;"
+                                                        @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)"
+                                                        disabled="@(loadingWhatsappId1 == invitation.Id)">
+                                                    @if (loadingWhatsappId1 == invitation.Id)
+                                                    {
+                                                        <span class="spinner-border spinner-border-sm"></span>
+                                                        <span>Invitando...</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="bi bi-whatsapp"></i>
+                                                        <span>Invitación</span>
+                                                    }
+                                                </button>
+
+                                                <button class="btn d-inline-flex align-items-center gap-2 text-white"
+                                                        style="background-color:#25d366;"
+                                                        @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 2)"
+                                                        disabled="@(loadingWhatsappId2 == invitation.Id)">
+                                                    @if (loadingWhatsappId2 == invitation.Id)
+                                                    {
+                                                        <span class="spinner-border spinner-border-sm"></span>
+                                                        <span>Avisando...</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="bi bi-whatsapp"></i>
+                                                        <span>Aviso</span>
+                                                    }
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button class="btn btn-info d-inline-flex align-items-center gap-2 text-white"
+                                                        @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 1)"
+                                                        disabled="@(copyingId1 == invitation.Id)">
+                                                    @if (copyingId1 == invitation.Id)
+                                                    {
+                                                        <span class="spinner-border spinner-border-sm"></span>
+                                                        <span>Copiando...</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="bi bi-clipboard"></i>
+                                                        <span>Invitación</span>
+                                                    }
+                                                </button>
+
+                                                <button class="btn btn-info d-inline-flex align-items-center gap-2 text-white"
+                                                        @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 2)"
+                                                        disabled="@(copyingId2 == invitation.Id)">
+                                                    @if (copyingId2 == invitation.Id)
+                                                    {
+                                                        <span class="spinner-border spinner-border-sm"></span>
+                                                        <span>Copiando...</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="bi bi-clipboard"></i>
+                                                        <span>Aviso</span>
+                                                    }
+                                                </button>
+                                            }
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- ======== COLUMNA 2: ESTADO ======== -->
+                            <td class="text-center">
+                                <span class="px-3 py-2 fs-6 badge @(invitation.Status == Status.Attend ? "bg-success" : invitation.Status == Status.NotAttend ? "bg-danger" : "bg-secondary")">
+                                    @invitation.Status.GetDescription()
+                                </span>
+                            </td>
+
+                            <!-- ======== COLUMNA 3: ACCIONES VACÍA PARA ALINEAR ======== -->
+                            <td>
+                                <button class="btn btn-custom" @onclick="() => ShowEditModal(invitation)">
+                                    <i class="bi bi-pencil-fill"></i> Editar
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="3" class="text-center text-muted py-4">No hay invitados registrados.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ✅ Vista móvil tipo “detalle” -->
+    <div class="d-block d-md-none">
+        @foreach (var invitation in Invitations!)
+        {
+            <div class="card mb-3 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="card-title mb-0">@invitation.Name</h5>
                         <span class="badge bg-@(invitation.Status == Status.Attend ? "success" : invitation.Status == Status.NotAttend ? "danger" : "secondary")">
                             @invitation.Status.GetDescription()
                         </span>
-                    </td>
-                    <td>
+                    </div>
+                    <p class="mb-1"><strong>Código:</strong> @invitation.Code</p>
+                    <p class="mb-1"><strong>Móvil:</strong> @invitation.PhoneNumber</p>
+                    <p class="mb-1"><strong>Adultos:</strong> @invitation.NumberAdults (@invitation.NumberConfirmedAdults confirmados)</p>
+                    <p class="mb-1"><strong>Niños:</strong> @invitation.NumberChildren (@invitation.NumberConfirmedChildren confirmados)</p>
+                    <p class="mb-1"><strong>Mesa:</strong> @invitation.Table</p>
+
+                    <div class="d-flex flex-wrap gap-2 mt-3">
                         @if (usarWhatsApp)
                         {
-                            <button class="btn d-flex align-items-center gap-2" style="background-color: #25d366; color:white;"
-                                    data-bs-toggle="tooltip" data-bs-placement="top" title="Invitar por WhatsApp"
-                                    @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)"
-                                    disabled="@(loadingWhatsappId1 == invitation.Id)">
-                                @if (loadingWhatsappId1 == invitation.Id)
-                                {
-                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                    <span>Abriendo...</span>
-                                }
-                                else
-                                {
-                                    <svg xmlns="http://www.w3.org/2000/svg" style="color:black;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-brand-whatsapp"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" /><path d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1" /></svg>
-                                }
+                            <button class="btn d-flex align-items-center gap-2 flex-fill" style="background-color:#25d366; color:white;"
+                                    @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)">
+                                <i class="bi bi-whatsapp"></i> Invitación
+                            </button>
+                            <button class="btn d-flex align-items-center gap-2 flex-fill" style="background-color:#25d366; color:white;"
+                                    @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 2)">
+                                <i class="bi bi-whatsapp"></i> Aviso
                             </button>
                         }
                         else
                         {
-                            <button class="btn btn-info d-flex align-items-center gap-2"
-                                    @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 1)"
-                                    data-bs-toggle="tooltip" data-bs-placement="top" title="Copiar invitacion"
-                                    disabled="@(copyingId1 == invitation.Id)">
-                                @if (copyingId1 == invitation.Id)
-                                {
-                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                    <span>Copiando...</span>
-                                }
-                                else
-                                {
-                                    <svg id='Copy_24' style="color:white;" width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'>
-                                        <rect width='24' height='24' stroke='none' fill='#000000' opacity='0' />
-                                        <g transform="matrix(0.77 0 0 0.77 12 12)">
-                                            <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" translate(-13, -13)" d="M 4 0 C 1.796875 0 0 1.796875 0 4 L 0 17 C 0 19.203125 1.796875 21 4 21 L 9 21 L 9 19 L 4 19 C 2.894531 19 2 18.105469 2 17 L 2 4 C 2 2.894531 2.894531 2 4 2 L 8.28125 2 C 9.003906 2.183594 9 3.050781 9 3.9375 L 9 6 C 9 6.25 9.097656 6.480469 9.25 6.65625 C 9.808594 5.117188 11.269531 4 13 4 L 13.0625 4 C 12.886719 3.824219 12.707031 3.644531 12.53125 3.46875 C 12.285156 3.222656 12.019531 2.992188 11.78125 2.75 C 10.070313 1.003906 9.0625 0 8 0 Z M 14 5 C 11.796875 5 10 6.796875 10 9 L 10 22 C 10 24.203125 11.796875 26 14 26 L 22 26 C 24.203125 26 26 24.203125 26 22 L 26 13 C 26 11.9375 25.027344 10.929688 23.28125 9.21875 C 23.039063 8.980469 22.777344 8.714844 22.53125 8.46875 C 22.285156 8.222656 22.019531 7.992188 21.78125 7.75 C 20.070313 6.003906 19.0625 5 18 5 Z M 14 7 L 18.28125 7 C 19.003906 7.183594 19 8.050781 19 8.9375 L 19 11 C 19 11.550781 19.449219 12 20 12 L 22 12 C 22.996094 12 24 12.003906 24 13 L 24 22 C 24 23.105469 23.105469 24 22 24 L 14 24 C 12.894531 24 12 23.105469 12 22 L 12 9 C 12 7.894531 12.894531 7 14 7 Z M 4 8 L 4 10 L 9 10 L 9 8 Z M 4 11 L 4 13 L 9 13 L 9 11 Z M 14 13 L 14 15 L 22 15 L 22 13 Z M 4 14 L 4 16 L 9 16 L 9 14 Z M 14 16 L 14 18 L 20 18 L 20 16 Z M 14 19 L 14 21 L 22 21 L 22 19 Z" stroke-linecap="round" />
-                                        </g>
-                                    </svg>
-                                }
+                            <button class="btn btn-info flex-fill text-white"
+                                    @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 1)">
+                                <i class="bi bi-clipboard"></i> Invitación
+                            </button>
+                            <button class="btn btn-info flex-fill text-white"
+                                    @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 2)">
+                                <i class="bi bi-clipboard"></i> Aviso
                             </button>
                         }
 
-                    </td>
-                    <td>
-                        @if (usarWhatsApp)
-                        {
-                            <button class="btn d-flex align-items-center gap-2" style="background-color: #25d366; color:white;"
-                                    data-bs-toggle="tooltip" data-bs-placement="top" title="Avisar por WhatsApp"
-                                    @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id,2)"
-                                    disabled="@(loadingWhatsappId2 == invitation.Id)">
-                                @if (loadingWhatsappId2 == invitation.Id)
-                                {
-                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                    <span>Abriendo...</span>
-                                }
-                                else
-                                {
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-brand-whatsapp"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" /><path d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1" /></svg>
-                                }
-                            </button>
-                        }
-                        else
-                        {
-                            <button class="btn btn-info d-flex align-items-center gap-2"
-                                    @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id,2)"
-                                    data-bs-toggle="tooltip" data-bs-placement="top" title="Copiar Aviso"
-                                    disabled="@(copyingId2 == invitation.Id)">
-                                @if (copyingId2 == invitation.Id)
-                                {
-                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                    <span>Copiando...</span>
-                                }
-                                else
-                                {
-                                    <svg id='Copy_24' width='24' height='24' viewBox='0 0 24 24' fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <rect width='24' height='24' opacity='0' />
-                                        <g transform="matrix(0.77 0 0 0.77 12 12)">
-                                            <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,255,255); fill-rule: nonzero; opacity: 1;" transform=" translate(-13, -13)" d="M 4 0 C 1.796875 0 0 1.796875 0 4 L 0 17 C 0 19.203125 1.796875 21 4 21 L 9 21 L 9 19 L 4 19 C 2.894531 19 2 18.105469 2 17 L 2 4 C 2 2.894531 2.894531 2 4 2 L 8.28125 2 C 9.003906 2.183594 9 3.050781 9 3.9375 L 9 6 C 9 6.25 9.097656 6.480469 9.25 6.65625 C 9.808594 5.117188 11.269531 4 13 4 L 13.0625 4 C 12.886719 3.824219 12.707031 3.644531 12.53125 3.46875 C 12.285156 3.222656 12.019531 2.992188 11.78125 2.75 C 10.070313 1.003906 9.0625 0 8 0 Z M 14 5 C 11.796875 5 10 6.796875 10 9 L 10 22 C 10 24.203125 11.796875 26 14 26 L 22 26 C 24.203125 26 26 24.203125 26 22 L 26 13 C 26 11.9375 25.027344 10.929688 23.28125 9.21875 C 23.039063 8.980469 22.777344 8.714844 22.53125 8.46875 C 22.285156 8.222656 22.019531 7.992188 21.78125 7.75 C 20.070313 6.003906 19.0625 5 18 5 Z M 14 7 L 18.28125 7 C 19.003906 7.183594 19 8.050781 19 8.9375 L 19 11 C 19 11.550781 19.449219 12 20 12 L 22 12 C 22.996094 12 24 12.003906 24 13 L 24 22 C 24 23.105469 23.105469 24 22 24 L 14 24 C 12.894531 24 12 23.105469 12 22 L 12 9 C 12 7.894531 12.894531 7 14 7 Z M 4 8 L 4 10 L 9 10 L 9 8 Z M 4 11 L 4 13 L 9 13 L 9 11 Z M 14 13 L 14 15 L 22 15 L 22 13 Z M 4 14 L 4 16 L 9 16 L 9 14 Z M 14 16 L 14 18 L 20 18 L 20 16 Z M 14 19 L 14 21 L 22 21 L 22 19 Z" stroke-linecap="round" />
-                                        </g>
-                                    </svg>
-                                }
-                            </button>
-                        }
-                    </td>
-                    <td>
-                        <button class="btn btn-custom me-2" @onclick="() => ShowEditModal(invitation)">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-pencil"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" /><path d="M13.5 6.5l4 4" /></svg>
+                        <button class="btn btn-custom flex-fill" @onclick="() => ShowEditModal(invitation)">
+                            Editar
                         </button>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+
     <div class="d-flex justify-content-center my-3">
         <Pagination CurrentPage="currentPage"
                     TotalPages="totalPages"
