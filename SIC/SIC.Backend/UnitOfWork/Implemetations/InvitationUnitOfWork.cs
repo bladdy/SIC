@@ -28,5 +28,7 @@ namespace SIC.Backend.UnitOfWork.Implemetations
         public async Task<ActionResponse<Invitation>> AddFullAsync(Invitation invitation) => await _invitationstRepository.AddFullAsync(invitation);
 
         public async Task<ActionResponse<Invitation>> UpdateFullAsync(Invitation invitation) => await _invitationstRepository.UpdateFullAsync(invitation);
+
+        public async Task<ActionResponse<InvitationConfirmationDto>> UpdateForConfirmarionFullAsync(InvitationConfirmationDto confirmationDto) => await _invitationstRepository.UpdateForConfirmarionFullAsync(confirmationDto);
     }
 }

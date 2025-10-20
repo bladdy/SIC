@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata;
+using QRCoder;
 using SIC.Backend.UnitOfWork.Implemetations;
 using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.DTOs;
@@ -81,5 +83,42 @@ public class InvitationsController : GenericController<Invitation>
             return Ok(action.Result);
         }
         return NotFound(action.Message);
+    }
+
+    [HttpPost("confirm")]
+    public async Task<IActionResult> ConfirmInvitation([FromBody] InvitationConfirmationDto confirmation)
+    {
+        var action = await _invitationUnitOfWork.UpdateForConfirmarionFullAsync(confirmation);
+        if (action.Success)
+        {
+            return Ok(action.Result);
+        }
+
+        return Ok(new { message = "Confirmación recibida con éxito" });
+    }
+
+    // Endpoint para obtener el código QR
+    [HttpGet("qr")]
+    public IActionResult GetQRCode(string codigo, string evento)
+    {
+        try
+        {
+            // Lógica para generar el código QR en base a los parámetros
+            string qrCodeBase64 = GenerateQRCodeBase64(codigo, evento);
+            return Ok(new { success = true, qrCodeBase64 });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { success = false, message = ex.Message });
+        }
+    }
+
+    private static string GenerateQRCodeBase64(string codigo, string evento)
+    {
+        // Aquí puedes usar alguna librería como QRCoder para generar el QR en base64
+        using var qrGenerator = new QRCodeGenerator();
+        var qrCodeData = qrGenerator.CreateQrCode($"{codigo}-{evento}", QRCodeGenerator.ECCLevel.Q);
+        var qrCode = new Base64QRCode(qrCodeData);
+        return qrCode.GetGraphic(20);
     }
 }

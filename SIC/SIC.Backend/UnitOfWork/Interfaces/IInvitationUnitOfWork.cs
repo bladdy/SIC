@@ -19,5 +19,7 @@ namespace SIC.Backend.UnitOfWork.Interfaces
         Task<ActionResponse<Invitation>> AddFullAsync(Invitation invitation);
 
         Task<ActionResponse<Invitation>> UpdateFullAsync(Invitation invitation);
+
+        Task<ActionResponse<InvitationConfirmationDto>> UpdateForConfirmarionFullAsync(InvitationConfirmationDto confirmationDto);
     }
 }

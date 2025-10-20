@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using SIC.Backend.Data;
 using SIC.Backend.Helpers;
 using SIC.Backend.Repositories.Interfaces;
@@ -170,6 +171,50 @@ namespace SIC.Backend.Repositories.Implemetations
                 Success = true,
                 Result = invitations
             };
+        }
+
+        public async Task<ActionResponse<InvitationConfirmationDto>> UpdateForConfirmarionFullAsync(InvitationConfirmationDto confirmationDto)
+        {
+            try
+            {
+                var invitations = await _context.Invitations.FirstOrDefaultAsync(x => x.Code == confirmationDto.CodigoInvitacion);
+                if (invitations == null)
+                {
+                    return new ActionResponse<InvitationConfirmationDto>
+                    {
+                        Success = false,
+                        Message = "La invitacion no existe."
+                    };
+                }
+                invitations.NumberConfirmedAdults = confirmationDto.ConfirmadosAdultos;
+                invitations.NumberConfirmedChildren = confirmationDto.ConfirmadosMenores;
+                invitations.ConfirmationDate = DateTime.Now;
+                invitations.Comments = confirmationDto.Mensaje;
+                if (confirmationDto.ConfirmacionAsistencia)
+                {
+                    invitations.Status = Shared.Enums.Status.Attend;
+                }
+                else
+                {
+                    invitations.Status = Shared.Enums.Status.NotAttend;
+                }
+
+                _context.Update(invitations);
+                await _context.SaveChangesAsync();
+                return new ActionResponse<InvitationConfirmationDto>
+                {
+                    Success = true,
+                    Result = confirmationDto
+                };
+            }
+            catch (Exception exception)
+            {
+                return new ActionResponse<InvitationConfirmationDto>
+                {
+                    Success = false,
+                    Message = exception.Message
+                };
+            }
         }
     }
 }
