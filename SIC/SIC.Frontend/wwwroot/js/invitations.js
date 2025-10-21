@@ -1,7 +1,8 @@
 ﻿// ==============================
 // invitations.js
 // ==============================
-
+// ToDo: validacion visual que sino encuentra la invitacion, 
+//  que le diga al invitado que esa invitacion no existe, favor de comunicarse con el Host o El Planner
 // Función para obtener los parámetros de la URL
 function getQueryVariable(variable) {
     var query = window.location.search.substring(1); // Obtener parte de la URL después del "?"

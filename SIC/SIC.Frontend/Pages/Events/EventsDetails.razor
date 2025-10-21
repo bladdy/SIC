@@ -31,67 +31,117 @@ else
 
         <!-- Body: Información detallada -->
         <div class="card-body">
-            <div class="row">
-                <!-- Columna 1: Fecha, Hora, Ubicación -->
-                <div class="col-md-4 ">
-                    <p><strong>Fecha:</strong> @EventDetail.Date.ToString("dd/MM/yyyy")</p>
-                    <p><strong>Hora:</strong> @DateTime.Today.Add(EventDetail.Time).ToString("hh:mm tt")</p>
-                    <p class="d-none"><strong>Ubicación:</strong> <a class="btn btn-sm btn-custom" href="@EventDetail.Ubication" target="_blank">Ubicación del evento</a></p>
+
+            <!-- ======================== -->
+            <!-- SECCIÓN 1: Fecha, Hora, Planner -->
+            <!-- ======================== -->
+            <div class="row g-3 mb-3">
+                <!-- Fecha -->
+                <div class="col-12 col-md-4">
+                    <p class="d-flex justify-content-between align-items-center px-3 py-1 ">
+                        <strong>Fecha:</strong>
+                        <span>@EventDetail.Date.ToString("dd/MM/yyyy")</span>
+                    </p>
                 </div>
 
-                <!-- Columna 2: Host y Planner -->
-                <div class="col-md-4">
-                    <p class="d-none"><strong>Host:</strong> @EventDetail.Host (@EventDetail.HostPhone)</p>
-                    <p>
+                <!-- Hora -->
+                <div class="col-12 col-md-4">
+                    <p class="d-flex justify-content-between align-items-center px-3 py-1">
+                        <strong>Hora:</strong>
+                        <span>@DateTime.Today.Add(EventDetail.Time).ToString("hh:mm tt")</span>
+                    </p>
+                </div>
+
+                <!-- Planner -->
+                <div class="col-12 col-md-4">
+                    <p class="d-flex justify-content-between align-items-center px-3 py-1 ">
                         <strong>Planner:</strong>
                         @if (!string.IsNullOrEmpty(EventDetail.Planner))
                         {
-                            @($"{EventDetail.Planner} ({EventDetail.PlannerPhone})")
+                            <span>@($"{EventDetail.Planner} ({EventDetail.PlannerPhone})")</span>
                         }
                         else
                         {
                             <em>No asignado</em>
                         }
                     </p>
-                    <p class="d-none"><strong>Url Invitación:</strong> <a href="@EventDetail.Url" class="btn btn-sm btn-custom" target="_blank">Ver invitación</a></p>
-                </div>
-
-                <!-- Columna 3: Invitados y Adultos/Niños -->
-                <div class="col-md-4">
-                    <div class="row">
-                        <div class="col-6">
-
-                            <p class="d-flex justify-content-between px-3 py-1 text-white" style="background-color:#3C6A79;">
-                                <strong>Invitados:</strong>
-                                <span>@(EventDetail.NumberAdults + EventDetail.NumberChildren)</span>
-                            </p>
-
-                            <p class="d-flex justify-content-between px-3 py-1 text-white" style="background-color:#3C6A79;">
-                                <strong>Adultos:</strong>
-                                <span>@EventDetail.NumberAdults</span>
-                            </p>
-                            <p class="d-flex justify-content-between px-3 py-1 text-white" style="background-color:#3C6A79;">
-                                <strong>Niños:</strong>
-                                <span>@EventDetail.NumberChildren</span>
-                            </p>
-                        </div>
-                        <div class="col-6">
-                            <p class="d-flex justify-content-between px-3 py-1 text-white bg-secondary">
-                                <strong>Pendientes:</strong>
-                                <span>@(EventDetail.NumberAdultsPending + EventDetail.NumberChildrenPending)</span>
-                            </p>
-                            <p class="d-flex justify-content-between px-3 py-1 text-white bg-success">
-                                <strong>Sí asistiré:</strong>
-                                <span>@(EventDetail.NumberAdultsConfirmed + EventDetail.NumberChildrenConfirmed)</span>
-                            </p>
-                            <p class="d-flex justify-content-between px-3 py-1 text-white bg-danger">
-                                <strong>No asistiré:</strong>
-                                <span>@(EventDetail.NumberAdultsNotAttend + EventDetail.NumberChildrenNotAttend)</span>
-                            </p>
-                        </div>
-                    </div>
                 </div>
             </div>
+
+            <!-- ======================== -->
+            <!-- SECCIÓN 2: Invitados -->
+            <!-- ======================== -->
+            <div class="row g-3 mb-3">
+                <!-- Invitados -->
+                <div class="col-12 col-md-4">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white" style="background-color:#3C6A79;">
+                        <strong>Invitados:</strong>
+                        <span>@(EventDetail.NumberAdults + EventDetail.NumberChildren)</span>
+                    </p>
+                </div>
+
+                <!-- Adultos -->
+                <div class="col-12 col-md-4">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#3C6A79;">
+                        <strong>Adultos:</strong>
+                        <span>@EventDetail.NumberAdults</span>
+                    </p>
+                </div>
+
+                <!-- Niños -->
+                <div class="col-12 col-md-4">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#3C6A79;">
+                        <strong>Niños:</strong>
+                        <span>@EventDetail.NumberChildren</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- ======================== -->
+            <!-- SECCIÓN 3: Confirmaciones -->
+            <!-- ======================== -->
+            <div class="row g-3 text-center">
+                <!-- Pendientes -->
+                <div class="col-12 col-md">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-secondary">
+                        <strong>Pendientes:</strong>
+                        <span>@(EventDetail.NumberAdultsPending + EventDetail.NumberChildrenPending)</span>
+                    </p>
+                </div>
+
+                <!-- No asistiré -->
+                <div class="col-12 col-md">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-danger">
+                        <strong>No asistiré:</strong>
+                        <span>@(EventDetail.NumberAdultsNotAttend + EventDetail.NumberChildrenNotAttend)</span>
+                    </p>
+                </div>
+
+                <!-- Sí asistiré (Adultos) -->
+                <div class="col-12 col-md">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-success">
+                        <strong>Sí asistiré (Adultos):</strong>
+                        <span>@EventDetail.NumberAdultsConfirmed</span>
+                    </p>
+                </div>
+
+                <!-- Sí asistiré (Niños) -->
+                <div class="col-12 col-md">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-success">
+                        <strong>Sí asistiré (Niños):</strong>
+                        <span>@EventDetail.NumberChildrenConfirmed</span>
+                    </p>
+                </div>
+
+                <!-- Sí asistiré (Total) -->
+                <div class="col-12 col-md">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-success">
+                        <strong>Sí asistiré (Total):</strong>
+                        <span>@(EventDetail.NumberAdultsConfirmed + EventDetail.NumberChildrenConfirmed)</span>
+                    </p>
+                </div>
+            </div>
+
         </div>
 
         <!-- Footer: Botones de acción -->
@@ -312,22 +362,22 @@ else
                         {
                             <button class="btn d-flex align-items-center gap-2 flex-fill" style="background-color:#25d366; color:white;"
                                     @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)">
-                                    <i class="bi bi-whatsapp"></i> Invitación
+                                <i class="bi bi-whatsapp"></i> Invitación
                             </button>
                             <button class="btn d-flex align-items-center gap-2 flex-fill" style="background-color:#25d366; color:white;"
                                     @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 2)">
-                                    <i class="bi bi-whatsapp"></i> Aviso
+                                <i class="bi bi-whatsapp"></i> Aviso
                             </button>
                         }
                         else
                         {
                             <button class="btn btn-info flex-fill text-white"
                                     @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 1)">
-                                    <i class="bi bi-clipboard"></i> Invitación
+                                <i class="bi bi-clipboard"></i> Invitación
                             </button>
                             <button class="btn btn-info flex-fill text-white"
                                     @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 2)">
-                                    <i class="bi bi-clipboard"></i> Aviso
+                                <i class="bi bi-clipboard"></i> Aviso
                             </button>
                         }
 
