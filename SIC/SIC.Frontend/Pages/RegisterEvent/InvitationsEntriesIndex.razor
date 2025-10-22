@@ -2,9 +2,13 @@
 @*/events/register-intations-by-event/{Code}"*@
 <PageTitle>Registro de invitaciones</PageTitle>
 
-    <h4 class="mb-0">Registro de Invitados</h4>
-
-@if(InvitationEntries is null)
+<h4 class="mb-2">Registro de Invitados</h4>
+<div class="mb-2">
+    <button class="btn btn-custom" @onclick="ShowCreateModal">
+        Registrar Invitación (Escanear QR)
+    </button>
+</div>
+@if (InvitationEntries is null)
 {
     <div class="alert alert-info">Cargando Registro de Invitados...</div>
 }
@@ -44,8 +48,7 @@ else
                                         <div class="col-12 col-md-4 d-flex flex-column">
                                             <div>
                                                 <strong>Código:</strong>
-                                                <a style="color:#3C6A79; cursor:pointer;"
-                                                   >
+                                                <a style="color:#3C6A79; cursor:pointer;">
                                                     @invitation.Code
                                                 </a>
                                             </div>
@@ -66,7 +69,7 @@ else
                                             <div><strong>Asist. Niños:</strong> @invitation.ChildrenEntered</div>
                                         </div>
 
-                                        
+
                                     </div>
                                 </div>
                             </td>
@@ -113,7 +116,7 @@ else
                     <p class="mb-1"><strong>Móvil:</strong> @invitation.Invitation!.PhoneNumber</p>
                     <p class="mb-1"><strong>Adultos:</strong> @invitation.Invitation!.NumberAdults (@invitation.AdultsEntered Asistentes)</p>
                     <p class="mb-1"><strong>Niños:</strong> @invitation.Invitation!.NumberChildren (@invitation.ChildrenEntered Asistentes)</p>
-                    
+
                 </div>
             </div>
         }
@@ -126,4 +129,99 @@ else
 
     </div>
 }
+<!-- Modal-->
+@if (IsModalVisible)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Registrar Invitados
+                    </h5>
+                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="reader" style="width:auto; height:100%;"></div>
+                    @if (!isScannerRunning)
+                    {
+                        @if (Invitation != null)
+                        {
+                            <div class="row g-1 mb-2">
+                                <div class="col-12 col-md-6 d-flex flex-column">
+                                    <div class="col-12 ">
+                                        <p class="d-flex justify-content-between align-items-center px-3 py-1">
+                                            <strong>Estado:</strong>
+                                            <span>@Invitation?.Status.GetDescription()</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-12">
+                                        <p class="d-flex justify-content-between align-items-center px-3 py-1">
+                                            <strong>Evento:</strong>
+                                            <span>@Invitation?.Event?.Name</span>
+                                        </p>
+                                    </div>
+                                    
 
+                                </div>
+                                <!-- Estado -->
+                                <div class="col-12 col-md-6 d-flex flex-column">
+
+                                    <!-- Adutlos Confirmados -->
+                                    <div class="col-12">
+                                        <p class="d-flex justify-content-between align-items-center px-3 py-1">
+                                            <strong>Adutlos Confirmados:</strong>
+                                            <span>@Invitation?.NumberConfirmedAdults</span>
+                                        </p>
+                                    </div>
+                                    <!-- Niños Confirmados -->
+                                    <div class="col-12">
+                                        <p class="d-flex justify-content-between align-items-center px-3 py-1">
+                                            <strong>Niños Confirmados:</strong>
+                                            <span>@Invitation?.NumberConfirmedChildren</span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-12 d-flex flex-column">
+                                    <!-- Nombres -->
+                                    <div class="col-12 ">
+                                        <p class="d-flex justify-content-between align-items-center px-3 py-1 ">
+                                            <strong>Nombres:</strong>
+                                            <span>@Invitation?.Name</span>
+                                        </p>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        }
+
+                        <EditForm Model="@NewInvitationEntry" OnValidSubmit="@SaveInvitationEntry">
+                            <DataAnnotationsValidator />
+                            <ValidationSummary />
+                            <div class="mb-3">
+                                <label class="form-label">Adultos Asistentes</label>
+                                <InputNumber class="form-control" @bind-Value="NewInvitationEntry.AdultsEntered" />
+                                <ValidationMessage For="@(() => NewInvitationEntry.AdultsEntered)" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Niños Asistentes</label>
+                                <InputNumber class="form-control" @bind-Value="NewInvitationEntry.ChildrenEntered" />
+                                <ValidationMessage For="@(() => NewInvitationEntry.ChildrenEntered)" />
+                            </div>
+                        </EditForm>
+                    }
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-custom">
+                        Guardar
+                    </button>
+                    <button type="button" class="btn btn-secondary" @onclick="CloseModal">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

@@ -117,7 +117,7 @@ public class InvitationsController : GenericController<Invitation>
     {
         // Aquí puedes usar alguna librería como QRCoder para generar el QR en base64
         using var qrGenerator = new QRCodeGenerator();
-        var qrCodeData = qrGenerator.CreateQrCode($"{codigo}-{evento}", QRCodeGenerator.ECCLevel.Q);
+        var qrCodeData = qrGenerator.CreateQrCode($"{codigo}", QRCodeGenerator.ECCLevel.Q);
         var qrCode = new Base64QRCode(qrCodeData);
         return qrCode.GetGraphic(20);
     }

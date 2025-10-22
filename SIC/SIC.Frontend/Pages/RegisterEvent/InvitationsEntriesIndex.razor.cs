@@ -1,9 +1,13 @@
 using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.JSInterop;
+using SIC.Frontend.Pages.Events;
 using SIC.Frontend.Repositories;
 using SIC.Frontend.Shared;
 using SIC.Shared.Entities;
 using System.Net;
+using System.Security.Claims;
 
 namespace SIC.Frontend.Pages.RegisterEvent;
 
@@ -11,9 +15,10 @@ public partial class InvitationsEntriesIndex
 {
     private int currentPage = 1;
     private int totalPages;
-    [Parameter] public string? Code { get; set; }
+    [Inject] private IJSRuntime JS { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
     [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
+    [Parameter] public string? Code { get; set; }
     [Parameter, SupplyParameterFromQuery] public string Page { get; set; } = string.Empty;
     [Parameter, SupplyParameterFromQuery] public int? RecordsNumber { get; set; }
     [Parameter, SupplyParameterFromQuery] public string Filter { get; set; } = string.Empty;
@@ -21,8 +26,13 @@ public partial class InvitationsEntriesIndex
     [Inject] private IRepository Repository { get; set; } = default!;
     public List<InvitationEntry>? InvitationEntries { get; set; }
     private InvitationEntry NewInvitationEntry = new();
+    private Invitation Invitation = new();
     private bool IsModalVisible = false;
     private bool IsEditMode = false;
+
+    private DotNetObjectReference<object>? objRef;
+    private bool isScannerRunning = false;
+    private string? qrResult;
 
     protected override async Task OnInitializedAsync()
     {
@@ -123,5 +133,90 @@ public partial class InvitationsEntriesIndex
     {
         Filter = string.Empty;
         await ApplyFilterAsync();
+    }
+
+    private async Task ShowCreateModal()
+    {
+        IsEditMode = false;
+        IsModalVisible = true;
+        await StartScannerAsync();
+    }
+
+    private async void CloseModal()
+    {
+        IsModalVisible = false;
+        StateHasChanged();
+        await OnQrCodeScannedClose();
+    }
+
+    private async Task StartScannerAsync()
+    {
+        if (isScannerRunning) return;
+
+        objRef?.Dispose(); // limpiar referencia anterior
+        objRef = DotNetObjectReference.Create<object>(this);
+
+        await Task.Delay(200);
+
+        await JS.InvokeVoidAsync("qrScanner.start", objRef);
+        isScannerRunning = true;
+    }
+
+    [JSInvokable]
+    public async Task OnQrCodeScannedClose()
+    {
+        await JS.InvokeVoidAsync("qrScanner.stop");
+        isScannerRunning = false;
+        StateHasChanged();
+        //Cargar el valor escaneado en el campo correspondiente
+    }
+
+    [JSInvokable]
+    public async Task OnQrCodeScanned(string code)
+    {
+        qrResult = code;
+        //Cargar el valor escaneado en el campo correspondiente
+        await LoadInvitation(qrResult);
+
+        await JS.InvokeVoidAsync("qrScanner.stop");
+        isScannerRunning = false;
+        StateHasChanged();
+    }
+
+    private async Task LoadInvitation(string qrResult)
+    {
+        var responseHttp = await Repository.GetAsync<Invitation>($"api/Invitations/byCode/{qrResult}");
+        if (responseHttp.Error)
+        {
+            if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+            {
+                await SweetAlertService.FireAsync("Info", "La invitacion no existe.", SweetAlertIcon.Error);
+                return;
+            }
+            var message = await responseHttp.GetErrorMessageAsync();
+            await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+        Invitation = responseHttp?.Response ?? new();
+    }
+
+    private async Task SaveInvitationEntry()
+    {
+        if (string.IsNullOrWhiteSpace(qrResult))
+        {
+            await SweetAlertService.FireAsync("Error", "Por favor, escanee un código QR antes de guardar.", SweetAlertIcon.Error);
+            return;
+        }
+        NewInvitationEntry.QrCode = qrResult;
+        var responseHttp = await Repository.PostAsync<InvitationEntry, InvitationEntry>("api/InvitationEntry", NewInvitationEntry);
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+        await SweetAlertService.FireAsync("Éxito", "La entrada de invitación se ha guardado correctamente.", SweetAlertIcon.Success);
+        IsModalVisible = false;
+        await LoadInvitationEntries(currentPage);
     }
 }
