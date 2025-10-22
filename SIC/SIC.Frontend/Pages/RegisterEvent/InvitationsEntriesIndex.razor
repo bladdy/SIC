@@ -1,0 +1,129 @@
+﻿@page "/events/register-event/invitations-entries/{Code}"
+@*/events/register-intations-by-event/{Code}"*@
+<PageTitle>Registro de invitaciones</PageTitle>
+
+    <h4 class="mb-0">Registro de Invitados</h4>
+
+@if(InvitationEntries is null)
+{
+    <div class="alert alert-info">Cargando Registro de Invitados...</div>
+}
+else
+{
+    ﻿﻿
+    <!--<Filter PlaceHolder="Buscar Invitacion..." Callback=@FilterCallBack /> 25d366-->
+    ﻿﻿<div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center;">
+        <input style="width:400px;" type="text" class="form-control" placeholder="Buscar Invitacion..." @bind-value="Filter">
+        <button type="button" class="btn btn-custom  mx-1" @onclick="ApplyFilterAsync"><i class="bi bi-funnel" /> Filtrar</button>
+        <button type="button" class="btn btn-custom " @onclick="CleanFilterAsync"><i class="bi bi-x-circle" /> Limpiar</button>
+    </div>
+
+    <!-- ====== VERSIÓN DE ESCRITORIO ====== -->
+    <div class="table-responsive d-none d-md-block">
+        <table class="table table-hover align-middle mb-0">
+            <thead style="background-color:#3C6A79; color:white;">
+                <tr class="text-center">
+                    <th class="text-start">Detalle del Invitado</th>
+                    <th>Mesa</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (InvitationEntries != null && InvitationEntries.Any())
+                {
+                    @foreach (var invitation in InvitationEntries)
+                    {
+                        <tr class="border-top">
+                            <!-- ======== COLUMNA 1: INFORMACIÓN GENERAL ======== -->
+                            <td style="white-space: normal; vertical-align: top;">
+                                <div class="container-fluid">
+                                    <div class="row g-3 small text-secondary">
+
+                                        <!-- ===== COLUMNA 1 ===== -->
+                                        <div class="col-12 col-md-4 d-flex flex-column">
+                                            <div>
+                                                <strong>Código:</strong>
+                                                <a style="color:#3C6A79; cursor:pointer;"
+                                                   >
+                                                    @invitation.Code
+                                                </a>
+                                            </div>
+                                            <div><strong>Nombre:</strong> @invitation.Invitation!.Name</div>
+                                            <div><strong>Móvil:</strong> @invitation.Invitation!.PhoneNumber</div>
+                                        </div>
+
+                                        <!-- ===== COLUMNA 2 ===== -->
+                                        <div class="col-12 col-md-4 d-flex flex-column">
+                                            <div><strong>Adultos:</strong> @invitation.Invitation!.NumberConfirmedAdults</div>
+                                            <div><strong>Niños:</strong> @invitation.Invitation!.NumberConfirmedChildren</div>
+
+                                        </div>
+
+                                        <!-- ===== COLUMNA 3 ===== -->
+                                        <div class="col-12 col-md-4 d-flex flex-column">
+                                            <div><strong>Asist. Adultos:</strong> @invitation.AdultsEntered</div>
+                                            <div><strong>Asist. Niños:</strong> @invitation.ChildrenEntered</div>
+                                        </div>
+
+                                        
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- ======== COLUMNA 2: ESTADO ======== -->
+                            <td class="text-center">
+                                <span class="px-3 py-2 fs-6 badge bg-secondary">
+                                    @invitation.Invitation!.Table
+                                </span>
+                            </td>
+
+                            <!-- ======== COLUMNA 3: ACCIONES VACÍA PARA ALINEAR ======== -->
+                            <td>
+                                <button class="btn btn-custom">
+                                    <i class="bi bi-pencil-fill"></i> Editar
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="3" class="text-center text-muted py-4">No hay invitados registrados.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ✅ Vista móvil tipo “detalle” -->
+    <div class="d-block d-md-none">
+        @foreach (var invitation in InvitationEntries!)
+        {
+            <div class="card mb-3 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="card-title mb-0">@invitation.Invitation!.Name</h5>
+                        <span class="badge bg-secondary">
+                            @invitation.Invitation!.Table
+                        </span>
+                    </div>
+                    <p class="mb-1"><strong>Código:</strong> @invitation.Code</p>
+                    <p class="mb-1"><strong>Móvil:</strong> @invitation.Invitation!.PhoneNumber</p>
+                    <p class="mb-1"><strong>Adultos:</strong> @invitation.Invitation!.NumberAdults (@invitation.AdultsEntered Asistentes)</p>
+                    <p class="mb-1"><strong>Niños:</strong> @invitation.Invitation!.NumberChildren (@invitation.ChildrenEntered Asistentes)</p>
+                    
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="d-flex justify-content-center my-3">
+        <Pagination CurrentPage="currentPage"
+                    TotalPages="totalPages"
+                    SelectedPage="SelectedPageAsync" />
+
+    </div>
+}
+

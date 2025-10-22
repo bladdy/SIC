@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SIC.Backend.Data;
 
@@ -11,9 +12,11 @@ using SIC.Backend.Data;
 namespace SIC.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20251021221312_addInvitationEntryRelaiontoInvitation")]
+    partial class addInvitationEntryRelaiontoInvitation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -325,9 +328,6 @@ namespace SIC.Backend.Migrations
                     b.Property<DateTime>("EntryDateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("EventId")
-                        .HasColumnType("int");
-
                     b.Property<int>("InvitationId")
                         .HasColumnType("int");
 
@@ -339,8 +339,6 @@ namespace SIC.Backend.Migrations
 
                     b.HasIndex("Code")
                         .IsUnique();
-
-                    b.HasIndex("EventId");
 
                     b.HasIndex("InvitationId")
                         .IsUnique();
@@ -778,19 +776,11 @@ namespace SIC.Backend.Migrations
 
             modelBuilder.Entity("SIC.Shared.Entities.InvitationEntry", b =>
                 {
-                    b.HasOne("SIC.Shared.Entities.Event", "Event")
-                        .WithMany()
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("SIC.Shared.Entities.Invitation", "Invitation")
                         .WithOne("InvitationEntry")
                         .HasForeignKey("SIC.Shared.Entities.InvitationEntry", "InvitationId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Event");
 
                     b.Navigation("Invitation");
                 });

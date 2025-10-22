@@ -22,6 +22,7 @@ public class DataContext : IdentityDbContext<User>
     public DbSet<MassiveShippingProgress> MassiveShippingProgresses { get; set; }
     public DbSet<MessageKey> MessageKeys { get; set; }
     public DbSet<Template> Templates { get; set; }
+    public DbSet<InvitationEntry> InvitationEntries { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -31,7 +32,7 @@ public class DataContext : IdentityDbContext<User>
         modelBuilder.Entity<Item>().HasIndex(x => x.Name).IsUnique();
         modelBuilder.Entity<Plan>().HasIndex(x => x.Name).IsUnique();
         modelBuilder.Entity<PlanItem>().HasIndex(x => new { x.PlanId, x.ItemId }).IsUnique();
-
+        modelBuilder.Entity<InvitationEntry>().HasIndex(x => x.Code).IsUnique();
         DisableCascadingDelete(modelBuilder);
     }
 
