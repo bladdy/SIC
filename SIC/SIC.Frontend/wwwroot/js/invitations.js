@@ -79,8 +79,7 @@ function validarBotonEnviar() {
 // Función para generar QR
 // ==============================
 function fillQRCodeImage(codigo_inv, codigo_evento) {
-    var qrUrl = `https://localhost:7141/api/Invitations/qr?codigo=${codigo_inv}&evento=${codigo_evento}`;
-    //var qrUrl = `http://invboxv-app.com/api/Invitations/qr?codigo=${codigo_inv}&evento=${codigo_evento}`;
+    var qrUrl = `http://invboxv-app.com/api/Invitations/qr?codigo=${codigo_inv}&evento=${codigo_evento}`;
 
     fetch(qrUrl)
         .then(response => response.json())
@@ -108,9 +107,7 @@ function fillQRCodeImage(codigo_inv, codigo_evento) {
 function obtenerDatosInvitacion(codigo) {
     // Deshabilitar inicialmente el botón
     boton.disabled = true;
-    var apiUrl = `https://localhost:7141/api/Invitations/byCode/${codigo}`;
-    //var apiUrl = `http://invboxv-app.com/api/Invitations/byCode/${codigo}`;
-
+    var apiUrl = `http://invboxv-app.com/api/Invitations/byCode/${codigo}`;
 
     fetch(apiUrl)
         .then(response => {
@@ -205,9 +202,8 @@ function sendRespuesta() {
         ConfirmadosMenores: menoresConfirmados,
         Mensaje: mensaje
     };
-    var apiUrl = "https://localhost:7141/api/Invitations/confirm";
-    //var apiUrl = "http://invboxv-app.com/api/Invitations/confirm";
-    fetch(apiUrl, {
+
+    fetch("http://invboxv-app.com/api/Invitations/confirm", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
