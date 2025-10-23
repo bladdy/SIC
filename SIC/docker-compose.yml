@@ -22,6 +22,7 @@ services:
     container_name: sic_backend
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5000
       - ConnectionStrings__DefaultConnection=Server=sic_sqlserver,1433;Database=SIC_DB;User Id=sa;Password=Bladdy3434!;TrustServerCertificate=True;Encrypt=False;
     depends_on:
       - sqlserver
