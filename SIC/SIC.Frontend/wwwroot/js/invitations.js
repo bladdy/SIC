@@ -1,7 +1,7 @@
 ﻿// ==============================
 // invitations.js
 // ==============================
-// ToDo: validacion visual que sino encuentra la invitacion, 
+// ToDo: validacion visual que sino encuentra la invitacion,
 //  que le diga al invitado que esa invitacion no existe, favor de comunicarse con el Host o El Planner
 // Función para obtener los parámetros de la URL
 function getQueryVariable(variable) {
@@ -32,7 +32,6 @@ if (codigo) {
 // Función para mostrar u ocultar selects según asistencia
 // ==============================
 function fn_asistencia(respuesta) {
-
     if (respuesta === 's') {
         document.getElementById("seladultos").style.display = "block";
         document.getElementById("selmenores").style.display = "block";
@@ -51,7 +50,6 @@ function fn_asistencia(respuesta) {
         boton.disabled = false;
     }
 }
-
 
 // ==============================
 // Validación del botón Enviar
@@ -79,7 +77,7 @@ function validarBotonEnviar() {
 // Función para generar QR
 // ==============================
 function fillQRCodeImage(codigo_inv, codigo_evento) {
-    var qrUrl = `http://invboxv-app.com/api/Invitations/qr?codigo=${codigo_inv}&evento=${codigo_evento}`;
+    var qrUrl = `https://invboxv-app.com/api/Invitations/qr?codigo=${codigo_inv}&evento=${codigo_evento}`;
 
     fetch(qrUrl)
         .then(response => response.json())
@@ -107,7 +105,7 @@ function fillQRCodeImage(codigo_inv, codigo_evento) {
 function obtenerDatosInvitacion(codigo) {
     // Deshabilitar inicialmente el botón
     boton.disabled = true;
-    var apiUrl = `http://invboxv-app.com/api/Invitations/byCode/${codigo}`;
+    var apiUrl = `https://invboxv-app.com/api/Invitations/byCode/${codigo}`;
 
     fetch(apiUrl)
         .then(response => {
@@ -203,7 +201,7 @@ function sendRespuesta() {
         Mensaje: mensaje
     };
 
-    fetch("http://invboxv-app.com/api/Invitations/confirm", {
+    fetch("https://invboxv-app.com/api/Invitations/confirm", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -242,7 +240,7 @@ function descargarQR() {
     // Crear un enlace temporal
     const enlace = document.createElement("a");
     enlace.href = qrImage.src;
-    enlace.download = "INV - " +`${invitacionData.event.name}.png`; // Nombre del archivo
+    enlace.download = "INV - " + `${invitacionData.event.name}.png`; // Nombre del archivo
     document.body.appendChild(enlace);
     enlace.click();
     document.body.removeChild(enlace);
