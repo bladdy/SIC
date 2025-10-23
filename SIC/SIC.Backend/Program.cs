@@ -56,7 +56,7 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddDbContext<DataContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddTransient<SeedDb>();
 
 // Registrar el servicio de WhatsAppService
@@ -84,9 +84,6 @@ builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
 builder.Services.AddScoped<IUserUnitOfWork, UserUnitOfWork>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-
-builder.Services.AddScoped<IInvitationEntryUnitOfWork, InvitationEntryUnitOfWork>();
-builder.Services.AddScoped<IInvitationEntryRepository, InvitationEntryRepository>();
 
 builder.Services.AddScoped<IWhatsAppConfigUnitOfWork, WhatsAppConfigUnitOfWork>();
 builder.Services.AddScoped<IWhatsAppConfigRepository, WhatsAppConfigRepository>();
