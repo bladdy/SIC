@@ -14,7 +14,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 // Detectar si estamos corriendo dentro de Docker
 var isDocker = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
 
-string backendUrl = "http://localhost:5000/";//"https://localhost:7141/";
+string backendUrl = "https://localhost:7141/";//"https://localhost:7141/";
 /*if (isDocker)
 {
     // Contenedores Docker: usar nombre del servicio y puerto interno
@@ -25,13 +25,13 @@ else
 {
     // Local: acceder a localhost y puerto expuesto por docker
     backendUrl = "http://localhost:5000/";
-}*/
+}
 builder.Services.AddSingleton(sp => new HttpClient
 {
     BaseAddress = new Uri($"{builder.HostEnvironment.BaseAddress}")
-});
+});*/
 // Configurar HttpClient con la URL correcta
-//builder.Services.AddSingleton(sp => new HttpClient { BaseAddress = new Uri(backendUrl) });
+builder.Services.AddSingleton(sp => new HttpClient { BaseAddress = new Uri(backendUrl) });
 
 // Servicios y autenticación
 builder.Services.AddScoped<IRepository, Repository>();
@@ -44,3 +44,9 @@ builder.Services.AddScoped<AuthenticationStateProvider, AuthenticationProviderJW
 builder.Services.AddScoped<ILoginService, AuthenticationProviderJWT>(x => x.GetRequiredService<AuthenticationProviderJWT>());
 
 await builder.Build().RunAsync();
+//ToDo:
+/*
+ * Terrminar la parte de lector de QR para confirmar Asistencia
+ * Validar que si ya la invitacion del QR esta confirmada, no dejar volver a confirmar
+ * Enviar la asistencia con los datos del QR
+*/
