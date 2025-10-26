@@ -49,13 +49,13 @@ namespace SIC.Backend.Helpers
                 {
                     case "linkinvitation":
                         {
-                            // Construye la URL dinámica: miapp.com/mievento/codigoevento/codigoinvitacion
-                            var baseUrl = invitation.Event?.Url?.TrimEnd('/') ?? "https://miapp.com";
+                            // Construye la URL dinámica: https://invboxv.com/mievento/?codigoinvitacion
+                            var baseUrl = invitation.Event?.Url?.TrimEnd('/') ?? "https://invboxv.com/";
                             var eventCode = invitation.Event?.Code ?? string.Empty;
                             var invitationCode = invitation.Code ?? string.Empty;
 
                             // Construcción final
-                            return $"{baseUrl}/?e={eventCode}&i={invitationCode}";
+                            return $"{baseUrl}/?codigo={invitationCode}";
                         }
                     default:
                         return string.Empty;

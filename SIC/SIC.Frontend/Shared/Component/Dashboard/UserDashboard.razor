@@ -1,0 +1,35 @@
+﻿@using SIC.Shared.DTOs
+
+@inject NavigationManager Navigation
+
+@if(UserDashboards is null)
+{
+    <p>Cargando datos del dashboard...</p>
+    return;
+}
+else
+{
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>@UserDashboards.EventName</h5>
+                    <p class="text-muted">@UserDashboards.EventDate.ToString("dddd, dd MMM yyyy")</p>
+                    <p>Total Invitaciones: <strong>@UserDashboards.TotalInvitations</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h6>Confirmadas</h6>
+                    <h3>@UserDashboards.Confirmed</h3>
+                    <small class="text-muted">Pendientes: @UserDashboards.Pending</small>
+                </div>
+            </div>
+        </div>
+
+    </div>
+}
+

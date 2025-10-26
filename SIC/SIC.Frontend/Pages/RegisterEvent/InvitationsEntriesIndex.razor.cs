@@ -1,4 +1,4 @@
-using CurrieTechnologies.Razor.SweetAlert2;
+ï»¿using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
@@ -26,8 +26,10 @@ public partial class InvitationsEntriesIndex
     [Inject] private IRepository Repository { get; set; } = default!;
     public List<InvitationEntry>? InvitationEntries { get; set; }
     private InvitationEntry NewInvitationEntry = new();
-    private Invitation Invitation = new();
+    private InvitationEntry EditedInvitationEntry = new();
+    private Invitation? Invitation = null;
     private bool IsModalVisible = false;
+    private bool IsModalEditVisible = false;
     private bool IsEditMode = false;
 
     private DotNetObjectReference<object>? objRef;
@@ -82,7 +84,7 @@ public partial class InvitationsEntriesIndex
             }
         }
 
-        InvitationEntries = responseHttp?.Response ?? new List<InvitationEntry>();
+        InvitationEntries = responseHttp?.Response;
         return true;
     }
 
@@ -135,11 +137,23 @@ public partial class InvitationsEntriesIndex
         await ApplyFilterAsync();
     }
 
+    private void ShowEditModal(InvitationEntry invitationEntry)
+    {
+        IsEditMode = false;
+        IsModalEditVisible = true;
+        EditedInvitationEntry = invitationEntry;
+    }
+
     private async Task ShowCreateModal()
     {
         IsEditMode = false;
         IsModalVisible = true;
         await StartScannerAsync();
+    }
+
+    private void CloseEditModal()
+    {
+        IsModalEditVisible = false;
     }
 
     private async void CloseModal()
@@ -185,37 +199,65 @@ public partial class InvitationsEntriesIndex
 
     private async Task LoadInvitation(string qrResult)
     {
+        Invitation = null;
         var responseHttp = await Repository.GetAsync<Invitation>($"api/Invitations/byCode/{qrResult}");
-        if (responseHttp.Error)
+        if (responseHttp.Response == null)
         {
-            if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+            if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NoContent)
             {
                 await SweetAlertService.FireAsync("Info", "La invitacion no existe.", SweetAlertIcon.Error);
+                StateHasChanged();
+                await OnQrCodeScannedClose();
+                await Task.Delay(200);
+                await StartScannerAsync();
                 return;
             }
             var message = await responseHttp.GetErrorMessageAsync();
             await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
             return;
         }
-        Invitation = responseHttp?.Response ?? new();
+        Invitation = responseHttp?.Response!;
     }
 
-    private async Task SaveInvitationEntry()
+    private async Task UpdateInvitationEntry()
     {
-        if (string.IsNullOrWhiteSpace(qrResult))
+        InvitationEntry invitationEntry = new()
         {
-            await SweetAlertService.FireAsync("Error", "Por favor, escanee un código QR antes de guardar.", SweetAlertIcon.Error);
-            return;
-        }
-        NewInvitationEntry.QrCode = qrResult;
-        var responseHttp = await Repository.PostAsync<InvitationEntry, InvitationEntry>("api/InvitationEntry", NewInvitationEntry);
+            Id = EditedInvitationEntry.Id,
+            Code = EditedInvitationEntry.Code,
+            InvitationId = EditedInvitationEntry.InvitationId,
+            EventId = EditedInvitationEntry.EventId,
+            AdultsEntered = EditedInvitationEntry.AdultsEntered,
+            ChildrenEntered = EditedInvitationEntry.ChildrenEntered,
+            EntryDateTime = EditedInvitationEntry.EntryDateTime,
+            QrCode = EditedInvitationEntry.QrCode
+        };
+        var responseHttp = await Repository.PutAsync<InvitationEntry>("api/InvitationEntry/full", invitationEntry);
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();
             await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
             return;
         }
-        await SweetAlertService.FireAsync("Éxito", "La entrada de invitación se ha guardado correctamente.", SweetAlertIcon.Success);
+        await SweetAlertService.FireAsync("Exito", "La entrada de invitacion se ha actualizada correctamente.", SweetAlertIcon.Success);
+        IsModalVisible = false;
+        CloseEditModal();
+        await LoadInvitationEntries(currentPage);
+    }
+
+    private async Task SaveInvitationEntry()
+    {
+        NewInvitationEntry.Code = Invitation!.Code;
+        NewInvitationEntry.QrCode = qrResult;
+        NewInvitationEntry.InvitationId = Invitation!.Id;
+        var responseHttp = await Repository.PostAsync<InvitationEntry>("api/InvitationEntry/full", NewInvitationEntry);
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+        await SweetAlertService.FireAsync("Exito", "La entrada de invitacion se ha guardado correctamente.", SweetAlertIcon.Success);
         IsModalVisible = false;
         await LoadInvitationEntries(currentPage);
     }

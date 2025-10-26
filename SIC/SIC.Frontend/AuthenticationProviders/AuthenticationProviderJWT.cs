@@ -58,5 +58,11 @@ namespace SIC.Frontend.AuthenticationProviders
             _httpClient.DefaultRequestHeaders.Authorization = null;
             NotifyAuthenticationStateChanged(Task.FromResult(_anonimus));
         }
+
+        public async Task<string?> GetTokenAsync()
+        {
+            var token = await _jSRuntime.GetLocalStorage(_tokenKey);
+            return token?.ToString();
+        }
     }
 }

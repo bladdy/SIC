@@ -52,14 +52,14 @@ else
                                                     @invitation.Code
                                                 </a>
                                             </div>
-                                            <div><strong>Nombre:</strong> @invitation.Invitation!.Name</div>
-                                            <div><strong>Móvil:</strong> @invitation.Invitation!.PhoneNumber</div>
+                                            <div><strong>Nombre:</strong> @invitation.Invitation?.Name</div>
+                                            <div><strong>Móvil:</strong> @invitation.Invitation?.PhoneNumber</div>
                                         </div>
 
                                         <!-- ===== COLUMNA 2 ===== -->
                                         <div class="col-12 col-md-4 d-flex flex-column">
-                                            <div><strong>Adultos:</strong> @invitation.Invitation!.NumberConfirmedAdults</div>
-                                            <div><strong>Niños:</strong> @invitation.Invitation!.NumberConfirmedChildren</div>
+                                            <div><strong>Adultos:</strong> @invitation.Invitation?.NumberConfirmedAdults</div>
+                                            <div><strong>Niños:</strong> @invitation.Invitation?.NumberConfirmedChildren</div>
 
                                         </div>
 
@@ -77,13 +77,13 @@ else
                             <!-- ======== COLUMNA 2: ESTADO ======== -->
                             <td class="text-center">
                                 <span class="px-3 py-2 fs-6 badge bg-secondary">
-                                    @invitation.Invitation!.Table
+                                    @invitation.Invitation?.Table
                                 </span>
                             </td>
 
                             <!-- ======== COLUMNA 3: ACCIONES VACÍA PARA ALINEAR ======== -->
                             <td>
-                                <button class="btn btn-custom">
+                                <button class="btn btn-custom" @onclick="() => ShowEditModal(invitation)">
                                     <i class="bi bi-pencil-fill"></i> Editar
                                 </button>
                             </td>
@@ -102,22 +102,32 @@ else
 
     <!-- ✅ Vista móvil tipo “detalle” -->
     <div class="d-block d-md-none">
-        @foreach (var invitation in InvitationEntries!)
+        @if (InvitationEntries != null && InvitationEntries.Any())
         {
-            <div class="card mb-3 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h5 class="card-title mb-0">@invitation.Invitation!.Name</h5>
-                        <span class="badge bg-secondary">
-                            @invitation.Invitation!.Table
-                        </span>
-                    </div>
-                    <p class="mb-1"><strong>Código:</strong> @invitation.Code</p>
-                    <p class="mb-1"><strong>Móvil:</strong> @invitation.Invitation!.PhoneNumber</p>
-                    <p class="mb-1"><strong>Adultos:</strong> @invitation.Invitation!.NumberAdults (@invitation.AdultsEntered Asistentes)</p>
-                    <p class="mb-1"><strong>Niños:</strong> @invitation.Invitation!.NumberChildren (@invitation.ChildrenEntered Asistentes)</p>
+            @foreach (var invitation in InvitationEntries)
+            {
+                <div class="card mb-3 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="card-title mb-0">@invitation.Invitation?.Name</h5>
+                            <span class="badge bg-secondary">
+                                @invitation.Invitation?.Table
+                            </span>
+                        </div>
+                        <p class="mb-1"><strong>Código:</strong> @invitation.Code</p>
+                        <p class="mb-1"><strong>Móvil:</strong> @invitation.Invitation?.PhoneNumber</p>
+                        <p class="mb-1"><strong>Adultos:</strong> @invitation.Invitation?.NumberAdults (@invitation.AdultsEntered Asistentes)</p>
+                        <p class="mb-1"><strong>Niños:</strong> @invitation.Invitation?.NumberChildren (@invitation.ChildrenEntered Asistentes)</p>
 
+                    </div>
                 </div>
+            }
+            
+        }
+        else
+        {
+            <div>
+                <p class="text-center text-muted py-4">No hay invitados registrados.</p>
             </div>
         }
     </div>
@@ -127,6 +137,97 @@ else
                     TotalPages="totalPages"
                     SelectedPage="SelectedPageAsync" />
 
+    </div>
+}
+@if (IsModalEditVisible)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Registrar Invitados
+                    </h5>
+                    <button type="button" class="btn-close" @onclick="CloseEditModal"></button>
+                </div>
+                <div class="modal-body">
+
+
+                    <EditForm Model="@NewInvitationEntry" OnValidSubmit="@SaveInvitationEntry">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+                        <div class="row g-1 mb-2">
+                            <div class="col-12 col-md-6 d-flex flex-column">
+                                <div class="col-12 ">
+                                    <p class="d-flex justify-content-between align-items-center px-3 py-1">
+                                        <strong>Estado:</strong>
+                                        <span>@EditedInvitationEntry.Invitation?.Status.GetDescription()</span>
+                                    </p>
+                                </div>
+                                <div class="col-12">
+                                    <p class="d-flex justify-content-between align-items-center px-3 py-1">
+                                        <strong>Evento:</strong>
+                                        <span>@EditedInvitationEntry.Invitation?.Event?.Name</span>
+                                    </p>
+                                </div>
+
+
+                            </div>
+                            <!-- Estado -->
+                            <div class="col-12 col-md-6 d-flex flex-column">
+
+                                <!-- Adutlos Confirmados -->
+                                <div class="col-12">
+                                    <p class="d-flex justify-content-between align-items-center px-3 py-1">
+                                        <strong>Adultos Confirmados:</strong>
+                                        <span>@EditedInvitationEntry.Invitation?.NumberConfirmedAdults</span>
+                                    </p>
+                                </div>
+                                <!-- Niños Confirmados -->
+                                <div class="col-12">
+                                    <p class="d-flex justify-content-between align-items-center px-3 py-1">
+                                        <strong>Niños Confirmados:</strong>
+                                        <span>@EditedInvitationEntry.Invitation?.NumberConfirmedChildren</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-12 d-flex flex-column">
+                                <!-- Nombres -->
+                                <div class="col-12 ">
+                                    <p class="d-flex justify-content-between align-items-center px-3 py-1 ">
+                                        <strong>Nombres:</strong>
+                                        <span>@EditedInvitationEntry.Invitation?.Name</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Adultos Asistentes</label>
+                            <InputNumber class="form-control" @bind-Value="EditedInvitationEntry.AdultsEntered" min="0" max="@Invitation?.NumberConfirmedAdults" />
+                            <ValidationMessage For="@(() => EditedInvitationEntry.AdultsEntered)" />
+                            <small class="text-muted">Máximo permitido: @EditedInvitationEntry.Invitation?.NumberConfirmedAdults</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Niños Asistentes</label>
+                            <InputNumber class="form-control" @bind-Value="EditedInvitationEntry.ChildrenEntered" min="0" max="@Invitation?.NumberConfirmedChildren" />
+                            <ValidationMessage For="@(() => EditedInvitationEntry.ChildrenEntered)" />
+                            <small class="text-muted">Máximo permitido: @EditedInvitationEntry.Invitation?.NumberConfirmedChildren</small>
+                        </div>
+                    </EditForm>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-custom" @onclick="UpdateInvitationEntry">
+                        Guardar
+                    </button>
+                    <button type="button" class="btn btn-secondary" @onclick="CloseEditModal">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 }
 <!-- Modal-->
@@ -145,7 +246,7 @@ else
                     <div id="reader" style="width:auto; height:100%;"></div>
                     @if (!isScannerRunning)
                     {
-                        @if (Invitation != null)
+                        @if (Invitation is not null)
                         {
                             <div class="row g-1 mb-2">
                                 <div class="col-12 col-md-6 d-flex flex-column">
@@ -161,7 +262,7 @@ else
                                             <span>@Invitation?.Event?.Name</span>
                                         </p>
                                     </div>
-                                    
+
 
                                 </div>
                                 <!-- Estado -->
@@ -170,7 +271,7 @@ else
                                     <!-- Adutlos Confirmados -->
                                     <div class="col-12">
                                         <p class="d-flex justify-content-between align-items-center px-3 py-1">
-                                            <strong>Adutlos Confirmados:</strong>
+                                            <strong>Adultos Confirmados:</strong>
                                             <span>@Invitation?.NumberConfirmedAdults</span>
                                         </p>
                                     </div>
@@ -194,27 +295,29 @@ else
 
                             </div>
 
+                            <EditForm Model="@NewInvitationEntry" OnValidSubmit="@SaveInvitationEntry">
+                                <DataAnnotationsValidator />
+                                <ValidationSummary />
+                                <div class="mb-3">
+                                    <label class="form-label">Adultos Asistentes</label>
+                                    <InputNumber class="form-control" @bind-Value="NewInvitationEntry.AdultsEntered" min="0" max="@Invitation?.NumberConfirmedAdults" />
+                                    <ValidationMessage For="@(() => NewInvitationEntry.AdultsEntered)" />
+                                    <small class="text-muted">Máximo permitido: @Invitation?.NumberConfirmedAdults</small>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Niños Asistentes</label>
+                                    <InputNumber class="form-control" @bind-Value="NewInvitationEntry.ChildrenEntered" min="0" max="@Invitation?.NumberConfirmedChildren" />
+                                    <ValidationMessage For="@(() => NewInvitationEntry.ChildrenEntered)" />
+                                    <small class="text-muted">Máximo permitido: @Invitation?.NumberConfirmedChildren</small>
+                                </div>
+                            </EditForm>
                         }
 
-                        <EditForm Model="@NewInvitationEntry" OnValidSubmit="@SaveInvitationEntry">
-                            <DataAnnotationsValidator />
-                            <ValidationSummary />
-                            <div class="mb-3">
-                                <label class="form-label">Adultos Asistentes</label>
-                                <InputNumber class="form-control" @bind-Value="NewInvitationEntry.AdultsEntered" />
-                                <ValidationMessage For="@(() => NewInvitationEntry.AdultsEntered)" />
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Niños Asistentes</label>
-                                <InputNumber class="form-control" @bind-Value="NewInvitationEntry.ChildrenEntered" />
-                                <ValidationMessage For="@(() => NewInvitationEntry.ChildrenEntered)" />
-                            </div>
-                        </EditForm>
                     }
 
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-custom">
+                    <button type="submit" class="btn btn-custom" @onclick="SaveInvitationEntry" disabled="@(Invitation == null)">
                         Guardar
                     </button>
                     <button type="button" class="btn btn-secondary" @onclick="CloseModal">

@@ -1,0 +1,59 @@
+﻿@using SIC.Shared.DTOs
+@using SIC.Shared.Entities
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<div class="modal fade" id="addCreditModal" tabindex="-1" aria-labelledby="addCreditModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0 rounded-3">
+            <div class="modal-header text-white" style="background-color:#3C6A79;">
+                <h5 class="modal-title" id="addCreditModalLabel">Agregar Créditos a Planner</h5>
+                <button type="button" class="btn-close btn-close-white" @onclick="Close" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @if (isLoading)
+                {
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="mb-3">
+                        <label class="form-label">Buscar Planner</label>
+                        <input type="text" class="form-control mb-2" placeholder="Escribe un nombre para filtrar..."
+                               @bind="filterText" @bind:event="oninput" disabled="@isPreselectedUser" />
+
+                        <select class="form-select" @bind="model.UserId" disabled="@isPreselectedUser">
+                            <option value="">-- Selecciona un planner --</option>
+                            @foreach (var user in FilteredUsers)
+                            {
+                                <option value="@user.Id">@user.FullName (@user.Email)</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Créditos a agregar</label>
+                        <input type="number" class="form-control" @bind="model.CreditsToAdd" min="1" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Notas (opcional)</label>
+                        <textarea class="form-control" rows="2" @bind="model.Notes"></textarea>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-custom" @onclick="AddCreditsAsync" disabled="@isSaving">
+                    @(isSaving ? "Guardando..." : "Agregar Créditos")
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+

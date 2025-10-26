@@ -3,9 +3,27 @@
 <h3 class="mb-2">Mis Eventos</h3>
 
 <div class="mb-3">
-    <button class="btn btn-custom" @onclick="ShowCreateModal">
-        Crear Evento
-    </button>
+    <!-- Admin -->
+    <AuthorizeView Roles="Admin">
+        <Authorized>
+            <button class="btn btn-custom" @onclick="ShowCreateModal">
+                Crear Evento
+            </button>
+        </Authorized>
+    </AuthorizeView>
+
+    <!-- Planner -->
+    <AuthorizeView Roles="WeddingPlanner">
+        <Authorized>
+            <button class="btn btn-custom"
+                    @onclick="ShowCreateModal"
+                    disabled="@(AvailableCredits == 0)"
+                    title="@(AvailableCredits == 0 ? "No tienes créditos disponibles" : $"Tienes {AvailableCredits} créditos disponibles")">
+                Crear Evento (@AvailableCredits)
+            </button>
+        </Authorized>
+    </AuthorizeView>
+    
 </div>
 <div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center; gap: 10px;">
     <!-- Buscar por texto -->

@@ -1,0 +1,204 @@
+﻿@if (AdminDashboards != null)
+{
+    <div class="row g-4">
+
+        <!-- KPI Cards -->
+        <div class="col-md-3 col-sm-6">
+            <div class="card shadow-sm border-0 text-center">
+                <div class="card-body">
+                    <h6 class="text-muted">Eventos Totales</h6>
+                    <h3>@AdminDashboards.EventsTotal</h3>
+                    <small class="text-muted">Todos los eventos</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="card shadow-sm border-0 text-center">
+                <div class="card-body">
+                    <h6 class="text-muted">Eventos Activos</h6>
+                    <h3 class="text-success">@AdminDashboards.EventsActive</h3>
+                    <small class="text-muted">Status = Activos</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="card shadow-sm border-0 text-center">
+                <div class="card-body">
+                    <h6 class="text-muted">Invitaciones Totales</h6>
+                    <h3>@AdminDashboards.InvitationsTotal</h3>
+                    <small class="text-muted">Todas las invitaciones</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="card shadow-sm border-0 text-center">
+                <div class="card-body">
+                    <h6 class="text-muted">Confirmaciones</h6>
+                    <h3 class="text-success">@AdminDashboards.InvitationsConfirmed</h3>
+                    <small class="text-muted">Status = “Sí asistiré”</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumen de invitados -->
+        <div class="col-12 mt-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="mb-3 text-center">Resumen de invitados</h6>
+
+                    @if (AdminDashboards.TotalGuests > 0)
+                    {
+                        <div class="progress" style="height: 28px;">
+                            @if (AdminDashboards.ConfirmedGuests > 0)
+                            {
+                                var confirmedPct = (double)AdminDashboards.ConfirmedGuests / AdminDashboards.TotalGuests * 100;
+                                <div class="progress-bar bg-success" style="width:@confirmedPct%">
+                                    Confirmados: @AdminDashboards.ConfirmedGuests
+                                </div>
+                            }
+
+                            @if (AdminDashboards.PendingGuests > 0)
+                            {
+                                var pendingPct = (double)AdminDashboards.PendingGuests / AdminDashboards.TotalGuests * 100;
+                                <div class="progress-bar bg-warning text-dark" style="width:@pendingPct%">
+                                    Pendientes: @AdminDashboards.PendingGuests
+                                </div>
+                            }
+
+                            @if (AdminDashboards.NotAttendingGuests > 0)
+                            {
+                                var notAttendPct = (double)AdminDashboards.NotAttendingGuests / AdminDashboards.TotalGuests * 100;
+                                <div class="progress-bar bg-danger" style="width:@notAttendPct%">
+                                    No asistirán: @AdminDashboards.NotAttendingGuests
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted">Sin datos de invitados</div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Top 10 planners con menos créditos -->
+        <div class="col-12 mt-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="mb-3">Top 10 planners con menos créditos</h6>
+
+                    <table class="table table-sm align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Planner</th>
+                                <th class="text-center">Créditos disponibles</th>
+                                <th class="text-center">Créditos totales</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var planner in AdminDashboards.Top10PlannersLowCredits)
+                            {
+                                <tr>
+                                    <td>@planner.FullName</td>
+                                    <td class="text-center fw-bold @(planner.AvailableCredits == 0 ? "text-danger" : "text-success")">
+                                        @planner.AvailableCredits
+                                    </td>
+                                    <td class="text-center">@planner.TotalCredits</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top eventos por invitados -->
+        <div class="col-md-6 col-12 mt-3">
+            <div class="card shadow-sm" style="height: 450px;">
+                <div class="card-body d-flex flex-column h-100">
+                    <h6 class="mb-3">Top eventos (por invitados confirmados)</h6>
+
+                    <!-- Contenido scrollable -->
+                    <div class="flex-grow-1 overflow-auto">
+                        @foreach (var e in TopEventsPage)
+                        {
+                            var total = e.TotalGuests > 0 ? e.TotalGuests : 1;
+                            var confirmedPct = (double)e.ConfirmedGuests / total * 100;
+                            var pendingPct = (double)e.PendingGuests / total * 100;
+                            var notAttendPct = (double)e.NotAttendingGuests / total * 100;
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <strong>@e.EventName</strong>
+                                    <small>@e.ConfirmedGuests confirmados / @e.TotalGuests invitados</small>
+                                </div>
+
+                                <div class="progress" style="height: 22px;">
+                                    <div class="progress-bar bg-success" style="width:@confirmedPct%">@e.ConfirmedGuests</div>
+                                    <div class="progress-bar bg-warning text-dark" style="width:@pendingPct%">@e.PendingGuests</div>
+                                    <div class="progress-bar bg-danger" style="width:@notAttendPct%">@e.NotAttendingGuests</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Botones fijos al fondo -->
+                    <div class="d-flex justify-content-between mt-2">
+                        <button class="btn btn-sm btn-outline-primary" @onclick="PrevTopEvents" disabled="@(topEventsPage == 0)">Anterior</button>
+                        <button class="btn btn-sm btn-outline-primary" @onclick="NextTopEvents" disabled="@(topEventsPage >= TopEventsTotalPages - 1)">Siguiente</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Próximos eventos -->
+        <div class="col-md-6 col-12 mt-3">
+            <div class="card shadow-sm" style="height: 450px;">
+                <div class="card-body d-flex flex-column h-100">
+                    <h6 class="mb-3">Próximos eventos</h6>
+
+                    <div class="flex-grow-1 overflow-auto">
+                        @if (UpcomingEventsPage.Any())
+                        {
+                            <ul class="list-group list-group-flush">
+                                @foreach (var upcoming in UpcomingEventsPage)
+                                {
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>@upcoming.EventName</strong><br />
+                                            <small class="text-muted">@upcoming.Date.ToString("dd/MM/yyyy")</small>
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">@upcoming.TotalGuests invitados</span>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <div class="text-muted text-center">No hay eventos próximos.</div>
+                        }
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-2">
+                        <button class="btn btn-sm btn-outline-primary" @onclick="PrevUpcomingEvents" disabled="@(upcomingEventsPage == 0)">Anterior</button>
+                        <button class="btn btn-sm btn-outline-primary" @onclick="NextUpcomingEvents" disabled="@(upcomingEventsPage >= UpcomingEventsTotalPages - 1)">Siguiente</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+}
+else
+{
+    <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+    </div>
+}

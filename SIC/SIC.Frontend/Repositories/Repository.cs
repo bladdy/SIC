@@ -1,6 +1,9 @@
-﻿using SIC.Frontend.Repositories;
+﻿using Microsoft.JSInterop;
+using SIC.Frontend.AuthenticationProviders;
+using SIC.Frontend.Repositories;
 using SIC.Shared.Response;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 
@@ -9,15 +12,17 @@ namespace SIC.Frontend.Repositories;
 public class Repository : IRepository
 {
     private readonly HttpClient _httpClient;
+    private readonly AuthenticationProviderJWT _authProvider;
 
     private JsonSerializerOptions _jsonDefaultOptions => new JsonSerializerOptions
     {
         PropertyNameCaseInsensitive = true
     };
 
-    public Repository(HttpClient httpClient)
+    public Repository(HttpClient httpClient, AuthenticationProviderJWT authProvider)
     {
         _httpClient = httpClient;
+        _authProvider = authProvider;
     }
 
     public async Task<HttpResponseWrapper<object>> GetAsync(string url)
@@ -26,8 +31,23 @@ public class Repository : IRepository
         return new HttpResponseWrapper<object>(null, !responseHTTP.IsSuccessStatusCode, responseHTTP);
     }
 
+    private async Task AddAuthorizationHeaderAsync()
+    {
+        var token = await _authProvider.GetTokenAsync();
+        if (!string.IsNullOrEmpty(token))
+        {
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+        }
+        else
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = null;
+        }
+    }
+
     public async Task<HttpResponseWrapper<T>> GetAsync<T>(string url)
     {
+        await AddAuthorizationHeaderAsync();
         var responseHttp = await _httpClient.GetAsync(url);
 
         if (responseHttp.IsSuccessStatusCode)
@@ -135,5 +155,12 @@ public class Repository : IRepository
         }
 
         return new HttpResponseWrapper<TActionResponse>(default!, true, responseHttp);
+    }
+
+    public async Task<HttpResponseWrapper<object>> PostAsync<T>(string url)
+    {
+        var responseHttp = await _httpClient.PostAsync(url, null);
+        var response = await UnserializeAnswerAsync<object>(responseHttp);
+        return new HttpResponseWrapper<object>(response, !responseHttp.IsSuccessStatusCode, responseHttp); ;
     }
 }

@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using SIC.Frontend.Repositories;
-using SIC.Frontend.Shared;
 using SIC.Shared.Entities;
 using System.Net;
 using System.Security.Claims;
+using static System.Net.WebRequestMethods;
 
 namespace SIC.Frontend.Pages.MyEvents;
 
@@ -14,8 +14,10 @@ namespace SIC.Frontend.Pages.MyEvents;
 public partial class MyEventsIndex
 {
     private string? _userId;
+    private string? _userRol;
     private int currentPage = 1;
     private int totalPages;
+    private int AvailableCredits = 0;
     [Inject] private IRepository repository { get; set; } = default!;
     [Inject] private SweetAlertService sweetAlertService { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
@@ -42,8 +44,11 @@ public partial class MyEventsIndex
         if (user.Identity is not null && user.Identity.IsAuthenticated)
         {
             var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            _userRol = user.FindFirst(ClaimTypes.Role)?.Value;
             _userId = userId;
             NewEvent.UserId = userId ?? string.Empty;
+
+            await LoadAvailableCreditsAsync();
         }
         RecordsNumber ??= 15;
 
@@ -206,6 +211,19 @@ public partial class MyEventsIndex
         IsModalVisible = true;
     }
 
+    private async Task LoadAvailableCreditsAsync()
+    {
+        try
+        {
+            var responseHttp = await repository.GetAsync<UserCreditDTO>($"api/UserCredits/{_userId}") ?? null;
+            AvailableCredits = responseHttp?.Response?.AvailableCredits ?? 0;
+        }
+        catch
+        {
+            AvailableCredits = 0;
+        }
+    }
+
     private async Task SelectedPageAsync(int page)
     {
         currentPage = page;
@@ -220,6 +238,7 @@ public partial class MyEventsIndex
     private async Task SaveEvent()
     {
         HttpResponseWrapper<object>? responseHttp;
+        bool isPost = false;
 
         if (IsEditMode)
         {
@@ -230,8 +249,14 @@ public partial class MyEventsIndex
         {
             // POST -> Crear
             responseHttp = await repository.PostAsync("api/events/full", NewEvent);
+            isPost = true;
         }
-
+        if ((_userRol == "WeddingPlanner") && isPost)
+        {
+            HttpResponseWrapper<object>? responseHttps;
+            responseHttps = await repository.PostAsync<object>($"api/UserCredits/consume/{_userId}");
+            await LoadAvailableCreditsAsync();
+        }
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync() ?? "No se pudo guardar el plan.";

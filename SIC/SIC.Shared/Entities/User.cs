@@ -35,4 +35,7 @@ public class User : IdentityUser
 
     public ICollection<Event>? Events { get; set; }
     public UsuarioWhatsAppConfig? UserWhatsAppConfigs { get; set; }
+
+    // Relación 1:1 con créditos
+    public UserCredit? UserCredit { get; set; }
 }

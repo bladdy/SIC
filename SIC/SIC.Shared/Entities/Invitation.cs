@@ -37,7 +37,7 @@ public class Invitation
     public int NumberConfirmedChildren { get; set; }
 
     [Display(Name = "Estado")]
-    public Status Status { get; set; }
+    public Status Status { get; set; } = Status.Pending;
 
     [Display(Name = "Mesa")]
     public string? Table { get; set; }

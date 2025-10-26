@@ -1,8 +1,50 @@
 ﻿@page "/"
+
 @using Microsoft.AspNetCore.Authorization
+@using SIC.Frontend.Shared.Component.Dashboard
+
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
 @attribute [Authorize]
 
-<PageTitle>Inicio</PageTitle>
+<PageTitle>Dashboard</PageTitle>
 
-<h1>Bienvenido al panel</h1>
 
+
+        <div class="container py-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h3 class="mb-0">Panel de Control</h3>
+                    <small class="text-muted">Bienvenido</small>
+                </div>
+                <div>
+                    <button class="btn btn-outline-secondary" @onclick="GoToProfile">Mi Perfil</button>
+                </div>
+            </div>
+
+            <!-- Admin -->
+            <AuthorizeView Roles="Admin">
+                <Authorized>
+                    <AdminDashboard />
+                </Authorized>
+            </AuthorizeView>
+
+            <!-- Planner -->
+            <AuthorizeView Roles="WeddingPlanner">
+                <Authorized>
+                    <PlannerDashboard />
+                </Authorized>
+            </AuthorizeView>
+
+            <!-- User -->
+            <AuthorizeView Roles="User">
+                <Authorized>
+                    <UserDashboard />
+                </Authorized>
+            </AuthorizeView>
+        </div>
+
+@code {
+    private void GoToProfile() => Navigation.NavigateTo("profile");
+}

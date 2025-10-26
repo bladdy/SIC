@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using SIC.Frontend.Repositories;
 using SIC.Shared.Entities;
+using SIC.Shared.Enums;
 using System.Net;
+using System.Net.Http.Json;
 using System.Security.Claims;
 
 namespace SIC.Frontend.Pages.Events
@@ -12,166 +14,88 @@ namespace SIC.Frontend.Pages.Events
     [Authorize(Roles = "Admin")]
     public partial class EventsIndex
     {
-        private string? _userId;
-        private int currentPage = 1;
-        private int totalPages;
-
         [Inject] private IRepository repository { get; set; } = default!;
         [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
         [Inject] private NavigationManager NavigationManager { get; set; } = default!;
         [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
+        [Inject] private HttpClient Http { get; set; } = default!;
 
-        [Parameter, SupplyParameterFromQuery] public string Page { get; set; } = string.Empty;
-        [Parameter, SupplyParameterFromQuery] public string Filter { get; set; } = string.Empty;
-        [Parameter, SupplyParameterFromQuery] public DateTime? DateSelectd { get; set; } = null;
-        [Parameter, SupplyParameterFromQuery] public int? SelectedEventType { get; set; }
-        [Parameter, SupplyParameterFromQuery] public string OrderBy { get; set; } = "";
-        [Parameter, SupplyParameterFromQuery] public int? RecordsNumber { get; set; }
-
-        public List<Event>? Events { get; set; }
-        public List<EventType>? EventTypes { get; set; }
+        private List<Event>? Events;
+        private List<EventType>? EventTypes;
+        private List<User> AllUsers = new();
 
         private Event NewEvent = new();
         private bool IsModalVisible = false;
         private bool IsEditMode = false;
-        private DateTime MinAllowedDate { get; set; } = new DateTime(2023, 1, 1);
+
+        private int currentPage = 1;
+        private int totalPages;
+
+        private string filterText = string.Empty;
+        private bool isPreselectedUser = false;
+
+        [Parameter] public string? Filter { get; set; }
+        [Parameter] public DateTime? DateSelectd { get; set; }
+        [Parameter] public int? SelectedEventType { get; set; }
+        [Parameter] public string? OrderBy { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
-            await base.OnInitializedAsync();
-
-            // Si RecordsNumber viene null, lo asignamos a 15
-            RecordsNumber ??= 15;
-
             await LoadEventTypes();
+            await LoadUsersAsync();
             await LoadEvents(currentPage);
+        }
+
+        private async Task LoadUsersAsync()
+        {
+            var result = await Http.GetFromJsonAsync<List<User>>("api/Accounts/all");
+            if (result != null)
+            {
+                // Solo usuarios que NO sean Admin ni WeddingPlanner
+                AllUsers = result.Where(u => u.UserType != UserType.Admin && u.UserType != UserType.WeddingPlanner).ToList();
+            }
+        }
+
+        private IEnumerable<User> FilteredUsers =>
+            string.IsNullOrWhiteSpace(filterText)
+                ? AllUsers
+                : AllUsers.Where(u => u.FullName.Contains(filterText, StringComparison.OrdinalIgnoreCase));
+
+        private async Task LoadEventTypes()
+        {
+            var response = await repository.GetAsync<List<EventType>>("api/EventTypes");
+            if (!response.Error)
+                EventTypes = response.Response;
+        }
+
+        private async Task LoadEvents(int page)
+        {
+            var url = $"api/Events/paginated?PageNumber={page}&PageSize=15";
+            var response = await repository.GetAsync<List<Event>>(url);
+            if (!response.Error)
+                Events = response.Response;
         }
 
         private async Task SelectedPageAsync(int page)
         {
             currentPage = page;
-            await LoadEvents(currentPage);
-        }
-
-        private async Task CleanFilterAsync()
-        {
-            Filter = string.Empty;
-            SelectedEventType = null;
-            DateSelectd = null;
-            OrderBy = "";
-            await ApplyFilterAsync();
-        }
-
-        private async Task ApplyFilterAsync()
-        {
-            int page = 1;
             await LoadEvents(page);
         }
 
-        private async Task LoadEvents(int page = 1)
-        {
-            if (!string.IsNullOrWhiteSpace(Page))
-            {
-                page = Convert.ToInt32(Page);
-            }
-            var ok = await LoadListAsync(page);
-            if (ok)
-            {
-                await LoadPagesAsync();
-            }
-        }
+        private async Task ApplyFilterAsync() => await LoadEvents(1);
 
-        private async Task<bool> LoadListAsync(int page)
-        {
-            var url = $"api/Events/paginated?PageNumber={page}&PageSize={RecordsNumber}";
-
-            if (!string.IsNullOrWhiteSpace(Filter))
-            {
-                url += $"&Filter={Filter}";
-            }
-            if (DateSelectd != null)
-            {
-                url += $"&Date={DateSelectd}";
-            }
-            if (SelectedEventType != null)
-            {
-                url += $"&EventTypeId={SelectedEventType}";
-            }
-            if (!string.IsNullOrWhiteSpace(OrderBy))
-            {
-                url += $"&OrderBy={OrderBy}";
-            }
-            var responseHttp = await repository.GetAsync<List<Event>>(url);
-
-            if (responseHttp.Error)
-            {
-                if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
-                {
-                    NavigationManager.NavigateTo("/events");
-                    var message = await responseHttp.GetErrorMessageAsync();
-                    await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
-                    return false;
-                }
-            }
-
-            Events = responseHttp?.Response ?? new List<Event>();
-            return true;
-        }
-
-        private async Task LoadPagesAsync()
-        {
-            var url = $"api/Events/totalRecords?RecordsNumber={RecordsNumber}";
-
-            if (!string.IsNullOrWhiteSpace(Filter))
-            {
-                url += $"&Filter={Filter}";
-            }
-            if (DateSelectd != null)
-            {
-                url += $"&Date={DateSelectd}";
-            }
-            if (SelectedEventType != null)
-            {
-                url += $"&EventTypeId={SelectedEventType}";
-            }
-
-            var responseHttp = await repository.GetAsync<int>(url);
-            if (responseHttp.Error)
-            {
-                var message = await responseHttp.GetErrorMessageAsync();
-                await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
-                return;
-            }
-
-            totalPages = responseHttp.Response;
-        }
-
-        private async Task LoadEventTypes()
-        {
-            var responseHttp = await repository.GetAsync<List<EventType>>("api/EventTypes");
-            if (!responseHttp.Error && responseHttp.Response != null)
-            {
-                EventTypes = responseHttp.Response;
-            }
-        }
+        private async Task CleanFilterAsync()
+        { Filter = string.Empty; await LoadEvents(1); }
 
         private async Task ShowCreateModal()
         {
             var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             var user = authState.User;
 
-            if (user.Identity is not null && user.Identity.IsAuthenticated)
-            {
-                var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-                NewEvent = new Event
-                {
-                    UserId = userId ?? string.Empty
-                };
-            }
-            else
+            if (user.Identity?.IsAuthenticated == true)
             {
                 NewEvent = new Event();
+                isPreselectedUser = false;
             }
 
             IsEditMode = false;
@@ -199,93 +123,54 @@ namespace SIC.Frontend.Pages.Events
                 EventType = evnt.EventType,
                 Status = evnt.Status
             };
+            isPreselectedUser = true;
             IsEditMode = true;
             IsModalVisible = true;
         }
 
-        private void CloseModal()
-        {
-            IsModalVisible = false;
-        }
+        private void CloseModal() => IsModalVisible = false;
 
-        private async Task ConfirmDelete(Event events)
+        private async Task ConfirmDelete(Event evnt)
         {
             var result = await SweetAlertService.FireAsync(new SweetAlertOptions
             {
-                Title = "¿Está seguro?",
-                Text = $"Se eliminará el evento '{events.Name}'. Esta acción no se puede deshacer.",
+                Title = "¿Eliminar evento?",
+                Text = $"Se eliminará '{evnt.Name}'. Esta acción no se puede deshacer.",
                 Icon = SweetAlertIcon.Warning,
-                ShowCancelButton = true,
-                ConfirmButtonText = "Sí, borrar",
-                CancelButtonText = "Cancelar"
+                ShowCancelButton = true
             });
 
             if (!string.IsNullOrEmpty(result.Value))
-            {
-                await DeleteEvents(events);
-            }
+                await DeleteEvent(evnt);
         }
 
-        private async Task DeleteEvents(Event events)
+        private async Task DeleteEvent(Event evnt)
         {
-            var responseHttp = await repository.DeleteAsync<Event>($"api/Events/{events.Id}");
-
-            if (responseHttp.Error)
+            var response = await repository.DeleteAsync<Event>($"api/Events/{evnt.Id}");
+            if (!response.Error)
             {
-                var message = await responseHttp.GetErrorMessageAsync() ?? "No se pudo eliminar el Evento.";
-                await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
-                return;
+                await SweetAlertService.FireAsync("Eliminado", "Evento borrado correctamente.", SweetAlertIcon.Success);
+                await LoadEvents(currentPage);
             }
-
-            var toast = SweetAlertService.Mixin(new SweetAlertOptions
-            {
-                Toast = true,
-                Position = SweetAlertPosition.TopEnd,
-                ShowConfirmButton = false,
-                Timer = 3000,
-                TimerProgressBar = true,
-            });
-            await toast.FireAsync("Eliminado", "El Evento fue borrado correctamente.", SweetAlertIcon.Success);
-
-            await LoadEvents(currentPage);
         }
 
         private async Task SaveEvent()
         {
-            HttpResponseWrapper<object>? responseHttp;
-
+            HttpResponseWrapper<object>? response;
             if (IsEditMode)
-            {
-                responseHttp = await repository.PutAsync("api/events/full", NewEvent);
-            }
+                response = await repository.PutAsync("api/Events/full", NewEvent);
             else
-            {
-                responseHttp = await repository.PostAsync("api/events/full", NewEvent);
-            }
+                response = await repository.PostAsync("api/Events/full", NewEvent);
 
-            if (responseHttp.Error)
+            if (response.Error)
             {
-                var message = await responseHttp.GetErrorMessageAsync() ?? "No se pudo guardar el evento.";
+                var message = await response.GetErrorMessageAsync() ?? "No se pudo guardar el evento.";
                 await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
                 return;
             }
 
+            await SweetAlertService.FireAsync("Éxito", IsEditMode ? "Evento actualizado." : "Evento creado.", SweetAlertIcon.Success);
             CloseModal();
-
-            var toast = SweetAlertService.Mixin(new SweetAlertOptions
-            {
-                Toast = true,
-                Position = SweetAlertPosition.TopEnd,
-                ShowConfirmButton = false,
-                Timer = 3000,
-                TimerProgressBar = true,
-            });
-            await toast.FireAsync(
-                "Éxito",
-                IsEditMode ? "Evento actualizado con éxito." : "Evento creado con éxito.",
-                SweetAlertIcon.Success
-            );
-
             await LoadEvents(currentPage);
         }
     }

@@ -74,9 +74,9 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
                 Message = "El registro no existe."
             };
         }
-        _entity.Remove(entity);
         try
         {
+            _entity.Remove(entity);
             await _context.SaveChangesAsync();
             return new ActionResponse<T>
             {

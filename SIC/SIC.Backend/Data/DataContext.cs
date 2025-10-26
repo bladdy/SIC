@@ -23,6 +23,8 @@ public class DataContext : IdentityDbContext<User>
     public DbSet<MessageKey> MessageKeys { get; set; }
     public DbSet<Template> Templates { get; set; }
     public DbSet<InvitationEntry> InvitationEntries { get; set; }
+    public DbSet<UserCredit> UserCredits { get; set; }
+    public DbSet<UserCreditHistory> UserCreditHistories { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -34,6 +36,27 @@ public class DataContext : IdentityDbContext<User>
         modelBuilder.Entity<PlanItem>().HasIndex(x => new { x.PlanId, x.ItemId }).IsUnique();
         modelBuilder.Entity<InvitationEntry>().HasIndex(x => x.Code).IsUnique();
         DisableCascadingDelete(modelBuilder);
+
+        modelBuilder.Entity<UserCredit>()
+            .HasIndex(x => x.UserId)
+            .IsUnique();
+
+        modelBuilder.Entity<UserCredit>()
+            .HasOne(x => x.User)
+            .WithOne()
+            .HasForeignKey<UserCredit>(x => x.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<UserCreditHistory>()
+            .HasOne(h => h.UserCredit)
+            .WithMany(c => c.CreditHistory)
+            .HasForeignKey(h => h.UserCreditId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<User>()
+            .HasOne(u => u.UserCredit)
+            .WithOne(c => c.User)
+            .HasForeignKey<UserCredit>(c => c.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 
     private void DisableCascadingDelete(ModelBuilder modelBuilder)

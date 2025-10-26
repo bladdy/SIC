@@ -1,4 +1,8 @@
 ﻿@page "/events"
+@using SIC.Shared.Entities
+@using SIC.Shared.Enums
+@using Microsoft.AspNetCore.Components.Forms
+
 <PageTitle>Eventos</PageTitle>
 <h3 class="mb-2">Eventos</h3>
 
@@ -7,14 +11,10 @@
         Crear Evento
     </button>
 </div>
+
 <div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center; gap: 10px;">
-    <!-- Buscar por texto -->
-    <input style="width:400px;" type="text" class="form-control focus:border-[#3C6A79]" placeholder="Buscar Evento..." @bind="Filter" />
-
-    <!-- Fecha -->
+    <input style="width:400px;" type="text" class="form-control" placeholder="Buscar Evento..." @bind="Filter" />
     <InputDate class="form-control" @bind-Value="DateSelectd" style="width:150px;" />
-
-    <!-- Tipo de Evento -->
     <InputSelect class="form-select" @bind-Value="SelectedEventType" style="width:300px;">
         <option value="">-- Selecciona un tipo de Evento --</option>
         @if (EventTypes != null)
@@ -25,18 +25,14 @@
             }
         }
     </InputSelect>
-
-    <!-- Orden -->
     <InputSelect class="form-select" @bind-Value="OrderBy" style="width:200px;">
-        <option value="">-- Ordernar por --</option>
+        <option value="">-- Ordenar por --</option>
         <option value="FechaAsc">Fecha Ascendente </option>
         <option value="FechaDesc">Fecha Descendente</option>
-        <option value="Nombre">Nombre Alfabetico</option>
+        <option value="Nombre">Nombre Alfabético</option>
         <option value="Evento">Tipo de Evento</option>
         <option value="Estado">Estado</option>
     </InputSelect>
-
-    <!-- Botones -->
     <button type="button" class="btn btn-custom" @onclick="ApplyFilterAsync">
         <i class="bi bi-funnel" /> Filtrar
     </button>
@@ -45,6 +41,7 @@
     </button>
 </div>
 
+<!-- Tabla principal -->
 <GenericList MyList="Events">
     <Body>
         <div class="table-responsive d-none d-md-block">
@@ -57,88 +54,49 @@
                         <th>Acciones</th>
                     </tr>
                 </thead>
-
                 <tbody>
                     @if (Events != null && Events.Any())
                     {
                         @foreach (var even in Events)
                         {
                             <tr class="border-top">
-
-                                <!-- ======== COLUMNA 1: INFORMACIÓN GENERAL ======== -->
                                 <td style="white-space: normal; vertical-align: top;">
                                     <div class="container-fluid">
                                         <div class="row g-3 small text-secondary">
-
-                                            <!-- ===== COLUMNA 1 ===== -->
                                             <div class="col-12 col-md-4 d-flex flex-column">
                                                 <div class="mb-2">
                                                     <strong>Código:</strong>
-                                                    <a class="text-decoration-none text-primary">
-                                                        @even.Code
-                                                    </a>
+                                                    <a class="text-decoration-none text-primary">@even.Code</a>
                                                 </div>
-
-                                                <div>
-                                                    <strong>Tipo:</strong> @even.EventType!.Name
-                                                </div>
+                                                <div><strong>Tipo:</strong> @even.EventType!.Name</div>
                                             </div>
-
-                                            <!-- ===== COLUMNA 2 ===== -->
-                                            <div class="col-12 col-md-4 d-flex flex-column">
-                                                <div class="fw-bold fs-6 text-dark mb-1">
-                                                    @even.Name
-                                                </div>
-
+                                            <div class="col-12 col-md-4">
+                                                <div class="fw-bold fs-6 text-dark mb-1">@even.Name</div>
                                                 @if (!string.IsNullOrWhiteSpace(even.SubTitle))
                                                 {
-                                                    <div class="text-muted small mb-2">
-                                                        @even.SubTitle
-                                                    </div>
+                                                    <div class="text-muted small mb-2">@even.SubTitle</div>
                                                 }
                                             </div>
-
-                                            <!-- ===== COLUMNA 3 ===== -->
                                             <div class="col-12 col-md-4 d-flex flex-row flex-wrap align-items-center gap-1">
-                                                <div class="mb-2 flex-grow-1">
-                                                    <a href="@even.Url" target="_blank" class="btn btn-custom w-100">
-                                                        Ver Invitación
-                                                    </a>
-                                                </div>
-
-                                                <div class="mb-2 flex-grow-1">
-                                                    <a href="/events/details/@even.Code" class="btn btn-custom w-100">
-                                                        Invitados
-                                                    </a>
-                                                </div>
+                                                <a href="@even.Url" target="_blank" class="btn btn-custom w-100">Ver Invitación</a>
+                                                <a href="/events/details/@even.Code" class="btn btn-custom w-100">Invitados</a>
                                             </div>
                                         </div>
                                     </div>
                                 </td>
-
-                                <!-- ======== COLUMNA 2: ESTADO ======== -->
                                 <td class="text-center">
                                     <span class="px-3 py-2 fs-6 badge @(even.Status == Status.Active ? "bg-success" : even.Status == Status.Cancelled ? "bg-danger" : "bg-secondary")">
                                         @even.Status.GetDescription()
                                     </span>
                                 </td>
-
-                                <!-- ======== COLUMNA 3: FECHA ======== -->
                                 <td class="text-center">
-                                    <div class="fw-semibold text-dark">
-                                        @even.Date.ToString("dd/MM/yyyy")
-                                    </div>
-                                    <div class="text-muted small">
-                                        @DateTime.Today.Add(even.Time).ToString("hh:mm tt")
-                                    </div>
+                                    <div class="fw-semibold text-dark">@even.Date.ToString("dd/MM/yyyy")</div>
+                                    <div class="text-muted small">@DateTime.Today.Add(even.Time).ToString("hh:mm tt")</div>
                                 </td>
-
-                                <!-- ======== COLUMNA 4: ACCIONES ======== -->
                                 <td class="text-center">
                                     <button class="btn btn-sm btn-custom mb-1" @onclick="() => ShowEditModal(even)">
                                         <i class="bi bi-pencil-fill"></i>
                                     </button>
-
                                     <button class="btn btn-sm btn-custom mb-1" @onclick="() => ConfirmDelete(even)">
                                         <i class="bi bi-trash-fill"></i>
                                     </button>
@@ -148,74 +106,27 @@
                     }
                     else
                     {
-                        <tr>
-                            <td colspan="4" class="text-center text-muted py-4">
-                                No hay eventos registrados.
-                            </td>
-                        </tr>
+                        <tr><td colspan="4" class="text-center text-muted py-4">No hay eventos registrados.</td></tr>
                     }
                 </tbody>
             </table>
         </div>
-        <div class="d-block d-md-none">
-            @if (Events != null && Events.Any())
-            {
-                @foreach (var even in Events)
-                {
-                    <div class="card mb-3 shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title fw-bold">@even.Name</h5>
-                            @if (!string.IsNullOrWhiteSpace(even.SubTitle))
-                            {
-                                <p class="card-subtitle text-muted small mb-2">@even.SubTitle</p>
-                            }
-                            <p class="mb-1"><strong>Código:</strong> @even.Code</p>
-                            <p class="mb-1"><strong>Tipo:</strong> @even.EventType!.Name</p>
-                            <p class="mb-1">
-                                <strong>Estado:</strong>
-                                <span class="badge @(even.Status == Status.Active ? "bg-success" : even.Status == Status.Cancelled ? "bg-danger" : "bg-secondary")">
-                                    @even.Status.GetDescription()
-                                </span>
-                            </p>
-                            <p class="mb-2"><strong>Fecha y Hora:</strong> @even.Date.ToString("dd/MM/yyyy") - @DateTime.Today.Add(even.Time).ToString("hh:mm tt")</p>
-                            <div class="d-flex gap-2 flex-wrap">
-                                <button class="btn btn-sm btn-custom flex-grow-1" @onclick="() => ShowEditModal(even)"><i class="bi bi-pencil-fill"></i> Editar</button>
-                                <button class="btn btn-sm btn-custom flex-grow-1" @onclick="() => ConfirmDelete(even)"><i class="bi bi-trash-fill"></i> Borrar</button>
-                                <a href="@even.Url" target="_blank" class="btn btn-sm btn-custom flex-grow-1">Ver Invitación</a>
-                                <a href="/events/details/@even.Code" class="btn btn-sm btn-custom flex-grow-1">Invitados</a>
-                            </div>
-                        </div>
-                    </div>
-                }
-            }
-            else
-            {
-                <p class="text-center text-muted py-4">No hay eventos registrados.</p>
-            }
-        </div>
-
-
     </Body>
 </GenericList>
 
-<!-- paginacion-->
+<!-- Paginación -->
 <div class="d-flex justify-content-center my-3">
-    <Pagination CurrentPage="currentPage"
-                TotalPages="totalPages"
-                SelectedPage="SelectedPageAsync" />
-
+    <Pagination CurrentPage="currentPage" TotalPages="totalPages" SelectedPage="SelectedPageAsync" />
 </div>
 
-<!-- Modal-->
+<!-- Modal -->
 @if (IsModalVisible)
 {
     <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">
-                        @((IsEditMode ? $"Editar Evento: {@NewEvent.Code}" : "Crear Evento"))
-                    </h5>
+                    <h5 class="modal-title">@((IsEditMode ? $"Editar Evento: {NewEvent.Code}" : "Crear Evento"))</h5>
                     <button type="button" class="btn-close" @onclick="CloseModal"></button>
                 </div>
                 <div class="modal-body">
@@ -223,52 +134,51 @@
                         <DataAnnotationsValidator />
                         <ValidationSummary />
 
+                        <!-- Asignar Usuario -->
+                        <div class="mb-3">
+                            <label class="form-label">Asignar a Usuario</label>
+                            <input type="text" class="form-control mb-2" placeholder="Filtrar usuarios..."
+                                   @bind="filterText" @bind:event="oninput" disabled="@isPreselectedUser" />
+                            <select class="form-select" @bind="NewEvent.UserId" disabled="@isPreselectedUser">
+                                <option value="">-- Selecciona un usuario --</option>
+                                @foreach (var user in FilteredUsers)
+                                {
+                                    <option value="@user.Id">@user.FullName (@user.Email)</option>
+                                }
+                            </select>
+                        </div>
 
+                        <!-- Campos estándar -->
                         <div class="mb-3">
                             <label class="form-label">Título</label>
                             <InputText class="form-control" @bind-Value="NewEvent.Name" />
-                            <ValidationMessage For="@(() => NewEvent.Name)" />
                         </div>
-
                         <div class="mb-3">
                             <label class="form-label">Sub-Título</label>
                             <InputText class="form-control" @bind-Value="NewEvent.SubTitle" />
-                            <ValidationMessage For="@(() => NewEvent.SubTitle)" />
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Tipo de Evento</label>
                             <InputSelect class="form-select" @bind-Value="NewEvent.EventTypeId">
-                                <option value="">-- Selecciona un tipo de Evento --</option>
-                                @if (EventTypes != null)
+                                <option value="">-- Selecciona un tipo --</option>
+                                @foreach (var type in EventTypes)
                                 {
-                                    @foreach (var type in EventTypes)
-                                    {
-                                        <option value="@type.Id">@type.Name</option>
-                                    }
+                                    <option value="@type.Id">@type.Name</option>
                                 }
                             </InputSelect>
-                            <ValidationMessage For="@(() => NewEvent.EventTypeId)" />
                         </div>
                         <div class="mb-3 row">
-                            <div class="col-auto">
+                            <div class="col">
                                 <label class="form-label">Fecha</label>
                                 <InputDate class="form-control" @bind-Value="NewEvent.Date" />
-                                <ValidationMessage For="@(() => NewEvent.Date)" />
                             </div>
-
-                            <div class="col-auto">
+                            <div class="col">
                                 <label class="form-label">Hora</label>
                                 <InputTime CssClass="form-control" @bind-Value="NewEvent.Time" />
                             </div>
-
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">URL</label>
-                            <InputText class="form-control" @bind-Value="NewEvent.Url" />
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Ubicacion</label>
+                            <label class="form-label">Ubicación</label>
                             <InputText class="form-control" @bind-Value="NewEvent.Ubication" />
                         </div>
                         <div class="mb-3 row">
@@ -306,14 +216,11 @@
                             </InputSelect>
                             <ValidationMessage For="@(() => NewEvent.Status)" />
                         </div>
-                        <!--Inhabilitar los botones hasta que termine de enviar-->
+
+                        <!-- Footer -->
                         <div class="modal-footer">
-                            <button type="submit" class="btn btn-custom">
-                                Guardar
-                            </button>
-                            <button type="button" class="btn btn-secondary" @onclick="CloseModal">
-                                Cancelar
-                            </button>
+                            <button type="submit" class="btn btn-custom">Guardar</button>
+                            <button type="button" class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
                         </div>
                     </EditForm>
                 </div>
