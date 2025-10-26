@@ -1,17 +1,17 @@
-//Zulu 72 y 76
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SIC.Backend.Data;
+using SIC.Backend.Repositories.Implementations;
 using SIC.Backend.Repositories.Implemetations;
 using SIC.Backend.Repositories.Interfaces;
 using SIC.Backend.Services;
 using SIC.Backend.UnitOfWork.Implemetations;
 using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.Entities;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -62,16 +62,13 @@ builder.Services.AddTransient<SeedDb>();
 // Registrar el servicio de WhatsAppService
 builder.Services.AddScoped<WhatsAppService>();
 builder.Services.AddScoped<BoletaService>();
-// Inyecci�n de dependencias gen�rica
+// Inyeccion de dependencias gen�rica
 
 builder.Services.AddScoped(typeof(IGenericUnitOfWork<>), typeof(GenericUnitOfWork<>));
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
-builder.Services.AddScoped<IPlanUnitOfWork, PlanUnitOfWork>();
-builder.Services.AddScoped<IPlanRepository, PlanRepository>();
-
-builder.Services.AddScoped<IPlanItemUnitOfWork, PlanItemUnitOfWork>();
-builder.Services.AddScoped<IPlanItemRepository, PlanItemRepository>();
+builder.Services.AddScoped<IDashboardUnitOfWork, DashboardUnitOfWork>();
+builder.Services.AddScoped<IDashboardReporsitory, DashboardReporsitory>();
 
 builder.Services.AddScoped<IEventsUnitOfWork, EventsUnitOfWork>();
 builder.Services.AddScoped<IEventsRepository, EventsRepository>();
@@ -79,14 +76,26 @@ builder.Services.AddScoped<IEventsRepository, EventsRepository>();
 builder.Services.AddScoped<IInvitationUnitOfWork, InvitationUnitOfWork>();
 builder.Services.AddScoped<IInvitationRepository, InvitationRepository>();
 
+builder.Services.AddScoped<IInvitationEntryUnitOfWork, InvitationEntryUnitOfWork>();
+builder.Services.AddScoped<IInvitationEntryRepository, InvitationEntryRepository>();
+
 builder.Services.AddScoped<IMessageUnitOfWork, MessageUnitOfWork>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+
+builder.Services.AddScoped<IPlanUnitOfWork, PlanUnitOfWork>();
+builder.Services.AddScoped<IPlanRepository, PlanRepository>();
+
+builder.Services.AddScoped<IPlanItemUnitOfWork, PlanItemUnitOfWork>();
+builder.Services.AddScoped<IPlanItemRepository, PlanItemRepository>();
 
 builder.Services.AddScoped<IUserUnitOfWork, UserUnitOfWork>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-builder.Services.AddScoped<IWhatsAppConfigUnitOfWork, WhatsAppConfigUnitOfWork>();
-builder.Services.AddScoped<IWhatsAppConfigRepository, WhatsAppConfigRepository>();
+builder.Services.AddScoped<IUserUnitOfWork, UserUnitOfWork>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+builder.Services.AddScoped<IUserCreditUnitsOfWork, UserCreditUnitsOfWork>();
+builder.Services.AddScoped<IUserCreditRepository, UserCreditRepository>();
 
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
@@ -108,7 +117,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["jwtKey"]!)),
-        ClockSkew = TimeSpan.Zero
+        ClockSkew = TimeSpan.Zero,
+        RoleClaimType = ClaimTypes.Role,
+        NameClaimType = ClaimTypes.NameIdentifier
     });
 
 var app = builder.Build();
@@ -143,6 +154,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
