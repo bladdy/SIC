@@ -18,8 +18,6 @@ namespace SIC.Backend.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> GetAllAsync()
         {
             var response = await _creditUnitsOfWork.GetPlannersWithCreditsAsync();
@@ -27,8 +25,6 @@ namespace SIC.Backend.Controllers
         }
 
         [HttpGet("{userId}")]
-        [Authorize(Roles = "Admin,WeddingPlanner")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> GetByUserAsync(string userId)
         {
             var response = await _creditUnitsOfWork.GetByUserIdAsync(userId);
@@ -36,8 +32,6 @@ namespace SIC.Backend.Controllers
         }
 
         [HttpPost("add")]
-        [Authorize(Roles = "Admin")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> AddCreditsAsync(AddCreditsRequest request)
         {
             var response = await _creditUnitsOfWork.AddAsync(request);
@@ -45,8 +39,6 @@ namespace SIC.Backend.Controllers
         }
 
         [HttpPost("consume/{userId}")]
-        [Authorize(Roles = "WeddingPlanner")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> ConsumeCreditAsync(string userId)
         {
             var response = await _creditUnitsOfWork.ConsumeCreditAsync(userId);
@@ -54,8 +46,6 @@ namespace SIC.Backend.Controllers
         }
 
         [HttpGet("history/{userId}")]
-        [Authorize(Roles = "Admin,WeddingPlanner")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> GetHistoryAsync(string userId)
         {
             var response = await _creditUnitsOfWork.GetHistoryAsync(userId);
