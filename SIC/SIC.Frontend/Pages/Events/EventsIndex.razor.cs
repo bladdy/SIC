@@ -5,9 +5,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using SIC.Frontend.Repositories;
 using SIC.Shared.Entities;
 using SIC.Shared.Enums;
-using System.Net;
 using System.Net.Http.Json;
-using System.Security.Claims;
 
 namespace SIC.Frontend.Pages.Events
 {
@@ -46,20 +44,26 @@ namespace SIC.Frontend.Pages.Events
             await LoadEvents(currentPage);
         }
 
+        //  Cargar todos los usuarios disponibles
         private async Task LoadUsersAsync()
         {
             var result = await Http.GetFromJsonAsync<List<User>>("api/Accounts/all");
             if (result != null)
             {
-                // Solo usuarios que NO sean Admin ni WeddingPlanner
-                AllUsers = result.Where(u => u.UserType != UserType.Admin && u.UserType != UserType.WeddingPlanner).ToList();
+                // Excluir Admin y WeddingPlanner
+                AllUsers = result
+                    //.Where(u => u.UserType != UserType.Admin && u.UserType != UserType.WeddingPlanner)
+                    .ToList();
             }
         }
 
+        //  Filtrado de usuarios
         private IEnumerable<User> FilteredUsers =>
             string.IsNullOrWhiteSpace(filterText)
                 ? AllUsers
-                : AllUsers.Where(u => u.FullName.Contains(filterText, StringComparison.OrdinalIgnoreCase));
+                : AllUsers.Where(u =>
+                    u.FullName.Contains(filterText, StringComparison.OrdinalIgnoreCase) ||
+                    u.Email.Contains(filterText, StringComparison.OrdinalIgnoreCase));
 
         private async Task LoadEventTypes()
         {
@@ -85,23 +89,24 @@ namespace SIC.Frontend.Pages.Events
         private async Task ApplyFilterAsync() => await LoadEvents(1);
 
         private async Task CleanFilterAsync()
-        { Filter = string.Empty; await LoadEvents(1); }
+        {
+            Filter = string.Empty;
+            await LoadEvents(1);
+        }
 
+        //  Crear nuevo evento
         private async Task ShowCreateModal()
         {
             var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             var user = authState.User;
 
-            if (user.Identity?.IsAuthenticated == true)
-            {
-                NewEvent = new Event();
-                isPreselectedUser = false;
-            }
-
+            NewEvent = new Event();
+            isPreselectedUser = false; // Se puede seleccionar cualquier usuario
             IsEditMode = false;
             IsModalVisible = true;
         }
 
+        //  Editar evento existente
         private void ShowEditModal(Event evnt)
         {
             NewEvent = new Event
@@ -123,13 +128,16 @@ namespace SIC.Frontend.Pages.Events
                 EventType = evnt.EventType,
                 Status = evnt.Status
             };
-            isPreselectedUser = true;
+
+            // Ahora el usuario también puede cambiar la asignación
+            isPreselectedUser = false;
             IsEditMode = true;
             IsModalVisible = true;
         }
 
         private void CloseModal() => IsModalVisible = false;
 
+        // Confirmar eliminación
         private async Task ConfirmDelete(Event evnt)
         {
             var result = await SweetAlertService.FireAsync(new SweetAlertOptions
@@ -154,8 +162,15 @@ namespace SIC.Frontend.Pages.Events
             }
         }
 
+        // Guardar evento (crear o editar)
         private async Task SaveEvent()
         {
+            if (string.IsNullOrEmpty(NewEvent.UserId))
+            {
+                await SweetAlertService.FireAsync("Error", "Debes asignar un usuario al evento.", SweetAlertIcon.Error);
+                return;
+            }
+
             HttpResponseWrapper<object>? response;
             if (IsEditMode)
                 response = await repository.PutAsync("api/Events/full", NewEvent);

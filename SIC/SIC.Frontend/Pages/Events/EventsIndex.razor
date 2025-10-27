@@ -111,6 +111,43 @@
                 </tbody>
             </table>
         </div>
+        <div class="d-block d-md-none">
+            @if (Events != null && Events.Any())
+            {
+                @foreach (var even in Events)
+                {
+                    <div class="card mb-3 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">@even.Name</h5>
+                            @if (!string.IsNullOrWhiteSpace(even.SubTitle))
+                            {
+                                <p class="card-subtitle text-muted small mb-2">@even.SubTitle</p>
+                            }
+                            <p class="mb-1"><strong>Código:</strong> @even.Code</p>
+                            <p class="mb-1"><strong>Tipo:</strong> @even.EventType!.Name</p>
+                            <p class="mb-1">
+                                <strong>Estado:</strong>
+                                <span class="badge @(even.Status == Status.Active ? "bg-success" : even.Status == Status.Cancelled ? "bg-danger" : "bg-secondary")">
+                                    @even.Status.GetDescription()
+                                </span>
+                            </p>
+                            <p class="mb-2"><strong>Fecha y Hora:</strong> @even.Date.ToString("dd/MM/yyyy") - @DateTime.Today.Add(even.Time).ToString("hh:mm tt")</p>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <button class="btn btn-sm btn-custom flex-grow-1" @onclick="() => ShowEditModal(even)"><i class="bi bi-pencil-fill"></i> Editar</button>
+                                <button class="btn btn-sm btn-custom flex-grow-1" @onclick="() => ConfirmDelete(even)"><i class="bi bi-trash-fill"></i> Borrar</button>
+                                <a href="@even.Url" target="_blank" class="btn btn-sm btn-custom flex-grow-1">Ver Invitación</a>
+                                <a href="/my-events/details/@even.Code" class="btn btn-sm btn-custom flex-grow-1">Invitados</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="text-center text-muted py-4">No hay eventos registrados.</p>
+            }
+        </div>
+
     </Body>
 </GenericList>
 
@@ -134,16 +171,23 @@
                         <DataAnnotationsValidator />
                         <ValidationSummary />
 
-                        <!-- Asignar Usuario -->
+                        <!-- 🔹 Asignar Usuario -->
                         <div class="mb-3">
                             <label class="form-label">Asignar a Usuario</label>
-                            <input type="text" class="form-control mb-2" placeholder="Filtrar usuarios..."
-                                   @bind="filterText" @bind:event="oninput" disabled="@isPreselectedUser" />
+
+                            @if (!isPreselectedUser)
+                            {
+                                <input type="text" class="form-control mb-2"
+                                       placeholder="Filtrar usuarios..."
+                                       @bind="filterText"
+                                       @bind:event="oninput" />
+                            }
+
                             <select class="form-select" @bind="NewEvent.UserId" disabled="@isPreselectedUser">
                                 <option value="">-- Selecciona un usuario --</option>
                                 @foreach (var user in FilteredUsers)
                                 {
-                                    <option value="@user.Id">@user.FullName (@user.Email)</option>
+                                    <option value="@user.Id">@user.FullName (@user.UserType.GetDescription())</option>
                                 }
                             </select>
                         </div>
