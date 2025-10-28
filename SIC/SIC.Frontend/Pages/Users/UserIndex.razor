@@ -1,23 +1,45 @@
 ﻿@page "/users"
+@using SIC.Frontend.Shared.Modals
 <PageTitle>Usuarios</PageTitle>
-<span>
-    <a class="btn btn-custom float-end" href="/users/create"><i class="oi oi-plus"></i>Crear Usuario</a>
-</span>
-<div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center;">
-    <div>
-        <input style="width: 400px;" type="text" class="form-control" id="titulo" placeholder="Buscar usuario..." @bind-value="Filter" />
-    </div>
-    <div class="mx-1">
-        <button type="button" class="btn btn-custom" @onclick="ApplyFilterAsync"><i class="oi oi-layers" /> Filtrar</button>
-        <button type="button" class="btn btn-custom" @onclick="CleanFilterAsync"><i class="oi oi-ban" /> Limpiar</button>
-    </div>
-</div>
 
-<GenericList MyList="Users">
-    <Body>
-        <table class="table table-striped table-hover table-bordered align-middle">
-            <thead class="" style="background-color:#3C6A79; color: white;">
-                <tr class="text-center">
+<div class="container-fluid px-2">
+
+    <!-- Encabezado -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+        <h4 class="mb-2 mb-md-0">Usuarios</h4>
+        <button class="btn btn-custom" @onclick="() => ShowCreateModal(true)">
+            <i class="oi oi-plus"></i> Crear Usuario
+        </button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+        <div class="flex-grow-1" style="min-width: 250px; max-width: 400px;">
+            <input type="text"
+            class="form-control"
+            id="titulo"
+            placeholder="Buscar usuario..."
+            @bind-value="Filter" />
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+            <button type="button"
+            class="btn btn-custom"
+            @onclick="ApplyFilterAsync">
+                <i class="oi oi-layers"></i> Filtrar
+            </button>
+            <button type="button"
+            class="btn btn-custom"
+            @onclick="CleanFilterAsync">
+                <i class="oi oi-ban"></i> Limpiar
+            </button>
+        </div>
+    </div>
+    <!-- ====== VERSIÓN DE ESCRITORIO ====== -->
+    <div class="table-responsive d-none d-md-block">
+        <table class="table table-striped table-hover table-bordered align-middle mb-3">
+            <thead class="text-center" style="background-color:#3C6A79; color: white;">
+                <tr>
                     <th>Usuario</th>
                     <th>Documento</th>
                     <th>Teléfono</th>
@@ -38,31 +60,72 @@
                     @foreach (var user in Users)
                     {
                         <tr>
-
                             <td>@user.FullName</td>
                             <td>@user.Document</td>
                             <td>@user.PhoneNumber</td>
                             <td>@user.Email</td>
                             <td>@user.Address</td>
-                            <td>@user.EmailConfirmed</td>
+                            <td>@(user.EmailConfirmed ? "Sí" : "No")</td>
                             <td>@user.UserType.GetDescription()</td>
                             <td class="text-center">
-                                <a href="/users/edit/@user.Id" class="btn btn-sm btn-custom me-2">
+                                <button @onclick="() => ShowEditModal(user)" class="btn btn-sm btn-custom me-2">
                                     <i class="bi bi-pencil-fill"></i>
-                                </a>
+                                </button>
                             </td>
                         </tr>
                     }
                 }
             </tbody>
         </table>
+    </div>
+    <!-- ✅ Vista móvil tipo “detalle” -->
+    <div class="d-block d-md-none">
+        @if (Users != null)
+        {
+            @foreach (var user in Users)
+            {
+                <div class="card mb-3 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="card-title mb-0">@user.FullName</h5>
+                            <span class="badge bg-@(user.UserType == UserType.Admin ? "success" : user.UserType == UserType.WeddingPlanner ? "danger" : "secondary")">
+                                @user.UserType.GetDescription()
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <p class="mb-0"><strong>Teléfono:</strong> @user.PhoneNumber </p>
 
-        <div class="d-flex justify-content-center my-3">
-            <Pagination CurrentPage="currentPage"
-                        TotalPages="totalPages"
-                        SelectedPage="SelectedPage" />
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <p class="mb-0"><strong>Email:</strong> @user.Email</p>
 
-        </div>
+                        </div>
 
-    </Body>
-</GenericList>
+                        <div class="d-flex flex-wrap justify-content-between gap-1 mt-3">
+                            <button @onclick="() => ShowEditModal(user)" class="btn btn-custom d-flex align-items-center justify-content-center gap-1 flex-fill">
+                                <i class="bi bi-pencil-fill"></i>Editar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+    
+            
+        }
+    </div>
+    <!-- Paginación -->
+    <div class="d-flex justify-content-center my-3">
+        <Pagination CurrentPage="currentPage"
+                    TotalPages="totalPages"
+                    SelectedPage="SelectedPage" />
+    </div>
+
+</div>
+<UserCreateModal Show="@ShowCreate"
+                 ShowChanged="@((bool val) => ShowCreate = val)"
+                 OnSaved="LoadUsers" />
+
+<UserEditModal Show="@ShowEdit"
+               ShowChanged="@((bool val) => ShowEdit = val)"
+               UserModel="@SelectedUser"
+               OnSaved="LoadUsers" />

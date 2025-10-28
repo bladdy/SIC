@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using SIC.Frontend.Repositories;
+using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using static System.Net.WebRequestMethods;
 
@@ -14,6 +15,21 @@ namespace SIC.Frontend.Pages.Users
         public List<User>? Users { get; set; }
         private int currentPage = 1;
         private int totalPages;
+
+        private bool ShowModal = false;
+
+        private bool ShowCreate = false;
+        private bool ShowEdit = false;
+        private User? SelectedUser;
+
+        private void ShowCreateModal(bool show) => ShowCreate = show;
+
+        private void ShowEditModal(User user)
+        {
+            SelectedUser = user;
+            ShowEdit = true;
+        }
+
         [Inject] private NavigationManager NavigationManager { get; set; } = default!;
         [Inject] private IRepository Repository { get; set; } = null!;
         [Inject] private SweetAlertService SweetAlertService { get; set; } = null!;
@@ -37,6 +53,11 @@ namespace SIC.Frontend.Pages.Users
             {
                 await LoadPagesAsync();
             }
+        }
+
+        private async Task LoadUsers()
+        {
+            await LoadAsync();
         }
 
         private async Task SelectedPage(int page)

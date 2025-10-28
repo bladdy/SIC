@@ -170,7 +170,14 @@ namespace SIC.Frontend.Pages.Events
                 await SweetAlertService.FireAsync("Error", "Debes asignar un usuario al evento.", SweetAlertIcon.Error);
                 return;
             }
-
+            var HostUser = AllUsers.FirstOrDefault(u => u.Id == NewEvent.UserId);
+            if (HostUser == null)
+            {
+                await SweetAlertService.FireAsync("Error", "El usuario asignado no es válido.", SweetAlertIcon.Error);
+                return;
+            }
+            NewEvent.Host = HostUser.FullName;
+            NewEvent.HostPhone = HostUser.PhoneNumber!;
             HttpResponseWrapper<object>? response;
             if (IsEditMode)
                 response = await repository.PutAsync("api/Events/full", NewEvent);
