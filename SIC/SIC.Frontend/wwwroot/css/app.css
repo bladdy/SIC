@@ -5,6 +5,18 @@ html, body {
 h1:focus {
     outline: none;
 }
+/* Estilos generales para todos los input tipo checkbox */
+input[type="checkbox"] {
+    accent-color: auto; /* Por defecto usa el color del sistema */
+    display: block;
+    width: 20px;
+    height: 20px;
+}
+
+    /* Checkbox con estilo personalizado */
+    input[type="checkbox"].custom {
+        accent-color: #3C6A79; /* Color personalizado */
+    }
 
 a, .btn-link {
     color: #3C6A79;

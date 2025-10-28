@@ -12,6 +12,7 @@ namespace SIC.Shared.DTOs
         public int Agregadas { get; set; }
         public int Modificadas { get; set; }
         public int Errores { get; set; }
+        public int Eliminadas { get; set; }
         public string Message { get; set; } = string.Empty;
     }
 }

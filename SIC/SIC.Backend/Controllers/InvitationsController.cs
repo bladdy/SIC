@@ -85,6 +85,19 @@ public class InvitationsController : GenericController<Invitation>
         return NotFound(action.Message);
     }
 
+    /*
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAsync(int id)
+    {
+        var action = await _invitationUnitOfWork.DeleteByIdAsync(id);
+        if (action.Success)
+        {
+            return Ok(action.Result);
+        }
+        return NotFound(action.Message);
+    }
+    */
+
     [HttpPost("confirm")]
     public async Task<IActionResult> ConfirmInvitation([FromBody] InvitationConfirmationDto confirmation)
     {

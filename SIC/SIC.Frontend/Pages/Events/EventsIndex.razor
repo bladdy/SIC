@@ -34,7 +34,7 @@
         <option value="Estado">Estado</option>
     </InputSelect>
     <button type="button" class="btn btn-custom" @onclick="ApplyFilterAsync">
-        <i class="bi bi-funnel" /> Filtrar
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-search"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg> Buscar
     </button>
     <button type="button" class="btn btn-custom" @onclick="CleanFilterAsync">
         <i class="bi bi-x-circle" /> Limpiar
@@ -131,12 +131,12 @@
                                     @even.Status.GetDescription()
                                 </span>
                             </p>
-                            <p class="mb-2"><strong>Fecha y Hora:</strong> @even.Date.ToString("dd/MM/yyyy") - @DateTime.Today.Add(even.Time).ToString("hh:mm tt")</p>
+                            <p class="mb-2"><strong>Fecha y Hora:</strong> @even.Date.ToString("dd/MM/yyyy")</p>
                             <div class="d-flex gap-2 flex-wrap">
                                 <button class="btn btn-sm btn-custom flex-grow-1" @onclick="() => ShowEditModal(even)"><i class="bi bi-pencil-fill"></i> Editar</button>
                                 <button class="btn btn-sm btn-custom flex-grow-1" @onclick="() => ConfirmDelete(even)"><i class="bi bi-trash-fill"></i> Borrar</button>
                                 <a href="@even.Url" target="_blank" class="btn btn-sm btn-custom flex-grow-1">Ver Invitación</a>
-                                <a href="/my-events/details/@even.Code" class="btn btn-sm btn-custom flex-grow-1">Invitados</a>
+                                <a href="/events/details/@even.Code" class="btn btn-sm btn-custom flex-grow-1">Invitados</a>
                             </div>
                         </div>
                     </div>
@@ -178,9 +178,9 @@
                             @if (!isPreselectedUser)
                             {
                                 <input type="text" class="form-control mb-2"
-                                       placeholder="Filtrar usuarios..."
-                                       @bind="filterText"
-                                       @bind:event="oninput" />
+                                placeholder="Filtrar usuarios..."
+                                @bind="filterText"
+                                @bind:event="oninput" />
                             }
 
                             <select class="form-select" @bind="NewEvent.UserId" disabled="@isPreselectedUser">
@@ -192,25 +192,30 @@
                             </select>
                         </div>
 
+
                         <!-- Campos estándar -->
-                        <div class="mb-3">
-                            <label class="form-label">Título</label>
-                            <InputText class="form-control" @bind-Value="NewEvent.Name" />
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Sub-Título</label>
-                            <InputText class="form-control" @bind-Value="NewEvent.SubTitle" />
-                        </div>
                         <div class="mb-3">
                             <label class="form-label">Tipo de Evento</label>
                             <InputSelect class="form-select" @bind-Value="NewEvent.EventTypeId">
                                 <option value="">-- Selecciona un tipo --</option>
-                                @foreach (var type in EventTypes)
+                                @if (EventTypes != null)
                                 {
-                                    <option value="@type.Id">@type.Name</option>
+                                    @foreach (var type in EventTypes)
+                                    {
+                                        <option value="@type.Id">@type.Name</option>
+                                    }
                                 }
                             </InputSelect>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">Anfitrión(es)</label>
+                            <InputText class="form-control" @bind-Value="NewEvent.Name" placeholder="Ej. Fernanda & Raúl" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nombre del Evento</label>
+                            <InputText class="form-control" @bind-Value="NewEvent.SubTitle" placeholder="Ej. Nuestra Boda" />
+                        </div>
+                        
                         <div class="mb-3 row">
                             <div class="col">
                                 <label class="form-label">Fecha</label>
@@ -222,10 +227,14 @@
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Ubicación</label>
-                            <InputText class="form-control" @bind-Value="NewEvent.Ubication" />
+                            <label class="form-label">URL Invitacion</label>
+                            <InputText class="form-control" @bind-Value="NewEvent.Url" placeholder="Ej. https://mi-invitacion.com.." />
                         </div>
-                        <div class="mb-3 row">
+                        <div class="mb-3">
+                            <label class="form-label">Ubicación</label>
+                            <InputText class="form-control" @bind-Value="NewEvent.Ubication" placeholder="Ej. https://www.google.com/maps/....." />
+                        </div>
+                        <div class="mb-3 row d-none">
 
                             <div class="col-auto">
                                 <label class="form-label">Anfitrión</label>
@@ -240,12 +249,12 @@
                         <div class="mb-3 row">
                             <div class="col-auto">
                                 <label class="form-label">Planner</label>
-                                <InputText class="form-control" @bind-Value="NewEvent.Planner" />
+                                <InputText class="form-control" placeholder="Nombre..." @bind-Value="NewEvent.Planner" />
                             </div>
 
                             <div class="col-auto">
                                 <label class="form-label">Teléfono Planner</label>
-                                <InputText class="form-control" @bind-Value="NewEvent.PlannerPhone" />
+                                <InputText class="form-control" placeholder="Numero celular..." @bind-Value="NewEvent.PlannerPhone" />
                             </div>
                         </div>
 

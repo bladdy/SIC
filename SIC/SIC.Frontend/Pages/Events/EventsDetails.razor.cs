@@ -8,6 +8,7 @@ using SIC.Frontend.Repositories;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using System.Net;
+using System.Text.Encodings.Web;
 
 namespace SIC.Frontend.Pages.Events;
 
@@ -37,7 +38,9 @@ public partial class EventsDetails
 
     private Invitation NewInvitation = new();
     private bool IsModalVisible = false;
+    private bool IsModalExcelVisible = false;
     private bool IsEditMode = false;
+    private bool DeleteRegister = false;
     private DateTime MinAllowedDate { get; set; } = new DateTime(2023, 1, 1); // Sets January 1, 2023 as the minimum
     public Event? EventDetail { get; set; }
     public List<Invitation>? Invitations { get; set; }
@@ -73,6 +76,16 @@ public partial class EventsDetails
         IsModalVisible = true;
     }
 
+    private void ShowModalExcel()
+    {
+        IsModalExcelVisible = true;
+    }
+
+    private void CloseModalExcel()
+    {
+        IsModalExcelVisible = false;
+    }
+
     private void NavegateToMessage()
     {
         NavigationManager.NavigateTo($"/events/message-events/{EventDetail!.Code}");
@@ -105,6 +118,56 @@ public partial class EventsDetails
     private void CloseModal()
     {
         IsModalVisible = false;
+    }
+
+    private async Task DeleteInvitation()
+    {
+        // 🔹 Confirmación antes de eliminar
+        var confirmResult = await SweetAlertService.FireAsync(new SweetAlertOptions
+        {
+            Title = "¿Eliminar invitación?",
+            Text = "Esta acción no se puede deshacer. ¿Deseas continuar?",
+            Icon = SweetAlertIcon.Warning,
+            ShowCancelButton = true,
+            ConfirmButtonText = "Sí, eliminar",
+            CancelButtonText = "Cancelar",
+            ConfirmButtonColor = "#d33",
+            CancelButtonColor = "#3085d6"
+        });
+
+        // Si el usuario cancela, no hacer nada
+        if (confirmResult.IsDismissed)
+            return;
+
+        // 🔹 Proceder con la eliminación
+        var responseHttp = await Repository.DeleteAsync<object>($"api/Invitations/{NewInvitation.Id}");
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync() ?? "No se pudo eliminar la invitación.";
+            await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        CloseModal();
+
+        // 🔹 Mostrar notificación tipo toast
+        var toast = SweetAlertService.Mixin(new SweetAlertOptions
+        {
+            Toast = true,
+            Position = SweetAlertPosition.TopEnd,
+            ShowConfirmButton = false,
+            Timer = 3000,
+            TimerProgressBar = true,
+        });
+
+        await toast.FireAsync(
+            "Éxito",
+            "Invitación eliminada con éxito.",
+            SweetAlertIcon.Success
+        );
+
+        await LoadEvent();
+        await LoadInvitations();
     }
 
     private async Task SaveInvitation()
@@ -158,7 +221,7 @@ public partial class EventsDetails
 
             if (content.Length > 0)
             {
-                await JsRuntime.DownloadFileAsync("reporte.xlsx", content);
+                await JsRuntime.DownloadFileAsync($"{EventDetail.Name}.xlsx", content);
             }
         }
         finally
@@ -305,7 +368,7 @@ public partial class EventsDetails
             else
             {
                 responseHttp = await Repository.UploadFileAsync<object, ImportExcelResultDTO>(
-                        $"api/excel/ImportarExcel/{EventDetail!.Id}",
+                        $"api/excel/ImportarExcel/{EventDetail!.Id}/{DeleteRegister}",
                         stream,
                         selectedFile.Name
                     );
@@ -313,14 +376,31 @@ public partial class EventsDetails
                 {
                     var result = responseHttp.Response;
                     importResult = $"✅ Archivo procesado: {result}";
-                    await SweetAlertService.FireAsync("Invitaciones",
+                    /*await SweetAlertService.FireAsync("Invitaciones",
+
                             $"Agregadas: {result!.Agregadas}\n" +
                             $"Modificadas: {result!.Modificadas}\n" +
                             $"Errores: {result!.Errores}\n" +
                             $"Total procesadas: {result!.Total}\n\n" +
                             "✅ Las invitaciones se actualizaron correctamente",
-                            SweetAlertIcon.Info);
-
+                            SweetAlertIcon.Info);*/
+                    await SweetAlertService.FireAsync(new SweetAlertOptions
+                    {
+                        Title = "Invitaciones",
+                        Html = $@"<div style='text-align:left; font-size:0.95rem; line-height:1.4;'>
+                                <ul style='padding-left:1.2rem; margin:0 0 0.6rem 0;'>
+                                    <li><strong>Agregadas:</strong> {result!.Agregadas}</li>
+                                    <li><strong>Modificadas:</strong> {result!.Modificadas}</li>
+                                    <li><strong>Eliminadas:</strong> {result!.Eliminadas} </li>
+                                    <li><strong>Errores:</strong> {result!.Errores}</li>
+                                    <li><strong> Total procesadas:</strong> {result!.Total}</li>
+                                </ul>
+                                <p style = 'margin-top:0.6rem;'>✅ <strong> Las invitaciones se actualizaron correctamente </strong></p>
+                            </div> ",
+                        Icon = SweetAlertIcon.Success,
+                        ConfirmButtonText = "Aceptar"
+                    });
+                    CloseModalExcel();
                     await LoadInvitations();
                 }
                 else

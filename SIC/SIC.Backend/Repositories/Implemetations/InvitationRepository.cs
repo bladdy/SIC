@@ -6,6 +6,7 @@ using SIC.Backend.Repositories.Interfaces;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using SIC.Shared.Response;
+using System;
 using System.Linq;
 
 namespace SIC.Backend.Repositories.Implemetations
@@ -215,6 +216,39 @@ namespace SIC.Backend.Repositories.Implemetations
                     Message = exception.Message
                 };
             }
+        }
+
+        public async Task<ActionResponse<bool>> DeleteAsync(Invitation invitation)
+        {
+            _context.Remove(invitation);
+            await _context.SaveChangesAsync(); // Ensure changes are saved to the database
+
+            return new ActionResponse<bool>
+            {
+                Success = true,
+                Result = true
+            };
+        }
+
+        public async Task<ActionResponse<bool>> DeleteByIdAsync(int id)
+        {
+            var invitation = await _context.Invitations.FindAsync(id);
+            if (invitation == null)
+            {
+                return new ActionResponse<bool>
+                {
+                    Success = false,
+                    Message = "La invitacion no existe."
+                };
+            }
+            _context.Remove(invitation);
+            await _context.SaveChangesAsync(); // Ensure changes are saved to the database
+
+            return new ActionResponse<bool>
+            {
+                Success = true,
+                Result = true
+            };
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using SIC.Backend.Repositories.Interfaces;
+﻿using Microsoft.EntityFrameworkCore.Metadata;
+using SIC.Backend.Repositories.Interfaces;
 using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
@@ -27,8 +28,12 @@ namespace SIC.Backend.UnitOfWork.Implemetations
 
         public async Task<ActionResponse<Invitation>> AddFullAsync(Invitation invitation) => await _invitationstRepository.AddFullAsync(invitation);
 
+        public async Task<ActionResponse<bool>> DeleteAsync(Invitation invitation) => await _invitationstRepository.DeleteAsync(invitation);
+
         public async Task<ActionResponse<Invitation>> UpdateFullAsync(Invitation invitation) => await _invitationstRepository.UpdateFullAsync(invitation);
 
         public async Task<ActionResponse<InvitationConfirmationDto>> UpdateForConfirmarionFullAsync(InvitationConfirmationDto confirmationDto) => await _invitationstRepository.UpdateForConfirmarionFullAsync(confirmationDto);
+
+        public async Task<ActionResponse<bool>> DeleteByIdAsync(int id) => await _invitationstRepository.DeleteByIdAsync(id);
     }
 }
