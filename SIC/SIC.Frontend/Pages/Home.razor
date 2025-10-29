@@ -2,6 +2,8 @@
 
 @using Microsoft.AspNetCore.Authorization
 @using SIC.Frontend.Shared.Component.Dashboard
+@using SIC.Frontend.Shared.Component.Modals
+@using SIC.Frontend.Shared.Modals
 
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -12,39 +14,99 @@
 
 
 
-        <div class="container py-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                    <h3 class="mb-0">Panel de Control</h3>
-                    <small class="text-muted">Bienvenido</small>
-                </div>
-                <div>
-                    <button class="btn btn-outline-secondary" @onclick="GoToProfile">Mi Perfil</button>
-                </div>
-            </div>
-
-            <!-- Admin -->
-            <AuthorizeView Roles="Admin">
-                <Authorized>
-                    <AdminDashboard />
-                </Authorized>
-            </AuthorizeView>
-
-            <!-- Planner -->
-            <AuthorizeView Roles="WeddingPlanner">
-                <Authorized>
-                    <PlannerDashboard />
-                </Authorized>
-            </AuthorizeView>
-
-            <!-- User -->
-            <AuthorizeView Roles="User">
-                <Authorized>
-                    <UserDashboard />
-                </Authorized>
-            </AuthorizeView>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h3 class="mb-0">Panel de Control</h3>
+            <small class="text-muted">Bienvenido</small>
         </div>
+        <AuthorizeView Roles="Admin">
+            <Authorized>
+
+                <div class="flex gap-1">
+                    <button class="btn btn-custom" @onclick="() => ShowCreateUserModal(true)">
+                        <i class="oi oi-plus"></i> Crear Usuario
+                    </button>
+                    <button class="btn btn-custom" @onclick="() => ShowCreateEventModal()">
+                        <i class="oi oi-plus"></i> Crear Evento
+                    </button>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+
+    </div>
+
+    <!-- Admin -->
+    <AuthorizeView Roles="Admin">
+        <Authorized>
+            <AdminDashboard />
+        </Authorized>
+    </AuthorizeView>
+
+    <!-- Planner -->
+    <AuthorizeView Roles="WeddingPlanner">
+        <Authorized>
+            <PlannerDashboard />
+        </Authorized>
+    </AuthorizeView>
+
+    <!-- User -->
+    <AuthorizeView Roles="User">
+        <Authorized>
+            <UserDashboard />
+        </Authorized>
+    </AuthorizeView>
+</div>
+
+<UserCreateModal Show="@ShowCreateUser"
+                 ShowChanged="@((bool val) => ShowCreateUser = val)"
+                 OnSaved="LoadUsers" />
+
+<CreateEventModal Show="@ShowCreateEvent"
+                  ShowChanged="@((bool val) => ShowCreateEvent = val)"
+                  EventTypes="@EventTypes"
+                  AllUsers="@AllUsers"
+                  OnSaved="LoadEvent" />
 
 @code {
-    private void GoToProfile() => Navigation.NavigateTo("profile");
+    private List<User> AllUsers = new();
+    private List<EventType>? EventTypes;
+    private bool ShowCreateUser = false;
+    private bool ShowCreateEvent = false;
+    private bool ShowEdit = false;
+    private Event? SelectedEvent;
+    [Inject] private IRepository repository { get; set; } = default!;
+
+    private void ShowCreateUserModal(bool show) => ShowCreateUser = show;
+    private async void ShowCreateEventModal()
+    {
+        await LoadEventTypes();
+        await LoadUsersAsync();
+        ShowCreateEvent = true;
+    }
+    private async Task LoadUsersAsync()
+    {
+        var result = await repository.GetAsync<List<User>>("api/Accounts/all");
+        if (result != null)
+        {
+            // Excluir Admin y WeddingPlanner
+            AllUsers = result.Response!
+                //.Where(u => u.UserType != UserType.Admin && u.UserType != UserType.WeddingPlanner)
+                .ToList();
+        }
+    }
+    private async Task LoadEventTypes()
+    {
+        var response = await repository.GetAsync<List<EventType>>("api/EventTypes");
+        if (!response.Error)
+            EventTypes = response.Response;
+    }
+    private Task LoadUsers()
+    {
+        return Task.CompletedTask;
+    }
+    private Task LoadEvent()
+    {
+        return Task.CompletedTask;
+    }
 }

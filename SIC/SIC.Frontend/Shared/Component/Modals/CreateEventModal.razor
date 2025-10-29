@@ -1,0 +1,144 @@
+﻿@using CurrieTechnologies.Razor.SweetAlert2
+@using SIC.Shared.Entities
+@using SIC.Shared.Enums
+@using Microsoft.AspNetCore.Components.Forms
+
+@if (Show)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Crear Evento</h5>
+                    <button type="button" class="btn-close" @onclick="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <EditForm Model="@NewEvent" OnValidSubmit="@SaveEventAsync">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+
+                        <!-- Asignar Usuario -->
+                        <div class="mb-3">
+                            <label class="form-label">Asignar a Usuario</label>
+                            <input type="text" class="form-control mb-2"
+                                   placeholder="Filtrar usuarios..."
+                                   @bind="filterText"
+                                   @bind:event="oninput" />
+                            <select class="form-select" @bind="NewEvent.UserId">
+                                <option value="">-- Selecciona un usuario --</option>
+                                @foreach (var user in FilteredUsers)
+                                {
+                                    <option value="@user.Id">@user.FullName (@user.UserType.GetDescription())</option>
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Tipo de evento -->
+                        <div class="mb-3">
+                            <label class="form-label">Tipo de Evento</label>
+                            <InputSelect class="form-select" @bind-Value="NewEvent.EventTypeId">
+                                <option value="">-- Selecciona un tipo --</option>
+                                @foreach (var type in EventTypes)
+                                {
+                                    <option value="@type.Id">@type.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+
+                        <!-- Datos -->
+                        <div class="mb-3">
+                            <label class="form-label">Anfitrión(es)</label>
+                            <InputText class="form-control" @bind-Value="NewEvent.Name" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Nombre del Evento</label>
+                            <InputText class="form-control" @bind-Value="NewEvent.SubTitle" />
+                        </div>
+
+                        <div class="mb-3 row">
+                            <div class="col">
+                                <label class="form-label">Fecha</label>
+                                <InputDate class="form-control" @bind-Value="NewEvent.Date" />
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Hora</label>
+                                <InputTime CssClass="form-control" @bind-Value="NewEvent.Time" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Ubicación</label>
+                            <InputText class="form-control" @bind-Value="NewEvent.Ubication" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Planner</label>
+                            <InputText class="form-control" @bind-Value="NewEvent.Planner" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Teléfono Planner</label>
+                            <InputText class="form-control" @bind-Value="NewEvent.PlannerPhone" />
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-custom">Guardar</button>
+                            <button type="button" class="btn btn-secondary" @onclick="Close">Cancelar</button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Show { get; set; }
+    [Parameter] public EventCallback<bool> ShowChanged { get; set; }
+    [Parameter] public List<EventType> EventTypes { get; set; } = new();
+    [Parameter] public List<User> AllUsers { get; set; } = new();
+    [Parameter] public EventCallback<Event> OnSaved { get; set; }
+
+    [Inject] private IRepository Repository { get; set; } = default!;
+    [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
+
+    private Event NewEvent = new();
+    private string filterText = string.Empty;
+
+    private IEnumerable<User> FilteredUsers =>
+        string.IsNullOrWhiteSpace(filterText)
+            ? AllUsers
+            : AllUsers.Where(u =>
+                u.FullName.Contains(filterText, StringComparison.OrdinalIgnoreCase) ||
+                u.Email.Contains(filterText, StringComparison.OrdinalIgnoreCase));
+
+    private async Task SaveEventAsync()
+    {
+        if (string.IsNullOrEmpty(NewEvent.UserId))
+        {
+            await SweetAlertService.FireAsync("Error", "Debes asignar un usuario al evento.", SweetAlertIcon.Error);
+            return;
+        }
+        var HostUser = AllUsers.FirstOrDefault(u => u.Id == NewEvent.UserId);
+        if (HostUser == null)
+        {
+            await SweetAlertService.FireAsync("Error", "El usuario asignado no es válido.", SweetAlertIcon.Error);
+            return;
+        }
+        NewEvent.Host = HostUser.FullName;
+        NewEvent.HostPhone = HostUser.PhoneNumber!;
+        var response = await Repository.PostAsync("api/Events/full", NewEvent);
+        if (response.Error)
+        {
+            await SweetAlertService.FireAsync("Error", "No se pudo guardar el evento.", SweetAlertIcon.Error);
+            return;
+        }
+
+        await SweetAlertService.FireAsync("Éxito", "Evento creado correctamente.", SweetAlertIcon.Success);
+        await OnSaved.InvokeAsync(NewEvent);
+        await Close();
+    }
+
+    private async Task Close() => await ShowChanged.InvokeAsync(false);
+}
