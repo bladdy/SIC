@@ -21,9 +21,9 @@
                         <div class="mb-3">
                             <label class="form-label">Asignar a Usuario</label>
                             <input type="text" class="form-control mb-2"
-                                   placeholder="Filtrar usuarios..."
-                                   @bind="filterText"
-                                   @bind:event="oninput" />
+                            placeholder="Filtrar usuarios..."
+                            @bind="filterText"
+                            @bind:event="oninput" />
                             <select class="form-select" @bind="NewEvent.UserId">
                                 <option value="">-- Selecciona un usuario --</option>
                                 @foreach (var user in FilteredUsers)
@@ -96,7 +96,7 @@
 @code {
     [Parameter] public bool Show { get; set; }
     [Parameter] public EventCallback<bool> ShowChanged { get; set; }
-    [Parameter] public List<EventType> EventTypes { get; set; } = new();
+    public List<EventType> EventTypes { get; set; } = new();
     [Parameter] public List<User> AllUsers { get; set; } = new();
     [Parameter] public EventCallback<Event> OnSaved { get; set; }
 
@@ -111,8 +111,13 @@
             ? AllUsers
             : AllUsers.Where(u =>
                 u.FullName.Contains(filterText, StringComparison.OrdinalIgnoreCase) ||
-                u.Email.Contains(filterText, StringComparison.OrdinalIgnoreCase));
+                u.PhoneNumber!.Contains(filterText, StringComparison.OrdinalIgnoreCase) ||
+                u.Email!.Contains(filterText, StringComparison.OrdinalIgnoreCase));
 
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadEventTypes();
+    }
     private async Task SaveEventAsync()
     {
         if (string.IsNullOrEmpty(NewEvent.UserId))
@@ -139,6 +144,11 @@
         await OnSaved.InvokeAsync(NewEvent);
         await Close();
     }
-
+    private async Task LoadEventTypes()
+    {
+        var response = await Repository.GetAsync<List<EventType>>("api/EventTypes");
+        if (!response.Error)
+            EventTypes = response.Response;
+    }
     private async Task Close() => await ShowChanged.InvokeAsync(false);
 }

@@ -64,7 +64,7 @@
 
 <CreateEventModal Show="@ShowCreateEvent"
                   ShowChanged="@((bool val) => ShowCreateEvent = val)"
-                  EventTypes="@EventTypes"
+                  
                   AllUsers="@AllUsers"
                   OnSaved="LoadEvent" />
 
@@ -80,8 +80,8 @@
     private void ShowCreateUserModal(bool show) => ShowCreateUser = show;
     private async void ShowCreateEventModal()
     {
+        
         ShowCreateEvent = true;
-        await LoadEventTypes();
         await LoadUsersAsync();
     }
     private async Task LoadUsersAsync()
