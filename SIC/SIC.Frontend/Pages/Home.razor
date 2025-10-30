@@ -78,11 +78,9 @@
     [Inject] private IRepository repository { get; set; } = default!;
 
     private void ShowCreateUserModal(bool show) => ShowCreateUser = show;
-    private async void ShowCreateEventModal()
+    private void ShowCreateEventModal()
     {
-        
         ShowCreateEvent = true;
-        await LoadUsersAsync();
     }
     private async Task LoadUsersAsync()
     {

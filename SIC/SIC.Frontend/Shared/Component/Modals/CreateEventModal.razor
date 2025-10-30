@@ -117,6 +117,7 @@
     protected override async Task OnInitializedAsync()
     {
         await LoadEventTypes();
+        await LoadUsersAsync();
     }
     private async Task SaveEventAsync()
     {
@@ -143,6 +144,17 @@
         await SweetAlertService.FireAsync("Éxito", "Evento creado correctamente.", SweetAlertIcon.Success);
         await OnSaved.InvokeAsync(NewEvent);
         await Close();
+    }
+    private async Task LoadUsersAsync()
+    {
+        var result = await Repository.GetAsync<List<User>>("api/Accounts/all");
+        if (result != null)
+        {
+            // Excluir Admin y WeddingPlanner
+            AllUsers = result.Response!
+                //.Where(u => u.UserType != UserType.Admin && u.UserType != UserType.WeddingPlanner)
+                .ToList();
+        }
     }
     private async Task LoadEventTypes()
     {
