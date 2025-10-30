@@ -9,13 +9,14 @@
 }
 else
 {
-    <div class="card shadow-lg border-0 rounded-3 mb-3">
+    <div class="card shadow-lg border-0 rounded-3 mb-3 ">
         <!-- Header: título, subtítulo, tipo y estado -->
-        <div class="card-header text-white" style="background-color:#3C6A79;">
+        <div class="card-header text-white position-relative" style="background-color:#3C6A79;">
             <div class="d-flex justify-content-between align-items-stretch flex-wrap">
                 <div>
                     <h4 class="mb-0">@EventDetail.Name</h4>
                     <small>@EventDetail.SubTitle</small>
+                    <div><strong>@EventDetail.User!.UserType.GetDescription():</strong> @EventDetail.User!.FullName</div>
                     <p class="mb-1"><strong>Evento:</strong> @EventDetail.EventType?.Name</p>
                     <p class="mb-1"><strong>Fecha:</strong> @EventDetail.Date.ToString("dd/MM/yyyy")</p>
                 </div>
@@ -29,6 +30,10 @@ else
                     </p>
                 </div>
             </div>
+            <a href="/events/register-event/invitations-entries/@EventDetail.Code" style="background-color:#1F4854; border-color: white; padding-right: 5px;" class="btn btn-sm position-absolute bottom-0 end-0 mb-2 text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-qrcode"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M4 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /><path d="M7 17l0 .01" /><path d="M14 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /><path d="M7 7l0 .01" /><path d="M4 14m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /><path d="M17 7l0 .01" /><path d="M14 14l3 0" /><path d="M20 14l0 .01" /><path d="M14 14l0 3" /><path d="M14 20l3 0" /><path d="M17 17l3 0" /><path d="M20 17l0 3" /></svg>
+                Scan QR
+            </a>
 
         </div>
 
@@ -38,7 +43,7 @@ else
             <!-- ======================== -->
             <!-- SECCIÓN 2: Invitados -->
             <!-- ======================== -->
-            <div class="row g-3 text-center align-items-stretch">
+            <div class="row text-center align-items-stretch">
                 <!-- Invitados -->
                 <div class="col-12 col-md-4 mb-0">
                     <p class="d-flex justify-content-between px-3 py-1 text-white" style="background-color:#3C6A79;">
@@ -67,9 +72,9 @@ else
             <!-- ======================== -->
             <!-- SECCIÓN 3: Confirmaciones -->
             <!-- ======================== -->
-            <div class="row g-3 text-center align-items-stretch">
+            <div class="row text-center align-items-stretch">
                 <!-- Total Sí asistiré -->
-                <div class="col-12 col-md-2">
+                <div class="col-12 col-md-4">
                     <p class="d-flex justify-content-between px-3 py-1 text-white bg-success ">
                         <strong>Total SÍ ASISTIRÉ:</strong>
                         <span>@(EventDetail.NumberAdultsConfirmed + EventDetail.NumberChildrenConfirmed)</span>
@@ -77,7 +82,7 @@ else
                 </div>
 
                 <!-- Adultos (Sí asistiré) -->
-                <div class="col-6 col-md-2">
+                <div class="col-6 col-md-4">
                     <p class="d-flex justify-content-between px-3 py-1 text-white bg-success ">
                         <strong>Adultos:</strong>
                         <span>@EventDetail.NumberAdultsConfirmed</span>
@@ -85,7 +90,7 @@ else
                 </div>
 
                 <!-- Niños (Sí asistiré) -->
-                <div class="col-6 col-md-2">
+                <div class="col-6 col-md-4">
                     <p class="d-flex justify-content-between px-3 py-1 text-white bg-success ">
                         <strong>Niños:</strong>
                         <span>@EventDetail.NumberChildrenConfirmed</span>
@@ -93,7 +98,7 @@ else
                 </div>
 
                 <!-- No asistiré -->
-                <div class="col-12 col-md-2">
+                <div class="col-12 col-md-4">
                     <p class="d-flex justify-content-between px-3 py-1 text-white bg-danger  ">
                         <strong>Total NO ASISTIRÉ:</strong>
                         <span>@(EventDetail.NumberAdultsNotAttend + EventDetail.NumberChildrenNotAttend)</span>
@@ -101,7 +106,7 @@ else
                 </div>
 
                 <!-- Pendientes -->
-                <div class="col-12 col-md-2">
+                <div class="col-12 col-md-4">
                     <p class="d-flex justify-content-between px-3 py-1 text-white bg-warning  ">
                         <strong>Pendientes:</strong>
                         <span>@(EventDetail.NumberAdultsPending + EventDetail.NumberChildrenPending)</span>
@@ -115,6 +120,7 @@ else
         <!-- Footer: Botones de acción -->
         <div class="card-footer d-flex justify-content-end flex-wrap gap-2">
 
+            <button class="btn btn-sm btn-custom" @onclick="ShowCreateModal">Agregar Invitado</button>
             <button class="btn btn-sm btn-custom" @onclick="DescargarExcel" disabled="@isLoading">
                 @if (isLoading)
                 {
@@ -129,9 +135,8 @@ else
             <button class="btn btn-sm btn-custom" @onclick="ShowModalExcel">Importar Excel</button>
 
             
-            <button class="btn btn-sm btn-custom" @onclick="ShowCreateModal">Agregar Invitado</button>
             <!--Activar con condiccional-->
-            <a href="/events/register-event/invitations-entries/@EventDetail.Code" class="btn btn-sm btn-custom">Registrar Invitados (Escanear QR)</a>
+            
         </div>
     </div>
 

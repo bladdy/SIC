@@ -1,0 +1,67 @@
+﻿@if (Visible)
+{
+    <div class="modal" tabindex="-1" style="display:block;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" style="color:black">Configuración del Sorteo</h5>
+                    <button type="button" class="btn-close" @onclick="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <label style="color:black">Valor Mínimo:</label>
+                        <input type="number" @bind="LocalMinValue" class="form-control" />
+                    </div>
+                    <div class="mt-2">
+                        <label style="color:black">Valor Máximo:</label>
+                        <input type="number" @bind="LocalMaxValue" class="form-control" />
+                    </div>
+                    <div class="mt-2">
+                        <label style="color:black">Cantidad de Números:</label>
+                        <input type="number" @bind="LocalQuantity" class="form-control" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="Close">Cancelar</button>
+                    <button type="button" class="btn btn-primary" @onclick="Save">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public EventCallback<(int Min, int Max, int Quantity)> OnSave { get; set; }
+
+    private int LocalMinValue = 1;
+    private int LocalMaxValue = 100;
+    private int LocalQuantity = 3;
+
+    protected override void OnParametersSet()
+    {
+        LocalMinValue = LocalMinValue == 0 ? 1 : LocalMinValue;
+        LocalMaxValue = LocalMaxValue == 0 ? 100 : LocalMaxValue;
+        LocalQuantity = LocalQuantity == 0 ? 3 : LocalQuantity;
+    }
+
+    private async Task Save()
+    {
+        if (OnSave.HasDelegate)
+        {
+            await OnSave.InvokeAsync((LocalMinValue, LocalMaxValue, LocalQuantity));
+        }
+
+        await Close();
+    }
+
+    private async Task Close()
+    {
+        Visible = false;
+        if (VisibleChanged.HasDelegate)
+        {
+            await VisibleChanged.InvokeAsync(false);
+        }
+    }
+}

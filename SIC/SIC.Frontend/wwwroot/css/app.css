@@ -1,6 +1,103 @@
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
+/* Agregar estas reglas en el archivo wwwroot/css/app.css */
+@keyframes rotateNumber {
+    0% {
+        opacity: 0;
+        transform: scale(0.5) rotateX(45deg);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1) rotateX(0);
+    }
+}
+.small-list {
+    overflow-y: auto;
+    height: 100%;
+    border: none;
+    padding-left: 1rem;
+    scrollbar-width: thin;
+}
+
+    .small-list .list-group-item {
+        border: none;
+        background-color: #f8f9fa;
+        margin-bottom: 2px;
+        border-radius: 0.25rem;
+        transition: all 0.2s;
+    }
+
+        .small-list .list-group-item:hover {
+            background-color: #0d6efd;
+            color: white;
+            transform: scale(1.05);
+        }
+
+/* Para ocupar todo el alto visible */
+.full-height {
+    min-height: 100vh;
+}
+
+#currentNumber {
+    animation: rotateNumber 0.5s ease-in-out;
+}
+
+body {
+    background-color: #f8f9fa;
+}
+
+/* Contenedor del número actual */
+.number-display {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    color: #fff;
+    font-size: 5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 220px;
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Animación de rebote */
+.animated-number {
+    animation: bounceNumber 0.5s ease-in-out;
+}
+
+@keyframes bounceNumber {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Lista más atractiva */
+.list-group-item {
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+    .list-group-item:hover {
+        background-color: #0d6efd;
+        color: white;
+        transform: scale(1.05);
+    }
+
+/* Botón con efecto */
+.btn-lg:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s;
+}
 
 h1:focus {
     outline: none;
@@ -21,6 +118,7 @@ input[type="checkbox"] {
 a, .btn-link {
     color: #3C6A79;
 }
+
 .btn-custom {
     background-color: #3C6A79 !important; /* Color de fondo */
     color: white !important; /* Color del texto */
@@ -54,10 +152,12 @@ input.form-control:focus {
     border-color: #3C6A79 !important; /* Cambiar el color del borde */
     box-shadow: 0 0 5px rgba(60, 106, 121, 0.5); /* Agregar resplandor */
 }
+
 select.form-control:focus {
     border-color: #3C6A79 !important; /* Cambiar el color del borde */
     box-shadow: 0 0 5px rgba(60, 106, 121, 0.5); /* Agregar resplandor */
 }
+
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
     box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #3C6A79;
 }

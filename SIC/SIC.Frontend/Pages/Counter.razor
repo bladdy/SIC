@@ -1,18 +1,137 @@
-﻿@page "/counter"
+﻿@page "/sorteo"
+@layout LoginLayout
+@using SIC.Frontend.Shared.Modals
+<div class="container-fluid min-vh-100 py-4 position-relative text-light">
 
-<PageTitle>Counter</PageTitle>
+    <!-- Botón Configuración esquina superior derecha -->
+    <button @onclick="ShowModal"
+            class="btn btn-primary position-absolute top-0 end-0 m-3">
+        ⚙ Configuración del Sorteo
+    </button>
 
-<h1>Counter</h1>
+    <!-- Modal -->
+    <Modal @bind-Visible="showModal" OnSave="HandleModalSave" />
 
-<p role="status">Current count: @currentCount</p>
+    <!-- Título centrado -->
+    <h2 class="text-center mb-3 fw-bold display-5" style="color:#000;">🎲 Sorteo de Números 🎲</h2>
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+    <!-- Número actual y botón (centrado arriba) -->
+    <div class="text-center mb-3">
+        <div class="number-display shadow rounded-4 d-inline-block p-4 bg-primary bg-gradient">
+            <h1 class="animated-number fw-bold"
+                style="font-size: 10rem; color: #fff; text-shadow: 3px 3px 12px rgba(0,0,0,0.5);">
+                @currentNumber
+            </h1>
+        </div>
+
+        <div class="mt-4">
+            @if (drawnNumbers.Count < quantity)
+            {
+                <button class="btn btn-success btn-lg px-5 py-2 fw-bold"
+                        @onclick="PickNextNumber"
+                        disabled="@isAnimating">
+                    🎯 Siguiente Número
+                </button>
+            }
+            else
+            {
+                <p class="text-success fw-bold mt-3 fs-4">✅ Sorteo completado</p>
+            }
+        </div>
+    </div>
+
+    <!-- Lista de números generados (debajo, en columnas de 15) -->
+    <div class="card shadow-sm border-0 bg-light text-dark mx-auto" style="max-width: 1200px;">
+        <div class="card-body">
+            <h4 class="text-center mb-1 fw-bold">Números Generados</h4>
+
+            @if (drawnNumbers.Count == 0)
+            {
+                <p class="text-center text-muted">Aún no se ha generado ningún número.</p>
+            }
+            else
+            {
+                <div class="container-fluid">
+                    <div class="row">
+                        @foreach (var group in drawnNumbers
+                           .Select((num, index) => new { num, index })
+                           .GroupBy(x => x.index / 15))
+                        {
+                            <div class="col-6 col-md-3 col-lg-2 mb-2">
+                                <ul class="list-group small-list">
+                                    @foreach (var item in group)
+                                    {
+                                        <li class="list-group-item text-center fw-bold fs-2 py-1">
+                                            @(item.index + 1).- (@item.num)
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
 
 @code {
-    private int currentCount = 0;
+    private bool showModal = false;
+    private int minValue = 1;
+    private int maxValue = 100;
+    private int quantity = 3;
 
-    private void IncrementCount()
+    private List<int> drawnNumbers = new List<int>();
+    private int currentNumber = 0;
+
+    private Random random = new Random();
+    private bool isAnimating = false;
+
+    private void ShowModal()
     {
-        currentCount++;
+        showModal = true;
+    }
+
+    private void HandleModalSave((int Min, int Max, int Quantity) result)
+    {
+        minValue = result.Min;
+        maxValue = result.Max;
+        quantity = result.Quantity;
+
+        drawnNumbers.Clear();
+        currentNumber = 0;
+
+        StateHasChanged();
+    }
+
+    private async void PickNextNumber()
+    {
+        if (drawnNumbers.Count >= quantity || isAnimating)
+            return;
+
+        isAnimating = true;
+
+        // Elegir número definitivo único
+        int finalNumber = 0;
+        while (finalNumber == 0 || drawnNumbers.Contains(finalNumber))
+        {
+            finalNumber = random.Next(minValue, maxValue + 1);
+        }
+
+        // Animación de números corriendo
+        for (int i = 0; i < 100; i++)
+        {
+            currentNumber = random.Next(minValue, maxValue + 1);
+            StateHasChanged();
+            await Task.Delay(30);
+        }
+
+        // Mostrar número elegido
+        currentNumber = finalNumber;
+        drawnNumbers.Add(finalNumber);
+        isAnimating = false;
+        StateHasChanged();
     }
 }

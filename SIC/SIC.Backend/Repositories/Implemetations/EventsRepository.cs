@@ -21,6 +21,7 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
     {
         var events = await _context.Events
             .Include(i => i.Invitations)
+            .Include(u => u.User)
             .Include(et => et.EventType).FirstOrDefaultAsync(x => x.Code!.Contains(code));
         if (events == null)
         {
