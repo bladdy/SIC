@@ -41,7 +41,7 @@
     </div>
 
     <!-- Lista de números generados (debajo, en columnas de 15) -->
-    <div class="card shadow-sm border-0 bg-light text-dark mx-auto" style="max-width: 1200px;">
+    <div class="card shadow-sm border-0 bg-light text-dark mx-auto" style="max-width: 90%;">
         <div class="card-body">
             <h4 class="text-center mb-1 fw-bold">Números Generados</h4>
 
@@ -55,7 +55,7 @@
                     <div class="row">
                         @foreach (var group in drawnNumbers
                            .Select((num, index) => new { num, index })
-                           .GroupBy(x => x.index / 15))
+                           .GroupBy(x => x.index / 10))
                         {
                             <div class="col-6 col-md-3 col-lg-2 mb-2">
                                 <ul class="list-group small-list">
