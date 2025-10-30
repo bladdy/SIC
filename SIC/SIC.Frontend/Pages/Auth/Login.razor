@@ -34,13 +34,13 @@ Que se vean mas claros
 
                 <div class="mb-3 text-start">
                     <label class="form-label fw-semibold text btn-">Usuario</label>
-                    <InputText class="form-control form-control-lg rounded-3" @bind-Value="@loginDTO.Email" placeholder="0000000000" style="--bs-placeholder-color:#bbb; color:#bbb;" />
+                    <InputText class="form-control form-control-lg rounded-3" @bind-Value="@loginDTO.Email"  />
                     <ValidationMessage For="@(() => loginDTO.Email)" />
                 </div>
 
                 <div class="mb-3 text-start">
                     <label class="form-label fw-semibold">Contraseña</label>
-                    <InputText type="password" class="form-control form-control-lg rounded-3" @bind-Value="@loginDTO.Password" placeholder="**********" />
+                    <InputText type="password" class="form-control form-control-lg rounded-3" @bind-Value="@loginDTO.Password" />
                     <ValidationMessage For="@(() => loginDTO.Password)" />
                 </div>
 

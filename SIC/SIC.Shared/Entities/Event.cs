@@ -28,7 +28,7 @@ public class Event : IEntityWithName
 
     [Display(Name = "Hora")]
     [DisplayFormat(DataFormatString = "{0:hh:mm}")]
-    public TimeSpan Time { get; set; }
+    public TimeSpan Time { get; set; } 
 
     [Display(Name = "Ubicación")]
     public string? Ubication { get; set; }

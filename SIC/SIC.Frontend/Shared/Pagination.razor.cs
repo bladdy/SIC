@@ -19,7 +19,7 @@ namespace SIC.Frontend.Shared
             {
                 Page = CurrentPage - 1,
                 Enable = CurrentPage != 1,
-                Text = "Previous"
+                Text = "Anterior"
             });
 
             for (int i = 1; i <= TotalPages; i++)
@@ -58,7 +58,7 @@ namespace SIC.Frontend.Shared
             {
                 Page = CurrentPage != TotalPages ? CurrentPage + 1 : CurrentPage,
                 Enable = CurrentPage != TotalPages,
-                Text = "Next"
+                Text = "Siguiente"
             });
         }
 

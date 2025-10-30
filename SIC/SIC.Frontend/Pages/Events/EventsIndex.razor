@@ -4,11 +4,10 @@
 @using Microsoft.AspNetCore.Components.Forms
 
 <PageTitle>Eventos</PageTitle>
-<h3 class="mb-2">Eventos</h3>
-
-<div class="mb-3">
-    <button class="btn btn-custom" @onclick="ShowCreateModal">
-        Crear Evento
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+    <h3 class="mb-0">Eventos</h3>
+    <button class="btn btn-custom mt-2 mt-md-0" @onclick="ShowCreateModal">
+        <i class="oi oi-plus"></i> Crear Evento
     </button>
 </div>
 
@@ -50,7 +49,7 @@
                     <tr class="text-center">
                         <th class="text-start">Detalle del Evento</th>
                         <th>Estado</th>
-                        <th>Fecha y Hora</th>
+                        <th>Fecha</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -69,6 +68,7 @@
                                                     <a class="text-decoration-none text-primary">@even.Code</a>
                                                 </div>
                                                 <div><strong>Tipo:</strong> @even.EventType!.Name</div>
+                                                <div><strong>@even.User!.UserType.GetDescription():</strong> @even.User!.FullName</div>
                                             </div>
                                             <div class="col-12 col-md-4">
                                                 <div class="fw-bold fs-6 text-dark mb-1">@even.Name</div>
@@ -91,7 +91,6 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="fw-semibold text-dark">@even.Date.ToString("dd/MM/yyyy")</div>
-                                    <div class="text-muted small">@DateTime.Today.Add(even.Time).ToString("hh:mm tt")</div>
                                 </td>
                                 <td class="text-center">
                                     <button class="btn btn-sm btn-custom mb-1" @onclick="() => ShowEditModal(even)">
@@ -123,6 +122,7 @@
                             {
                                 <p class="card-subtitle text-muted small mb-2">@even.SubTitle</p>
                             }
+                            <p class="mb-1"><strong>@even.User!.UserType.GetDescription():</strong> @even.User!.FullName</p>
                             <p class="mb-1"><strong>Código:</strong> @even.Code</p>
                             <p class="mb-1"><strong>Tipo:</strong> @even.EventType!.Name</p>
                             <p class="mb-1">
@@ -131,7 +131,7 @@
                                     @even.Status.GetDescription()
                                 </span>
                             </p>
-                            <p class="mb-2"><strong>Fecha y Hora:</strong> @even.Date.ToString("dd/MM/yyyy")</p>
+                            <p class="mb-2"><strong>Fecha:</strong> @even.Date.ToString("dd/MM/yyyy")</p>
                             <div class="d-flex gap-2 flex-wrap">
                                 <button class="btn btn-sm btn-custom flex-grow-1" @onclick="() => ShowEditModal(even)"><i class="bi bi-pencil-fill"></i> Editar</button>
                                 <button class="btn btn-sm btn-custom flex-grow-1" @onclick="() => ConfirmDelete(even)"><i class="bi bi-trash-fill"></i> Borrar</button>
@@ -221,7 +221,7 @@
                                 <label class="form-label">Fecha</label>
                                 <InputDate class="form-control" @bind-Value="NewEvent.Date" />
                             </div>
-                            <div class="col">
+                            <div class="col d-none">
                                 <label class="form-label">Hora</label>
                                 <InputTime CssClass="form-control" @bind-Value="NewEvent.Time" />
                             </div>
@@ -230,7 +230,7 @@
                             <label class="form-label">URL Invitacion</label>
                             <InputText class="form-control" @bind-Value="NewEvent.Url" placeholder="Ej. https://mi-invitacion.com.." />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-3 d-none">
                             <label class="form-label">Ubicación</label>
                             <InputText class="form-control" @bind-Value="NewEvent.Ubication" placeholder="Ej. https://www.google.com/maps/....." />
                         </div>

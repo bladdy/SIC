@@ -71,7 +71,7 @@
                     <tr class="text-center">
                         <th class="text-start">Detalle del Evento</th>
                         <th>Estado</th>
-                        <th>Fecha y Hora</th>
+                        <th>Fecha</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -146,9 +146,7 @@
                                     <div class="fw-semibold text-dark">
                                         @even.Date.ToString("dd/MM/yyyy")
                                     </div>
-                                    <div class="text-muted small">
-                                        @DateTime.Today.Add(even.Time).ToString("hh:mm tt")
-                                    </div>
+                                    
                                 </td>
 
                                 <!-- ======== COLUMNA 4: ACCIONES ======== -->
@@ -195,7 +193,7 @@
                                     @even.Status.GetDescription()
                                 </span>
                             </p>
-                            <p class="mb-2"><strong>Fecha y Hora:</strong> @even.Date.ToString("dd/MM/yyyy") - @DateTime.Today.Add(even.Time).ToString("hh:mm tt")</p>
+                            <p class="mb-2"><strong>Fecha:</strong> @even.Date.ToString("dd/MM/yyyy") - @DateTime.Today.Add(even.Time).ToString("hh:mm tt")</p>
                             <div class="d-flex gap-2 flex-wrap">
                                 <button class="btn btn-sm btn-custom flex-grow-1" @onclick="() => ShowEditModal(even)"><i class="bi bi-pencil-fill"></i> Editar</button>
                                 <button class="btn btn-sm btn-custom flex-grow-1" @onclick="() => ConfirmDelete(even)"><i class="bi bi-trash-fill"></i> Borrar</button>

@@ -68,7 +68,7 @@ namespace SIC.Frontend.Shared.Component.Modals
 
         private async Task AddCreditsAsync()
         {
-            if (string.IsNullOrEmpty(model.UserId) || model.CreditsToAdd <= 0)
+            if (string.IsNullOrEmpty(model.UserId))
                 return;
 
             isSaving = true;

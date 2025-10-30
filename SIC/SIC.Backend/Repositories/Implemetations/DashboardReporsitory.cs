@@ -80,7 +80,7 @@ public class DashboardReporsitory : IDashboardReporsitory
 
         // 🔝 Top 15 eventos (solo del admin actual)
         var topEventsRaw = await _context.Events
-            .Where(e => e.UserId == adminUserId)
+            //.Where(e => e.UserId == adminUserId) para traiga todos los eventos de todos
             .OrderByDescending(e => e.Invitations
                 .Where(i => i.Status == Status.Attend)
                 .Sum(i => i.NumberConfirmedAdults + i.NumberConfirmedChildren))

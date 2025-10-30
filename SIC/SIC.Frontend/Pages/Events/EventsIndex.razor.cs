@@ -63,7 +63,8 @@ namespace SIC.Frontend.Pages.Events
                 ? AllUsers
                 : AllUsers.Where(u =>
                     u.FullName.Contains(filterText, StringComparison.OrdinalIgnoreCase) ||
-                    u.Email.Contains(filterText, StringComparison.OrdinalIgnoreCase));
+                    u.PhoneNumber!.Contains(filterText, StringComparison.OrdinalIgnoreCase) ||
+                    u.Email!.Contains(filterText, StringComparison.OrdinalIgnoreCase));
 
         private async Task LoadEventTypes()
         {
@@ -86,7 +87,11 @@ namespace SIC.Frontend.Pages.Events
             await LoadEvents(page);
         }
 
-        private async Task ApplyFilterAsync() => await LoadEvents(1);
+        private async Task ApplyFilterAsync()
+        {
+            int page = 1;
+            await LoadEvents(page);
+        }
 
         private async Task CleanFilterAsync()
         {
