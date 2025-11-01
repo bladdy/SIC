@@ -46,7 +46,7 @@ else
 
             <!-- Botón QR: versión móvil -->
             <a href="/events/register-event/invitations-entries/@EventDetail.Code"
-               class="btn btn-sm text-white mt-2 px-4 position-absolute top-0 end-0 mt-2 me-2 d-block d-md-none align-items-center"
+               class="btn btn-sm text-white mt-2 px-4 position-absolute bottom-0 end-0 mb-2 me-2 d-block d-md-none align-items-center"
                 style="background-color:#1F4854; border-color:white;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -66,7 +66,7 @@ else
             <!-- ======================== -->
             <!-- SECCIÓN 2: Invitados -->
             <!-- ======================== -->
-            <div class="row text-center align-items-stretch">
+            <div class="row text-center align-items-stretch g-1 g-md-3 mt-0">
                 <!-- Invitados -->
                 <div class="col-12 col-md-4 mb-0">
                     <p class="d-flex justify-content-between px-3 py-1 text-white" style="background-color:#3C6A79;">
@@ -95,17 +95,17 @@ else
             <!-- ======================== -->
             <!-- SECCIÓN 3: Confirmaciones -->
             <!-- ======================== -->
-            <div class="row text-center align-items-stretch">
-                <!-- Total Sí asistiré -->
-                <div class="col-12 col-md-4">
-                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-success ">
+            <div class="row text-center align-items-stretch g-1 g-md-3 mt-0">
+                <!-- (Sí asistiré) -->
+                <div class="col-12 col-md-4 m-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-success">
                         <strong>Total SÍ ASISTIRÉ:</strong>
                         <span>@(EventDetail.NumberAdultsConfirmed + EventDetail.NumberChildrenConfirmed)</span>
                     </p>
                 </div>
 
                 <!-- Adultos (Sí asistiré) -->
-                <div class="col-6 col-md-4">
+                <div class="col-6 col-md-4 m-0">
                     <p class="d-flex justify-content-between px-3 py-1 text-white bg-success ">
                         <strong>Adultos:</strong>
                         <span>@EventDetail.NumberAdultsConfirmed</span>
@@ -113,7 +113,7 @@ else
                 </div>
 
                 <!-- Niños (Sí asistiré) -->
-                <div class="col-6 col-md-4">
+                <div class="col-6 col-md-4 m-0">
                     <p class="d-flex justify-content-between px-3 py-1 text-white bg-success ">
                         <strong>Niños:</strong>
                         <span>@EventDetail.NumberChildrenConfirmed</span>
@@ -121,46 +121,56 @@ else
                 </div>
 
                 <!-- No asistiré -->
-                <div class="col-12 col-md-4">
-                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-danger  ">
+                <div class="col-12 col-md-4 m-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-danger ">
                         <strong>Total NO ASISTIRÉ:</strong>
                         <span>@(EventDetail.NumberAdultsNotAttend + EventDetail.NumberChildrenNotAttend)</span>
                     </p>
                 </div>
 
                 <!-- Pendientes -->
-                <div class="col-12 col-md-4">
-                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-warning  ">
+                <div class="col-12 col-md-4 m-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-warning ">
                         <strong>Pendientes:</strong>
                         <span>@(EventDetail.NumberAdultsPending + EventDetail.NumberChildrenPending)</span>
                     </p>
                 </div>
             </div>
 
-
         </div>
 
         <!-- Footer: Botones de acción -->
-        <div class="card-footer d-flex justify-content-end flex-wrap gap-2">
-            <h4 class="mb-0">Lista de Invitados</h4>
+        <div class="card-footer d-flex justify-content-center flex-wrap gap-2">
+            <div class="text-center">
+                <!-- Título centrado arriba -->
+                <h4 class="mb-1">Crear Lista de Invitados</h4>
 
-            <button class="btn btn-sm btn-custom" @onclick="ShowCreateModal">Agregar Invitado</button>
-            <button class="btn btn-sm btn-custom" @onclick="DescargarExcel" disabled="@isLoading">
-                @if (isLoading)
-                {
-                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    <span> Generando... </span>
-                }
-                else
-                {
-                    <span>Exportar Excel</span>
-                }
-            </button>
-            <button class="btn btn-sm btn-custom" @onclick="ShowModalExcel">Importar Excel</button>
+                <!-- Contenedor responsive -->
+                <div class="d-flex flex-column flex-lg-row justify-content-center align-items-center  gap-2 mt-2">
+                    <!-- En mobile: los botones se apilan como indicas -->
+                    <!-- En PC: se ponen en una fila juntos debajo del título -->
+                    <div class="d-flex justify-content-center gap-2 mb-2 mb-lg-0">
+                        <button class="btn btn-sm btn-custom" @onclick="DescargarExcel" disabled="@isLoading">
+                            @if (isLoading)
+                            {
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                <span> Generando... </span>
+                            }
+                            else
+                            {
+                                <span>Exportar Excel</span>
+                            }
+                        </button>
+                        <button class="btn btn-sm btn-custom" @onclick="ShowModalExcel">Importar Excel</button>
+                    </div>
 
-            
-            <!--Activar con condiccional-->
-            
+                    <!-- Botón que en móvil queda debajo, pero en escritorio en la misma fila -->
+                    <div>
+                        <button class="btn btn-sm btn-custom" @onclick="ShowCreateModal">Agregar Invitado</button>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -170,16 +180,15 @@ else
     ﻿﻿<div class="mb-2 gap-2" style="display: flex; flex-wrap:wrap; align-items: center;">
         <input style="width:400px;" type="text" class="form-control" placeholder="Buscar Invitacion..." @bind-value="Filter">
         <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center; justify-content: start;">
-            <button type="button" class="btn btn-custom"  style="display: flex; align-items: center; gap: 4px;" @onclick="ApplyFilterAsync"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-search"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg> Filtrar</button>
+            <button type="button" class="btn btn-custom"  style="display: flex; align-items: center; gap: 4px;" @onclick="ApplyFilterAsync"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-search"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg> Buscar</button>
             <button type="button" class="btn btn-custom"  style="display: flex; align-items: center; gap: 4px;" @onclick="CleanFilterAsync"><i class="bi bi-x-circle" /> Limpiar</button>
             <button type="button" class="btn btn-custom"  style="display: flex; align-items: center; gap: 4px;" @onclick="NavegateToMessage"> <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-mail"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" /><path d="M3 7l9 6l9 -6" /></svg>Mensajes</button>
 
         </div>
-        <div></div>
-        <div class="form-check form-switch mx-1">
+        <div class="form-check form-switch">
             <input class="form-check-input btn-custom" type="checkbox" id="chkUsarWhatsApp" @bind="usarWhatsApp" />
             <label class="form-check-label fw-bold" for="chkUsarWhatsApp">
-                @(usarWhatsApp ? "Modo: Enviar por WhatsApp" : "Modo: Copiar al Portapapeles")
+                @(usarWhatsApp ? "Enviar por WhatsApp" : "Copiar al Portapapeles")
             </label>
         </div>
     </div>
