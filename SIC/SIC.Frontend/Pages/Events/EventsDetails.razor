@@ -30,12 +30,35 @@ else
                     </p>
                 </div>
             </div>
-            <a href="/events/register-event/invitations-entries/@EventDetail.Code" style="background-color:#1F4854; border-color: white; padding-right: 5px;" class="btn btn-sm position-absolute bottom-0 end-0 mb-2 text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-qrcode"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M4 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /><path d="M7 17l0 .01" /><path d="M14 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /><path d="M7 7l0 .01" /><path d="M4 14m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /><path d="M17 7l0 .01" /><path d="M14 14l3 0" /><path d="M20 14l0 .01" /><path d="M14 14l0 3" /><path d="M14 20l3 0" /><path d="M17 17l3 0" /><path d="M20 17l0 3" /></svg>
+
+            <!-- Botón QR: versión escritorio -->
+            <a href="/events/register-event/invitations-entries/@EventDetail.Code"
+               class="btn btn-sm text-white position-absolute top-0 end-0 mt-2 me-2 d-none d-md-inline-flex align-items-center"
+               style="background-color:#1F4854; border-color:white;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     class="me-1">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h3v3h3v3h-6z" />
+                </svg>
+                Scan QR
+            </a>
+
+            <!-- Botón QR: versión móvil -->
+            <a href="/events/register-event/invitations-entries/@EventDetail.Code"
+               class="btn btn-sm text-white mt-2 px-4 position-absolute top-0 end-0 mt-2 me-2 d-block d-md-none align-items-center"
+                style="background-color:#1F4854; border-color:white;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="me-1">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h3v3h3v3h-6z" />
+                </svg>
                 Scan QR
             </a>
 
         </div>
+
 
         <!-- Body: Información detallada -->
         <div class="card-body">
@@ -119,6 +142,7 @@ else
 
         <!-- Footer: Botones de acción -->
         <div class="card-footer d-flex justify-content-end flex-wrap gap-2">
+            <h4 class="mb-0">Lista de Invitados</h4>
 
             <button class="btn btn-sm btn-custom" @onclick="ShowCreateModal">Agregar Invitado</button>
             <button class="btn btn-sm btn-custom" @onclick="DescargarExcel" disabled="@isLoading">

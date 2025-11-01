@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using SIC.Frontend.Repositories;
 using SIC.Shared.Entities;
 using SIC.Shared.Enums;
+using System.Net;
 using System.Net.Http.Json;
 
 namespace SIC.Frontend.Pages.Events
@@ -32,13 +33,16 @@ namespace SIC.Frontend.Pages.Events
         private string filterText = string.Empty;
         private bool isPreselectedUser = false;
 
-        [Parameter] public string? Filter { get; set; }
-        [Parameter] public DateTime? DateSelectd { get; set; }
-        [Parameter] public int? SelectedEventType { get; set; }
-        [Parameter] public string? OrderBy { get; set; }
+        [Parameter, SupplyParameterFromQuery] public string Page { get; set; } = string.Empty;
+        [Parameter, SupplyParameterFromQuery] public string Filter { get; set; } = string.Empty;
+        [Parameter, SupplyParameterFromQuery] public DateTime? DateSelectd { get; set; } = null;
+        [Parameter, SupplyParameterFromQuery] public int? SelectedEventType { get; set; }
+        [Parameter, SupplyParameterFromQuery] public string OrderBy { get; set; } = "";
+        [Parameter, SupplyParameterFromQuery] public int? RecordsNumber { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
+            RecordsNumber ??= 15;
             await LoadEventTypes();
             await LoadUsersAsync();
             await LoadEvents(currentPage);
@@ -47,11 +51,11 @@ namespace SIC.Frontend.Pages.Events
         //  Cargar todos los usuarios disponibles
         private async Task LoadUsersAsync()
         {
-            var result = await Http.GetFromJsonAsync<List<User>>("api/Accounts/all");
+            var result = await repository.GetAsync<List<User>>("api/Accounts/all");
             if (result != null)
             {
                 // Excluir Admin y WeddingPlanner
-                AllUsers = result
+                AllUsers = result.Response!
                     //.Where(u => u.UserType != UserType.Admin && u.UserType != UserType.WeddingPlanner)
                     .ToList();
             }
@@ -75,10 +79,80 @@ namespace SIC.Frontend.Pages.Events
 
         private async Task LoadEvents(int page)
         {
-            var url = $"api/Events/paginated?PageNumber={page}&PageSize=15";
-            var response = await repository.GetAsync<List<Event>>(url);
-            if (!response.Error)
-                Events = response.Response;
+            if (!string.IsNullOrWhiteSpace(Page))
+            {
+                page = Convert.ToInt32(Page);
+            }
+            var ok = await LoadListAsync(page);
+            if (ok)
+            {
+                await LoadPagesAsync();
+            }
+        }
+
+        private async Task LoadPagesAsync()
+        {
+            var url = $"api/Events/totalRecords?RecordsNumber={RecordsNumber}";
+
+            if (!string.IsNullOrWhiteSpace(Filter))
+            {
+                url += $"&Filter={Filter}";
+            }
+            if (DateSelectd != null)
+            {
+                url += $"&Date={DateSelectd}";
+            }
+            if (SelectedEventType != null)
+            {
+                url += $"&EventTypeId={SelectedEventType}";
+            }
+
+            var responseHttp = await repository.GetAsync<int>(url);
+            if (responseHttp.Error)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
+            }
+
+            totalPages = responseHttp.Response;
+        }
+
+        private async Task<bool> LoadListAsync(int page)
+        {
+            var url = $"api/Events/paginated?PageNumber={page}&PageSize={RecordsNumber}";
+
+            if (!string.IsNullOrWhiteSpace(Filter))
+            {
+                url += $"&Filter={Filter}";
+            }
+            if (DateSelectd != null)
+            {
+                url += $"&Date={DateSelectd}";
+            }
+            if (SelectedEventType != null)
+            {
+                url += $"&EventTypeId={SelectedEventType}";
+            }
+            if (!string.IsNullOrWhiteSpace(OrderBy))
+            {
+                url += $"&OrderBy={OrderBy}";
+            }
+            var responseHttp = await repository.GetAsync<List<Event>>(url);
+
+            if (responseHttp.Error)
+            {
+                if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+                {
+                    NavigationManager.NavigateTo("/events");
+                    var message = await responseHttp.GetErrorMessageAsync();
+                    await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                    return false;
+                }
+            }
+
+            Events = responseHttp?.Response ?? new List<Event>();
+            return true;
         }
 
         private async Task SelectedPageAsync(int page)

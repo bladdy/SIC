@@ -48,12 +48,12 @@
                         <!-- Datos -->
                         <div class="mb-3">
                             <label class="form-label">Anfitrión(es)</label>
-                            <InputText class="form-control" @bind-Value="NewEvent.Name" />
+                            <InputText class="form-control" @bind-Value="NewEvent.Name" placeholder="Ej. Fernanda & Raúl" />
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Nombre del Evento</label>
-                            <InputText class="form-control" @bind-Value="NewEvent.SubTitle" />
+                            <InputText class="form-control" @bind-Value="NewEvent.SubTitle" placeholder="Ej. Nuestra Boda" />
                         </div>
 
                         <div class="mb-3 row">
@@ -61,25 +61,36 @@
                                 <label class="form-label">Fecha</label>
                                 <InputDate class="form-control" @bind-Value="NewEvent.Date" />
                             </div>
-                            <div class="col">
+                            <div class="col d-none">
                                 <label class="form-label">Hora</label>
                                 <InputTime CssClass="form-control" @bind-Value="NewEvent.Time" />
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Ubicación</label>
-                            <InputText class="form-control" @bind-Value="NewEvent.Ubication" />
+                            <label class="form-label">URL Invitacion</label>
+                            <InputText class="form-control" @bind-Value="NewEvent.Url" placeholder="Ej. https://mi-invitacion.com.." />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-3 d-none">
                             <label class="form-label">Planner</label>
                             <InputText class="form-control" @bind-Value="NewEvent.Planner" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-3 d-none">
                             <label class="form-label">Teléfono Planner</label>
                             <InputText class="form-control" @bind-Value="NewEvent.PlannerPhone" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Estado</label>
+                            <InputSelect class="form-select" @bind-Value="NewEvent.Status">
+                                <option value="">-- Selecciona un Estado --</option>
+                                @foreach (var status in Enum.GetValues<Status>())
+                                {
+                                    <option value="@status">@status.GetDescription()</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => NewEvent.Status)" />
                         </div>
 
                         <div class="modal-footer">
@@ -107,12 +118,12 @@
     private string filterText = string.Empty;
 
     private IEnumerable<User> FilteredUsers =>
-        string.IsNullOrWhiteSpace(filterText)
-            ? AllUsers
-            : AllUsers.Where(u =>
-                u.FullName.Contains(filterText, StringComparison.OrdinalIgnoreCase) ||
-                u.PhoneNumber!.Contains(filterText, StringComparison.OrdinalIgnoreCase) ||
-                u.Email!.Contains(filterText, StringComparison.OrdinalIgnoreCase));
+                string.IsNullOrWhiteSpace(filterText)
+                    ? AllUsers
+                    : AllUsers.Where(u =>
+                        u.FullName.Contains(filterText, StringComparison.OrdinalIgnoreCase) ||
+                        u.PhoneNumber!.Contains(filterText, StringComparison.OrdinalIgnoreCase) ||
+                        u.Email!.Contains(filterText, StringComparison.OrdinalIgnoreCase));
 
     protected override async Task OnInitializedAsync()
     {
