@@ -108,7 +108,7 @@
     [Parameter] public bool Show { get; set; }
     [Parameter] public EventCallback<bool> ShowChanged { get; set; }
     public List<EventType> EventTypes { get; set; } = new();
-    [Parameter] public List<User> AllUsers { get; set; } = new();
+    public List<User> AllUsers { get; set; } = new();
     [Parameter] public EventCallback<Event> OnSaved { get; set; }
 
     [Inject] private IRepository Repository { get; set; } = default!;
