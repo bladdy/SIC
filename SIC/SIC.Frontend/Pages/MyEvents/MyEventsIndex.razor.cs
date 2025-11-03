@@ -6,10 +6,8 @@ using SIC.Frontend.Repositories;
 using SIC.Shared.Entities;
 using System.Net;
 using System.Security.Claims;
-using static System.Net.WebRequestMethods;
 
 namespace SIC.Frontend.Pages.MyEvents;
-
 [Authorize(Roles = "Admin,WeddingPlanner,User")]
 public partial class MyEventsIndex
 {
@@ -251,10 +249,10 @@ public partial class MyEventsIndex
             responseHttp = await repository.PostAsync("api/events/full", NewEvent);
             isPost = true;
         }
-        if ((_userRol == "WeddingPlanner") && isPost)
+        if ((_userRol == "WeddingPlanner") && isPost && !responseHttp.Error)
         {
             HttpResponseWrapper<object>? responseHttps;
-            responseHttps = await repository.PostAsync<object>($"api/UserCredits/consume/{_userId}");
+            responseHttps = await repository.PostAsync<object>($"api/UserCredits/consume/{_userId}/{NewEvent.Name}");
             await LoadAvailableCreditsAsync();
         }
         if (responseHttp.Error)

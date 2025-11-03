@@ -14,8 +14,6 @@ using System.Net;
 
 namespace SIC.Frontend.Pages.MyEvents;
 
-//Todo: Agregar disable cuando se Crea o se actualiza una invitacion
-//ToDo: Cuando se genere el evento que inmediatamente se pueda crea el mensaje de invitacion y confirmacion
 [Authorize(Roles = "Admin,WeddingPlanner,User")]
 public partial class MyEventsDetails
 {

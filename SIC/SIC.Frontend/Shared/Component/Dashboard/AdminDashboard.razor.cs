@@ -10,6 +10,7 @@ namespace SIC.Frontend.Shared.Component.Dashboard;
 
 public partial class AdminDashboard
 {
+    //ToDo: Agregar el consumo cuando sea un planner para que haga el descuento de los creditos
     [Inject] private IRepository Repository { get; set; } = default!;
     public AdminDashboardDto? AdminDashboards { get; set; }
 

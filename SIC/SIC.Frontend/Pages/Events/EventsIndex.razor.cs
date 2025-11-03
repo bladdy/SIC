@@ -11,6 +11,8 @@ using System.Net.Http.Json;
 namespace SIC.Frontend.Pages.Events
 {
     [Authorize(Roles = "Admin")]
+
+    //ToDo: Agregar el consumo cuando sea un planner para que haga el descuento de los creditos
     public partial class EventsIndex
     {
         [Inject] private IRepository repository { get; set; } = default!;

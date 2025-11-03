@@ -1,16 +1,10 @@
-﻿using Azure;
-using Azure.Core;
-using DocumentFormat.OpenXml.Office2016.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SIC.Backend.Data;
+using SIC.Backend.Helpers;
 using SIC.Backend.Repositories.Interfaces;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using SIC.Shared.Response;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SIC.Backend.Repositories.Implementations
 {
@@ -28,6 +22,8 @@ namespace SIC.Backend.Repositories.Implementations
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == entity.UserId);
             if (user == null)
                 return new ActionResponse<UserCreditDTO> { Success = false, Message = "Usuario no encontrado." };
+
+            if (string.IsNullOrEmpty(entity.Notes)) entity.Notes = "Recarga de Creditos.";
 
             var credit = await _context.UserCredits.FirstOrDefaultAsync(x => x.UserId == entity.UserId);
 
@@ -94,7 +90,7 @@ namespace SIC.Backend.Repositories.Implementations
             await _context.SaveChangesAsync();
         }
 
-        public async Task<ActionResponse<bool>> ConsumeCreditAsync(string userId)
+        public async Task<ActionResponse<bool>> ConsumeCreditAsync(string userId, string EventName)
         {
             var credit = await _context.UserCredits.FirstOrDefaultAsync(x => x.UserId == userId);
 
@@ -111,12 +107,43 @@ namespace SIC.Backend.Repositories.Implementations
 
             await _context.SaveChangesAsync();
 
-            await AddHistoryAsync(credit.Id, "Consumo", -1, credit.AvailableCredits, userId, "Creación de evento");
+            await AddHistoryAsync(credit.Id, "Consumo", -1, credit.AvailableCredits, userId, $"Creación de evento: {EventName}.");
 
             return new ActionResponse<bool>
             {
                 Success = true,
                 Result = true
+            };
+        }
+
+        public async Task<ActionResponse<IEnumerable<UserCreditHistory>>> GetAsync(PaginationDTO pagination)
+        {
+            var queryable = _context.UserCreditHistories.Include(e => e.UserCredit).AsQueryable();
+            if (!string.IsNullOrWhiteSpace(pagination.UserId))
+                queryable = queryable.Where(x => x.UserCredit.UserId == pagination.UserId);
+
+            queryable = queryable.OrderByDescending(x => x.Date);
+            return new ActionResponse<IEnumerable<UserCreditHistory>>
+            {
+                Success = true,
+                Result = await queryable
+                    .Paginate(pagination)
+                    .ToListAsync()
+            };
+        }
+
+        public async Task<ActionResponse<int>> GetTotalRecordAsync(PaginationDTO pagination)
+        {
+            var queryable = _context.UserCreditHistories.Include(e => e.UserCredit).AsQueryable();
+            if (!string.IsNullOrWhiteSpace(pagination.UserId))
+                queryable = queryable.Where(x => x.UserCredit.UserId == pagination.UserId);
+
+            double count = await queryable.CountAsync();
+            int totalPages = (int)Math.Ceiling(count / pagination.PageSize);
+            return new ActionResponse<int>
+            {
+                Success = true,
+                Result = totalPages
             };
         }
 

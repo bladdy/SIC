@@ -14,7 +14,11 @@ namespace SIC.Backend.Repositories.Interfaces
 
         Task<ActionResponse<UserCreditDTO>> AddAsync(AddCreditsRequest entity);
 
-        Task<ActionResponse<bool>> ConsumeCreditAsync(string userId);
+        Task<ActionResponse<bool>> ConsumeCreditAsync(string userId, string EventName);
+
+        Task<ActionResponse<IEnumerable<UserCreditHistory>>> GetAsync(PaginationDTO pagination);
+
+        Task<ActionResponse<int>> GetTotalRecordAsync(PaginationDTO pagination);
 
         Task<ActionResponse<IEnumerable<UserCreditDTO>>> GetPlannersWithCreditsAsync();
 

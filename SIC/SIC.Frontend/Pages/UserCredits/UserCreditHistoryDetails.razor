@@ -1,0 +1,47 @@
+﻿@page "/users-credits/details"
+@page "/users-credits/details/{Id?}"
+<PageTitle>Historial de Creditos</PageTitle>
+
+<h1>Historial</h1>
+<GenericList MyList="userCreditHistories">
+    <Body>
+        <table class="table table-striped table-hover table-bordered align-middle">
+            <thead class="" style="background-color:#3C6A79; color: white;">
+                <tr class="text-center">
+                    <th>Tipo de accion</th>
+                    <th>Creditos</th>
+                    <th>Disponibles</th>
+                    <th>Fecha</th>
+                    <th>Nota</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (userCreditHistories is null)
+                {
+                    <Loading />
+                }
+                else
+                {
+                    @foreach (var userCreditHistory in userCreditHistories)
+                    {
+                        <tr class="text-center">
+
+                            <td>@userCreditHistory.ActionType</td>
+                            <td>@userCreditHistory.Amount</td>
+                            <td>@userCreditHistory.AvailableAfter</td>
+                            <td>@userCreditHistory.Date.ToString("dd/MM/yyyy")</td>
+                            <td>@userCreditHistory.Notes</td>
+                            
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+        <div class="d-flex justify-content-center my-3">
+            <Pagination CurrentPage="currentPage"
+                        TotalPages="totalPages"
+                        SelectedPage="SelectedPage" />
+        </div>
+    </Body>
+</GenericList>
