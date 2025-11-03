@@ -5,6 +5,9 @@ using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using SIC.Shared.Enums;
 
+//ToDO: Validar que las invitaciones importadas pertenezcan al eventId
+//ToDO: Manejar mejor los errores (ej. código duplicado)
+
 namespace SIC.Backend.Controllers
 {
     [ApiController]
@@ -208,13 +211,15 @@ namespace SIC.Backend.Controllers
             worksheet.Cell(1, 9).Value = "Estado";
             worksheet.Cell(1, 10).Value = "Mesa";
             worksheet.Cell(1, 11).Value = "Comentarios";
-            worksheet.Cell(1, 12).Value = "Fecha Envío";
-            worksheet.Cell(1, 13).Value = "Fecha Confirmación";
+            /*worksheet.Cell(1, 12).Value = "Fecha Envío";
+            worksheet.Cell(1, 13).Value = "Fecha Confirmación";*/
 
-            var headerRange = worksheet.Range(1, 1, 1, 13);
+            var headerRange = worksheet.Range(1, 1, 1, 11);
             headerRange.Style.Font.Bold = true;
             headerRange.Style.Fill.BackgroundColor = XLColor.LightGray;
             headerRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+            worksheet.SheetView.Freeze(1, 1);
 
             // 🔹 Contenido
             int row = 2;
@@ -231,8 +236,8 @@ namespace SIC.Backend.Controllers
                 worksheet.Cell(row, 9).Value = invitation.Status.ToString();
                 worksheet.Cell(row, 10).Value = invitation.Table;
                 worksheet.Cell(row, 11).Value = invitation.Comments;
-                worksheet.Cell(row, 12).Value = invitation.SentDate.ToString("dd/MM/yyyy HH:mm");
-                worksheet.Cell(row, 13).Value = invitation.ConfirmationDate?.ToString("dd/MM/yyyy HH:mm") ?? "—";
+                /*worksheet.Cell(row, 12).Value = invitation.SentDate.ToString("dd/MM/yyyy HH:mm");
+                worksheet.Cell(row, 13).Value = invitation.ConfirmationDate?.ToString("dd/MM/yyyy HH:mm") ?? "—";*/
 
                 row++;
             }

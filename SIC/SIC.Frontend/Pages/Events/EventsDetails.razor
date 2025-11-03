@@ -33,11 +33,11 @@ else
 
             <!-- Botón QR: versión escritorio -->
             <a href="/events/register-event/invitations-entries/@EventDetail.Code"
-               class="btn btn-sm text-white position-absolute top-0 end-0 mt-2 me-2 d-none d-md-inline-flex align-items-center"
-               style="background-color:#1F4854; border-color:white;">
+            class="btn btn-sm text-white position-absolute top-0 end-0 mt-2 me-2 d-none d-md-inline-flex align-items-center"
+            style="background-color:#1F4854; border-color:white;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                     class="me-1">
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="me-1">
                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                     <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h3v3h3v3h-6z" />
                 </svg>
@@ -46,11 +46,11 @@ else
 
             <!-- Botón QR: versión móvil -->
             <a href="/events/register-event/invitations-entries/@EventDetail.Code"
-               class="btn btn-sm text-white mt-2 px-4 position-absolute bottom-0 end-0 mb-2 me-2 d-block d-md-none align-items-center"
-                style="background-color:#1F4854; border-color:white;">
+            class="btn btn-sm text-white mt-2 px-4 position-absolute bottom-0 end-0 mb-2 me-2 d-block d-md-none align-items-center"
+            style="background-color:#1F4854; border-color:white;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                        class="me-1">
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="me-1">
                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                     <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h3v3h3v3h-6z" />
                 </svg>
@@ -214,13 +214,11 @@ else
                             <td style="white-space: normal; vertical-align: top;">
                                 <div class="container-fluid">
                                     <div class="row g-3 small text-secondary">
-
                                         <!-- ===== COLUMNA 1 ===== -->
                                         <div class="col-12 col-md-4 d-flex flex-column">
                                             <div>
                                                 <strong>Código:</strong>
-                                                <a style="color:#3C6A79; cursor:pointer;"
-                                                @onclick="() => ShowEditModal(invitation)">
+                                                <a style="color:#3C6A79; cursor:pointer;" @onclick="() => ShowEditModal(invitation)">
                                                     @invitation.Code
                                                 </a>
                                             </div>
@@ -242,9 +240,9 @@ else
                                             @if (usarWhatsApp)
                                             {
                                                 <button class="btn d-inline-flex align-items-center gap-2 text-white"
-                                                style="background-color:#25d366;"
-                                                @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)"
-                                                disabled="@(loadingWhatsappId1 == invitation.Id)">
+                                                        style="background-color:#25d366;"
+                                                        @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)"
+                                                        disabled="@(loadingWhatsappId1 == invitation.Id)">
                                                     @if (loadingWhatsappId1 == invitation.Id)
                                                     {
                                                         <span class="spinner-border spinner-border-sm"></span>
@@ -258,9 +256,9 @@ else
                                                 </button>
 
                                                 <button class="btn d-inline-flex align-items-center gap-2 text-white"
-                                                style="background-color:#25d366;"
-                                                @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 2)"
-                                                disabled="@(loadingWhatsappId2 == invitation.Id)">
+                                                        style="background-color:#25d366;"
+                                                        @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 2)"
+                                                        disabled="@(loadingWhatsappId2 == invitation.Id)">
                                                     @if (loadingWhatsappId2 == invitation.Id)
                                                     {
                                                         <span class="spinner-border spinner-border-sm"></span>
@@ -276,8 +274,8 @@ else
                                             else
                                             {
                                                 <button class="btn btn-info d-inline-flex align-items-center gap-2 text-white"
-                                                @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 1)"
-                                                disabled="@(copyingId1 == invitation.Id)">
+                                                        @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 1)"
+                                                        disabled="@(copyingId1 == invitation.Id)">
                                                     @if (copyingId1 == invitation.Id)
                                                     {
                                                         <span class="spinner-border spinner-border-sm"></span>
@@ -291,8 +289,8 @@ else
                                                 </button>
 
                                                 <button class="btn btn-info d-inline-flex align-items-center gap-2 text-white"
-                                                @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 2)"
-                                                disabled="@(copyingId2 == invitation.Id)">
+                                                        @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 2)"
+                                                        disabled="@(copyingId2 == invitation.Id)">
                                                     @if (copyingId2 == invitation.Id)
                                                     {
                                                         <span class="spinner-border spinner-border-sm"></span>
@@ -306,7 +304,6 @@ else
                                                 </button>
                                             }
                                         </div>
-
                                     </div>
                                 </div>
                             </td>
@@ -325,6 +322,17 @@ else
                                 </button>
                             </td>
                         </tr>
+
+                        <!-- ======== FILA PARA DEDICATORIA ======== -->
+                        @if (!string.IsNullOrEmpty(invitation.Comments))
+                        {
+                            <tr>
+                                <td colspan="3" class="text-secondary" style="word-wrap: break-word;">
+                                    <strong>Dedicatoria:</strong> @invitation.Comments
+                                </td>
+                            </tr>
+                        }
+
                     }
                 }
                 else
@@ -355,6 +363,7 @@ else
 
                     </div>
                     <p class="mb-1"><strong>Mesa:</strong> @invitation.Table</p>
+                    <p class="mb-1"><strong>Dedicatoria:</strong> @invitation.Comments</p>
 
                     <div class="d-flex flex-wrap gap-1 mt-3">
                         @if (usarWhatsApp)
@@ -547,7 +556,7 @@ else
                                 <ValidationMessage For="@(() => NewInvitation.Table)" />
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Comentarios</label>
+                                <label class="form-label">Dedicatoria</label>
                                 <InputTextArea class="form-control" @bind-Value="NewInvitation.Comments" />
                                 <ValidationMessage For="@(() => NewInvitation.Comments)" />
                             </div>
@@ -555,7 +564,7 @@ else
 
                         <!--Inhabilitar los botones hasta que termine de enviar-->
                         <div class="modal-footer">
-                            <button type="submit" class="btn btn-custom">
+                            <button type="submit" class="btn btn-custom" disabled="@(isSavingInvitation)">
                                 Guardar
                             </button>
                             <button type="button" class="btn btn-secondary" @onclick="CloseModal">

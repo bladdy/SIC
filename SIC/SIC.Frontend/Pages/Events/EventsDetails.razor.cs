@@ -8,12 +8,8 @@ using SIC.Frontend.Repositories;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using System.Net;
-using System.Text.Encodings.Web;
 
 namespace SIC.Frontend.Pages.Events;
-
-//Todo: Agregar un loading para cuando se genera el excel
-//Todo: Agregar disable cuando se Crea o se actualiza una invitacion
 
 [Authorize(Roles = "Admin")]
 public partial class EventsDetails
@@ -27,6 +23,7 @@ public partial class EventsDetails
 
     private string copyButtonText = "Copiar Invitación";
     private bool usarWhatsApp = true;
+    private bool isSavingInvitation = false;
     private int currentPage = 1;
     private int totalPages;
     private bool isLoading = false;
@@ -173,6 +170,7 @@ public partial class EventsDetails
     private async Task SaveInvitation()
     {
         HttpResponseWrapper<object>? responseHttp;
+        isSavingInvitation = true;
 
         if (IsEditMode)
         {
@@ -208,6 +206,7 @@ public partial class EventsDetails
             IsEditMode ? "Inivitacion actualizada con éxito." : "Inivitacion creada con éxito.",
             SweetAlertIcon.Success
         );
+        isSavingInvitation = false;
         await LoadEvent();
         await LoadInvitations();
     }
