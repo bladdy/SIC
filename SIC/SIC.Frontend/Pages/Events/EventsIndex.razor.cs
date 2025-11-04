@@ -4,10 +4,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using SIC.Frontend.Repositories;
 using SIC.Shared.Entities;
-using SIC.Shared.Enums;
 using System.Net;
-using System.Net.Http.Json;
-
 namespace SIC.Frontend.Pages.Events
 {
     [Authorize(Roles = "Admin")]

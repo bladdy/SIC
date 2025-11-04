@@ -151,6 +151,11 @@
             await SweetAlertService.FireAsync("Error", "No se pudo guardar el evento.", SweetAlertIcon.Error);
             return;
         }
+        if ((HostUser.UserType.ToString() == "WeddingPlanner") && !response.Error)
+        {
+            HttpResponseWrapper<object>? responseHttps;
+            responseHttps = await Repository.PostAsync<object>($"api/UserCredits/consume/{NewEvent.UserId}/{NewEvent.Name}");
+        }
 
         await SweetAlertService.FireAsync("Éxito", "Evento creado correctamente.", SweetAlertIcon.Success);
         await OnSaved.InvokeAsync(NewEvent);
