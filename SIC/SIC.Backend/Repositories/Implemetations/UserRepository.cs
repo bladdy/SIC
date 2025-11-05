@@ -45,7 +45,7 @@ namespace SIC.Backend.Repositories.Implemetations
 
         public async Task<ActionResponse<IEnumerable<User>>> GetAsync(PaginationDTO pagination)
         {
-            var queryable = _context.Users
+            var queryable = _context.Users.Include(c => c.UserCredit)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(pagination.Filter))

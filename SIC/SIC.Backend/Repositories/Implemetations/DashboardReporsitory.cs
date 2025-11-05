@@ -214,7 +214,7 @@ public class DashboardReporsitory : IDashboardReporsitory
                 Confirmed = e.Invitations.Count(i => i.Status == Status.Attend),
                 Pending = e.Invitations.Count(i => i.Status == Status.Pending),
                 NotAttending = e.Invitations.Count(i => i.Status == Status.NotAttend),
-
+                Date = e.Date, 
                 // 🔹 Invitados (adultos + niños)
                 TotalGuests = e.Invitations.Sum(i => i.NumberAdults + i.NumberChildren),
                 ConfirmedGuests = e.Invitations
@@ -268,7 +268,7 @@ public class DashboardReporsitory : IDashboardReporsitory
                     Pending = x.Pending,
                     NotAttending = x.NotAttending,
                     TotalInvitations = x.TotalInvitations,
-
+                    Date = x.Date,
                     TotalGuests = x.TotalGuests,
                     ConfirmedGuests = x.ConfirmedGuests,
                     PendingGuests = x.PendingGuests,

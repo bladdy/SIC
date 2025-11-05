@@ -76,7 +76,7 @@ namespace SIC.Frontend.Pages.Events
                 EventTypes = response.Response;
         }
 
-        private async Task LoadEvents(int page)
+        private async Task LoadEvents(int page = 1)
         {
             if (!string.IsNullOrWhiteSpace(Page))
             {
@@ -91,7 +91,7 @@ namespace SIC.Frontend.Pages.Events
 
         private async Task LoadPagesAsync()
         {
-            var url = $"api/Events/totalRecords?RecordsNumber={RecordsNumber}";
+            var url = $"api/Events/totalRecords?PageSize={RecordsNumber}";
 
             if (!string.IsNullOrWhiteSpace(Filter))
             {

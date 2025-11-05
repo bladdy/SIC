@@ -7,7 +7,6 @@
                 <div class="card-body">
                     <h6>Mis Creditos</h6>
                     <h3>@UserCreditDTO?.AvailableCredits</h3>
-                    <small class="text-muted">Creditos disponibles</small>
                 </div>
             </div>
         </div>
@@ -16,12 +15,11 @@
                 <div class="card-body">
                     <h6>Mis Eventos</h6>
                     <h3>@PlannerDashboards.MyEventsCount</h3>
-                    <small class="text-muted">Asignados a ti</small>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-3 d-none">
             <div class="card shadow-sm text-center">
                 <div class="card-body">
                     <h6>Invitaciones (mis eventos)</h6>
@@ -31,7 +29,7 @@
             </div>
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-3 d-none">
             <div class="card shadow-sm text-center">
                 <div class="card-body">
                     <h6>Confirmadas</h6>
@@ -43,7 +41,7 @@
         <!-- Resumen de invitados del planner -->
         @if (PlannerDashboards != null)
         {
-            <div class="col-12 mt-3">
+            <div class="col-12 mt-3 d-none">
                 <div class="card shadow-sm">
                     <div class="card-body">
                         <h6 class="mb-3 text-center">Resumen de invitados</h6>
@@ -85,52 +83,34 @@
             </div>
         }
 
-        <!-- Top eventos progreso -->
-        <div class="col-md-6 col-12 mt-3">
-            <div class="card shadow-sm" style="height: 450px;">
-                <!-- Altura fija -->
+        <!-- Top eventos por invitados -->
+        <div class="col-12 mt-3">
+            <div class="card shadow-sm" style="height: 580px;">
                 <div class="card-body d-flex flex-column h-100">
-                    <h6 class="mb-3">Top 15 eventos por confirmaciones</h6>
+                    <h5 class="mb-3"><strong>Próximos eventos</strong></h5>
 
                     <!-- Contenido scrollable -->
                     <div class="flex-grow-1 overflow-auto">
                         @foreach (var e in TopEventsPage)
                         {
                             var total = e.TotalGuests > 0 ? e.TotalGuests : 1;
-                            var confirmedPercent = (int)((double)e.ConfirmedGuests / total * 100);
-                            var pendingPercent = (int)((double)e.PendingGuests / total * 100);
-                            var notAttendingPercent = (int)((double)e.NotAttendingGuests / total * 100);
+                            var confirmedPct = (double)e.ConfirmedGuests / total * 100;
+                            var pendingPct = (double)e.PendingGuests / total * 100;
+                            var notAttendPct = (double)e.NotAttendingGuests / total * 100;
 
                             <div class="mb-3">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <strong>@e.EventName</strong>
-                                    @if (e.TotalGuests > 0)
-                                    {
-                                        <small>@e.ConfirmedGuests confirmados de @e.TotalGuests invitados</small>
-                                    }
-                                    else
-                                    {
-                                        <small class="text-muted">Sin invitados</small>
-                                    }
+                                    <div>
+                                        <strong>@e.EventName</strong><br />
+                                        <small class="text-muted">@e.Date.ToString("dd/MM/yyyy")</small>
+                                    </div>
+                                    <small>@e.ConfirmedGuests confirmados / @e.TotalGuests invitados</small>
                                 </div>
 
                                 <div class="progress" style="height: 22px;">
-                                    @if (e.ConfirmedGuests > 0)
-                                    {
-                                        <div class="progress-bar bg-success" style="width: @confirmedPercent%">@e.ConfirmedGuests Confirmados</div>
-                                    }
-                                    @if (e.PendingGuests > 0)
-                                    {
-                                        <div class="progress-bar bg-warning text-dark" style="width: @pendingPercent%">@e.PendingGuests Pendientes</div>
-                                    }
-                                    @if (e.NotAttendingGuests > 0)
-                                    {
-                                        <div class="progress-bar bg-danger" style="width: @notAttendingPercent%">@e.NotAttendingGuests No asistirán</div>
-                                    }
-                                    @if (e.TotalGuests == 0)
-                                    {
-                                        <div class="progress-bar bg-secondary" style="width: 100%">Sin datos</div>
-                                    }
+                                    <div class="progress-bar bg-success" style="width:@confirmedPct%">@e.ConfirmedGuests</div>
+                                    <div class="progress-bar bg-warning text-dark" style="width:@pendingPct%">@e.PendingGuests</div>
+                                    <div class="progress-bar bg-danger" style="width:@notAttendPct%">@e.NotAttendingGuests</div>
                                 </div>
                             </div>
                         }
@@ -138,15 +118,19 @@
 
                     <!-- Botones fijos al fondo -->
                     <div class="d-flex justify-content-between mt-2">
-                        <button class="btn btn-sm btn-outline-primary" @onclick="PrevTopEvents" disabled="@(topEventsPage == 0)">Anterior</button>
-                        <button class="btn btn-sm btn-outline-primary" @onclick="NextTopEvents" disabled="@(topEventsPage >= TopEventsTotalPages - 1)">Siguiente</button>
+                        <button class="btn btn-sm btn-custom" @onclick="PrevTopEvents" disabled="@(topEventsPage == 0)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-compact-left"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M13 20l-3 -8l3 -8" /></svg>
+                        </button>
+                        <button class="btn btn-sm btn-custom" @onclick="NextTopEvents" disabled="@(topEventsPage >= TopEventsTotalPages - 1)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-compact-right"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M11 4l3 8l-3 8" /></svg>
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Próximos eventos -->
-        <div class="col-md-6 col-12 mt-3">
+        <div class="col-md-6 col-12 mt-3 d-none">
             <div class="card shadow-sm" style="height: 450px;">
                 <!-- Altura fija -->
                 <div class="card-body d-flex flex-column h-100">

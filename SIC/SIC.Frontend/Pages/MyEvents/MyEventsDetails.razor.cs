@@ -1,4 +1,4 @@
-//@page "/my-events/details/{Code}"
+﻿//@page "/my-events/details/{Code}"
 using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
@@ -17,33 +17,37 @@ namespace SIC.Frontend.Pages.MyEvents;
 [Authorize(Roles = "Admin,WeddingPlanner,User")]
 public partial class MyEventsDetails
 {
-    // Estados din�micos por ID
+    // Estados dinámicos por ID
     private int? loadingWhatsappId1;
 
     private int? loadingWhatsappId2;
     private int? copyingId1;
     private int? copyingId2;
 
-    private string copyButtonText = "Copiar Invitaci�n";
+    private string copyButtonText = "Copiar Invitación";
     private bool usarWhatsApp = true;
+    private bool isSavingInvitation = false;
     private int currentPage = 1;
     private int totalPages;
     private bool isLoading = false;
-    private Invitation NewInvitation = new();
-    private bool IsModalVisible = false;
-    private bool IsEditMode = false;
-
     private bool isLoadingImport = false;
-    private string? importResult;
-
     private bool hasFileSelected = false;
     private IBrowserFile? selectedFile;
+
+    private string? importResult;
+
+    private Invitation NewInvitation = new();
+    private bool IsModalVisible = false;
+    private bool IsModalExcelVisible = false;
+    private bool IsEditMode = false;
+    private bool DeleteRegister = false;
     private DateTime MinAllowedDate { get; set; } = new DateTime(2023, 1, 1); // Sets January 1, 2023 as the minimum
     public Event? EventDetail { get; set; }
     public List<Invitation>? Invitations { get; set; }
     [Inject] private IRepository Repository { get; set; } = default!;
     [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+
     [Inject] private IJSRuntime JsRuntime { get; set; } = default!;
 
     [Parameter, SupplyParameterFromQuery] public string Page { get; set; } = string.Empty;
@@ -64,6 +68,152 @@ public partial class MyEventsDetails
         await LoadInvitations(currentPage);
     }
 
+    private async Task ShowCreateModal()
+    {
+        NewInvitation = new Invitation();
+        NewInvitation.EventId = EventDetail!.Id;
+        IsEditMode = false;
+        IsModalVisible = true;
+    }
+
+    private void ShowModalExcel()
+    {
+        IsModalExcelVisible = true;
+    }
+
+    private void CloseModalExcel()
+    {
+        IsModalExcelVisible = false;
+    }
+
+    private void NavegateToMessage()
+    {
+        NavigationManager.NavigateTo($"/events/message-my-events/{EventDetail!.Code}");
+    }
+
+    private void ShowEditModal(Invitation invitation)
+    {
+        NewInvitation = new Invitation
+        {
+            Id = invitation.Id,
+            Code = invitation.Code,
+            Email = invitation.Email,
+            EventId = invitation.EventId,
+            PhoneNumber = invitation.PhoneNumber,
+            NumberAdults = invitation.NumberAdults,
+            NumberChildren = invitation.NumberChildren,
+            NumberConfirmedAdults = invitation.NumberConfirmedAdults,
+            NumberConfirmedChildren = invitation.NumberConfirmedChildren,
+            Table = invitation.Table,
+            Comments = invitation.Comments,
+            SentDate = invitation.SentDate,
+            ConfirmationDate = invitation.ConfirmationDate,
+            Name = invitation.Name,
+            Status = invitation.Status
+        };
+        IsEditMode = true;
+        IsModalVisible = true;
+    }
+
+    private void CloseModal()
+    {
+        IsModalVisible = false;
+    }
+
+    private async Task DeleteInvitation()
+    {
+        // 🔹 Confirmación antes de eliminar
+        var confirmResult = await SweetAlertService.FireAsync(new SweetAlertOptions
+        {
+            Title = "¿Eliminar invitación?",
+            Text = "Esta acción no se puede deshacer. ¿Deseas continuar?",
+            Icon = SweetAlertIcon.Warning,
+            ShowCancelButton = true,
+            ConfirmButtonText = "Sí, eliminar",
+            CancelButtonText = "Cancelar",
+            ConfirmButtonColor = "#d33",
+            CancelButtonColor = "#3085d6"
+        });
+
+        // Si el usuario cancela, no hacer nada
+        if (confirmResult.IsDismissed)
+            return;
+
+        // 🔹 Proceder con la eliminación
+        var responseHttp = await Repository.DeleteAsync<object>($"api/Invitations/{NewInvitation.Id}");
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync() ?? "No se pudo eliminar la invitación.";
+            await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        CloseModal();
+
+        // 🔹 Mostrar notificación tipo toast
+        var toast = SweetAlertService.Mixin(new SweetAlertOptions
+        {
+            Toast = true,
+            Position = SweetAlertPosition.TopEnd,
+            ShowConfirmButton = false,
+            Timer = 3000,
+            TimerProgressBar = true,
+        });
+
+        await toast.FireAsync(
+            "Éxito",
+            "Invitación eliminada con éxito.",
+            SweetAlertIcon.Success
+        );
+
+        await LoadEvent();
+        await LoadInvitations();
+    }
+
+    private async Task SaveInvitation()
+    {
+        HttpResponseWrapper<object>? responseHttp;
+        isSavingInvitation = true;
+
+        if (IsEditMode)
+        {
+            // PUT -> Editar
+            responseHttp = await Repository.PutAsync("api/Invitations/full", NewInvitation);
+        }
+        else
+        {
+            // POST -> Crear
+            responseHttp = await Repository.PostAsync("api/Invitations/full", NewInvitation);
+        }
+
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync() ?? "No se pudo guardar la Inivitacion.";
+            await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        CloseModal();
+
+        // Luego mostrar la notificación
+        var toast = SweetAlertService.Mixin(new SweetAlertOptions
+        {
+            Toast = true,
+            Position = SweetAlertPosition.TopEnd,
+            ShowConfirmButton = false,
+            Timer = 3000,
+            TimerProgressBar = true,
+        });
+        await toast.FireAsync(
+            "Éxito",
+            IsEditMode ? "Inivitacion actualizada con éxito." : "Inivitacion creada con éxito.",
+            SweetAlertIcon.Success
+        );
+        isSavingInvitation = false;
+        await LoadEvent();
+        await LoadInvitations();
+    }
+
     private async Task DescargarExcel()
     {
         try
@@ -73,7 +223,7 @@ public partial class MyEventsDetails
 
             if (content.Length > 0)
             {
-                await JsRuntime.DownloadFileAsync("reporte.xlsx", content);
+                await JsRuntime.DownloadFileAsync($"{EventDetail.Name}.xlsx", content);
             }
         }
         finally
@@ -116,28 +266,23 @@ public partial class MyEventsDetails
         }
         else
         {
-            await SweetAlertService.FireAsync("Error", "No se encontr� el mensaje de invitaci�n.", SweetAlertIcon.Error);
+            await SweetAlertService.FireAsync("Error", "No se encontró el mensaje de invitación.", SweetAlertIcon.Error);
             if (column == 1)
                 copyingId1 = null;
             else
                 copyingId2 = null;
-            copyButtonText = "Copiar Invitaci�n";
+            copyButtonText = "Copiar Invitación";
             return;
         }
         var url = $"https://wa.me/{phoneNumber}?text={Uri.EscapeDataString(mensaje)}";
 
         await JsRuntime.InvokeVoidAsync("window.open", url, "_blank");
 
-        await Task.Delay(1000); // peque�a pausa solo visual
+        await Task.Delay(1000); // pequeña pausa solo visual
         if (column == 1)
             loadingWhatsappId1 = null;
         else
             loadingWhatsappId2 = null;
-    }
-
-    private void NavegateToMessage()
-    {
-        NavigationManager.NavigateTo($"/events/message-my-events/{EventDetail!.Code}");
     }
 
     private async Task CopiarInvitacion(string codeinvitation, int invitationId, int column)
@@ -176,12 +321,12 @@ public partial class MyEventsDetails
         }
         else
         {
-            await SweetAlertService.FireAsync("Error", "No se encontr� el mensaje de invitaci�n.", SweetAlertIcon.Error);
+            await SweetAlertService.FireAsync("Error", "No se encontró el mensaje de invitación.", SweetAlertIcon.Error);
             if (column == 1)
                 copyingId1 = null;
             else
                 copyingId2 = null;
-            copyButtonText = "Copiar Invitaci�n";
+            copyButtonText = "Copiar Invitación";
             return;
         }
 
@@ -191,90 +336,11 @@ public partial class MyEventsDetails
         copyButtonText = "Mensaje copiado";
 
         await Task.Delay(1500); // Mostrar el mensaje copiado un momento
-        copyButtonText = "Copiar Invitaci�n";
+        copyButtonText = "Copiar Invitación";
         if (column == 1)
             copyingId1 = null;
         else
             copyingId2 = null;
-    }
-
-    private void ShowCreateModal()
-    {
-        NewInvitation = new Invitation();
-        NewInvitation.EventId = EventDetail!.Id;
-        IsEditMode = false;
-        IsModalVisible = true;
-    }
-
-    private void ShowEditModal(Invitation invitation)
-    {
-        NewInvitation = new Invitation
-        {
-            Id = invitation.Id,
-            Code = invitation.Code,
-            Email = invitation.Email,
-            EventId = invitation.EventId,
-            PhoneNumber = invitation.PhoneNumber,
-            NumberAdults = invitation.NumberAdults,
-            NumberChildren = invitation.NumberChildren,
-            NumberConfirmedAdults = invitation.NumberConfirmedAdults,
-            NumberConfirmedChildren = invitation.NumberConfirmedChildren,
-            Table = invitation.Table,
-            Comments = invitation.Comments,
-            SentDate = invitation.SentDate,
-            ConfirmationDate = invitation.ConfirmationDate,
-            Name = invitation.Name,
-            Status = invitation.Status
-        };
-        IsEditMode = true;
-        IsModalVisible = true;
-    }
-
-    private void CloseModal()
-    {
-        IsModalVisible = false;
-    }
-
-    private async Task SaveInvitation()
-    {
-        HttpResponseWrapper<object>? responseHttp;
-
-        if (IsEditMode)
-        {
-            // PUT -> Editar
-            responseHttp = await Repository.PutAsync("api/Invitations/full", NewInvitation);
-        }
-        else
-        {
-            // POST -> Crear
-            responseHttp = await Repository.PostAsync("api/Invitations/full", NewInvitation);
-        }
-
-        if (responseHttp.Error)
-        {
-            var message = await responseHttp.GetErrorMessageAsync() ?? "No se pudo guardar el Invitacion.";
-            await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
-            return;
-        }
-
-        CloseModal();
-
-        // Luego mostrar la notificaci�n
-        var toast = SweetAlertService.Mixin(new SweetAlertOptions
-        {
-            Toast = true,
-            Position = SweetAlertPosition.TopEnd,
-            ShowConfirmButton = false,
-            Timer = 3000,
-            TimerProgressBar = true,
-        });
-        await toast.FireAsync(
-            "�xito",
-            IsEditMode ? "Invitacion actualizada con �xito." : "Invitacion creada con �xito.",
-            SweetAlertIcon.Success
-        );
-
-        await LoadInvitations();
     }
 
     private void HandleFileSelected(InputFileChangeEventArgs e)
@@ -304,28 +370,45 @@ public partial class MyEventsDetails
             else
             {
                 responseHttp = await Repository.UploadFileAsync<object, ImportExcelResultDTO>(
-                        $"api/excel/ImportarExcel/{EventDetail!.Id}",
+                        $"api/excel/ImportarExcel/{EventDetail!.Id}/{DeleteRegister}",
                         stream,
                         selectedFile.Name
                     );
                 if (!responseHttp.Error)
                 {
                     var result = responseHttp.Response;
-                    importResult = $"? Archivo procesado: {result}";
-                    await SweetAlertService.FireAsync("Invitaciones",
+                    importResult = $"✅ Archivo procesado: {result}";
+                    /*await SweetAlertService.FireAsync("Invitaciones",
+
                             $"Agregadas: {result!.Agregadas}\n" +
                             $"Modificadas: {result!.Modificadas}\n" +
                             $"Errores: {result!.Errores}\n" +
                             $"Total procesadas: {result!.Total}\n\n" +
-                            "? Las invitaciones se actualizaron correctamente",
-                            SweetAlertIcon.Info);
-
+                            "✅ Las invitaciones se actualizaron correctamente",
+                            SweetAlertIcon.Info);*/
+                    await SweetAlertService.FireAsync(new SweetAlertOptions
+                    {
+                        Title = "Invitaciones",
+                        Html = $@"<div style='text-align:left; font-size:0.95rem; line-height:1.4;'>
+                                <ul style='padding-left:1.2rem; margin:0 0 0.6rem 0;'>
+                                    <li><strong>Agregadas:</strong> {result!.Agregadas}</li>
+                                    <li><strong>Modificadas:</strong> {result!.Modificadas}</li>
+                                    <li><strong>Eliminadas:</strong> {result!.Eliminadas} </li>
+                                    <li><strong>Errores:</strong> {result!.Errores}</li>
+                                    <li><strong> Total procesadas:</strong> {result!.Total}</li>
+                                </ul>
+                                <p style = 'margin-top:0.6rem;'>✅ <strong> Las invitaciones se actualizaron correctamente </strong></p>
+                            </div> ",
+                        Icon = SweetAlertIcon.Success,
+                        ConfirmButtonText = "Aceptar"
+                    });
+                    CloseModalExcel();
                     await LoadInvitations();
                 }
                 else
                 {
                     var error = responseHttp.Error;
-                    importResult = $"? Error: {error}";
+                    importResult = $"❌ Error: {error}";
                 }
             }
         }
@@ -403,7 +486,7 @@ public partial class MyEventsDetails
             return;
         }
 
-        // Backend ya devuelve total de p�ginas, no de registros
+        // Backend ya devuelve total de páginas, no de registros
         totalPages = responseHttp.Response;
     }
 

@@ -8,6 +8,7 @@ using System.Net;
 using System.Security.Claims;
 
 namespace SIC.Frontend.Pages.MyEvents;
+
 [Authorize(Roles = "Admin,WeddingPlanner,User")]
 public partial class MyEventsIndex
 {
@@ -104,6 +105,10 @@ public partial class MyEventsIndex
         {
             EventTypes = responseHttp.Response;
         }
+        else
+        {
+            EventTypes = new List<EventType>(); // Inicializa como lista vacía si no se obtiene información
+        }
     }
 
     private async Task ShowCreateModal()
@@ -117,7 +122,9 @@ public partial class MyEventsIndex
 
             NewEvent = new Event
             {
-                UserId = userId ?? string.Empty
+                UserId = userId ?? string.Empty,
+                Host = "",
+                HostPhone = ""
             };
         }
         else
@@ -159,7 +166,7 @@ public partial class MyEventsIndex
 
     private async Task LoadPagesAsync()
     {
-        var url = $"api/Events/totalRecords?RecordsNumber={RecordsNumber}";
+        var url = $"api/Events/totalRecords?PageSize={RecordsNumber}&UserId={_userId}";
 
         if (!string.IsNullOrWhiteSpace(Filter))
         {
@@ -279,7 +286,7 @@ public partial class MyEventsIndex
             SweetAlertIcon.Success
         );
 
-        await LoadEvents();
+        await LoadEvents(currentPage);
     }
 
     private async Task ConfirmDelete(Event events)

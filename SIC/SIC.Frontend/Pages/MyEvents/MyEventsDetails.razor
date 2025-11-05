@@ -9,17 +9,20 @@
 }
 else
 {
-    <div class="card shadow-lg border-0 rounded-3 mb-3">
+    <div class="card shadow-lg border-0 rounded-3 mb-3 ">
         <!-- Header: título, subtítulo, tipo y estado -->
-        <div class="card-header text-white" style="background-color:#3C6A79;">
-            <div class="d-flex justify-content-between align-items-start flex-wrap">
+        <div class="card-header text-white position-relative" style="background-color:#3C6A79;">
+            <div class="d-flex justify-content-between align-items-stretch flex-wrap">
                 <div>
                     <h4 class="mb-0">@EventDetail.Name</h4>
                     <small>@EventDetail.SubTitle</small>
+                    <div><strong>@EventDetail.User!.UserType.GetDescription():</strong> @EventDetail.User!.FullName</div>
+                    <p class="mb-1"><strong>Evento:</strong> @EventDetail.EventType?.Name</p>
+                    <p class="mb-1"><strong>Fecha:</strong> @EventDetail.Date.ToString("dd/MM/yyyy")</p>
                 </div>
-                <div class="text-end">
-                    <p class="mb-1"><strong>Tipo:</strong> @EventDetail.EventType?.Name</p>
-                    <p class="mb-0">
+
+                <div class="text-end d-flex flex-column justify-content-end">
+                    <p class="mb-1">
                         <strong>Estado:</strong>
                         <span class="badge bg-@(EventDetail.Status == Status.Active ? "success" : "secondary")">
                             @EventDetail.Status.GetDescription()
@@ -27,61 +30,52 @@ else
                     </p>
                 </div>
             </div>
+
+            <!-- Botón QR: versión escritorio -->
+            <a href="/events/register-event/invitations-entries/@EventDetail.Code"
+               class="btn btn-sm text-white position-absolute top-0 end-0 mt-2 me-2 d-none d-md-inline-flex align-items-center"
+               style="background-color:#1F4854; border-color:white;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     class="me-1">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h3v3h3v3h-6z" />
+                </svg>
+                Scan QR
+            </a>
+
+            <!-- Botón QR: versión móvil -->
+            <a href="/events/register-event/invitations-entries/@EventDetail.Code"
+               class="btn btn-sm text-white mt-2 px-4 position-absolute bottom-0 end-0 mb-2 me-2 d-block d-md-none align-items-center"
+               style="background-color:#1F4854; border-color:white;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     class="me-1">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h3v3h3v3h-6z" />
+                </svg>
+                Scan QR
+            </a>
+
         </div>
+
 
         <!-- Body: Información detallada -->
         <div class="card-body">
 
             <!-- ======================== -->
-            <!-- SECCIÓN 1: Fecha, Hora, Planner -->
-            <!-- ======================== -->
-            <div class="row g-3 mb-3">
-                <!-- Fecha -->
-                <div class="col-12 col-md-4">
-                    <p class="d-flex justify-content-between align-items-center px-3 py-1 ">
-                        <strong>Fecha:</strong>
-                        <span>@EventDetail.Date.ToString("dd/MM/yyyy")</span>
-                    </p>
-                </div>
-
-                <!-- Hora -->
-                <div class="col-12 col-md-4">
-                    <p class="d-flex justify-content-between align-items-center px-3 py-1">
-                        <strong>Hora:</strong>
-                        <span>@DateTime.Today.Add(EventDetail.Time).ToString("hh:mm tt")</span>
-                    </p>
-                </div>
-
-                <!-- Planner -->
-                <div class="col-12 col-md-4">
-                    <p class="d-flex justify-content-between align-items-center px-3 py-1 ">
-                        <strong>Planner:</strong>
-                        @if (!string.IsNullOrEmpty(EventDetail.Planner))
-                        {
-                            <span>@($"{EventDetail.Planner} ({EventDetail.PlannerPhone})")</span>
-                        }
-                        else
-                        {
-                            <em>No asignado</em>
-                        }
-                    </p>
-                </div>
-            </div>
-
-            <!-- ======================== -->
             <!-- SECCIÓN 2: Invitados -->
             <!-- ======================== -->
-            <div class="row g-3 mb-3">
+            <div class="row text-center align-items-stretch g-1 g-md-3 mt-0">
                 <!-- Invitados -->
-                <div class="col-12 col-md-4">
+                <div class="col-12 col-md-4 mb-0">
                     <p class="d-flex justify-content-between px-3 py-1 text-white" style="background-color:#3C6A79;">
                         <strong>Invitados:</strong>
                         <span>@(EventDetail.NumberAdults + EventDetail.NumberChildren)</span>
                     </p>
                 </div>
-
                 <!-- Adultos -->
-                <div class="col-12 col-md-4">
+                <div class="col-6 col-md-4">
                     <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#3C6A79;">
                         <strong>Adultos:</strong>
                         <span>@EventDetail.NumberAdults</span>
@@ -89,55 +83,56 @@ else
                 </div>
 
                 <!-- Niños -->
-                <div class="col-12 col-md-4">
+                <div class="col-6 col-md-4">
                     <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#3C6A79;">
                         <strong>Niños:</strong>
                         <span>@EventDetail.NumberChildren</span>
                     </p>
                 </div>
+
             </div>
 
             <!-- ======================== -->
             <!-- SECCIÓN 3: Confirmaciones -->
             <!-- ======================== -->
-            <div class="row g-3 text-center">
-                <!-- Pendientes -->
-                <div class="col-12 col-md">
-                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-secondary">
-                        <strong>Pendientes:</strong>
-                        <span>@(EventDetail.NumberAdultsPending + EventDetail.NumberChildrenPending)</span>
-                    </p>
-                </div>
-
-                <!-- No asistiré -->
-                <div class="col-12 col-md">
-                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-danger">
-                        <strong>No asistiré:</strong>
-                        <span>@(EventDetail.NumberAdultsNotAttend + EventDetail.NumberChildrenNotAttend)</span>
-                    </p>
-                </div>
-
-                <!-- Sí asistiré (Adultos) -->
-                <div class="col-12 col-md">
+            <div class="row text-center align-items-stretch g-1 g-md-3 mt-0">
+                <!-- (Sí asistiré) -->
+                <div class="col-12 col-md-4 m-0">
                     <p class="d-flex justify-content-between px-3 py-1 text-white bg-success">
-                        <strong>Sí asistiré (Adultos):</strong>
+                        <strong>Total SÍ ASISTIRÉ:</strong>
+                        <span>@(EventDetail.NumberAdultsConfirmed + EventDetail.NumberChildrenConfirmed)</span>
+                    </p>
+                </div>
+
+                <!-- Adultos (Sí asistiré) -->
+                <div class="col-6 col-md-4 m-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-success ">
+                        <strong>Adultos:</strong>
                         <span>@EventDetail.NumberAdultsConfirmed</span>
                     </p>
                 </div>
 
-                <!-- Sí asistiré (Niños) -->
-                <div class="col-12 col-md">
-                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-success">
-                        <strong>Sí asistiré (Niños):</strong>
+                <!-- Niños (Sí asistiré) -->
+                <div class="col-6 col-md-4 m-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-success ">
+                        <strong>Niños:</strong>
                         <span>@EventDetail.NumberChildrenConfirmed</span>
                     </p>
                 </div>
 
-                <!-- Sí asistiré (Total) -->
-                <div class="col-12 col-md">
-                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-success">
-                        <strong>Sí asistiré (Total):</strong>
-                        <span>@(EventDetail.NumberAdultsConfirmed + EventDetail.NumberChildrenConfirmed)</span>
+                <!-- No asistiré -->
+                <div class="col-12 col-md-4 m-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-danger ">
+                        <strong>Total NO ASISTIRÉ:</strong>
+                        <span>@(EventDetail.NumberAdultsNotAttend + EventDetail.NumberChildrenNotAttend)</span>
+                    </p>
+                </div>
+
+                <!-- Pendientes -->
+                <div class="col-12 col-md-4 m-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-warning ">
+                        <strong>Pendientes:</strong>
+                        <span>@(EventDetail.NumberAdultsPending + EventDetail.NumberChildrenPending)</span>
                     </p>
                 </div>
             </div>
@@ -145,49 +140,52 @@ else
         </div>
 
         <!-- Footer: Botones de acción -->
-        <div class="card-footer d-flex justify-content-end flex-wrap gap-2">
-            <button class="btn btn-sm btn-custom" @onclick="ShowCreateModal">Agregar Invitado</button>
-            <button class="btn btn-sm btn-custom" @onclick="NavegateToMessage">Mensajes</button>
+        <div class="card-footer d-flex justify-content-center flex-wrap gap-2">
+            <div class="text-center">
+                <!-- Título centrado arriba -->
+                <h4 class="mb-1">Crear Lista de Invitados</h4>
 
-            <button class="btn btn-sm btn-custom" @onclick="DescargarExcel" disabled="@isLoading">
-                @if (isLoading)
-                {
-                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    <span> Generando... </span>
-                }
-                else
-                {
-                    <span>Exportar Excel</span>
-                }
-            </button>
+                <!-- Contenedor responsive -->
+                <div class="d-flex flex-column flex-lg-row justify-content-center align-items-center  gap-2 mt-2">
+                    <!-- En mobile: los botones se apilan como indicas -->
+                    <!-- En PC: se ponen en una fila juntos debajo del título -->
+                    <div class="d-flex justify-content-center gap-2 mb-2 mb-lg-0">
+                        <button class="btn btn-sm btn-custom" @onclick="DescargarExcel" disabled="@isLoading">
+                            @if (isLoading)
+                            {
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                <span> Generando... </span>
+                            }
+                            else
+                            {
+                                <span>Exportar Excel</span>
+                            }
+                        </button>
+                        <button class="btn btn-sm btn-custom" @onclick="ShowModalExcel">Importar Excel</button>
+                    </div>
 
-            <div class="d-flex gap-2 align-items-center">
-                <InputFile class="form-control form-control-sm" style="width: 200px;" OnChange="HandleFileSelected" />
-                <button class="btn btn-sm btn-custom" @onclick="SubirExcel" disabled="@(!hasFileSelected || isLoadingImport)">
-                    @if (isLoadingImport)
-                    {
-                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                        <span> Cargando... </span>
-                    }
-                    else
-                    {
-                        <span>Cargar Lista de Invitados</span>
-                    }
-                </button>
+                    <!-- Botón que en móvil queda debajo, pero en escritorio en la misma fila -->
+                    <div>
+                        <button class="btn btn-sm btn-custom" @onclick="ShowCreateModal">Agregar Invitado</button>
+                    </div>
+                </div>
             </div>
 
-            <a href="/my-events/register-intations-by-event/@EventDetail.Code" class="btn btn-sm btn-custom d-none">Scan QR</a>
         </div>
     </div>
 
     <h4 class="mb-0">Lista de Invitados</h4>
     ﻿﻿
     <!--<Filter PlaceHolder="Buscar Invitacion..." Callback=@FilterCallBack /> 25d366-->
-    ﻿﻿<div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center;">
+    ﻿﻿<div class="mb-2 gap-2" style="display: flex; flex-wrap:wrap; align-items: center;">
         <input style="width:400px;" type="text" class="form-control" placeholder="Buscar Invitacion..." @bind-value="Filter">
-        <button type="button" class="btn btn-custom  mx-1" @onclick="ApplyFilterAsync"><i class="bi bi-funnel" /> Filtrar</button>
-        <button type="button" class="btn btn-custom " @onclick="CleanFilterAsync"><i class="bi bi-x-circle" /> Limpiar</button>
-        <div class="form-check form-switch mx-1">
+        <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center; justify-content: start;">
+            <button type="button" class="btn btn-custom" style="display: flex; align-items: center; gap: 4px;" @onclick="ApplyFilterAsync"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-search"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg> Buscar</button>
+            <button type="button" class="btn btn-custom" style="display: flex; align-items: center; gap: 4px;" @onclick="CleanFilterAsync"><i class="bi bi-x-circle" /> Limpiar</button>
+            <button type="button" class="btn btn-custom mt-2 mt-lg-0" style="display: flex; align-items: center; gap: 4px;" @onclick="NavegateToMessage"> <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-mail"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" /><path d="M3 7l9 6l9 -6" /></svg>Mensajes</button>
+
+        </div>
+        <div class="form-check form-switch">
             <input class="form-check-input btn-custom" type="checkbox" id="chkUsarWhatsApp" @bind="usarWhatsApp" />
             <label class="form-check-label fw-bold" for="chkUsarWhatsApp">
                 @(usarWhatsApp ? "Modo: Enviar por WhatsApp" : "Modo: Copiar al Portapapeles")
@@ -216,13 +214,11 @@ else
                             <td style="white-space: normal; vertical-align: top;">
                                 <div class="container-fluid">
                                     <div class="row g-3 small text-secondary">
-
                                         <!-- ===== COLUMNA 1 ===== -->
                                         <div class="col-12 col-md-4 d-flex flex-column">
                                             <div>
                                                 <strong>Código:</strong>
-                                                <a style="color:#3C6A79; cursor:pointer;"
-                                                   @onclick="() => ShowEditModal(invitation)">
+                                                <a style="color:#3C6A79; cursor:pointer;" @onclick="() => ShowEditModal(invitation)">
                                                     @invitation.Code
                                                 </a>
                                             </div>
@@ -255,7 +251,7 @@ else
                                                     else
                                                     {
                                                         <i class="bi bi-whatsapp"></i>
-                                                        <span>Invitación</span>
+                                                        <span>Invitar</span>
                                                     }
                                                 </button>
 
@@ -271,7 +267,7 @@ else
                                                     else
                                                     {
                                                         <i class="bi bi-whatsapp"></i>
-                                                        <span>Aviso</span>
+                                                        <span>Avisar</span>
                                                     }
                                                 </button>
                                             }
@@ -288,7 +284,7 @@ else
                                                     else
                                                     {
                                                         <i class="bi bi-clipboard"></i>
-                                                        <span>Invitación</span>
+                                                        <span>Invitar</span>
                                                     }
                                                 </button>
 
@@ -303,12 +299,11 @@ else
                                                     else
                                                     {
                                                         <i class="bi bi-clipboard"></i>
-                                                        <span>Aviso</span>
+                                                        <span>Avisar</span>
                                                     }
                                                 </button>
                                             }
                                         </div>
-
                                     </div>
                                 </div>
                             </td>
@@ -327,6 +322,17 @@ else
                                 </button>
                             </td>
                         </tr>
+
+                        <!-- ======== FILA PARA DEDICATORIA ======== -->
+                        @if (!string.IsNullOrEmpty(invitation.Comments))
+                        {
+                            <tr>
+                                <td colspan="3" class="text-secondary" style="word-wrap: break-word;">
+                                    <strong>Dedicatoria:</strong> @invitation.Comments
+                                </td>
+                            </tr>
+                        }
+
                     }
                 }
                 else
@@ -351,38 +357,40 @@ else
                             @invitation.Status.GetDescription()
                         </span>
                     </div>
-                    <p class="mb-1"><strong>Código:</strong> @invitation.Code</p>
-                    <p class="mb-1"><strong>Móvil:</strong> @invitation.PhoneNumber</p>
-                    <p class="mb-1"><strong>Adultos:</strong> @invitation.NumberAdults (@invitation.NumberConfirmedAdults confirmados)</p>
-                    <p class="mb-1"><strong>Niños:</strong> @invitation.NumberChildren (@invitation.NumberConfirmedChildren confirmados)</p>
-                    <p class="mb-1"><strong>Mesa:</strong> @invitation.Table</p>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <p class="mb-0"><strong>Adultos:</strong> @invitation.NumberAdults (@invitation.NumberConfirmedAdults conf.)</p>
+                        <p class="mb-0"><strong>Niños:</strong> @invitation.NumberChildren (@invitation.NumberConfirmedChildren conf.)</p>
 
-                    <div class="d-flex flex-wrap gap-2 mt-3">
+                    </div>
+                    <p class="mb-1"><strong>Mesa:</strong> @invitation.Table</p>
+                    <p class="mb-1"><strong>Dedicatoria:</strong> @invitation.Comments</p>
+
+                    <div class="d-flex flex-wrap gap-1 mt-3">
                         @if (usarWhatsApp)
                         {
-                            <button class="btn d-flex align-items-center gap-2 flex-fill" style="background-color:#25d366; color:white;"
+                            <button class="btn d-flex align-items-center gap-1 flex-fill" style="background-color:#25d366; color:white;"
                                     @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)">
-                                <i class="bi bi-whatsapp"></i> Invitación
+                                <i class="bi bi-whatsapp"></i> Invitar
                             </button>
-                            <button class="btn d-flex align-items-center gap-2 flex-fill" style="background-color:#25d366; color:white;"
+                            <button class="btn d-flex align-items-center gap-1 flex-fill" style="background-color:#25d366; color:white;"
                                     @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 2)">
                                 <i class="bi bi-whatsapp"></i> Aviso
                             </button>
                         }
                         else
                         {
-                            <button class="btn btn-info flex-fill text-white"
+                            <button class="btn btn-info d-flex align-items-center gap-1 flex-fill text-white"
                                     @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 1)">
-                                <i class="bi bi-clipboard"></i> Invitación
+                                <i class="bi bi-clipboard"></i> Invitar
                             </button>
-                            <button class="btn btn-info flex-fill text-white"
+                            <button class="btn btn-info fd-flex align-items-center gap-1 flex-fill text-white"
                                     @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 2)">
                                 <i class="bi bi-clipboard"></i> Aviso
                             </button>
                         }
 
-                        <button class="btn btn-custom flex-fill" @onclick="() => ShowEditModal(invitation)">
-                            Editar
+                        <button class="btn btn-custom d-flex align-items-center gap-1 flex-fill" @onclick="() => ShowEditModal(invitation)">
+                            <i class="bi bi-pencil-fill"></i>Editar
                         </button>
                     </div>
                 </div>
@@ -390,13 +398,77 @@ else
         }
     </div>
 
-
     <div class="d-flex justify-content-center my-3">
         <Pagination CurrentPage="currentPage"
                     TotalPages="totalPages"
                     SelectedPage="SelectedPageAsync" />
 
     </div>
+}
+@if (IsModalExcelVisible)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Importar Excel
+                    </h5>
+                    <button type="button" class="btn-close" @onclick="CloseModalExcel"></button>
+                </div>
+
+
+                <div class="modal-body">
+                    <div class="d-flex flex-column gap-2">
+                        <div class="d-flex flex-column gap-2">
+                            <!-- InputFile oculto -->
+                            <InputFile class="d-none" id="fileInput" OnChange="HandleFileSelected" />
+
+                            <!-- Label que actúa como botón -->
+                            <label for="fileInput" class="form-control form-control-sm w-100 text-center" style="cursor:pointer;">
+                                Elige un archivo
+                            </label>
+                            <!-- Checkbox con label en la misma línea y centrado vertical -->
+                            <div class="form-check d-flex align-items-center gap-2">
+                                <input class="form-check-input custom" type="checkbox"
+                                       id="deleteRegisterCheck"
+                                       checked="@DeleteRegister"
+                                       @onchange="(e) => DeleteRegister = e.Value is bool value && value" />
+                                <label class="form-check-label mb-0" for="deleteRegisterCheck">
+                                    Eliminar los registros que no estén en el Excel.
+                                </label>
+                            </div>
+                            <!-- Botón de carga -->
+                            <button class="btn btn-sm btn-custom w-100"
+                                    @onclick="SubirExcel" disabled="@(!hasFileSelected || isLoadingImport)">
+                                @if (isLoadingImport)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    <span>Cargando...</span>
+                                }
+                                else
+                                {
+                                    <span>Cargar Lista de Invitados</span>
+                                }
+                            </button>
+                        </div>
+                    </div>
+
+
+
+                </div>
+                <div class="modal-footer">
+
+                    <button type="button" class="btn btn-secondary" @onclick="CloseModalExcel">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
 }
 <!-- Modal -->
 @if (IsModalVisible)
@@ -422,72 +494,89 @@ else
                             <ValidationMessage For="@(() => NewInvitation.Name)" />
                         </div>
                         <div class="mb-3 row">
-                            <div class="col-auto">
+                            <div class="col-auto d-none">
                                 <label class="form-label">Email</label>
-                                <InputText class="form-control" @bind-Value="NewInvitation.Email" />
+                                <InputText class="form-control" @bind-Value="NewInvitation.Email" placeholder="Como estará rotulada la invitacion" />
                                 <ValidationMessage For="@(() => NewInvitation.Email)" />
                             </div>
-                            <div class="col-auto">
-                                <label class="form-label">Telefono</label>
-                                <InputText class="form-control" @bind-Value="NewInvitation.PhoneNumber" />
-                                <ValidationMessage For="@(() => NewInvitation.PhoneNumber)" />
-                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">WhasApp</label>
+                            <InputText class="form-control" @bind-Value="NewInvitation.PhoneNumber" placeholder="Número de WhasApp" />
+                            <ValidationMessage For="@(() => NewInvitation.PhoneNumber)" />
                         </div>
                         <div class="mb-3 row col-12">
-                            <div class="col-3">
-                                <label class="form-label">Numero de adultos</label>
+                            <div class="col-6">
+                                <label class="form-label">Adultos</label>
                                 <InputNumber class="form-control" @bind-Value="NewInvitation.NumberAdults" />
                                 <ValidationMessage For="@(() => NewInvitation.NumberAdults)" />
                             </div>
-                            <div class="col-3">
-                                <label class="form-label">Numero de Niños</label>
+                            <div class="col-6">
+                                <label class="form-label">Niños</label>
                                 <InputNumber class="form-control" @bind-Value="NewInvitation.NumberChildren" />
                                 <ValidationMessage For="@(() => NewInvitation.NumberChildren)" />
                             </div>
-                            <div class="col-3">
-                                <label class="form-label">N° adultos Confirmados</label>
-                                <InputNumber class="form-control" @bind-Value="NewInvitation.NumberConfirmedAdults" />
-                                <ValidationMessage For="@(() => NewInvitation.NumberConfirmedAdults)" />
-                            </div>
-                            <div class="col-3">
-                                <label class="form-label">N° Niños Confirmados</label>
-                                <InputNumber class="form-control" @bind-Value="NewInvitation.NumberConfirmedChildren" />
-                                <ValidationMessage For="@(() => NewInvitation.NumberConfirmedChildren)" />
-                            </div>
                         </div>
+                        @if (IsEditMode)
+                        {
+                            <div class="dropdown-divider mb-2"></div>
+                            <h5 class="mb-2">Respuesta de confirmación</h5>
 
-                        <div class="mb-3">
-                            <label class="form-label">Estado</label>
-                            <InputSelect class="form-select" @bind-Value="NewInvitation.Status">
-                                <option value="">-- Selecciona un Estado --</option>
-                                @foreach (var status in Enum.GetValues<Status>()
+                            <div class="mb-3">
+                                <label class="form-label">Estado</label>
+                                <InputSelect class="form-select" @bind-Value="NewInvitation.Status">
+                                    <option value="">-- Selecciona un Estado --</option>
+                                    @foreach (var status in Enum.GetValues<Status>()
                             .Where(s => s == Status.NotAttend || s == Status.Pending || s == Status.Attend || s == Status.Warned))
-                                {
-                                    <option value="@status">@status.GetDescription()</option>
-                                }
-                            </InputSelect>
-                            <ValidationMessage For="@(() => NewInvitation.Status)" />
-                        </div>
+                                    {
+                                        <option value="@status">@status.GetDescription()</option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => NewInvitation.Status)" />
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Mesa</label>
-                            <InputText class="form-control" @bind-Value="NewInvitation.Table" />
-                            <ValidationMessage For="@(() => NewInvitation.Table)" />
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Comentarios</label>
-                            <InputTextArea class="form-control" @bind-Value="NewInvitation.Comments" />
-                            <ValidationMessage For="@(() => NewInvitation.Comments)" />
-                        </div>
+                            <div class="mb-3 row col-12">
+                                <div class="col-6">
+                                    <label class="form-label">Adultos</label>
+                                    <InputNumber class="form-control" @bind-Value="NewInvitation.NumberConfirmedAdults" />
+                                    <ValidationMessage For="@(() => NewInvitation.NumberConfirmedAdults)" />
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">Niños</label>
+                                    <InputNumber class="form-control" @bind-Value="NewInvitation.NumberConfirmedChildren" />
+                                    <ValidationMessage For="@(() => NewInvitation.NumberConfirmedChildren)" />
+                                </div>
+
+                            </div>
+
+
+                            <div class="mb-3">
+                                <label class="form-label">Mesa</label>
+                                <InputText class="form-control" @bind-Value="NewInvitation.Table" />
+                                <ValidationMessage For="@(() => NewInvitation.Table)" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Dedicatoria</label>
+                                <InputTextArea class="form-control" @bind-Value="NewInvitation.Comments" />
+                                <ValidationMessage For="@(() => NewInvitation.Comments)" />
+                            </div>
+                        }
 
                         <!--Inhabilitar los botones hasta que termine de enviar-->
                         <div class="modal-footer">
-                            <button type="submit" class="btn btn-custom">
+                            <button type="submit" class="btn btn-custom" disabled="@(isSavingInvitation)">
                                 Guardar
                             </button>
                             <button type="button" class="btn btn-secondary" @onclick="CloseModal">
                                 Cancelar
                             </button>
+                            @if (IsEditMode)
+                            {
+                                <button type="button" class="btn btn-danger" @onclick="DeleteInvitation">
+                                    Eliminar
+                                </button>
+
+                            }
                         </div>
                     </EditForm>
                 </div>

@@ -28,7 +28,15 @@
                                 <option value="">-- Selecciona un usuario --</option>
                                 @foreach (var user in FilteredUsers)
                                 {
-                                    <option value="@user.Id">@user.FullName (@user.UserType.GetDescription())</option>
+                                    <option value="@user.Id">@user.FullName (@user.UserType.GetDescription())
+                                        @if (@user.UserCredit != null)
+                                        {
+                                            <span>
+                                                - Cretidos: (@user.UserCredit?.AvailableCredits)
+                                            </span>
+                                        }
+
+                                    </option>
                                 }
                             </select>
                         </div>
@@ -138,11 +146,21 @@
             return;
         }
         var HostUser = AllUsers.FirstOrDefault(u => u.Id == NewEvent.UserId);
+
         if (HostUser == null)
         {
             await SweetAlertService.FireAsync("Error", "El usuario asignado no es válido.", SweetAlertIcon.Error);
             return;
         }
+        if (HostUser.UserCredit != null)
+        {
+            if ((HostUser.UserType.ToString() == "WeddingPlanner") && (HostUser.UserCredit?.AvailableCredits <= 0))
+            {
+                await SweetAlertService.FireAsync("Error", "El usuario asignado no tiene creditos dis ponibles.", SweetAlertIcon.Error);
+                return;
+            }
+        }
+        
         NewEvent.Host = HostUser.FullName;
         NewEvent.HostPhone = HostUser.PhoneNumber!;
         var response = await Repository.PostAsync("api/Events/full", NewEvent);

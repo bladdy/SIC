@@ -45,6 +45,8 @@ namespace SIC.Shared.DTOs
             public int ConfirmedGuests { get; set; }         // Confirmados (adultos + niños)
             public int PendingGuests { get; set; }           // Pendientes (adultos + niños)
             public int NotAttendingGuests { get; set; }      // No asistirán (adultos + niños)
+            public DateTime Date { get; set; }
+
         }
     }
 }
