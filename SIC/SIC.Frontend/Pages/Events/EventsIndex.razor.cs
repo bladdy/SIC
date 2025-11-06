@@ -254,6 +254,14 @@ namespace SIC.Frontend.Pages.Events
                 await SweetAlertService.FireAsync("Error", "El usuario asignado no es válido.", SweetAlertIcon.Error);
                 return;
             }
+            if (HostUser.UserCredit != null)
+            {
+                if ((HostUser.UserType.ToString() == "WeddingPlanner") && (HostUser.UserCredit?.AvailableCredits <= 0))
+                {
+                    await SweetAlertService.FireAsync("Error", "El usuario asignado no tiene creditos dis ponibles.", SweetAlertIcon.Error);
+                    return;
+                }
+            }
             NewEvent.Host = HostUser.FullName;
             NewEvent.HostPhone = HostUser.PhoneNumber!;
             HttpResponseWrapper<object>? response;
@@ -268,10 +276,15 @@ namespace SIC.Frontend.Pages.Events
                 await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
                 return;
             }
-
+            if ((HostUser.UserType.ToString() == "WeddingPlanner") && !response.Error)
+            {
+                HttpResponseWrapper<object>? responseHttps;
+                responseHttps = await repository.PostAsync<object>($"api/UserCredits/consume/{NewEvent.UserId}/{NewEvent.Name}");
+            }
             await SweetAlertService.FireAsync("Éxito", IsEditMode ? "Evento actualizado." : "Evento creado.", SweetAlertIcon.Success);
             CloseModal();
             await LoadEvents(currentPage);
+            await LoadUsersAsync();
         }
     }
 }

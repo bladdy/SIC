@@ -8,8 +8,7 @@ public class User : IdentityUser
 {
     [Display(Name = "Documento")]
     [MaxLength(20, ErrorMessage = "El campo {0} debe tener máximo {1} caractéres.")]
-    [Required(ErrorMessage = "El campo {0} es obligatorio.")]
-    public string Document { get; set; } = null!;
+    public string? Document { get; set; }
 
     [Display(Name = "Nombres")]
     [MaxLength(50, ErrorMessage = "El campo {0} debe tener máximo {1} caractéres.")]
@@ -23,8 +22,7 @@ public class User : IdentityUser
 
     [Display(Name = "Dirección")]
     [MaxLength(200, ErrorMessage = "El campo {0} debe tener máximo {1} caractéres.")]
-    [Required(ErrorMessage = "El campo {0} es obligatorio.")]
-    public string Address { get; set; } = null!;
+    public string? Address { get; set; }
 
     [Display(Name = "Tipo de usuario")]
     [Required(ErrorMessage = "El campo {0} es obligatorio.")]

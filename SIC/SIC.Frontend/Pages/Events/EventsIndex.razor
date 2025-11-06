@@ -187,7 +187,16 @@
                                 <option value="">-- Selecciona un usuario --</option>
                                 @foreach (var user in FilteredUsers)
                                 {
-                                    <option value="@user.Id">@user.FullName (@user.UserType.GetDescription())</option>
+                                    <option value="@user.Id">
+                                        @user.FullName (@user.UserType.GetDescription())
+                                        @if (@user.UserCredit != null)
+                                        {
+                                            <span>
+                                                - Cretidos: (@user.UserCredit?.AvailableCredits)
+                                            </span>
+                                        }
+
+                                    </option>
                                 }
                             </select>
                         </div>

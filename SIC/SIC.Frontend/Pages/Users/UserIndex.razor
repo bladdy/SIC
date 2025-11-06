@@ -41,11 +41,7 @@
             <thead class="text-center" style="background-color:#3C6A79; color: white;">
                 <tr>
                     <th>Usuario</th>
-                    <th>Documento</th>
                     <th>Teléfono</th>
-                    <th>Email</th>
-                    <th>Dirección</th>
-                    <th>Confirmado</th>
                     <th>Tipo Usuario</th>
                     <th>Acciones</th>
                 </tr>
@@ -61,11 +57,7 @@
                     {
                         <tr>
                             <td>@user.FullName</td>
-                            <td>@user.Document</td>
                             <td>@user.PhoneNumber</td>
-                            <td>@user.Email</td>
-                            <td>@user.Address</td>
-                            <td>@(user.EmailConfirmed ? "Sí" : "No")</td>
                             <td>@user.UserType.GetDescription()</td>
                             <td class="text-center">
                                 <button @onclick="() => ShowEditModal(user)" class="btn btn-sm btn-custom me-2">

@@ -35,9 +35,11 @@ namespace SIC.Frontend.Pages.Users
         [Inject] private SweetAlertService SweetAlertService { get; set; } = null!;
         [Parameter, SupplyParameterFromQuery] public string Page { get; set; } = string.Empty;
         [Parameter, SupplyParameterFromQuery] public string Filter { get; set; } = string.Empty;
+        [Parameter, SupplyParameterFromQuery] public int? RecordsNumber { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
+            RecordsNumber ??= 15;
             await LoadAsync();
         }
 
@@ -68,7 +70,7 @@ namespace SIC.Frontend.Pages.Users
 
         private async Task<bool> LoadListAsync(int page)
         {
-            var url = $"api/accounts/all?page={page}";
+            var url = $"api/accounts/all?PageNumber={page}&PageSize={RecordsNumber}";
             if (!string.IsNullOrEmpty(Filter))
             {
                 url += $"&filter={Filter}";
@@ -86,7 +88,7 @@ namespace SIC.Frontend.Pages.Users
 
         private async Task LoadPagesAsync()
         {
-            var url = "api/accounts/totalPages";
+            var url = $"api/accounts/totalPages?PageSize={RecordsNumber}";
             if (!string.IsNullOrEmpty(Filter))
             {
                 url += $"?filter={Filter}";

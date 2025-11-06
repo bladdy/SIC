@@ -99,7 +99,7 @@ y el cerrar session esconder en telefono navbar, y mostralo en el menu de movil 
         </AuthorizeView>
 
         <!-- 🔒 WeddingPlanner y User -->
-        <AuthorizeView Roles="WeddingPlanner,User">
+        <AuthorizeView Roles="WeddingPlanner">
             <Authorized>
                 <div class="nav-item px-3">
                     <NavLink class="dropdown-item flex gap-2" href="my-events" Match="NavLinkMatch.All">
@@ -115,6 +115,27 @@ y el cerrar session esconder en telefono navbar, y mostralo en el menu de movil 
                         </span> Mis Compras
                     </NavLink>
                 </div>
+                <div class="nav-item px-3 d-md-none">
+                    <NavLink class="dropdown-item flex gap-2" href="Logout" Match="NavLinkMatch.All">
+                        <span class="">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-logout"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2" /><path d="M9 12h12l-3 -3" /><path d="M18 15l3 -3" /></svg>
+                        </span> Cerrar Sessión
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+
+        <!-- 🔒 WeddingPlanner y User -->
+        <AuthorizeView Roles="User">
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="dropdown-item flex gap-2" href="my-events" Match="NavLinkMatch.All">
+                        <span class="">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-calendar-check"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M11.5 21h-5.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v6" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h16" /><path d="M15 19l2 2l4 -4" /></svg>
+                        </span> Mis Eventos
+                    </NavLink>
+                </div>
+                
             </Authorized>
         </AuthorizeView>
         <div class="nav-item px-3 d-md-none">

@@ -16,6 +16,18 @@
                         <ValidationSummary />
 
                         <div class="mb-3">
+                            <label>Tipo de usuario</label>
+                            <InputSelect class="form-select" @bind-Value="user.UserType">
+                                <option value="0">-- Selecciona un tipo de Usuario --</option>
+                                @foreach (var tipo in Enum.GetValues<UserType>())
+                                {
+                                    <option value="@tipo">@tipo.GetDescription()</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => user.UserType)" />
+                        </div>
+
+                        <div class="mb-3 d-none">
                             <label>Documento</label>
                             <InputText class="form-control" @bind-Value="user.Document" />
                         </div>
@@ -30,7 +42,7 @@
                             <InputText class="form-control" @bind-Value="user.LastName" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-3 d-none">
                             <label>Correo electrónico</label>
                             <InputText class="form-control" @bind-Value="user.Email" />
                         </div>
@@ -40,22 +52,12 @@
                             <InputText class="form-control" @bind-Value="user.PhoneNumber" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-3 d-none">
                             <label>Dirección</label>
                             <InputText class="form-control" @bind-Value="user.Address" />
                         </div>
 
-                        <div class="mb-3">
-                            <label>Tipo de usuario</label>
-                            <InputSelect class="form-select" @bind-Value="user.UserType">
-                                <option value="0">-- Selecciona un tipo de Usuario --</option>
-                                @foreach (var tipo in Enum.GetValues<UserType>())
-                                {
-                                    <option value="@tipo">@tipo.GetDescription()</option>
-                                }
-                            </InputSelect>
-                            <ValidationMessage For="@(() => user.UserType)" />
-                        </div>
+                        
 
                         @if (!IsEditMode)
                         {

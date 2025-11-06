@@ -2,10 +2,16 @@
 // invitations.js
 // ==============================
 // Pendiente: HTML agregarle la opciones de tipo de letra, color y tamaño
+// Si los niños es = 0 que diga "Respetuosamente NO NIÑOS" y el select de niños no se muestre
+
+//Select
+// options 1 Adultos
+// options 2 Adultos
+// Igual para los niños
 
 // ✅ Constante global accesible en todo el archivo
-//const apiUrl = "https://localhost:7141"; 🔹 Constante global
-const apiUrl = "https://invboxv-app.com"
+const apiUrl = "https://localhost:7141"; //🔹 Constante global
+//const apiUrl = "https://invboxv-app.com"
 
 let invitacionData = null;
 
@@ -84,8 +90,8 @@ function mostrarMensajeNoInvitacion(codigoInvitacion) {
 // ✅ Muestra los datos en el HTML
 function mostrarDatosInvitacion(inv) {
     document.getElementById("rotulo_invitacion").innerText = inv.name;
-    document.getElementById("invitados_mayores").innerText = `Adultos: ${inv.numberAdults}`;
-    document.getElementById("invitados_menores").innerText = `Niños: ${inv.numberChildren}`;
+    document.getElementById("invitados_mayores").innerText = `${inv.numberAdults} Adultos`;
+    document.getElementById("invitados_menores").innerText = `${inv.numberChildren} Niños`;
 
     llenarSelect("confirmadosadultos", inv.numberAdults, "adultos");
     llenarSelect("confirmadosmenores", inv.numberChildren, "niños");
@@ -102,7 +108,7 @@ function llenarSelect(selectId, cantidad, tipo) {
     for (let i = 1; i <= cantidad; i++) {
         const opt = document.createElement("option");
         opt.value = i;
-        opt.text = i;
+        opt.text = `${i} ${tipo}`;
         select.appendChild(opt);
     }
 }

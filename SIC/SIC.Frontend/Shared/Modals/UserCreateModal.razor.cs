@@ -42,7 +42,9 @@ namespace SIC.Frontend.Shared.Modals
         private async Task HandleValidSubmit()
         {
             user.UserName = user.PhoneNumber;
-
+            user.Email = user.PhoneNumber + "@sic.com";
+            user.Document = user.PhoneNumber;
+            user.Address = user.PhoneNumber;
             var endpoint = IsEditMode ? "api/Accounts/UpdateUser" : "api/Accounts/CreateUser";
             var response = IsEditMode
                 ? await Repository.PutAsync(endpoint, user)
