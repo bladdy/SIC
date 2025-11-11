@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata;
 using QRCoder;
-using SIC.Backend.UnitOfWork.Implemetations;
+using SIC.Backend.Services;
 using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
@@ -13,10 +12,12 @@ namespace SIC.Backend.Controllers;
 public class InvitationsController : GenericController<Invitation>
 {
     private readonly IInvitationUnitOfWork _invitationUnitOfWork;
+    private readonly BoletaService _boletaService;
 
-    public InvitationsController(IGenericUnitOfWork<Invitation> unitOfWork, IInvitationUnitOfWork invitationUnitOfWork) : base(unitOfWork)
+    public InvitationsController(IGenericUnitOfWork<Invitation> unitOfWork, IInvitationUnitOfWork invitationUnitOfWork, BoletaService boletaService) : base(unitOfWork)
     {
         _invitationUnitOfWork = invitationUnitOfWork;
+        _boletaService = boletaService;
     }
 
     [HttpGet]
@@ -111,20 +112,49 @@ public class InvitationsController : GenericController<Invitation>
     }
 
     // Endpoint para obtener el código QR
+    // ToDo: Cambiar el codigo para que genere la boleta con lo datos del evento, invitados y el Qr
     [HttpGet("qr")]
-    public IActionResult GetQRCode(string codigo, string evento)
+    public async Task<IActionResult> GetQRCodeAsync(string codigo, string evento)
     {
         try
         {
-            // Lógica para generar el código QR en base a los parámetros
-            string qrCodeBase64 = GenerateQRCodeBase64(codigo, evento);
-            return Ok(new { success = true, qrCodeBase64 });
+            // Buscar la invitación
+            var response = await _invitationUnitOfWork.GetByCodeAsync(codigo);
+            var invitacion = response.Result;
+            if (invitacion == null)
+                return NotFound(new { success = false, message = "Invitación no encontrada." });
+
+            // Crear el DTO
+            var dto = new BoletaInvitacionDto
+            {
+                NombreInvitado = invitacion.Name,
+                NombreEvento = invitacion.Event!.Name,
+                SubNombre = invitacion.Event!.SubTitle,
+                Fecha = invitacion.Event!.Date,
+                Hora = DateTime.Today.Add(invitacion.Event!.Time).ToString("hh:mm tt"),
+                Lugar = invitacion.Event!.Url!,
+                CantidadPersonas = invitacion.NumberAdults + invitacion.NumberChildren,
+                Niños  = invitacion.NumberChildren,
+                Adultos = invitacion.NumberAdults,
+                MesaAsignada = invitacion.Table ?? "Sin asignar",
+                CodigoQr = invitacion.Code ?? $"INV-{invitacion.Id}-{evento}"
+            };
+
+            // Generar PDF
+            var (pdfBytes, _) = _boletaService.GenerarBoleta(dto);
+
+            // Nombre del archivo
+            var fileName = $"Boleta_{dto.NombreInvitado}_{dto.NombreEvento}.pdf";
+
+            // Retornar como archivo descargable
+            return File(pdfBytes, "application/pdf", fileName);
         }
         catch (Exception ex)
         {
             return BadRequest(new { success = false, message = ex.Message });
         }
     }
+
 
     private static string GenerateQRCodeBase64(string codigo, string evento)
     {

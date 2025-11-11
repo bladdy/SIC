@@ -2,18 +2,13 @@
 // invitations.js
 // ==============================
 // Pendiente: HTML agregarle la opciones de tipo de letra, color y tamaño
-// Si los niños es = 0 que diga "Respetuosamente NO NIÑOS" y el select de niños no se muestre
-
-//Select
-// options 1 Adultos
-// options 2 Adultos
-// Igual para los niños
-
+// ToDo: Validar cuando el inv.numberChildren sea 0 no mostrar el select de niños
 // ✅ Constante global accesible en todo el archivo
 //const apiUrl = "https://localhost:7141"; //🔹 Constante global
 const apiUrl = "https://invboxv-app.com"
 
 let invitacionData = null;
+let hayNiños = false;
 
 document.addEventListener("DOMContentLoaded", function () {
     obtenerDatosInvitacion();
@@ -34,7 +29,7 @@ function obtenerDatosInvitacion() {
             return res.json();
         })
         .then((data) => {
-            console.log("📦 Datos recibidos:", data);
+            //console.log("📦 Datos recibidos:", data);
 
             if (!data || Object.keys(data).length === 0) {
                 mostrarMensajeNoInvitacion(codigoInvitacion);
@@ -89,24 +84,30 @@ function mostrarMensajeNoInvitacion(codigoInvitacion) {
 // ✅ Muestra los datos en el HTML
 function mostrarDatosInvitacion(inv) {
     document.getElementById("rotulo_invitacion").innerText = inv.name;
-    document.getElementById("invitados_mayores").innerText = `${inv.numberAdults} Adultos`;
-    document.getElementById("invitados_menores").innerText = `${inv.numberChildren} Niños`;
+    document.getElementById("invitados_mayores").innerText = `${inv.numberAdults} Adulto(s)`;
+    document.getElementById("invitados_menores").innerText = inv.numberChildren === 0
+        ? "Respetuosamente NO NIÑOS"
+        : `${inv.numberChildren} Niño(s)`;
 
-    llenarSelect("confirmadosadultos", inv.numberAdults, "adultos");
-    llenarSelect("confirmadosmenores", inv.numberChildren, "niños");
+
+    if (inv.numberChildren > 0) hayNiños = true;
+
+    llenarSelect("confirmadosadultos", inv.numberAdults, "Adulto");
+    llenarSelect("confirmadosmenores", inv.numberChildren, "Niño");
 }
 
 // ✅ Llena los selects
 function llenarSelect(selectId, cantidad, tipo) {
     const select = document.getElementById(selectId);
     if (!select) return;
-    if (tipo === "niños") {
-        select.innerHTML = `<option value="0">No asistirán ${tipo}</option>`;
+    if (tipo === "Niño") {
+        select.innerHTML = `<option value="0">No asistirán ${tipo}(s)</option>`;
     }
     for (let i = 1; i <= cantidad; i++) {
         const opt = document.createElement("option");
         opt.value = i;
-        opt.text = `${i} ${tipo}`;
+        // Verifica si i es mayor que 1 y concatena "s" a tipo
+        opt.text = `${i} ${tipo}${i > 1 ? 's' : ''}`;
         select.appendChild(opt);
     }
 }
@@ -119,7 +120,7 @@ function fn_asistencia(valor) {
 
     if (valor === "s") {
         selAdultos.style.display = "block";
-        selMenores.style.display = "block";
+        if (hayNiños) selMenores.style.display = "block";
         btnConfirmar.style.display = "block";
     } else {
         selAdultos.style.display = "none";
@@ -197,47 +198,54 @@ function mostrarMensajeConfirmacion(data, asistira) {
     }
 }
 
-// ✅ Cargar el QR desde el backend
+// ✅ Cargar QR / Boleta PDF desde el backend
 function cargarQR(codigoInvitacion, codigoEvento) {
-    const imgQR = document.getElementById("mi_acceso_qr");
-    const enlaceQR = document.getElementById("mi_enlace_descarga_qr");
-    const contQR = document.getElementById("cont_descargaqr");
-
     const qrUrl = `${apiUrl}/api/Invitations/qr?codigo=${codigoInvitacion}&evento=${codigoEvento}`;
 
     fetch(qrUrl)
-        .then(response => response.json())
-        .then(data => {
-            console.log("Respuesta QR:", data);
-            if (data && data.qrCodeBase64) {
-                let qrImage = document.getElementById("mi_acceso_qr");
-                qrImage.src = "data:image/png;base64," + data.qrCodeBase64;
+        .then(response => {
+            if (!response.ok) throw new Error("Error al generar la boleta");
+            return response.blob(); // ✅ leer PDF como blob
+        })
+        .then(blob => {
+            // Crear URL temporal para mostrar o descargar
+            const url = window.URL.createObjectURL(blob);
 
-                let enlaceDescarga = document.getElementById("mi_enlace_descarga_qr");
-                enlaceDescarga.href = qrImage.src;
+            // ✅ Mostrar botón o enlace de descarga
+            const enlaceDescarga = document.getElementById("mi_enlace_descarga_qr");
+            enlaceDescarga.href = url;
+            enlaceDescarga.download = `Boleta_${codigoInvitacion}.pdf`;
+            enlaceDescarga.textContent = "Descargar boleta PDF";
 
-                // NO tocar display aquí
-                // document.getElementById("cont_descargaqr").style.display = "block";
-            } else {
-                console.error("No se recibió base64 del QR");
-            }
+            // ✅ (Opcional) Mostrar el PDF en un <iframe> o abrirlo en nueva pestaña
+            // window.open(url, "_blank");
+
+            // Mostrar el contenedor si estaba oculto
+            const contQR = document.getElementById("cont_descargaqr");
+            contQR.style.display = "block";
         })
         .catch(error => console.error("Error al generar QR:", error));
 }
 
-// ✅ Descargar QR
-function descargarQR() {
-    const qrImage = document.getElementById("mi_acceso_qr");
-    if (!qrImage.src) {
-        alert("El QR aún no está disponible");
-        return;
-    }
 
-    // Crear un enlace temporal
-    const enlace = document.createElement("a");
-    enlace.href = qrImage.src;
-    enlace.download = "INV - " + `${invitacionData.event.name}.png`; // Nombre del archivo
-    document.body.appendChild(enlace);
-    enlace.click();
-    document.body.removeChild(enlace);
+// ✅ Descargar boleta en PDF
+function descargarQR(codigoInvitacion, codigoEvento) {
+    const qrUrl = `${apiUrl}/api/Invitations/qr?codigo=${codigoInvitacion}&evento=${codigoEvento}`;
+
+    fetch(qrUrl)
+        .then(response => {
+            if (!response.ok) throw new Error("Error al generar la boleta");
+            return response.blob();
+        })
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `Boleta_${codigoInvitacion}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+        })
+        .catch(error => console.error("Error al descargar boleta:", error));
 }

@@ -116,6 +116,7 @@ namespace SIC.Backend.Controllers
 
             foreach (var invitacion in invitaciones)
             {
+                //Todo:Usar esto
                 var dto = new BoletaInvitacionDto
                 {
                     NombreInvitado = invitacion.Name,
