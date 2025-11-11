@@ -116,13 +116,13 @@ namespace SIC.Backend.Controllers
             {
                 try
                 {
-                    if (string.IsNullOrWhiteSpace(inv.Code))
+                    /*if (string.IsNullOrWhiteSpace(inv.Code))
                     {
                         errors++;
                         continue; // saltamos esta fila
-                    }
+                    }*/
 
-                    var response = await _invitationUnitOfWork.GetByCodeAsync(inv.Code);
+                    var response = await _invitationUnitOfWork.GetByCodeAsync(inv.Code!);
                     var existing = response.Result;
 
                     if (existing == null)
