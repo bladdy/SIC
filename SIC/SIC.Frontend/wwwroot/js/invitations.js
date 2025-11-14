@@ -4,8 +4,8 @@
 // Pendiente: HTML agregarle la opciones de tipo de letra, color y tamaño
 // ToDo: Validar cuando el inv.numberChildren sea 0 no mostrar el select de niños
 // ✅ Constante global accesible en todo el archivo
-const apiUrl = "https://localhost:7141"; //🔹 Constante global
-//const apiUrl = "https://invboxv-app.com"
+//const apiUrl = "https://localhost:7141"; //🔹 Constante global
+const apiUrl = "https://invboxv-app.com"
 
 let invitacionData = null;
 let hayNiños = false;
@@ -203,7 +203,6 @@ function cargarQR(codigoInvitacion, codigoEvento) {
 
     fetch(qrUrl)
         .then(async (response) => {
-
             // 📌 1. Leer el header del QR
             const qrBase64 = response.headers.get("X-QR-Base64");
             console.log("QR BASE64:", qrBase64);
@@ -232,7 +231,6 @@ function cargarQR(codigoInvitacion, codigoEvento) {
         })
         .catch((error) => console.error("Error al generar QR:", error));
 }
-
 
 // ✅ Descargar boleta en PDF
 function descargarQR(codigoInvitacion, codigoEvento) {
