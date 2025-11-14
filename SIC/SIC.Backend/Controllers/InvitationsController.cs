@@ -138,18 +138,19 @@ public class InvitationsController : GenericController<Invitation>
                 CodigoQr = invitacion.Code ?? $"INV-{invitacion.Id}-{evento}"
             };
 
-            // 🔹 Generar QR base64
+            // 🔹 QR Base64
             string qrBase64 = GenerateQRCodeBase64(dto.CodigoQr, evento);
 
-            // 🔹 Generar PDF con iTextSharp
+            // 🔹 PDF Base64
             var (pdfBytes, _) = _boletaService.GenerarBoleta(dto);
+            string pdfBase64 = Convert.ToBase64String(pdfBytes);
 
-            // 🔹 Colocar QR en el Header
-            Response.Headers.Append("X-QR-Base64", qrBase64);
-
-            // 🔹 Enviar PDF normal
-            var fileName = $"Boleta_{dto.NombreInvitado}_{dto.NombreEvento}.pdf";
-            return File(pdfBytes, "application/pdf", fileName);
+            return Ok(new
+            {
+                success = true,
+                qrBase64,
+                pdfBase64
+            });
         }
         catch (Exception ex)
         {
