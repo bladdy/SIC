@@ -118,13 +118,11 @@ public class InvitationsController : GenericController<Invitation>
     {
         try
         {
-            // Buscar la invitación
             var response = await _invitationUnitOfWork.GetByCodeAsync(codigo);
             var invitacion = response.Result;
             if (invitacion == null)
                 return NotFound(new { success = false, message = "Invitación no encontrada." });
 
-            // Crear el DTO
             var dto = new BoletaInvitacionDto
             {
                 NombreInvitado = invitacion.Name,
@@ -134,19 +132,23 @@ public class InvitationsController : GenericController<Invitation>
                 Hora = DateTime.Today.Add(invitacion.Event!.Time).ToString("hh:mm tt"),
                 Lugar = invitacion.Event!.Url!,
                 CantidadPersonas = invitacion.NumberAdults + invitacion.NumberChildren,
-                Niños  = invitacion.NumberChildren,
-                Adultos = invitacion.NumberAdults,
+                Niños = invitacion.NumberConfirmedChildren,
+                Adultos = invitacion.NumberConfirmedAdults,
                 MesaAsignada = invitacion.Table ?? "Sin asignar",
                 CodigoQr = invitacion.Code ?? $"INV-{invitacion.Id}-{evento}"
             };
 
-            // Generar PDF
+            // 🔹 Generar QR base64
+            string qrBase64 = GenerateQRCodeBase64(dto.CodigoQr, evento);
+
+            // 🔹 Generar PDF con iTextSharp
             var (pdfBytes, _) = _boletaService.GenerarBoleta(dto);
 
-            // Nombre del archivo
-            var fileName = $"Boleta_{dto.NombreInvitado}_{dto.NombreEvento}.pdf";
+            // 🔹 Colocar QR en el Header
+            Response.Headers.Append("X-QR-Base64", qrBase64);
 
-            // Retornar como archivo descargable
+            // 🔹 Enviar PDF normal
+            var fileName = $"Boleta_{dto.NombreInvitado}_{dto.NombreEvento}.pdf";
             return File(pdfBytes, "application/pdf", fileName);
         }
         catch (Exception ex)
@@ -154,7 +156,6 @@ public class InvitationsController : GenericController<Invitation>
             return BadRequest(new { success = false, message = ex.Message });
         }
     }
-
 
     private static string GenerateQRCodeBase64(string codigo, string evento)
     {

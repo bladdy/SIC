@@ -1,7 +1,7 @@
-﻿using PdfSharpCore.Drawing;
-using PdfSharpCore.Pdf;
+﻿
+using iTextSharp.text;
+using iTextSharp.text.pdf;
 using QRCoder;
-using SkiaSharp;
 using SIC.Shared.DTOs;
 
 namespace SIC.Backend.Services
@@ -10,119 +10,101 @@ namespace SIC.Backend.Services
     {
         public (byte[] pdfBytes, byte[] pngBytes) GenerarBoleta(BoletaInvitacionDto data)
         {
-            // 🧩 Generar código QR
+            // ============================================================
+            // 1️⃣ GENERAR QR COMO PNG
+            // ============================================================
             var qrGenerator = new QRCodeGenerator();
             var qrCodeData = qrGenerator.CreateQrCode(data.CodigoQr, QRCodeGenerator.ECCLevel.Q);
             var qrCode = new PngByteQRCode(qrCodeData);
-            var qrBytes = qrCode.GetGraphic(25); // más alto = QR más grande
+            var qrBytes = qrCode.GetGraphic(25); // tamaño del QR
 
-            // 🖼️ Configurar tamaño base del QR y márgenes
-            float qrSize = 600;
-            float sideMargin = 20;
-            float contentWidth = qrSize + sideMargin * 2;
+            // ============================================================
+            // 2️⃣ CREAR DOCUMENTO PDF
+            // ============================================================
+            using var msPdf = new MemoryStream();
+            using var document = new Document(PageSize.Letter, 40, 40, 40, 40);
+            PdfWriter.GetInstance(document, msPdf);
 
-            // 📏 Calcular alto dinámico según cantidad de líneas de texto
-            int totalLines = 5; // título + líneas de info
-            float lineHeight = 80;
-            float topMargin = 60;
-            float qrTop = topMargin + 100;
-            float contentHeight = qrTop + qrSize + (lineHeight * totalLines) + 100;
+            document.Open();
 
-            // 🖌️ Crear lienzo con fondo blanco
-            using var surface = SKSurface.Create(new SKImageInfo((int)contentWidth, (int)contentHeight));
-            var canvas = surface.Canvas;
-            canvas.Clear(SKColors.White);
+            // Fuente principal
+            var fontTitle = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 22, BaseColor.Black);
+            var fontSubtitle = FontFactory.GetFont(FontFactory.HELVETICA_OBLIQUE, 18, BaseColor.DarkGray);
+            var fontText = FontFactory.GetFont(FontFactory.HELVETICA, 16, BaseColor.Black);
 
-            // 🖋️ Fuentes principales
-            using var fontTitle = new SKPaint
+            // ============================================================
+            // 3️⃣ AGREGAR TÍTULO CENTRADO
+            // ============================================================
+            var title = new Paragraph(data.NombreEvento?.ToUpper() ?? "EVENTO", fontTitle)
             {
-                TextSize = 46,
-                IsAntialias = true,
-                Color = new SKColor(30, 30, 30),
-                Typeface = SKTypeface.FromFamilyName("Arial", SKFontStyle.Bold)
+                Alignment = Element.ALIGN_CENTER,
+                SpacingAfter = 10
             };
+            document.Add(title);
 
-            using var fontSubtitle = new SKPaint
+            if (!string.IsNullOrWhiteSpace(data.SubNombre))
             {
-                TextSize = 34,
-                IsAntialias = true,
-                Color = new SKColor(90, 90, 90),
-                Typeface = SKTypeface.FromFamilyName("Arial", SKFontStyle.Italic)
-            };
-
-            using var fontText = new SKPaint
-            {
-                TextSize = 40,
-                IsAntialias = true,
-                Color = new SKColor(50, 50, 50),
-                Typeface = SKTypeface.FromFamilyName("Arial")
-            };
-
-            // 🧾 Título centrado arriba
-            var title = data.NombreEvento?.ToUpperInvariant() ?? "EVENTO";
-            var titleWidth = fontTitle.MeasureText(title);
-            float titleY = topMargin + 20;
-            canvas.DrawText(title, (contentWidth - titleWidth) / 2, titleY, fontTitle);
-
-            // ✳️ Subtítulo centrado debajo del título
-            var subtitle = data.SubNombre?.Trim();
-            if (!string.IsNullOrEmpty(subtitle))
-            {
-                var subtitleWidth = fontSubtitle.MeasureText(subtitle);
-                float subtitleY = titleY + 50;
-                canvas.DrawText(subtitle, (contentWidth - subtitleWidth) / 2, subtitleY, fontSubtitle);
+                var subtitle = new Paragraph(data.SubNombre, fontSubtitle)
+                {
+                    Alignment = Element.ALIGN_CENTER,
+                    SpacingAfter = 20
+                };
+                document.Add(subtitle);
             }
 
-            // 🧩 QR centrado debajo del título
-            using var qrImage = SKImage.FromEncodedData(qrBytes);
-            float qrX = (contentWidth - qrSize) / 2;
-            canvas.DrawImage(qrImage, new SKRect(qrX, qrTop, qrX + qrSize, qrTop + qrSize));
+            // ============================================================
+            // 4️⃣ INSERTAR QR CENTRADO
+            // ============================================================
+            var qrImage = Image.GetInstance(qrBytes);
+            qrImage.Alignment = Image.ALIGN_CENTER;
+            qrImage.ScaleAbsolute(250, 250); // tamaño QR
+            document.Add(qrImage);
 
-            // 🧠 Código QR debajo como texto (centrado)
-            var codigoTexto = $"CÓDIGO: {data.CodigoQr}";
-            var codigoWidth = fontText.MeasureText(codigoTexto);
-            float codigoX = (contentWidth - codigoWidth) / 2;
-            float codigoY = qrTop + qrSize + 40;
-            canvas.DrawText(codigoTexto, codigoX, codigoY, fontText);
+            // Código QR debajo del QR
+            var codeText = new Paragraph($"CÓDIGO: {data.CodigoQr}", fontText)
+            {
+                Alignment = Element.ALIGN_CENTER,
+                SpacingAfter = 25
+            };
+            document.Add(codeText);
 
-            // 📋 Información del evento
-            float infoStartY = qrTop + qrSize + 120;
-            canvas.DrawText($"Invitado: {data.NombreInvitado}", sideMargin, infoStartY, fontText);
-            canvas.DrawText($"Fecha: {data.Fecha:dd/MM/yyyy}", sideMargin, infoStartY + lineHeight, fontText);
-            canvas.DrawText($"Hora: {data.Hora:hh:mm tt}", sideMargin, infoStartY + lineHeight * 2, fontText);
+            // ============================================================
+            // 5️⃣ INFORMACIÓN DEL EVENTO
+            // ============================================================
+            var info = new PdfPTable(1)
+            {
+                WidthPercentage = 100
+            };
 
-            // 👥 Texto de invitados con pluralización
-            var textoInvitados = $"{data.Adultos} {(data.Adultos == 1 ? "Adulto" : "Adultos")}";
+            void AddInfo(string text)
+            {
+                var cell = new PdfPCell(new Phrase(text, fontText))
+                {
+                    Border = Rectangle.NO_BORDER,
+                    PaddingBottom = 10
+                };
+                info.AddCell(cell);
+            }
+
+            AddInfo($"Invitado: {data.NombreInvitado}");
+            AddInfo($"Fecha: {data.Fecha:dd/MM/yyyy}");
+            AddInfo($"Hora: {data.Hora:hh:mm tt}");
+
+            var invitados = $"{data.Adultos} {(data.Adultos == 1 ? "Adulto" : "Adultos")}";
             if (data.Niños > 0)
-                textoInvitados += $"  {data.Niños} {(data.Niños == 1 ? "Niño" : "Niños")}";
+                invitados += $"  {data.Niños} {(data.Niños == 1 ? "Niño" : "Niños")}";
 
-            canvas.DrawText($"Invitado(s): {textoInvitados}", sideMargin, infoStartY + lineHeight * 3, fontText);
+            AddInfo($"Invitado(s): {invitados}");
 
-            canvas.Flush();
+            document.Add(info);
 
-            // 📤 Exportar PNG
-            using var image = surface.Snapshot();
-            using var dataPng = image.Encode(SKEncodedImageFormat.Png, 100);
-            var pngBytes = dataPng.ToArray();
+            // ============================================================
+            // 6️⃣ CERRAR PDF Y RETORNAR BYTES
+            // ============================================================
+            document.Close();
 
-            // 📄 Crear PDF ajustado al contenido real
-            using var ms = new MemoryStream();
-            var pdf = new PdfDocument();
-            var page = pdf.AddPage();
-            page.Width = contentWidth;
-            page.Height = contentHeight;
-
-            using (var gfx = XGraphics.FromPdfPage(page))
-            {
-                using var imgStream = new MemoryStream(pngBytes);
-                var xImage = XImage.FromStream(() => imgStream);
-                gfx.DrawImage(xImage, 0, 0, contentWidth, contentHeight);
-            }
-
-            pdf.Save(ms, false);
-            var pdfBytes = ms.ToArray();
-
-            return (pdfBytes, pngBytes);
+            var pdfBytes = msPdf.ToArray();
+            return (pdfBytes, qrBytes);
         }
     }
 }

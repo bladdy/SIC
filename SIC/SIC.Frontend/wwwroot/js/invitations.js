@@ -4,8 +4,8 @@
 // Pendiente: HTML agregarle la opciones de tipo de letra, color y tamaño
 // ToDo: Validar cuando el inv.numberChildren sea 0 no mostrar el select de niños
 // ✅ Constante global accesible en todo el archivo
-//const apiUrl = "https://localhost:7141"; //🔹 Constante global
-const apiUrl = "https://invboxv-app.com"
+const apiUrl = "https://localhost:7141"; //🔹 Constante global
+//const apiUrl = "https://invboxv-app.com"
 
 let invitacionData = null;
 let hayNiños = false;
@@ -88,7 +88,6 @@ function mostrarDatosInvitacion(inv) {
     document.getElementById("invitados_menores").innerText = inv.numberChildren === 0
         ? "Respetuosamente NO NIÑOS"
         : `${inv.numberChildren} Niño(s)`;
-
 
     if (inv.numberChildren > 0) hayNiños = true;
 
@@ -203,28 +202,35 @@ function cargarQR(codigoInvitacion, codigoEvento) {
     const qrUrl = `${apiUrl}/api/Invitations/qr?codigo=${codigoInvitacion}&evento=${codigoEvento}`;
 
     fetch(qrUrl)
-        .then(response => {
-            if (!response.ok) throw new Error("Error al generar la boleta");
-            return response.blob(); // ✅ leer PDF como blob
-        })
-        .then(blob => {
-            // Crear URL temporal para mostrar o descargar
-            const url = window.URL.createObjectURL(blob);
+        .then(async (response) => {
 
-            // ✅ Mostrar botón o enlace de descarga
+            // 📌 1. Leer el header del QR
+            const qrBase64 = response.headers.get("X-QR-Base64");
+            console.log("QR BASE64:", qrBase64);
+
+            if (!qrBase64 || qrBase64 === "null") {
+                console.error("QR vacío o nulo");
+            } else {
+                // 📌 2. Mostrar el QR en un <img>
+                const img = document.getElementById("qr_img");
+                img.src = `data:image/png;base64,${qrBase64}`;
+                img.style.display = "block";
+            }
+
+            // 📌 3. Leer el PDF como blob
+            const blob = await response.blob();
+
+            // 📌 4. Descargar PDF
+            const pdfUrl = window.URL.createObjectURL(blob);
+
             const enlaceDescarga = document.getElementById("mi_enlace_descarga_qr");
-            enlaceDescarga.href = url;
+            enlaceDescarga.href = pdfUrl;
             enlaceDescarga.download = `Boleta_${codigoInvitacion}.pdf`;
             enlaceDescarga.textContent = "Descargar boleta PDF";
 
-            // ✅ (Opcional) Mostrar el PDF en un <iframe> o abrirlo en nueva pestaña
-            // window.open(url, "_blank");
-
-            // Mostrar el contenedor si estaba oculto
-            const contQR = document.getElementById("cont_descargaqr");
-            contQR.style.display = "block";
+            document.getElementById("cont_descargaqr").style.display = "block";
         })
-        .catch(error => console.error("Error al generar QR:", error));
+        .catch((error) => console.error("Error al generar QR:", error));
 }
 
 
