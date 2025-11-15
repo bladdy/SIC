@@ -4,8 +4,8 @@
 // Pendiente: HTML agregarle la opciones de tipo de letra, color y tamaño
 // ToDo: Validar cuando el inv.numberChildren sea 0 no mostrar el select de niños
 // ✅ Constante global accesible en todo el archivo
-const apiUrl = "https://localhost:7141"; //🔹 Constante global
-//const apiUrl = "https://invboxv-app.com"
+//const apiUrl = "https://localhost:7141"; //🔹 Constante global
+const apiUrl = "https://invboxv-app.com"
 
 let invitacionData = null;
 let hayNiños = false;
@@ -162,6 +162,16 @@ function sendRespuesta() {
             if (asistira) {
                 mostrarMensajeConfirmacion(data, true);
                 cargarQR(invitacionData.code, invitacionData.event.code);
+                //ToDo: abrir whatsapp con mensaje predefinido, para avisar al que envio el mensaje que ya confirmo
+                var numero = invitacionData.event.hostPhone;
+                if (invitacionData.event.plannerPhone !== null)
+                {
+                    numero = invitacionData.event.plannerPhone;
+                }
+
+                const mensaje = `Ya confirmo mi asistencia, gracias por la invitación.`;
+
+                abrirWhatsApp(numero, mensaje);
             } else {
                 mostrarMensajeConfirmacion(data, false);
             }
@@ -170,6 +180,10 @@ function sendRespuesta() {
             console.error(err);
             alert("Ocurrió un error al enviar tu respuesta. Intenta de nuevo.");
         });
+}
+function abrirWhatsApp(numero, mensaje) {
+    const url = `https://api.whatsapp.com/send?phone=${numero}&text=${encodeURIComponent(mensaje)}&app_absent=0`;
+    window.open(url, "_blank");
 }
 
 // ✅ Muestra el mensaje final (con o sin QR)
@@ -202,7 +216,6 @@ function cargarQR(codigoInvitacion, codigoEvento) {
             return response.json(); // API debe devolver { qrBase64: "...", pdfBase64: "..." }
         })
         .then(data => {
-
             // ==========================
             // 1️⃣ CARGAR QR EN <img>
             // ==========================
@@ -247,4 +260,3 @@ function base64ToBlob(base64, mimeType) {
     }
     return new Blob([buffer], { type: mimeType });
 }
-
