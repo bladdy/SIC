@@ -49,7 +49,7 @@ public partial class EventsDetails
 
     [Parameter, SupplyParameterFromQuery] public string Page { get; set; } = string.Empty;
     [Parameter, SupplyParameterFromQuery] public string Filter { get; set; } = string.Empty;
-    [Parameter, SupplyParameterFromQuery] public int RecordsNumber { get; set; } = 10;
+    [Parameter, SupplyParameterFromQuery] public int RecordsNumber { get; set; } = 50;
 
     [Parameter] public string? Code { get; set; }
 

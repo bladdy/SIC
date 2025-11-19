@@ -36,20 +36,21 @@ function obtenerDatosInvitacion() {
             invitacionData = data;
             tipoEvent = data.event.eventType.name;
             const btnConfirmar = document.getElementById("btnConfirmar");
-            if (tipoEvent ==="Save the Date")
-            {
+            if (tipoEvent === "Save the Date") {
                 btnConfirmar.style.display = "block";
             }
 
             mostrarDatosInvitacion(data);
 
             // 🔹 Verificar estado
-            if (data.status === 19 ) {
+            if (data.status === 19) {//Asistire
                 mostrarMensajeConfirmacion(data, true);
-                cargarQR(data.code, data.event.code);
-            } else if (data.status === 20) {
+                if (tipoEvent !== "Save the Date") {
+                    cargarQR(data.code, data.event.code);
+                }
+            } else if (data.status === 20) {//No Asistire
                 mostrarMensajeConfirmacion(data, false);
-            } else if (data.status === 2) {
+            } else if (data.status === 2) {//Pendiente
                 const form = document.getElementById("formulario_respuesta");
                 if (form) form.style.display = "block";
             } else {
@@ -89,8 +90,7 @@ function mostrarMensajeNoInvitacion(codigoInvitacion) {
 function mostrarDatosInvitacion(inv) {
     document.getElementById("rotulo_invitacion").innerText = inv.name;
     console.log(tipoEvent)
-    if (tipoEvent !== "Save the Date")
-    {
+    if (tipoEvent !== "Save the Date") {
         document.getElementById("invitados_mayores").innerText = `${inv.numberAdults} Adulto(s)`;
         document.getElementById("invitados_menores").innerText = inv.numberChildren === 0
             ? "Respetuosamente NO NIÑOS"
@@ -100,7 +100,6 @@ function mostrarDatosInvitacion(inv) {
 
         llenarSelect("confirmadosadultos", inv.numberAdults, "Adulto");
         llenarSelect("confirmadosmenores", inv.numberChildren, "Niño");
-
     }
 }
 
@@ -150,9 +149,6 @@ function sendRespuesta() {
     const noAsistira = document.getElementById("noasistire")
         ? document.getElementById("noasistire").checked
         : null;
-    if (tipoEvent !== "Save the Date") {
-            
-    }
 
     if (!asistira && !noAsistira && (tipoEvent !== "Save the Date")) {
         alert("Por favor selecciona si asistirás o no al evento.");
@@ -168,7 +164,6 @@ function sendRespuesta() {
         confirmadosAdultos: parseInt(document.getElementById("confirmadosadultos")?.value || "0"),
         confirmadosMenores: parseInt(document.getElementById("confirmadosmenores")?.value || "0"),
         mensaje: document.getElementById("texto_respuesta")?.value || ""
-
     };
 
     fetch(`${apiUrl}/api/invitations/confirm`, {
@@ -186,12 +181,11 @@ function sendRespuesta() {
                 cargarQR(invitacionData.code, invitacionData.event.code);
                 //ToDo: abrir whatsapp con mensaje predefinido, para avisar al que envio el mensaje que ya confirmo
                 var numero = invitacionData.event.hostPhone;
-                if (invitacionData.event.plannerPhone !== null)
-                {
+                if (invitacionData.event.plannerPhone !== null) {
                     numero = invitacionData.event.plannerPhone;
                 }
 
-                const mensaje = `Ya confirmo mi asistencia, gracias por la invitación.`;
+                const mensaje = `Ya confirmé mi asistencia, gracias por la invitación.`;
 
                 abrirWhatsApp(numero, mensaje);
             } else {
@@ -218,7 +212,7 @@ function mostrarMensajeConfirmacion(data, asistira) {
     if (form) form.style.display = "none";
     if (mensajeGracias) mensajeGracias.style.display = "block";
 
-    if (asistira) {
+    if (asistira && tipoEvent !== "Save the Date") {
         if (mensajeQR) mensajeQR.style.display = "block";
         if (contQR) contQR.style.display = "block";
         document.getElementById("mi_codigo_invitado").innerText = `Código: ${data.codigoInvitacion || data.code}`;
@@ -241,6 +235,7 @@ function cargarQR(codigoInvitacion, codigoEvento) {
             // ==========================
             // 1️⃣ CARGAR QR EN <img>
             // ==========================
+
             const imgQr = document.getElementById("img_qr");
 
             if (!data.qrBase64 || data.qrBase64 === "null") {
