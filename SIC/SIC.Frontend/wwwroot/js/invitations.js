@@ -9,6 +9,7 @@ const apiUrl = "https://invboxv-app.com"
 
 let invitacionData = null;
 let hayNiños = false;
+let tipoEvent = "";
 
 document.addEventListener("DOMContentLoaded", function () {
     obtenerDatosInvitacion();
@@ -33,10 +34,17 @@ function obtenerDatosInvitacion() {
                 return;
             }
             invitacionData = data;
+            tipoEvent = data.event.eventType.name;
+            const btnConfirmar = document.getElementById("btnConfirmar");
+            if (tipoEvent ==="Save the Date")
+            {
+                btnConfirmar.style.display = "block";
+            }
+
             mostrarDatosInvitacion(data);
 
             // 🔹 Verificar estado
-            if (data.status === 19) {
+            if (data.status === 19 ) {
                 mostrarMensajeConfirmacion(data, true);
                 cargarQR(data.code, data.event.code);
             } else if (data.status === 20) {
@@ -80,15 +88,20 @@ function mostrarMensajeNoInvitacion(codigoInvitacion) {
 // ✅ Muestra los datos en el HTML
 function mostrarDatosInvitacion(inv) {
     document.getElementById("rotulo_invitacion").innerText = inv.name;
-    document.getElementById("invitados_mayores").innerText = `${inv.numberAdults} Adulto(s)`;
-    document.getElementById("invitados_menores").innerText = inv.numberChildren === 0
-        ? "Respetuosamente NO NIÑOS"
-        : `${inv.numberChildren} Niño(s)`;
+    console.log(tipoEvent)
+    if (tipoEvent !== "Save the Date")
+    {
+        document.getElementById("invitados_mayores").innerText = `${inv.numberAdults} Adulto(s)`;
+        document.getElementById("invitados_menores").innerText = inv.numberChildren === 0
+            ? "Respetuosamente NO NIÑOS"
+            : `${inv.numberChildren} Niño(s)`;
 
-    if (inv.numberChildren > 0) hayNiños = true;
+        if (inv.numberChildren > 0) hayNiños = true;
 
-    llenarSelect("confirmadosadultos", inv.numberAdults, "Adulto");
-    llenarSelect("confirmadosmenores", inv.numberChildren, "Niño");
+        llenarSelect("confirmadosadultos", inv.numberAdults, "Adulto");
+        llenarSelect("confirmadosmenores", inv.numberChildren, "Niño");
+
+    }
 }
 
 // ✅ Llena los selects
@@ -130,10 +143,18 @@ function sendRespuesta() {
         alert("No se ha cargado la invitación correctamente.");
         return;
     }
-    const asistira = document.getElementById("siasistire").checked;
-    const noAsistira = document.getElementById("noasistire").checked;
+    const asistira = document.getElementById("siasistire")
+        ? document.getElementById("siasistire").checked
+        : null;
 
-    if (!asistira && !noAsistira) {
+    const noAsistira = document.getElementById("noasistire")
+        ? document.getElementById("noasistire").checked
+        : null;
+    if (tipoEvent !== "Save the Date") {
+            
+    }
+
+    if (!asistira && !noAsistira && (tipoEvent !== "Save the Date")) {
         alert("Por favor selecciona si asistirás o no al evento.");
         return;
     }
@@ -143,10 +164,11 @@ function sendRespuesta() {
         nombre: invitacionData.name,
         cantidadDeMayores: invitacionData.numberAdults,
         cantidadDeMenores: invitacionData.numberChildren,
-        confirmacionAsistencia: asistira,
-        confirmadosAdultos: parseInt(document.getElementById("confirmadosadultos").value),
-        confirmadosMenores: parseInt(document.getElementById("confirmadosmenores").value),
-        mensaje: document.getElementById("texto_respuesta").value
+        confirmacionAsistencia: tipoEvent === "Save the Date" ? true : asistira,
+        confirmadosAdultos: parseInt(document.getElementById("confirmadosadultos")?.value || "0"),
+        confirmadosMenores: parseInt(document.getElementById("confirmadosmenores")?.value || "0"),
+        mensaje: document.getElementById("texto_respuesta")?.value || ""
+
     };
 
     fetch(`${apiUrl}/api/invitations/confirm`, {
