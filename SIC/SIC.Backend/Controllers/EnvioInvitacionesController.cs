@@ -29,6 +29,18 @@ namespace SIC.Backend.Controllers
             _MasiveShippingProgressUnitOfWork = MasiveShippingProgressUnitOfWork;
         }
 
+        [HttpGet("lista-envio-whatsapp/{eventoId}")]
+        public async Task<IActionResult> ObtenerListaEnvioWhatsApp(string eventoId)
+        {
+            // obtener la lista de invitaciones con los mensajes por evento
+            var response = await _messageUnitOfWork.GetMessageWhatsappInvitation(eventoId);
+            if (response.Success)
+            {
+                return Ok(response.Result);
+            }
+            return NotFound();
+        }
+
         //[HttpPost("enviar-masivo/{eventoId}")]
         //Logica para enviar masivo
         //Enviar en lotes de 10, primero va a consultar si tiene UsuarioWhatsAppConfigs activo buscando por el usuario
@@ -74,7 +86,7 @@ namespace SIC.Backend.Controllers
         public async Task<IActionResult> EnviarMasivo(string code, [FromQuery] int? tanda = null, [FromQuery] int tamanioTanda = 10, bool isInvitationMessage = true)
         {
             // 🔐 ID del usuario autenticado (en tu caso, temporalmente hardcodeado)
-            var usuarioId = "b5e6b942-98b4-4585-8e1a-1ec478e388cf";
+            var usuarioId = "cb50438d-93f4-4232-b682-d37cc4781e2a";
 
             var configWhatsApp = await _whatsAppConfigUnitOfWork.GetByUserIdAsync(usuarioId);
             if (configWhatsApp == null)

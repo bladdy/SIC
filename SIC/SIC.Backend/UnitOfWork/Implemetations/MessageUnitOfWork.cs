@@ -1,5 +1,7 @@
-﻿using SIC.Backend.Repositories.Interfaces;
+﻿using Microsoft.AspNetCore.Mvc;
+using SIC.Backend.Repositories.Interfaces;
 using SIC.Backend.UnitOfWork.Interfaces;
+using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using SIC.Shared.Response;
 
@@ -21,5 +23,7 @@ namespace SIC.Backend.UnitOfWork.Implemetations
         public async Task<ActionResponse<Message>> UpdateFullAsync(Message message, string eventCode) => await _messageRepository.UpdateFullAsync(message, eventCode);
 
         public async Task<ActionResponse<IEnumerable<MessageKey>>> GetKeysAsync() => await _messageRepository.GetKeysAsync();
+
+        public async Task<ActionResponse<IEnumerable<MessageWhatsappInvitationDTO>>> GetMessageWhatsappInvitation(string code) => await _messageRepository.GetMessageWhatsappInvitation(code);
     }
 }

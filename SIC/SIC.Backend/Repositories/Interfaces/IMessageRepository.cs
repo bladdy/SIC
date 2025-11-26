@@ -1,4 +1,6 @@
-﻿using SIC.Shared.Entities;
+﻿using Microsoft.AspNetCore.Mvc;
+using SIC.Shared.DTOs;
+using SIC.Shared.Entities;
 using SIC.Shared.Response;
 
 namespace SIC.Backend.Repositories.Interfaces
@@ -12,5 +14,7 @@ namespace SIC.Backend.Repositories.Interfaces
         Task<ActionResponse<Message>> UpdateFullAsync(Message message, string eventCode);
 
         Task<ActionResponse<IEnumerable<MessageKey>>> GetKeysAsync();
+
+        Task<ActionResponse<IEnumerable<MessageWhatsappInvitationDTO>>> GetMessageWhatsappInvitation(string code);
     }
 }

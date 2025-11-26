@@ -1,7 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using SIC.Backend.Data;
+using SIC.Backend.Helpers;
 using SIC.Backend.Repositories.Interfaces;
+using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using SIC.Shared.Response;
 
@@ -106,6 +110,43 @@ namespace SIC.Backend.Repositories.Implemetations
             {
                 Success = true,
                 Result = entities
+            };
+        }
+
+        public async Task<ActionResponse<IEnumerable<MessageWhatsappInvitationDTO>>> GetMessageWhatsappInvitation(string code)
+        {
+            var invitations = await _context.Invitations
+                .Include(i => i.Event)
+                .Where(i => i.Event!.Code == code)
+                .ToListAsync();
+
+            var message = await _context.Messages
+                .Include(e => e.Event)
+                .FirstOrDefaultAsync(x => x.Event!.Code!.Contains(code));
+
+            var key = await _context.MessageKeys.ToListAsync();
+
+            // Generamos el mensaje formateado para cada invitación
+            var messageWhatsappInvitations = invitations.Select(invitation =>
+            {
+                var formattedMessage = MessageFormatter.FormatMessage(message!, invitation, key.ToList());
+
+                return new MessageWhatsappInvitationDTO
+                {
+                    Name = invitation.Name,
+                    Event = invitation.Event!.Name,
+                    PhoneNumber = invitation.PhoneNumber,  // O la propiedad correcta para el número
+                    MessageConfirmation = formattedMessage.MessageConfirmation,
+                    MessageInvitation = formattedMessage.MessageInvitation,
+                    Sent = false,  // Se puede modificar cuando se marque como enviado
+                    Error = string.Empty  // Se puede actualizar en caso de error al enviar
+                };
+            }).ToList();
+
+            return new ActionResponse<IEnumerable<MessageWhatsappInvitationDTO>>
+            {
+                Success = true,
+                Result = messageWhatsappInvitations
             };
         }
     }

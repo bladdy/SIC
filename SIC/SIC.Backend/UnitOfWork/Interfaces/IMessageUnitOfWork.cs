@@ -1,10 +1,14 @@
-﻿using SIC.Shared.Entities;
+﻿using Microsoft.AspNetCore.Mvc;
+using SIC.Shared.Entities;
 using SIC.Shared.Response;
+using SIC.Shared.DTOs;
 
 namespace SIC.Backend.UnitOfWork.Interfaces
 {
     public interface IMessageUnitOfWork
     {
+        Task<ActionResponse<IEnumerable<MessageWhatsappInvitationDTO>>> GetMessageWhatsappInvitation(string code);
+
         Task<ActionResponse<Message>> GetByCodeAsync(string code);
 
         Task<ActionResponse<Message>> AddFullAsync(Message message, string eventCode);

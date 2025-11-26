@@ -16,18 +16,27 @@ namespace SIC.Backend.Services
 
         public async Task<(bool success, string messageId, string error)> enviaAsync(string token)
         {
+            token = "EAAUu8FHu8ZAwBP4g5ehkX4FzNUIQNEtZAPqY3vhxS3yM1cNiNHZCnOwwBzhKKTUkiURBprbA80QubiVZBVmUZAFf0XNMLQzAXd4AaLLBTDrj6C4UeqpZBIMA9l4KdGWot7aNwXZCI75b5O1ZCZCWVu48EoVkQtW7EPJNl66fu7k2meHnbvnSKb6XwADXA95eMrBBTEoaD1JxnHiewVwGZA0CRzas8EzifRUZB7KBddJd5quNKDQnDZA489yS2mTYq6YZD";
             // Identificador de número de teléfono
-            string idTelefono = "864164460106587";
+            string idTelefono = "909558215567844";
             // Nuestro teléfono
             string telefono = "528661425258";
             HttpClient client = new HttpClient();
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, $"https://graph.facebook.com/v22.0/{idTelefono}/messages");
             request.Headers.Add("Authorization", "Bearer " + token);
             request.Content = new StringContent(
-                "{ \"messaging_product\": \"whatsapp\", \"to\": \"528661425258\", \"type\": \"template\", \"template\": { \"name\": \"hello_world\", \"language\": { \"code\": \"en_US\" } } }",
+                "{ \"messaging_product\": \"whatsapp\", " +
+                "\"to\": \"528661425258\", " +
+                "\"type\": \"template\", " +
+                "\"template\": { " +
+                    "\"name\": \"invbox_test\", " +
+                    "\"language\": { \"code\": \"en\" } " +
+                "} " +
+                "}",
                 Encoding.UTF8,
                 "application/json"
             );
+
 
             HttpResponseMessage response = await client.SendAsync(request);
             string responseBody = await response.Content.ReadAsStringAsync();
@@ -40,6 +49,7 @@ namespace SIC.Backend.Services
             string numeroDestino,
             string mensaje)
         {
+            numeroDestino = "528661425258";
             try
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
@@ -101,9 +111,10 @@ namespace SIC.Backend.Services
             byte[] boletaPdf,
             string fileName)
         {
+            numeroDestino = "528661425258";
             try
             {
-                _httpClient.BaseAddress = new Uri($"https://graph.facebook.com/v22.0/{phoneNumberId}/");
+                _httpClient.BaseAddress = new Uri($"https://graph.facebook.com/v22.0/{phoneNumberId}/messages ");
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
                 // Enviar mensaje con el documento adjunto
