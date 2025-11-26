@@ -80,11 +80,9 @@ public class DashboardReporsitory : IDashboardReporsitory
 
         // 🔝 Top 15 eventos (solo del admin actual)
         var topEventsRaw = await _context.Events
-            //.Where(e => e.UserId == adminUserId) para traiga todos los eventos de todos
-            .OrderByDescending(e => e.Invitations
-                .Where(i => i.Status == Status.Attend)
-                .Sum(i => i.NumberConfirmedAdults + i.NumberConfirmedChildren))
-            .Take(15)
+            .Where(e => e.Date >= DateTime.Now && e.Status == Status.Active)// para traiga todos los eventos de todos
+            .OrderBy(e => e.Date)
+            .Take(20)
             .Select(e => new EventDashboardItemDto
             {
                 EventName = e.Name,
@@ -99,7 +97,8 @@ public class DashboardReporsitory : IDashboardReporsitory
                 NotAttendingGuests = e.Invitations
                     .Where(i => i.Status == Status.NotAttend)
                     .Sum(i => i.NumberAdults + i.NumberChildren)
-            })
+            }).
+            Where(e => e.Date > DateTime.Now.Date)
             .ToListAsync();
 
         // 📅 Próximos eventos (solo del admin actual)
@@ -152,7 +151,7 @@ public class DashboardReporsitory : IDashboardReporsitory
             NotAttendingGuests = notAttendingGuests,
 
             // Top y próximos eventos
-            TopEvents = topEventsRaw.OrderBy(d =>d.Date).ToList(),
+            TopEvents = topEventsRaw,
             UpcomingEvents = upcomingEventsRaw
         };
 
@@ -173,7 +172,7 @@ public class DashboardReporsitory : IDashboardReporsitory
 
         // 🔹 Próximos eventos con TotalGuests
         var upcomingEventsRaw = await myEventsQuery
-                                    .Where(e => e.Date >= DateTime.Today)
+                                    .Where(e => e.Date >= DateTime.Now && e.Status == Status.Active)// para traiga todos los eventos de todos
                                     .OrderBy(e => e.Date)
                                     .Take(15)
                                     .Select(e => new
@@ -204,7 +203,7 @@ public class DashboardReporsitory : IDashboardReporsitory
             .OrderByDescending(e => e.Invitations
                 .Where(i => i.Status == Status.Attend)
                 .Sum(i => i.NumberConfirmedAdults + i.NumberConfirmedChildren))
-            .Take(15)
+            .Take(20)
             .Select(e => new
             {
                 e.Id,
@@ -214,7 +213,7 @@ public class DashboardReporsitory : IDashboardReporsitory
                 Confirmed = e.Invitations.Count(i => i.Status == Status.Attend),
                 Pending = e.Invitations.Count(i => i.Status == Status.Pending),
                 NotAttending = e.Invitations.Count(i => i.Status == Status.NotAttend),
-                Date = e.Date, 
+                Date = e.Date,
                 // 🔹 Invitados (adultos + niños)
                 TotalGuests = e.Invitations.Sum(i => i.NumberAdults + i.NumberChildren),
                 ConfirmedGuests = e.Invitations
