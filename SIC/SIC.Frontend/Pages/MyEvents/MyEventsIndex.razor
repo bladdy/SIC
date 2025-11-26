@@ -73,7 +73,7 @@
                         <th class="text-start">Detalle del Evento</th>
                         <th>Estado</th>
                         <th>Fecha</th>
-                        <th>Acciones</th>
+                        <th class="d-none">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -115,7 +115,7 @@
                                 <td class="text-center">
                                     <div class="fw-semibold text-dark">@even.Date.ToString("dd/MM/yyyy")</div>
                                 </td>
-                                <td class="text-center">
+                                <td class="text-center d-none">
                                     <button class="btn btn-sm btn-custom mb-1" @onclick="() => ShowEditModal(even)">
                                         <i class="bi bi-pencil-fill"></i>
                                     </button>

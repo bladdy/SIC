@@ -1,5 +1,6 @@
 ﻿@page "/my-events/details/{Code}"
 @using SIC.Frontend.Shared
+@using SIC.Frontend.Shared.Component.Inputs
 <PageTitle>Detalles del Evento</PageTitle>
 <!--
 <h3 class="mb-2">Detalle del Evento</h3>-->
@@ -32,17 +33,21 @@ else
             </div>
 
             <!-- Botón QR: versión escritorio -->
-            <a href="/events/register-event/invitations-entries/@EventDetail.Code"
-               class="btn btn-sm text-white position-absolute top-0 end-0 mt-2 me-2 d-none d-md-inline-flex align-items-center"
-               style="background-color:#1F4854; border-color:white;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                     class="me-1">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h3v3h3v3h-6z" />
-                </svg>
-                Scan QR
-            </a>
+            @if (EventDetail.Date.Date == DateTime.Now.Date)
+            {
+                <a href="/events/register-event/invitations-entries/@EventDetail.Code"
+                   class="btn btn-sm text-white position-absolute top-0 end-0 mt-2 me-2 d-none d-md-inline-flex align-items-center"
+                   style="background-color:#1F4854; border-color:white;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         class="me-1">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h3v3h3v3h-6z" />
+                    </svg>
+                    Scan QR
+                </a>
+            }
+
 
             <!-- Botón QR: versión móvil -->
             <a href="/events/register-event/invitations-entries/@EventDetail.Code"
@@ -501,6 +506,32 @@ else
                             </div>
                         </div>
                         <div class="mb-3">
+                            <!--<div class="mb-3">
+                                <label for="telefono" class="form-label">Número de Teléfono</label>
+                                <div class="input-group">
+                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <span id="country-code">+1</span> 
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><p class="dropdown-item"  onclick="selectCode('+1')">+1 (USA/Canadá)</p></li>
+                                        <li><p class="dropdown-item" onclick="selectCode('+52')">+52 (México)</p></li>
+                                        <li><p class="dropdown-item"  onclick="selectCode('+34')">+34 (España)</p></li>
+                                        
+                                    </ul>
+
+                                    <input type="tel" id="telefono" name="telefono" class="form-control" placeholder="Ej: 123 456 7890" aria-label="Número de teléfono">
+                                </div>
+                            </div>
+
+                            <script>
+                                function selectCode(code) {
+                                    document.getElementById('country-code').textContent = code;
+                                }
+                            </script>
+                            
+                            <PhoneNumberInput @bind-PhoneNumber="NewInvitation.PhoneNumber" />
+
+                            -->
                             <label class="form-label">WhatsApp</label>
                             <InputText class="form-control" @bind-Value="NewInvitation.PhoneNumber" placeholder="Número de WhatsApp" />
                             <ValidationMessage For="@(() => NewInvitation.PhoneNumber)" />

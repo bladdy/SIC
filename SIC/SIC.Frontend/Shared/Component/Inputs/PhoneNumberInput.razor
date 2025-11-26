@@ -1,0 +1,57 @@
+﻿@using Microsoft.AspNetCore.Components
+
+<div class="mb-3">
+    <label for="telefono" class="form-label">Número de Teléfono</label>
+    <div class="input-group">
+        <!-- Dropdown para el código de área -->
+        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            @AreaCode <!-- Mostrar el código de área seleccionado -->
+        </button>
+        <ul class="dropdown-menu">
+            <!-- Lista de códigos de área -->
+            <li><a class="dropdown-item" href="#" @onclick="() => SetAreaCode(1)">+1 (USA/Canadá)</a></li>
+            <li><a class="dropdown-item" href="#" @onclick="() => SetAreaCode(52)">+52 (México)</a></li>
+            <li><a class="dropdown-item" href="#" @onclick="() => SetAreaCode(34)">+34 (España)</a></li>
+            <!-- Puedes agregar más códigos según sea necesario -->
+        </ul>
+
+        <!-- Campo de entrada para el número de teléfono -->
+        <input type="tel" id="telefono" name="telefono" class="form-control" placeholder="Ej: 123 456 7890"
+               aria-label="Número de teléfono" @bind="PhoneNumber">
+    </div>
+</div>
+
+@code {
+    // El código de área por defecto
+    private string AreaCode { get; set; } = "+1"; // Valor por defecto (EE. UU.)
+
+    // El número de teléfono
+    private string PhoneNumber { get; set; }
+
+    // Método para actualizar el código de área basado en un valor numérico
+    private void SetAreaCode(int countryCode)
+    {
+        // Usamos un switch para asignar el código de área
+        switch (countryCode)
+        {
+            case 1:
+                AreaCode = "+1"; // EE. UU. / Canadá
+                break;
+            case 52:
+                AreaCode = "+52"; // México
+                break;
+            case 34:
+                AreaCode = "+34"; // España
+                break;
+            // Puedes agregar más casos según lo necesites
+            default:
+                AreaCode = "+1"; // Valor por defecto
+                break;
+        }
+
+        StateHasChanged();  // Para que Blazor actualice la vista después de cambiar el código
+    }
+
+    // Propiedad para obtener el número completo con el código de área
+    public string FullPhoneNumber => $"{AreaCode} {PhoneNumber}";
+}
