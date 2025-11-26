@@ -117,7 +117,7 @@ namespace SIC.Backend.Repositories.Implemetations
         {
             var invitations = await _context.Invitations
                 .Include(i => i.Event)
-                .Where(i => i.Event!.Code == code)
+                .Where(i => i.Event!.Code == code && i.Status == Shared.Enums.Status.Pending)
                 .ToListAsync();
 
             var message = await _context.Messages
