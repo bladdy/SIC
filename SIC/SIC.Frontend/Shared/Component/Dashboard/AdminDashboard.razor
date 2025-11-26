@@ -117,12 +117,12 @@
 
         <!-- Top eventos por invitados -->
         <div class="col-12 mt-3">
-            <div class="card shadow-sm" style="height: 580px;">
+            <div class="card shadow-sm">
                 <div class="card-body d-flex flex-column h-100">
                     <h5 class="mb-3"><strong>Próximos eventos</strong></h5>
 
                     <!-- Contenido scrollable -->
-                    <div class="flex-grow-1 overflow-auto">
+                    <div class="flex-grow-1">
                         @foreach (var e in TopEventsPage)
                         {
                             var total = e.TotalGuests > 0 ? e.TotalGuests : 1;
