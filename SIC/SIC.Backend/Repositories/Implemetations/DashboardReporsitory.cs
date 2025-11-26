@@ -152,7 +152,7 @@ public class DashboardReporsitory : IDashboardReporsitory
             NotAttendingGuests = notAttendingGuests,
 
             // Top y próximos eventos
-            TopEvents = topEventsRaw,
+            TopEvents = topEventsRaw.OrderBy(d =>d.Date).ToList(),
             UpcomingEvents = upcomingEventsRaw
         };
 
@@ -259,6 +259,7 @@ public class DashboardReporsitory : IDashboardReporsitory
             NotAttendingGuests = notAttendingGuests,
 
             TopEvents = topEventsRaw
+                .OrderBy(d => d.Date)
                 .Select(x => new PlannerDashboardDto.TopEvent
                 {
                     EventId = x.Id,
