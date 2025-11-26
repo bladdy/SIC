@@ -32,13 +32,20 @@ namespace SIC.Backend.Controllers
         [HttpGet("ListaEnvio/{eventoId}")]
         public async Task<IActionResult> ObtenerListaEnvioWhatsApp(string eventoId)
         {
-            // obtener la lista de invitaciones con los mensajes por evento
-            var response = await _messageUnitOfWork.GetMessageWhatsappInvitation(eventoId);
-            if (response.Success)
+            try
             {
-                return Ok(response.Result);
+                // obtener la lista de invitaciones con los mensajes por evento
+                var response = await _messageUnitOfWork.GetMessageWhatsappInvitation(eventoId);
+                if (response.Success)
+                {
+                    return Ok(response.Result);
+                }
+                return NotFound();
             }
-            return NotFound();
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message, detalle = ex.StackTrace });
+            }
         }
 
         //[HttpPost("enviar-masivo/{eventoId}")]
