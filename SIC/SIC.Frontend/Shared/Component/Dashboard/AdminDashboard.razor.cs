@@ -12,11 +12,12 @@ public partial class AdminDashboard
 {
     //ToDo: Agregar el consumo cuando sea un planner para que haga el descuento de los creditos
     [Inject] private IRepository Repository { get; set; } = default!;
+
     public AdminDashboardDto? AdminDashboards { get; set; }
 
     private int topEventsPage = 0;
     private int upcomingEventsPage = 0;
-    private int pageSize = 5;
+    private int pageSize = 10;
 
     protected override async Task OnInitializedAsync()
     {
