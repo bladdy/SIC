@@ -6,6 +6,8 @@ using SIC.Shared.Entities;
 
 namespace SIC.Backend.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]")]
     public class EnviosWsController : ControllerBase
     {
         private readonly IMessageUnitOfWork _messageUnitOfWork;
