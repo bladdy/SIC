@@ -29,7 +29,7 @@ namespace SIC.Backend.Controllers
             _MasiveShippingProgressUnitOfWork = MasiveShippingProgressUnitOfWork;
         }
 
-        [HttpGet("lista-envio-whatsapp/{eventoId}")]
+        [HttpGet("lista-envio/{eventoId}")]
         public async Task<IActionResult> ObtenerListaEnvioWhatsApp(string eventoId)
         {
             // obtener la lista de invitaciones con los mensajes por evento
