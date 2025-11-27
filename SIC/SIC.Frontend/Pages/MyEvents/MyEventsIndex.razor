@@ -13,7 +13,7 @@
     </AuthorizeView>
 
     <!-- Planner -->
-    <AuthorizeView Roles="WeddingPlanner">
+    <AuthorizeView Roles="WeddingPlannerr">
         <Authorized>
             <button class="btn btn-custom"
                     @onclick="ShowCreateModal"
@@ -156,8 +156,8 @@
                             </p>
                             <p class="mb-2"><strong>Fecha:</strong> @even.Date.ToString("dd/MM/yyyy")</p>
                             <div class="d-flex gap-2 flex-wrap">
-                                <button class="btn btn-sm btn-custom flex-grow-1" @onclick="() => ShowEditModal(even)"><i class="bi bi-pencil-fill"></i> Editar</button>
-                                <button class="btn btn-sm btn-custom flex-grow-1" @onclick="() => ConfirmDelete(even)"><i class="bi bi-trash-fill"></i> Borrar</button>
+                                <button class="btn btn-sm btn-custom flex-grow-1 d-none" @onclick="() => ShowEditModal(even)"><i class="bi bi-pencil-fill"></i> Editar</button>
+                                <button class="btn btn-sm btn-custom flex-grow-1 d-none" @onclick="() => ConfirmDelete(even)"><i class="bi bi-trash-fill"></i> Borrar</button>
                                 <a href="@even.Url" target="_blank" class="btn btn-sm btn-custom flex-grow-1">Ver Invitación</a>
                                 <a href="/my-events/details/@even.Code" class="btn btn-sm btn-custom flex-grow-1">Invitados</a>
                             </div>
