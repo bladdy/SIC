@@ -2,13 +2,15 @@
 // invitations.js
 // ==============================
 // Pendiente: HTML agregarle la opciones de tipo de letra, color y tamaño
-// ToDo: Validar cuando el inv.numberChildren sea 0 no mostrar el select de niños
+// ToDo: Verificar que si el invtado selecciona que no asistira, que todas las cantidades sean 0
+// ToDo: Agregar campo de jovenes, y solo mostrar si la invitacion tiene jovenes
 // ✅ Constante global accesible en todo el archivo
-//const apiUrl = "https://localhost:7141"; //🔹 Constante global
-const apiUrl = "https://invboxv-app.com"
+const apiUrl = "https://localhost:7141"; //🔹 Constante global
+//const apiUrl = "https://invboxv-app.com"
 
 let invitacionData = null;
 let hayNiños = false;
+let hayJovenes = false;
 let tipoEvent = "";
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -89,16 +91,18 @@ function mostrarMensajeNoInvitacion(codigoInvitacion) {
 // ✅ Muestra los datos en el HTML
 function mostrarDatosInvitacion(inv) {
     document.getElementById("rotulo_invitacion").innerText = inv.name;
-    console.log(tipoEvent)
     if (tipoEvent !== "Save the Date") {
+        if (inv.numberChildren > 0) hayNiños = true;
+        if (inv.numberYouths > 0) hayJovenes = true;
+
         document.getElementById("invitados_mayores").innerText = `${inv.numberAdults} Adulto(s)`;
+        document.getElementById("invitados_jovenes").innerText = `${inv.numberYouths} Jóven(es)`;
         document.getElementById("invitados_menores").innerText = inv.numberChildren === 0
             ? "Respetuosamente NO NIÑOS"
             : `${inv.numberChildren} Niño(s)`;
 
-        if (inv.numberChildren > 0) hayNiños = true;
-
         llenarSelect("confirmadosadultos", inv.numberAdults, "Adulto");
+        llenarSelect("confirmadosjovenes", inv.numberYouths, "Jóven");
         llenarSelect("confirmadosmenores", inv.numberChildren, "Niño");
     }
 }
@@ -110,11 +114,18 @@ function llenarSelect(selectId, cantidad, tipo) {
     if (tipo === "Niño") {
         select.innerHTML = `<option value="0">No asistirán ${tipo}(s)</option>`;
     }
+    if (tipo === "Jóven") {
+        select.innerHTML = `<option value="0">No asistirán ${tipo}(es)</option>`;
+    }
     for (let i = 1; i <= cantidad; i++) {
         const opt = document.createElement("option");
         opt.value = i;
-        // Verifica si i es mayor que 1 y concatena "s" a tipo
-        opt.text = `${i} ${tipo}${i > 1 ? 's' : ''}`;
+        if (tipo === "Jóven") {
+            opt.text = `${i} ${tipo}${i > 1 ? 'es' : ''}`;
+        }
+        else {
+            opt.text = `${i} ${tipo}${i > 1 ? 's' : ''}`;
+        }
         select.appendChild(opt);
     }
 }
@@ -122,15 +133,18 @@ function llenarSelect(selectId, cantidad, tipo) {
 // ✅ Maneja el cambio de asistencia
 function fn_asistencia(valor) {
     const selAdultos = document.getElementById("seladultos");
+    const selJovenes = document.getElementById("seljovenes");
     const selMenores = document.getElementById("selmenores");
     const btnConfirmar = document.getElementById("btnConfirmar");
 
     if (valor === "s") {
         selAdultos.style.display = "block";
         if (hayNiños) selMenores.style.display = "block";
+        if (hayJovenes) selJovenes.style.display = "block";
         btnConfirmar.style.display = "block";
     } else {
         selAdultos.style.display = "none";
+        selJovenes.style.display = "none";
         selMenores.style.display = "none";
         btnConfirmar.style.display = "block";
     }
@@ -155,14 +169,21 @@ function sendRespuesta() {
         return;
     }
 
+    // Si no asiste, poner todos los confirmados a 0
+    const confirmadosAdultos = asistira === false ? 0 : parseInt(document.getElementById("confirmadosadultos")?.value || "0");
+    const confirmadosJovenes = asistira === false ? 0 : parseInt(document.getElementById("confirmadosjovenes")?.value || "0");
+    const confirmadosMenores = asistira === false ? 0 : parseInt(document.getElementById("confirmadosmenores")?.value || "0");
+
     const respuesta = {
         codigoInvitacion: invitacionData.code,
         nombre: invitacionData.name,
         cantidadDeMayores: invitacionData.numberAdults,
+        cantidadDeJovenes: invitacionData.NumberYouths,
         cantidadDeMenores: invitacionData.numberChildren,
         confirmacionAsistencia: tipoEvent === "Save the Date" ? true : asistira,
-        confirmadosAdultos: parseInt(document.getElementById("confirmadosadultos")?.value || "0"),
-        confirmadosMenores: parseInt(document.getElementById("confirmadosmenores")?.value || "0"),
+        confirmadosAdultos: confirmadosAdultos,
+        confirmadosJovenes: confirmadosJovenes,
+        confirmadosMenores: confirmadosMenores,
         mensaje: document.getElementById("texto_respuesta")?.value || ""
     };
 

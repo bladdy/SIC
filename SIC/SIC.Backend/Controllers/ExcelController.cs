@@ -1,6 +1,8 @@
 ﻿using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Extensions;
 using SIC.Backend.UnitOfWork.Interfaces;
+using SIC.Frontend.Helpers;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using SIC.Shared.Enums;
@@ -62,12 +64,14 @@ namespace SIC.Backend.Controllers
                         PhoneNumber = row.Cell(4).GetString(),
                         EventId = eventId,
                         NumberAdults = row.Cell(5).GetValue<int>(),
-                        NumberChildren = row.Cell(6).GetValue<int>(),
-                        NumberConfirmedAdults = row.Cell(7).GetValue<int>(),
-                        NumberConfirmedChildren = row.Cell(8).GetValue<int>(),
-                        Status = Status.Pending,
-                        Table = row.Cell(10).GetString(),
-                        Comments = row.Cell(11).GetString(),
+                        NumberYouths = row.Cell(6).GetValue<int>(),
+                        NumberChildren = row.Cell(7).GetValue<int>(),
+                        NumberConfirmedAdults = row.Cell(8).GetValue<int>(),
+                        NumberConfirmedYouths = row.Cell(9).GetValue<int>(),
+                        NumberConfirmedChildren = row.Cell(10).GetValue<int>(),
+                        Status = Status.Pending,// para que no se vuelva a modificar el estado tengoque poneer que valide si ya confirmo no cambie el estado
+                        Table = row.Cell(12).GetString(),
+                        Comments = row.Cell(13).GetString(),
                         SentDate = DateTime.Now,
                         ConfirmationDate = null
                     };
@@ -137,7 +141,9 @@ namespace SIC.Backend.Controllers
                         existing.PhoneNumber = inv.PhoneNumber;
                         existing.NumberAdults = inv.NumberAdults;
                         existing.NumberChildren = inv.NumberChildren;
+                        existing.NumberYouths = inv.NumberYouths;
                         existing.NumberConfirmedAdults = inv.NumberConfirmedAdults;
+                        existing.NumberConfirmedYouths = inv.NumberConfirmedYouths;
                         existing.NumberConfirmedChildren = inv.NumberConfirmedChildren;
                         existing.Status = inv.Status;
                         existing.Table = inv.Table;
@@ -184,8 +190,10 @@ namespace SIC.Backend.Controllers
                         Email = "ejemplo@correo.com",
                         PhoneNumber = "0000000000",
                         NumberAdults = 2,
+                        NumberYouths = 1,
                         NumberChildren = 1,
                         NumberConfirmedAdults = 0,
+                        NumberConfirmedYouths = 0,
                         NumberConfirmedChildren = 0,
                         Status = Status.Pending, // 👈 ajusta al enum real que uses
                         Table = "Mesa 1",
@@ -205,16 +213,18 @@ namespace SIC.Backend.Controllers
             worksheet.Cell(1, 3).Value = "Correo Electrónico";
             worksheet.Cell(1, 4).Value = "Número de Teléfono";
             worksheet.Cell(1, 5).Value = "Número de Adultos";
-            worksheet.Cell(1, 6).Value = "Número de Niños";
-            worksheet.Cell(1, 7).Value = "Adultos Confirmados";
-            worksheet.Cell(1, 8).Value = "Niños Confirmados";
-            worksheet.Cell(1, 9).Value = "Estado";
-            worksheet.Cell(1, 10).Value = "Mesa";
-            worksheet.Cell(1, 11).Value = "Comentarios";
+            worksheet.Cell(1, 6).Value = "Número de Jóvenes";
+            worksheet.Cell(1, 7).Value = "Número de Niños";
+            worksheet.Cell(1, 8).Value = "Adultos Confirmados";
+            worksheet.Cell(1, 9).Value = "Jóvenes Confirmados";
+            worksheet.Cell(1, 10).Value = "Niños Confirmados";
+            worksheet.Cell(1, 11).Value = "Estado";
+            worksheet.Cell(1, 12).Value = "Mesa";
+            worksheet.Cell(1, 13).Value = "Comentarios";
             /*worksheet.Cell(1, 12).Value = "Fecha Envío";
             worksheet.Cell(1, 13).Value = "Fecha Confirmación";*/
 
-            var headerRange = worksheet.Range(1, 1, 1, 11);
+            var headerRange = worksheet.Range(1, 1, 1, 13);
             headerRange.Style.Font.Bold = true;
             headerRange.Style.Fill.BackgroundColor = XLColor.LightGray;
             headerRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
@@ -230,12 +240,14 @@ namespace SIC.Backend.Controllers
                 worksheet.Cell(row, 3).Value = invitation.Email;
                 worksheet.Cell(row, 4).Value = invitation.PhoneNumber;
                 worksheet.Cell(row, 5).Value = invitation.NumberAdults;
-                worksheet.Cell(row, 6).Value = invitation.NumberChildren;
-                worksheet.Cell(row, 7).Value = invitation.NumberConfirmedAdults;
-                worksheet.Cell(row, 8).Value = invitation.NumberConfirmedChildren;
-                worksheet.Cell(row, 9).Value = invitation.Status.ToString();
-                worksheet.Cell(row, 10).Value = invitation.Table;
-                worksheet.Cell(row, 11).Value = invitation.Comments;
+                worksheet.Cell(row, 6).Value = invitation.NumberConfirmedYouths;
+                worksheet.Cell(row, 7).Value = invitation.NumberChildren;
+                worksheet.Cell(row, 8).Value = invitation.NumberConfirmedAdults;
+                worksheet.Cell(row, 9).Value = invitation.NumberConfirmedYouths;
+                worksheet.Cell(row, 10).Value = invitation.NumberConfirmedChildren;
+                worksheet.Cell(row, 11).Value = invitation.Status.GetDescription();
+                worksheet.Cell(row, 12).Value = invitation.Table;
+                worksheet.Cell(row, 13).Value = invitation.Comments;
                 /*worksheet.Cell(row, 12).Value = invitation.SentDate.ToString("dd/MM/yyyy HH:mm");
                 worksheet.Cell(row, 13).Value = invitation.ConfirmationDate?.ToString("dd/MM/yyyy HH:mm") ?? "—";*/
 

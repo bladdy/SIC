@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SIC.Frontend\SIC.Frontend.csproj" />
     <ProjectReference Include="..\SIC.Shared\SIC.Shared.csproj" />
   </ItemGroup>
 

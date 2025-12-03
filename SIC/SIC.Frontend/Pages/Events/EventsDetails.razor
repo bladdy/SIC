@@ -68,22 +68,28 @@ else
             <!-- ======================== -->
             <div class="row text-center align-items-stretch g-1 g-md-3 mt-0">
                 <!-- Invitados -->
-                <div class="col-12 col-md-4 mb-0">
+                <div class="col-12 col-md-3 mb-0">
                     <p class="d-flex justify-content-between px-3 py-1 text-white" style="background-color:#3C6A79;">
                         <strong>Invitados:</strong>
                         <span>@(EventDetail.NumberAdults + EventDetail.NumberChildren)</span>
                     </p>
                 </div>
                 <!-- Adultos -->
-                <div class="col-6 col-md-4">
+                <div class="col-6 col-md-3">
                     <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#3C6A79;">
                         <strong>Adultos:</strong>
                         <span>@EventDetail.NumberAdults</span>
                     </p>
                 </div>
+                <div class="col-6 col-md-3">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#3C6A79;">
+                        <strong>Jóvenes:</strong>
+                        <span>@EventDetail.NumberYouths</span>
+                    </p>
+                </div>
 
                 <!-- Niños -->
-                <div class="col-6 col-md-4">
+                <div class="col-6 col-md-3">
                     <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#3C6A79;">
                         <strong>Niños:</strong>
                         <span>@EventDetail.NumberChildren</span>
@@ -97,23 +103,31 @@ else
             <!-- ======================== -->
             <div class="row text-center align-items-stretch g-1 g-md-3 mt-0">
                 <!-- (Sí asistiré) -->
-                <div class="col-12 col-md-4 m-0">
+                <div class="col-12 col-md-3 m-0">
                     <p class="d-flex justify-content-between px-3 py-1 text-white bg-success">
                         <strong>Total SÍ ASISTIRÉ:</strong>
-                        <span>@(EventDetail.NumberAdultsConfirmed + EventDetail.NumberChildrenConfirmed)</span>
+                        <span>@(EventDetail.NumberAdultsConfirmed + EventDetail.NumberChildrenConfirmed + EventDetail.NumberYouthsConfirmed)</span>
                     </p>
                 </div>
 
                 <!-- Adultos (Sí asistiré) -->
-                <div class="col-6 col-md-4 m-0">
+                <div class="col-6 col-md-3 m-0">
                     <p class="d-flex justify-content-between px-3 py-1 text-white bg-success ">
                         <strong>Adultos:</strong>
                         <span>@EventDetail.NumberAdultsConfirmed</span>
                     </p>
                 </div>
 
+                <!-- Jóvenes (Sí asistiré) -->
+                <div class="col-6 col-md-3 m-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-success ">
+                        <strong>Jóvenes:</strong>
+                        <span>@EventDetail.NumberYouthsConfirmed</span>
+                    </p>
+                </div>
+
                 <!-- Niños (Sí asistiré) -->
-                <div class="col-6 col-md-4 m-0">
+                <div class="col-6 col-md-3 m-0">
                     <p class="d-flex justify-content-between px-3 py-1 text-white bg-success ">
                         <strong>Niños:</strong>
                         <span>@EventDetail.NumberChildrenConfirmed</span>
@@ -124,7 +138,7 @@ else
                 <div class="col-12 col-md-4 m-0">
                     <p class="d-flex justify-content-between px-3 py-1 text-white bg-danger ">
                         <strong>Total NO ASISTIRÉ:</strong>
-                        <span>@(EventDetail.NumberAdultsNotAttend + EventDetail.NumberChildrenNotAttend)</span>
+                        <span>@(EventDetail.NumberAdultsNotAttend + EventDetail.NumberChildrenNotAttend + EventDetail.NumberYouthNotAttend)</span>
                     </p>
                 </div>
 
@@ -132,7 +146,7 @@ else
                 <div class="col-12 col-md-4 m-0">
                     <p class="d-flex justify-content-between px-3 py-1 text-white bg-warning ">
                         <strong>Pendientes:</strong>
-                        <span>@(EventDetail.NumberAdultsPending + EventDetail.NumberChildrenPending)</span>
+                        <span>@(EventDetail.NumberAdultsPending + EventDetail.NumberChildrenPending + EventDetail.NumberYouthPending)</span>
                     </p>
                 </div>
             </div>
@@ -224,15 +238,17 @@ else
                                             </div>
                                             <div><strong>Nombre:</strong> @invitation.Name</div>
                                             <div><strong>Móvil:</strong> @invitation.PhoneNumber</div>
+                                            <div><strong>Mesa:</strong> @invitation.Table</div>
                                         </div>
 
                                         <!-- ===== COLUMNA 2 ===== -->
                                         <div class="col-12 col-md-4 d-flex flex-column">
                                             <div><strong>Adultos:</strong> @invitation.NumberAdults</div>
+                                            <div><strong>Jóvenes:</strong> @invitation.NumberYouths</div>
                                             <div><strong>Niños:</strong> @invitation.NumberChildren</div>
                                             <div><strong>Conf. Adultos:</strong> @invitation.NumberConfirmedAdults</div>
+                                            <div><strong>Conf. Jóvenes:</strong> @invitation.NumberConfirmedYouths</div>
                                             <div><strong>Conf. Niños:</strong> @invitation.NumberConfirmedChildren</div>
-                                            <div><strong>Mesa:</strong> @invitation.Table</div>
                                         </div>
 
                                         <!-- ===== COLUMNA 3 ===== -->
@@ -357,8 +373,9 @@ else
                             @invitation.Status.GetDescription()
                         </span>
                     </div>
-                    <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="row justify-content-between align-items-center">
                         <p class="mb-0"><strong>Adultos:</strong> @invitation.NumberAdults (@invitation.NumberConfirmedAdults conf.)</p>
+                        <p class="mb-0"><strong>Jóvenes:</strong> @invitation.NumberYouths (@invitation.NumberConfirmedYouths conf.)</p>
                         <p class="mb-0"><strong>Niños:</strong> @invitation.NumberChildren (@invitation.NumberConfirmedChildren conf.)</p>
 
                     </div>
@@ -506,12 +523,17 @@ else
                             <ValidationMessage For="@(() => NewInvitation.PhoneNumber)" />
                         </div>
                         <div class="mb-3 row col-12">
-                            <div class="col-6">
+                            <div class="col-4">
                                 <label class="form-label">Adultos</label>
                                 <InputNumber class="form-control" @bind-Value="NewInvitation.NumberAdults" />
                                 <ValidationMessage For="@(() => NewInvitation.NumberAdults)" />
                             </div>
-                            <div class="col-6">
+                            <div class="col-4">
+                                <label class="form-label">Jóvenes</label>
+                                <InputNumber class="form-control" @bind-Value="NewInvitation.NumberYouths" />
+                                <ValidationMessage For="@(() => NewInvitation.NumberYouths)" />
+                            </div>
+                            <div class="col-4">
                                 <label class="form-label">Niños</label>
                                 <InputNumber class="form-control" @bind-Value="NewInvitation.NumberChildren" />
                                 <ValidationMessage For="@(() => NewInvitation.NumberChildren)" />
@@ -536,12 +558,17 @@ else
                             </div>
 
                             <div class="mb-3 row col-12">
-                                <div class="col-6">
+                                <div class="col-4">
                                     <label class="form-label">Adultos</label>
                                     <InputNumber class="form-control" @bind-Value="NewInvitation.NumberConfirmedAdults" />
                                     <ValidationMessage For="@(() => NewInvitation.NumberConfirmedAdults)" />
                                 </div>
-                                <div class="col-6">
+                                <div class="col-4">
+                                    <label class="form-label">Jóvenes</label>
+                                    <InputNumber class="form-control" @bind-Value="NewInvitation.NumberConfirmedYouths" />
+                                    <ValidationMessage For="@(() => NewInvitation.NumberConfirmedYouths)" />
+                                </div>
+                                <div class="col-4">
                                     <label class="form-label">Niños</label>
                                     <InputNumber class="form-control" @bind-Value="NewInvitation.NumberConfirmedChildren" />
                                     <ValidationMessage For="@(() => NewInvitation.NumberConfirmedChildren)" />

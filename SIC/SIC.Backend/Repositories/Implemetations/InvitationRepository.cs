@@ -189,6 +189,7 @@ namespace SIC.Backend.Repositories.Implemetations
                     };
                 }
                 invitations.NumberConfirmedAdults = confirmationDto.ConfirmadosAdultos;
+                invitations.NumberConfirmedYouths = confirmationDto.confirmadosJovenes;
                 invitations.NumberConfirmedChildren = confirmationDto.ConfirmadosMenores;
                 invitations.ConfirmationDate = DateTime.Now;
                 invitations.Comments = confirmationDto.Mensaje;

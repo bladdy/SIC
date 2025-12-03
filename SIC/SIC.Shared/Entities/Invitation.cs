@@ -27,11 +27,17 @@ public class Invitation
     [Display(Name = "Numero de Adultos")]
     public int NumberAdults { get; set; }
 
+    [Display(Name = "Numero de Jovenes")]
+    public int NumberYouths { get; set; } = 0;
+
     [Display(Name = "Numero de Niños")]
     public int NumberChildren { get; set; }
 
     [Display(Name = "Numero de Adultos Confirmados")]
     public int NumberConfirmedAdults { get; set; }
+
+    [Display(Name = "Numero de Niños Jovenes")]
+    public int NumberConfirmedYouths { get; set; } = 0;
 
     [Display(Name = "Numero de Niños Confirmados")]
     public int NumberConfirmedChildren { get; set; }

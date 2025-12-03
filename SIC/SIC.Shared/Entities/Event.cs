@@ -28,7 +28,7 @@ public class Event : IEntityWithName
 
     [Display(Name = "Hora")]
     [DisplayFormat(DataFormatString = "{0:hh:mm}")]
-    public TimeSpan Time { get; set; } 
+    public TimeSpan Time { get; set; }
 
     [Display(Name = "Ubicación")]
     public string? Ubication { get; set; }
@@ -73,11 +73,16 @@ public class Event : IEntityWithName
     // 🔹 Total Adultos invitados
     public int NumberAdults => Invitations?.Sum(a => a.NumberAdults) ?? 0;
 
+    // 🔹 Total Jovenes invitados
+    public int NumberYouths => Invitations?.Sum(a => a.NumberYouths) ?? 0;
+
     // 🔹 Total Niños invitados
     public int NumberChildren => Invitations?.Sum(a => a.NumberChildren) ?? 0;
 
     // 🔹 Adultos confirmados
     public int NumberAdultsConfirmed => Invitations?.Where(s => s.Status == Status.Attend).Sum(a => a.NumberConfirmedAdults) ?? 0;
+    // 🔹 Jovenes confirmados
+    public int NumberYouthsConfirmed => Invitations?.Where(s => s.Status == Status.Attend).Sum(a => a.NumberConfirmedYouths) ?? 0;
 
     // 🔹 Niños confirmados
     public int NumberChildrenConfirmed => Invitations?.Where(s => s.Status == Status.Attend).Sum(a => a.NumberConfirmedChildren) ?? 0;
@@ -89,10 +94,16 @@ public class Event : IEntityWithName
     // 🔹 Niños pendientes
     public int NumberChildrenPending => Invitations?.Where(s => s.Status == Status.Pending)
                                                    .Sum(a => a.NumberChildren) ?? 0;
+    // 🔹 Jovenes pendientes
+    public int NumberYouthPending => Invitations?.Where(s => s.Status == Status.Pending)
+                                                   .Sum(a => a.NumberYouths) ?? 0;
 
     // 🔹 Niños No asistirán
     public int NumberChildrenNotAttend => Invitations?.Where(s => s.Status == Status.NotAttend)
                                                    .Sum(a => a.NumberChildren) ?? 0;
+    // 🔹 Jovenes No asistirán
+    public int NumberYouthNotAttend => Invitations?.Where(s => s.Status == Status.NotAttend)
+                                                   .Sum(a => a.NumberYouths) ?? 0;
 
     // 🔹 Adultos No asistiran
     public int NumberAdultsNotAttend => Invitations?.Where(s => s.Status == Status.NotAttend)
