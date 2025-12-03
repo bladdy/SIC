@@ -2,10 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Extensions;
 using SIC.Backend.UnitOfWork.Interfaces;
-using SIC.Frontend.Helpers;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using SIC.Shared.Enums;
+using SIC.Shared.Helpers;
 
 //ToDO: Validar que las invitaciones importadas pertenezcan al eventId
 //ToDO: Manejar mejor los errores (ej. código duplicado)
