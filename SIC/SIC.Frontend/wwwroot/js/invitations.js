@@ -5,8 +5,8 @@
 // ToDo: Verificar que si el invtado selecciona que no asistira, que todas las cantidades sean 0
 // ToDo: Agregar campo de jovenes, y solo mostrar si la invitacion tiene jovenes
 // ✅ Constante global accesible en todo el archivo
-const apiUrl = "https://localhost:7141"; //🔹 Constante global
-//const apiUrl = "https://invboxv-app.com"
+//const apiUrl = "https://localhost:7141"; //🔹 Constante global
+const apiUrl = "https://invboxv-app.com"
 
 let invitacionData = null;
 let hayNiños = false;
