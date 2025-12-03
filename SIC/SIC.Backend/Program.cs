@@ -15,6 +15,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
 
+//ToDo: Agregar la deshabilitacion de los botones Editar y Crear para los Clientes y los Wedding Planner
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -97,6 +98,9 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserCreditUnitsOfWork, UserCreditUnitsOfWork>();
 builder.Services.AddScoped<IUserCreditRepository, UserCreditRepository>();
 
+builder.Services.AddScoped<IWhatsAppConfigRepository, WhatsAppConfigRepository>();
+builder.Services.AddScoped<IWhatsAppConfigUnitOfWork, WhatsAppConfigUnitOfWork>();
+
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
     options.User.RequireUniqueEmail = true;
@@ -123,6 +127,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+    context.Database.Migrate();   // CREA LA TABLA __EFMigrationsHistory
+}
 
 SeedData(app);
 
