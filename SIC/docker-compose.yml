@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   # =========================
   # SQL Server
@@ -26,12 +28,14 @@ services:
       FTP_USER: sicftp
       FTP_PASS: SicFtp123!
       FTP_CHROOT_LOCAL_USER: "YES"
+
+      # 🔑 MODO PASIVO (OBLIGATORIO)
       PASV_ENABLE: "YES"
-      PASV_ADDRESS: invboxv-app.com # Cambiar por IP o dominio público del servidor localhost y producción el dominio o IP pública
+      PASV_ADDRESS: invboxv-app.com   # Dominio o IP pública del droplet
       PASV_MIN_PORT: 21100
       PASV_MAX_PORT: 21110
 
-      # 🔑 PERMISOS IMPORTANTES
+      # 🔐 PERMISOS DE ARCHIVOS
       FILE_OPEN_MODE: "0666"
       LOCAL_UMASK: "022"
     volumes:
@@ -40,9 +44,11 @@ services:
       - "21:21"
       - "21100-21110:21100-21110"
     restart: always
+    networks:
+      - sic_network
 
   # =========================
-  # Nginx – Servidor público
+  # Nginx – Servidor público de archivos
   # =========================
   file_server:
     image: nginx:alpine
@@ -54,7 +60,6 @@ services:
     restart: always
     networks:
       - sic_network
-
 
   # =========================
   # Backend .NET
@@ -68,15 +73,21 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:5000
 
-      # DB
-      ConnectionStrings__DefaultConnection: Server=sic_sqlserver,1433;Database=SIC_DB;User Id=sa;Password=Bladdy3434!;TrustServerCertificate=True;Encrypt=False;
+      # 🔗 DB
+      ConnectionStrings__DefaultConnection: >
+        Server=sic_sqlserver,1433;
+        Database=SIC_DB;
+        User Id=sa;
+        Password=Bladdy3434!;
+        TrustServerCertificate=True;
+        Encrypt=False;
 
-      # FTP CONFIG (⚠️ SOLO SI EL BACKEND ESTÁ EN DOCKER)
-      Ftp__Host: sic_ftp
+      # 📁 FTP (IMPORTANTE)
+      Ftp__Host: sic_ftp          # Nombre del contenedor
       Ftp__Port: 21
       Ftp__Username: sicftp
       Ftp__Password: SicFtp123!
-      Ftp__UrlBase: https://invboxv-app.com/files # Cambiar localhost por dominio público en producción https://invboxv-app.com/files http://localhost:9003
+      Ftp__UrlBase: https://invboxv-app.com/files
 
     depends_on:
       - sqlserver
@@ -109,7 +120,6 @@ services:
 volumes:
   sql_data:
   files_data:
-
 
 # =========================
 # Red
