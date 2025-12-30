@@ -5,11 +5,10 @@ using Microsoft.AspNetCore.Components.Authorization;
 using SIC.Frontend.Repositories;
 using SIC.Shared.Entities;
 using System.Net;
+
 namespace SIC.Frontend.Pages.Events
 {
     [Authorize(Roles = "Admin")]
-
-    //ToDo: Agregar el consumo cuando sea un planner para que haga el descuento de los creditos
     public partial class EventsIndex
     {
         [Inject] private IRepository repository { get; set; } = default!;
@@ -97,6 +96,7 @@ namespace SIC.Frontend.Pages.Events
             {
                 url += $"&Filter={Filter}";
             }
+
             if (DateSelectd != null)
             {
                 url += $"&Date={DateSelectd}";
@@ -202,6 +202,7 @@ namespace SIC.Frontend.Pages.Events
                 Host = evnt.Host,
                 HostPhone = evnt.HostPhone,
                 Planner = evnt.Planner,
+                HasAlbum = evnt.HasAlbum,
                 PlannerPhone = evnt.PlannerPhone,
                 EventType = evnt.EventType,
                 Status = evnt.Status

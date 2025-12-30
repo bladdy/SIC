@@ -58,4 +58,7 @@ public class Invitation
 
     // 👇 Relación 1:1 con InvitationEntry
     public InvitationEntry? InvitationEntry { get; set; } = null!;
+
+    // NUEVO: Lista dinámica de invitados
+    public ICollection<InvitationGuest> Guests { get; set; } = new List<InvitationGuest>();
 }

@@ -159,6 +159,10 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
         var queryable = _context.Events.Include(e => e.EventType).AsQueryable();
         if (!string.IsNullOrWhiteSpace(pagination.UserId))
             queryable = queryable.Where(x => x.UserId == pagination.UserId);
+        if (pagination.HasAlbum)
+        {
+            queryable = queryable.Where(x => x.HasAlbum == pagination.HasAlbum);
+        }
         if (!string.IsNullOrWhiteSpace(pagination.Filter))
         {
             var filter = pagination.Filter.ToLower();
@@ -198,9 +202,13 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
 
     public override async Task<ActionResponse<IEnumerable<Event>>> GetAsync(PaginationDTO pagination)
     {
-        var queryable = _context.Events.Include(e => e.EventType).Include(u =>u.User).AsQueryable();
+        var queryable = _context.Events.Include(e => e.EventType).Include(u => u.User).Include(i => i.Images).AsQueryable();
         if (!string.IsNullOrWhiteSpace(pagination.UserId))
             queryable = queryable.Where(x => x.UserId == pagination.UserId);
+        if (pagination.HasAlbum)
+        {
+            queryable = queryable.Where(x => x.HasAlbum == pagination.HasAlbum);
+        }
         if (!string.IsNullOrWhiteSpace(pagination.Filter))
         {
             var filter = pagination.Filter.ToLower();

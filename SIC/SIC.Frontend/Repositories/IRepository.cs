@@ -22,5 +22,7 @@
 
         Task<HttpResponseWrapper<TActionResponse>> UploadFileAsync<T, TActionResponse>(
         string url, Stream fileStream, string fileName);
+
+        Task<HttpResponseWrapper<TResponse>> PostMultipartAsync<TResponse>(string url, MultipartFormDataContent content);
     }
 }

@@ -25,6 +25,8 @@ public class DataContext : IdentityDbContext<User>
     public DbSet<InvitationEntry> InvitationEntries { get; set; }
     public DbSet<UserCredit> UserCredits { get; set; }
     public DbSet<UserCreditHistory> UserCreditHistories { get; set; }
+    public DbSet<InvitationGuest> InvitationGuest { get; set; }
+    public DbSet<EventImage> EventImages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

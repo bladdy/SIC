@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SIC.Backend.Data;
 
@@ -11,9 +12,11 @@ using SIC.Backend.Data;
 namespace SIC.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20251204211223_addStatusGuest")]
+    partial class addStatusGuest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -166,17 +169,11 @@ namespace SIC.Backend.Migrations
                     b.Property<string>("Code")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CoverImageUrl")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("EventTypeId")
                         .HasColumnType("int");
-
-                    b.Property<bool>("HasAlbum")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Host")
                         .IsRequired()
@@ -227,34 +224,6 @@ namespace SIC.Backend.Migrations
                         .IsUnique();
 
                     b.ToTable("Events");
-                });
-
-            modelBuilder.Entity("SIC.Shared.Entities.EventImage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("EventId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("FileName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("PostingDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EventId");
-
-                    b.ToTable("EventImages");
                 });
 
             modelBuilder.Entity("SIC.Shared.Entities.EventType", b =>
@@ -913,17 +882,6 @@ namespace SIC.Backend.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("SIC.Shared.Entities.EventImage", b =>
-                {
-                    b.HasOne("SIC.Shared.Entities.Event", "Event")
-                        .WithMany("Images")
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Event");
-                });
-
             modelBuilder.Entity("SIC.Shared.Entities.Invitation", b =>
                 {
                     b.HasOne("SIC.Shared.Entities.Event", "Event")
@@ -1041,8 +999,6 @@ namespace SIC.Backend.Migrations
 
             modelBuilder.Entity("SIC.Shared.Entities.Event", b =>
                 {
-                    b.Navigation("Images");
-
                     b.Navigation("Invitations");
 
                     b.Navigation("Message");

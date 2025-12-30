@@ -35,5 +35,7 @@ namespace SIC.Backend.UnitOfWork.Implemetations
         public async Task<ActionResponse<InvitationConfirmationDto>> UpdateForConfirmarionFullAsync(InvitationConfirmationDto confirmationDto) => await _invitationstRepository.UpdateForConfirmarionFullAsync(confirmationDto);
 
         public async Task<ActionResponse<bool>> DeleteByIdAsync(int id) => await _invitationstRepository.DeleteByIdAsync(id);
+
+        public async Task<ActionResponse<ResponseInvitationDTO>> UpdateForConfirmationListFullAsync(ResponseInvitationDTO invitations) => await _invitationstRepository.UpdateForConfirmationListFullAsync(invitations);
     }
 }

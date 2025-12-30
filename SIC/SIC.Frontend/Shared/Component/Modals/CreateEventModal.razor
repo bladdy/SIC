@@ -85,9 +85,25 @@
                             <InputText class="form-control" @bind-Value="NewEvent.Planner" />
                         </div>
 
-                        <div class="mb-3 d-none">
-                            <label class="form-label">Teléfono Planner</label>
-                            <InputText class="form-control" @bind-Value="NewEvent.PlannerPhone" />
+                        <div class="mb-3 row align-items-center">
+
+                            <div class="col-auto">
+                                <label class="form-label">Teléfono Planner</label>
+                                <InputText class="form-control"
+                                           placeholder="Numero celular..."
+                                           @bind-Value="NewEvent.PlannerPhone" />
+                            </div>
+
+                            <div class="col-auto">
+                                <div class="form-check mt-4">
+                                    <InputCheckbox class="form-check-input"
+                                                   @bind-Value="NewEvent.HasAlbum" />
+                                    <label class="form-check-label ms-1">
+                                        Álbum
+                                    </label>
+                                </div>
+                            </div>
+
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Estado</label>

@@ -44,6 +44,13 @@ public class Event : IEntityWithName
 
     public string? Planner { get; set; }
     public string? PlannerPhone { get; set; }
+    public bool HasAlbum { get; set; } = false;
+
+    // 🔹 Álbum de imágenes del evento
+    public ICollection<EventImage> Images { get; set; } = new List<EventImage>();
+
+    // 🔹 Imagen principal (cover)
+    public string? CoverImageUrl { get; set; }
 
     public int? EventTypeId { get; set; }
     public EventType? EventType { get; set; }
@@ -81,6 +88,7 @@ public class Event : IEntityWithName
 
     // 🔹 Adultos confirmados
     public int NumberAdultsConfirmed => Invitations?.Where(s => s.Status == Status.Attend).Sum(a => a.NumberConfirmedAdults) ?? 0;
+
     // 🔹 Jovenes confirmados
     public int NumberYouthsConfirmed => Invitations?.Where(s => s.Status == Status.Attend).Sum(a => a.NumberConfirmedYouths) ?? 0;
 
@@ -94,6 +102,7 @@ public class Event : IEntityWithName
     // 🔹 Niños pendientes
     public int NumberChildrenPending => Invitations?.Where(s => s.Status == Status.Pending)
                                                    .Sum(a => a.NumberChildren) ?? 0;
+
     // 🔹 Jovenes pendientes
     public int NumberYouthPending => Invitations?.Where(s => s.Status == Status.Pending)
                                                    .Sum(a => a.NumberYouths) ?? 0;
@@ -101,6 +110,7 @@ public class Event : IEntityWithName
     // 🔹 Niños No asistirán
     public int NumberChildrenNotAttend => Invitations?.Where(s => s.Status == Status.NotAttend)
                                                    .Sum(a => a.NumberChildren) ?? 0;
+
     // 🔹 Jovenes No asistirán
     public int NumberYouthNotAttend => Invitations?.Where(s => s.Status == Status.NotAttend)
                                                    .Sum(a => a.NumberYouths) ?? 0;

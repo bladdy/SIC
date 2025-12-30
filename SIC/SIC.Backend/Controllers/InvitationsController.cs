@@ -111,8 +111,17 @@ public class InvitationsController : GenericController<Invitation>
         return Ok(new { message = "Confirmación recibida con éxito" });
     }
 
-    // Endpoint para obtener el código QR
-    // ToDo: Cambiar el codigo para que genere la boleta con lo datos del evento, invitados y el Qr
+    [HttpPut("update-invitation")]
+    public async Task<IActionResult> UpdateInvitation(ResponseInvitationDTO invitation)
+    {
+        var action = await _invitationUnitOfWork.UpdateForConfirmationListFullAsync(invitation);
+        if (action.Success)
+        {
+            return Ok(action.Result);
+        }
+        return NotFound(action.Message);
+    }
+
     [HttpGet("qr")]
     public async Task<IActionResult> GetQRCodeAsync(string codigo, string evento)
     {

@@ -17,6 +17,7 @@ public class PaginationDTO
     public string? OrderBy { get; set; }
     public DateTime? Date { get; set; } = null;
     public int EventTypeId { get; set; } = 0;
+    public bool HasAlbum { get; set; } = false;
     //Agregar: orderby fechas asc desc
     //Nuevos filtros: Por nombre de anfitriones, por eventos, usuarios, fechas
     //Nuevos filtros Mis eventos: Por nombre de anfitriones, por eventos, fechas

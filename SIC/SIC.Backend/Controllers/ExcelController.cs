@@ -25,12 +25,13 @@ namespace SIC.Backend.Controllers
 
         //Validar si sean invitaciones que pertenecen al eventId
         [HttpPost("ImportarExcel/{eventId}/{DeleteRegister}")]
-        public async Task<IActionResult> ImportarExcel(int eventId, IFormFile file, bool DeleteRegister)
+        public async Task<IActionResult> ImportarExcel(
+            int eventId,
+            IFormFile file,
+            bool DeleteRegister)
         {
             if (file == null || file.Length == 0)
-            {
                 return BadRequest("El archivo no es válido.");
-            }
 
             var invitations = new List<Invitation>();
 
@@ -40,72 +41,73 @@ namespace SIC.Backend.Controllers
             var worksheet = workbook.Worksheets.FirstOrDefault();
 
             if (worksheet == null)
-            {
                 return BadRequest("El archivo Excel no contiene hojas válidas.");
-            }
 
             var rangeUsed = worksheet.RangeUsed();
             if (rangeUsed == null)
-            {
                 return BadRequest("El archivo Excel no contiene datos válidos.");
-            }
 
-            var rows = rangeUsed.RowsUsed().Skip(1); // Saltar encabezado
+            var rows = rangeUsed.RowsUsed().Skip(1); // encabezado
 
             foreach (var row in rows)
             {
                 try
                 {
+                    var code = row.Cell(1).GetString();
+
                     var invitation = new Invitation
                     {
-                        Code = row.Cell(1).GetString(),
+                        Code = code,
                         Name = row.Cell(2).GetString(),
                         Email = row.Cell(3).GetString(),
                         PhoneNumber = row.Cell(4).GetString(),
                         EventId = eventId,
+
                         NumberAdults = row.Cell(5).GetValue<int>(),
                         NumberYouths = row.Cell(6).GetValue<int>(),
                         NumberChildren = row.Cell(7).GetValue<int>(),
+
                         NumberConfirmedAdults = row.Cell(8).GetValue<int>(),
                         NumberConfirmedYouths = row.Cell(9).GetValue<int>(),
                         NumberConfirmedChildren = row.Cell(10).GetValue<int>(),
-                        Status = Status.Pending,// para que no se vuelva a modificar el estado tengoque poneer que valide si ya confirmo no cambie el estado
+
                         Table = row.Cell(12).GetString(),
                         Comments = row.Cell(13).GetString(),
                         SentDate = DateTime.Now,
-                        ConfirmationDate = null
+
+                        Guests = new List<InvitationGuest>()
                     };
 
                     invitations.Add(invitation);
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    return BadRequest($"{e.Message}");
+                    return BadRequest(ex.Message);
                 }
             }
 
             int added = 0;
             int updated = 0;
-            int errors = 0;
             int deleted = 0;
+            int errors = 0;
 
-            // 🔹 Si DeleteRegister = true, eliminar las invitaciones que no estén en el Excel
+            // 🔴 ELIMINAR los que no vienen en el Excel
             if (DeleteRegister)
             {
                 var response = await _invitationUnitOfWork.GetInivtationsByyEventIdAsync(eventId);
-                var invitationsList = response?.Result?.ToList() ?? new List<Invitation>();
+                var existingInvitations = response?.Result?.ToList() ?? new List<Invitation>();
 
-                // Obtener los códigos que vienen en el Excel
                 var excelCodes = invitations.Select(i => i.Code).ToHashSet();
 
-                // Buscar cuáles invitaciones no están en el Excel
-                var toDelete = invitationsList.Where(i => !excelCodes.Contains(i.Code)).ToList();
+                var toDelete = existingInvitations
+                    .Where(i => !excelCodes.Contains(i.Code))
+                    .ToList();
 
-                foreach (var incitacion in toDelete)
+                foreach (var inv in toDelete)
                 {
                     try
                     {
-                        await _invitationUnitOfWork.DeleteAsync(incitacion);
+                        await _invitationUnitOfWork.DeleteAsync(inv);
                         deleted++;
                     }
                     catch
@@ -115,42 +117,70 @@ namespace SIC.Backend.Controllers
                 }
             }
 
-            // 🔹 Agregar o actualizar las invitaciones del Excel
+            // 🟢 AGREGAR / ACTUALIZAR
             foreach (var inv in invitations)
             {
                 try
                 {
-                    /*if (string.IsNullOrWhiteSpace(inv.Code))
-                    {
-                        errors++;
-                        continue; // saltamos esta fila
-                    }*/
-
                     var response = await _invitationUnitOfWork.GetByCodeAsync(inv.Code!);
                     var existing = response.Result;
 
+                    // ➕ NUEVA
                     if (existing == null)
                     {
+                        inv.Status = Status.Pending;
+                        inv.ConfirmationDate = null;
+
+                        // 👥 Adultos
+                        for (int i = 0; i < inv.NumberAdults; i++)
+                        {
+                            inv.Guests.Add(new InvitationGuest
+                            {
+                                GuestType = GuestType.Adult,
+                                Status = Status.Pending
+                            });
+                        }
+
+                        // 👥 Jóvenes
+                        for (int i = 0; i < inv.NumberYouths; i++)
+                        {
+                            inv.Guests.Add(new InvitationGuest
+                            {
+                                GuestType = GuestType.Youth,
+                                Status = Status.Pending
+                            });
+                        }
+
+                        // 👥 Niños
+                        for (int i = 0; i < inv.NumberChildren; i++)
+                        {
+                            inv.Guests.Add(new InvitationGuest
+                            {
+                                GuestType = GuestType.Children,
+                                Status = Status.Pending
+                            });
+                        }
+
                         await _invitationUnitOfWork.AddFullAsync(inv);
                         added++;
                     }
+                    // ✏️ EXISTENTE
                     else
                     {
                         existing.Name = inv.Name;
                         existing.Email = inv.Email;
                         existing.PhoneNumber = inv.PhoneNumber;
                         existing.NumberAdults = inv.NumberAdults;
-                        existing.NumberChildren = inv.NumberChildren;
                         existing.NumberYouths = inv.NumberYouths;
+                        existing.NumberChildren = inv.NumberChildren;
                         existing.NumberConfirmedAdults = inv.NumberConfirmedAdults;
                         existing.NumberConfirmedYouths = inv.NumberConfirmedYouths;
                         existing.NumberConfirmedChildren = inv.NumberConfirmedChildren;
-                        existing.Status = inv.Status;
                         existing.Table = inv.Table;
                         existing.Comments = inv.Comments;
                         existing.SentDate = inv.SentDate;
-                        existing.ConfirmationDate = inv.ConfirmationDate;
 
+                        // 🔒 NO tocar estado ni invitados si ya existe
                         await _invitationUnitOfWork.UpdateFullAsync(existing);
                         updated++;
                     }
@@ -168,7 +198,12 @@ namespace SIC.Backend.Controllers
                 Modificadas = updated,
                 Eliminadas = deleted,
                 Errores = errors,
-                Message = $"Procesadas {invitations.Count} invitaciones. Agregadas: {added}, Modificadas: {updated}, Eliminadas: {deleted}, Errores: {errors}"
+                Message =
+                    $"Procesadas {invitations.Count} invitaciones. " +
+                    $"Agregadas: {added}, " +
+                    $"Modificadas: {updated}, " +
+                    $"Eliminadas: {deleted}, " +
+                    $"Errores: {errors}"
             });
         }
 

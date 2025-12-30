@@ -35,10 +35,7 @@ html, body {
             transform: scale(1.05);
         }
 
-/* Para ocupar todo el alto visible */
-.full-height {
-    min-height: 100vh;
-}
+
 
 #currentNumber {
     animation: rotateNumber 0.5s ease-in-out;
@@ -64,6 +61,20 @@ body {
 .animated-number {
     animation: bounceNumber 0.5s ease-in-out;
 }
+@media (max-width: 576px) {
+    .album-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .album-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
+
 
 @keyframes bounceNumber {
     0% {

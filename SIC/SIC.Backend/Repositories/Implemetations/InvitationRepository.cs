@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DocumentFormat.OpenXml.Drawing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using SIC.Backend.Data;
 using SIC.Backend.Helpers;
@@ -22,7 +23,7 @@ namespace SIC.Backend.Repositories.Implemetations
 
         public async Task<ActionResponse<Invitation>> GetByCodeAsync(string code)
         {
-            var invitations = await _context.Invitations.Include(e => e.Event).ThenInclude(e => e!.EventType).
+            var invitations = await _context.Invitations.Include(e => e.Event).ThenInclude(e => e!.EventType).Include(g => g.Guests).
                 FirstOrDefaultAsync(x => x.Code == code);
             if (invitations == null)
             {
@@ -41,7 +42,8 @@ namespace SIC.Backend.Repositories.Implemetations
 
         public override async Task<ActionResponse<IEnumerable<Invitation>>> GetAsync(PaginationDTO pagination)
         {
-            var queryable = _context.Invitations.AsQueryable();
+            //ToDo: Agregar el filtro para que filte cada uno de los Guests
+            var queryable = _context.Invitations.Include(g => g.Guests).AsQueryable();
             queryable = queryable.Where(x => x.EventId == pagination.Id);
 
             if (!string.IsNullOrWhiteSpace(pagination.Filter))
@@ -60,6 +62,7 @@ namespace SIC.Backend.Repositories.Implemetations
 
         public override async Task<ActionResponse<int>> GetTotalRecordAsync(PaginationDTO pagination)
         {
+            // ToDo: Agregar el filtro para que filte cada uno de los Guests
             var queryable = _context.Invitations.AsQueryable();
             queryable = queryable.Where(x => x.EventId == pagination.Id);
             if (!string.IsNullOrWhiteSpace(pagination.Filter))
@@ -130,8 +133,61 @@ namespace SIC.Backend.Repositories.Implemetations
         {
             try
             {
-                _context.Update(invitation);
+                // 1. Cargar la invitación actual con sus invitados desde la BD
+                var currentInvitation = await _context.Invitations
+                    .Include(i => i.Guests)
+                    .FirstOrDefaultAsync(i => i.Id == invitation.Id);
+
+                if (currentInvitation == null)
+                {
+                    return new ActionResponse<Invitation>
+                    {
+                        Success = false,
+                        Message = "La invitación no existe."
+                    };
+                }
+
+                // 2. Actualizar valores simples de Invitation
+                _context.Entry(currentInvitation).CurrentValues.SetValues(invitation);
+
+                // ==== 3. Sincronizar la colección de Guests ====
+
+                // IDs existentes en la BD
+                var dbGuests = currentInvitation.Guests.ToList();
+
+                // IDs enviados desde la UI (pueden ser 0 si son nuevos)
+                var incomingGuests = invitation.Guests.ToList();
+
+                // 🔥 3.1 ELIMINAR GUESTS QUE FUERON REMOVIDOS EN LA UI
+                foreach (var guestInDb in dbGuests)
+                {
+                    if (!incomingGuests.Any(g => g.Id == guestInDb.Id))
+                    {
+                        _context.InvitationGuest.Remove(guestInDb);
+                    }
+                }
+
+                // 🔥 3.2 ACTUALIZAR Y AGREGAR GUESTS NUEVOS
+                foreach (var incoming in incomingGuests)
+                {
+                    var existing = dbGuests.FirstOrDefault(g => g.Id == incoming.Id);
+
+                    if (existing == null)
+                    {
+                        // 👉 ES NUEVO
+                        incoming.InvitationId = invitation.Id;
+                        _context.InvitationGuest.Add(incoming);
+                    }
+                    else
+                    {
+                        // 👉 ES EXISTENTE — actualizar campos
+                        _context.Entry(existing).CurrentValues.SetValues(incoming);
+                    }
+                }
+
+                // 4. Guardar todos los cambios
                 await _context.SaveChangesAsync();
+
                 return new ActionResponse<Invitation>
                 {
                     Success = true,
@@ -143,7 +199,7 @@ namespace SIC.Backend.Repositories.Implemetations
                 return new ActionResponse<Invitation>
                 {
                     Success = false,
-                    Message = "Ya existe esta invitacion"
+                    Message = "Ya existe esta invitación."
                 };
             }
             catch (Exception exception)
@@ -251,6 +307,62 @@ namespace SIC.Backend.Repositories.Implemetations
                 Success = true,
                 Result = true
             };
+        }
+
+        public async Task<ActionResponse<ResponseInvitationDTO>> UpdateForConfirmationListFullAsync(ResponseInvitationDTO invitation)
+        {
+            try
+            {
+                var invitations = await _context.Invitations.FirstOrDefaultAsync(x => x.Code == invitation.Code);
+                if (invitations == null)
+                {
+                    return new ActionResponse<ResponseInvitationDTO>
+                    {
+                        Success = false,
+                        Message = "La invitación no existe."
+                    };
+                }
+
+                // Optimización: convierto la lista de invitados en un diccionario
+                var dbGuestsDict = invitations.Guests.ToDictionary(g => g.Id);
+
+                // Actualizar los contadores de confirmación
+                invitations.NumberConfirmedAdults = invitation.Guests.Count(T => T.GuestType == 1 && T.Status == 19);
+                invitations.NumberConfirmedYouths = invitation.Guests.Count(T => T.GuestType == 2 && T.Status == 19);
+                invitations.NumberConfirmedChildren = invitation.Guests.Count(T => T.GuestType == 3 && T.Status == 19);
+                invitations.ConfirmationDate = DateTime.Now;
+                invitations.Comments = invitation.Comments;
+
+                // Actualizar invitados existentes
+                foreach (var incoming in invitation.Guests)
+                {
+                    if (dbGuestsDict.TryGetValue(incoming.Id, out var existing))
+                    {
+                        _context.Entry(existing).CurrentValues.SetValues(incoming);
+                    }
+                }
+
+                invitations.Status = (Shared.Enums.Status)invitation.Status;
+
+                // Guardar cambios en la invitación
+                _context.Update(invitations);
+                await _context.SaveChangesAsync();
+
+                return new ActionResponse<ResponseInvitationDTO>
+                {
+                    Success = true,
+                    Result = invitation
+                };
+            }
+            catch (Exception exception)
+            {
+                // Puede ser útil registrar el error para diagnóstico
+                return new ActionResponse<ResponseInvitationDTO>
+                {
+                    Success = false,
+                    Message = exception.Message
+                };
+            }
         }
     }
 }

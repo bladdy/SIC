@@ -163,4 +163,23 @@ public class Repository : IRepository
         var response = await UnserializeAnswerAsync<object>(responseHttp);
         return new HttpResponseWrapper<object>(response, !responseHttp.IsSuccessStatusCode, responseHttp); ;
     }
+
+    public async Task<HttpResponseWrapper<TResponse>> PostMultipartAsync<TResponse>(
+    string url,
+    MultipartFormDataContent content)
+    {
+        var response = await _httpClient.PostAsync(url, content);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<TResponse>(
+                responseBody,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            return new HttpResponseWrapper<TResponse>(result, false, response);
+        }
+
+        return new HttpResponseWrapper<TResponse>(default, true, response);
+    }
 }

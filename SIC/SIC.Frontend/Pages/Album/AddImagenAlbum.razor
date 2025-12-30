@@ -1,0 +1,58 @@
+﻿@page "/upload-photo/{Code}"
+@layout LoginLayout
+@using Microsoft.AspNetCore.Components.Forms
+
+<PageTitle>Subir fotos</PageTitle>
+<div class="container-fluid min-vh-100 position-relative text-light" style=" margin: 0; padding: 0;">
+    <!-- Contenedor principal sin margen superior -->
+    <div style="width: 100%; font-family: Arial, sans-serif;">
+
+        <!-- Imagen de portada con overlay -->
+        <div style="position: relative; width: 100%; height: 440px; overflow: hidden; margin: 0; padding: 0;">
+            @if (Event is not null)
+            {
+                <img src="@Event!.CoverImageUrl"
+                     alt="Portada del evento"
+                     style="width: 100%; height: 440px; object-fit: cover; object-position: center;" />
+
+                <!-- Overlay con título y código -->
+                <div style="position: absolute; bottom: 20px; left: 20px; color: white; text-align: left;
+                            text-shadow: 0 0 10px rgba(0,0,0,0.7);">
+                    <h1 style="font-size: 2.5rem; margin: 0;">📸 Álbum del Evento: @Event.Name </h1>
+                    <p style="font-size: 1rem; margin: 5px 0 0 0;">Código del evento: <strong>@Code</strong></p>
+                </div>
+                
+            }
+
+        </div>
+        <div class="d-flex justify-content-center align-items-center" style="height: 200px;">
+            <div class="d-flex flex-column gap-3" style="width: 300px;">
+
+                <!-- InputFile oculto -->
+                <InputFile class="d-none" id="fileInput" OnChange="HandleFileSelected" multiple accept="image/*" />
+
+                <!-- Label que actúa como botón -->
+                <label for="fileInput" class="form-control form-control-sm text-center" style="cursor:pointer;">
+                    Elige una imagen
+                </label>
+
+                <!-- Botón de carga -->
+                <button class="btn btn-sm btn-custom w-100"
+                        @onclick="UploadPhoto" disabled="@(!hasFileSelected || isLoadingImport)">
+                    @if (isLoadingImport)
+                    {
+                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        <span>Cargando...</span>
+                    }
+                    else
+                    {
+                        <span>Subir Imagen</span>
+                    }
+                </button>
+
+            </div>
+        </div>
+
+
+    </div>
+</div>

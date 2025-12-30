@@ -25,5 +25,7 @@ namespace SIC.Backend.UnitOfWork.Interfaces
         Task<ActionResponse<bool>> DeleteAsync(Invitation invitation);
 
         Task<ActionResponse<InvitationConfirmationDto>> UpdateForConfirmarionFullAsync(InvitationConfirmationDto confirmationDto);
+
+        Task<ActionResponse<ResponseInvitationDTO>> UpdateForConfirmationListFullAsync(ResponseInvitationDTO invitations);
     }
 }

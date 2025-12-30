@@ -25,5 +25,6 @@ namespace SIC.Backend.Repositories.Interfaces
         Task<ActionResponse<Invitation>> UpdateFullAsync(Invitation invitation);
 
         Task<ActionResponse<InvitationConfirmationDto>> UpdateForConfirmarionFullAsync(InvitationConfirmationDto confirmationDto);
+        Task<ActionResponse<ResponseInvitationDTO>> UpdateForConfirmationListFullAsync(ResponseInvitationDTO invitations);
     }
 }

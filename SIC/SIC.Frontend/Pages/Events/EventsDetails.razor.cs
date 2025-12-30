@@ -3,11 +3,17 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
+using Newtonsoft.Json;
+using SIC.Backend.DTOs;
 using SIC.Frontend.Helpers;
 using SIC.Frontend.Repositories;
+using SIC.Frontend.Shared.Component;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
+using SIC.Shared.Enums;
+using SIC.Shared.Response;
 using System.Net;
+using static System.Net.WebRequestMethods;
 
 namespace SIC.Frontend.Pages.Events;
 
@@ -17,6 +23,7 @@ public partial class EventsDetails
     // Estados dinámicos por ID
     private int? loadingWhatsappId1;
 
+    private bool isLoadingWhatsapp = false;
     private int? loadingWhatsappId2;
     private int? copyingId1;
     private int? copyingId2;
@@ -88,6 +95,41 @@ public partial class EventsDetails
         NavigationManager.NavigateTo($"/events/message-events/{EventDetail!.Code}");
     }
 
+    private void AddGuest()
+    {
+        //Cuando le de a agregar actualiza el contador de NumberAdults y hacer un changed en el select cuando se cambie el tipo de invitado
+        NewInvitation.Guests ??= new List<InvitationGuest>();
+
+        NewInvitation.Guests.Add(new InvitationGuest
+        {
+            GuestName = null,           // permitido
+            GuestType = GuestType.Adult,
+            InvitationId = NewInvitation.Id,
+            Invitation = null,
+            // SIEMPRE null para evitar validaciones
+        });
+        UpdateGuestCounters(NewInvitation.Guests);
+    }
+
+    // Método para manejar el cambio de tipo de invitado
+    private void OnGuestTypeChanged()
+    {
+        UpdateGuestCounters(NewInvitation.Guests);
+    }
+
+    private void UpdateGuestCounters(ICollection<InvitationGuest> guests)
+    {
+        NewInvitation.NumberAdults = guests.Count(g => g.GuestType == GuestType.Adult);
+        NewInvitation.NumberYouths = guests.Count(g => g.GuestType == GuestType.Youth);
+        NewInvitation.NumberChildren = guests.Count(g => g.GuestType == GuestType.Children);
+    }
+
+    private void RemoveGuest(InvitationGuest guest)
+    {
+        NewInvitation.Guests.Remove(guest);
+        UpdateGuestCounters(NewInvitation.Guests);
+    }
+
     private void ShowEditModal(Invitation invitation)
     {
         NewInvitation = new Invitation
@@ -103,6 +145,7 @@ public partial class EventsDetails
             NumberConfirmedAdults = invitation.NumberConfirmedAdults,
             NumberConfirmedYouths = invitation.NumberConfirmedYouths,
             NumberConfirmedChildren = invitation.NumberConfirmedChildren,
+            Guests = invitation.Guests,
             Table = invitation.Table,
             Comments = invitation.Comments,
             SentDate = invitation.SentDate,
@@ -231,6 +274,33 @@ public partial class EventsDetails
         }
     }
 
+    private async Task EnviarInvitacion(string code)
+    {
+        try
+        {
+            isLoadingWhatsapp = true;
+            var responseHttp = await Repository.PostAsync<WhatsAppApiResponse>($"api/whatsapp/enviar-invitacion/{code}");
+
+            if (responseHttp.Error)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                var errorMessage = JsonConvert.DeserializeObject<WhatsAppApiError>(message!);
+                await SweetAlertService.FireAsync("Error", errorMessage!.error.message, SweetAlertIcon.Error);
+                return;
+            }
+            await SweetAlertService.FireAsync("Éxito", "Invitación enviada correctamente", SweetAlertIcon.Success);
+        }
+        catch (Exception ex)
+        {
+            await SweetAlertService.FireAsync("Error", "Algo ocurrio, intentalo más tarde", SweetAlertIcon.Error);
+            return;
+        }
+        finally
+        {
+            isLoadingWhatsapp = false;
+        }
+    }
+
     private async Task AbrirWhatsapp(string phoneNumber, string code, int invitationId, int column)
     {
         string mensaje;
@@ -244,6 +314,7 @@ public partial class EventsDetails
             loadingWhatsappId2 = invitationId;
             copyingId2 = null;
         }
+
         var responseHttp = await Repository.GetAsync<SIC.Shared.Entities.Message>($"api/Messages/byCode/{Code}/{code}");
 
         if (responseHttp.Error)

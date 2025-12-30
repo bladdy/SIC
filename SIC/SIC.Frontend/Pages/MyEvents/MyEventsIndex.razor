@@ -16,14 +16,14 @@
     <AuthorizeView Roles="WeddingPlannerr">
         <Authorized>
             <button class="btn btn-custom"
-                    @onclick="ShowCreateModal"
-                    disabled="@(AvailableCredits == 0)"
-                    title="@(AvailableCredits == 0 ? "No tienes créditos disponibles" : $"Tienes {AvailableCredits} créditos disponibles")">
+            @onclick="ShowCreateModal"
+            disabled="@(AvailableCredits == 0)"
+            title="@(AvailableCredits == 0 ? "No tienes créditos disponibles" : $"Tienes {AvailableCredits} créditos disponibles")">
                 Crear Evento (@AvailableCredits)
             </button>
         </Authorized>
     </AuthorizeView>
-    
+
 </div>
 <div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center; gap: 10px;">
     <!-- Buscar por texto -->
@@ -103,6 +103,10 @@
                                             <div class="col-12 col-md-4 d-flex flex-row flex-wrap align-items-center gap-1">
                                                 <a href="@even.Url" target="_blank" class="btn btn-custom w-100">Ver Invitación</a>
                                                 <a href="/my-events/details/@even.Code" class="btn btn-custom w-100">Invitados</a>
+                                                @if (even.HasAlbum)
+                                                {
+                                                    <a href="/my-album/@even.Code" class="btn btn-custom w-100">Album</a>
+                                                }
                                             </div>
                                         </div>
                                     </div>
