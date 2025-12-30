@@ -1,4 +1,7 @@
 services:
+  # =========================
+  # SQL Server
+  # =========================
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: sic_sqlserver
@@ -13,23 +16,80 @@ services:
     networks:
       - sic_network
 
+  # =========================
+  # FTP Server (Almacenamiento)
+  # =========================
+  ftp_server:
+    image: fauria/vsftpd
+    container_name: sic_ftp
+    environment:
+      FTP_USER: sicftp
+      FTP_PASS: SicFtp123!
+      FTP_CHROOT_LOCAL_USER: "YES"
+      PASV_ENABLE: "YES"
+      PASV_ADDRESS: invboxv-app.com # Cambiar por IP o dominio público del servidor localhost y producción el dominio o IP pública
+      PASV_MIN_PORT: 21100
+      PASV_MAX_PORT: 21110
+
+      # 🔑 PERMISOS IMPORTANTES
+      FILE_OPEN_MODE: "0666"
+      LOCAL_UMASK: "022"
+    volumes:
+      - files_data:/home/vsftpd/sicftp
+    ports:
+      - "21:21"
+      - "21100-21110:21100-21110"
+    restart: always
+
+  # =========================
+  # Nginx – Servidor público
+  # =========================
+  file_server:
+    image: nginx:alpine
+    container_name: sic_file_server
+    volumes:
+      - files_data:/usr/share/nginx/html:ro
+    ports:
+      - "9003:80"
+    restart: always
+    networks:
+      - sic_network
+
+
+  # =========================
+  # Backend .NET
+  # =========================
   backend:
     build:
       context: .
       dockerfile: SIC.Backend/Dockerfile
     container_name: sic_backend
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=http://+:5000
-      - ConnectionStrings__DefaultConnection=Server=sic_sqlserver,1433;Database=SIC_DB;User Id=sa;Password=Bladdy3434!;TrustServerCertificate=True;Encrypt=False;
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:5000
+
+      # DB
+      ConnectionStrings__DefaultConnection: Server=sic_sqlserver,1433;Database=SIC_DB;User Id=sa;Password=Bladdy3434!;TrustServerCertificate=True;Encrypt=False;
+
+      # FTP CONFIG (⚠️ SOLO SI EL BACKEND ESTÁ EN DOCKER)
+      Ftp__Host: sic_ftp
+      Ftp__Port: 21
+      Ftp__Username: sicftp
+      Ftp__Password: SicFtp123!
+      Ftp__UrlBase: https://invboxv-app.com/files # Cambiar localhost por dominio público en producción https://invboxv-app.com/files http://localhost:9003
+
     depends_on:
       - sqlserver
+      - ftp_server
     ports:
-      - "5000:5000"   # puerto interno
+      - "5000:5000"
     restart: always
     networks:
       - sic_network
 
+  # =========================
+  # Frontend
+  # =========================
   frontend:
     build:
       context: .
@@ -38,14 +98,22 @@ services:
     depends_on:
       - backend
     ports:
-      - "8080:80"   # puerto interno
+      - "8080:80"
     restart: always
     networks:
       - sic_network
 
+# =========================
+# Volúmenes
+# =========================
 volumes:
   sql_data:
+  files_data:
 
+
+# =========================
+# Red
+# =========================
 networks:
   sic_network:
     driver: bridge
