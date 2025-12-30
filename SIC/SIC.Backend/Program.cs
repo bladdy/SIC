@@ -63,6 +63,8 @@ builder.Services.AddTransient<SeedDb>();
 // Registrar el servicio de WhatsAppService
 builder.Services.AddScoped<WhatsAppService>();
 builder.Services.AddScoped<BoletaService>();
+builder.Services.AddScoped<FtpStorageService>();
+
 // Inyeccion de dependencias gen�rica
 
 builder.Services.AddScoped(typeof(IGenericUnitOfWork<>), typeof(GenericUnitOfWork<>));
@@ -76,6 +78,9 @@ builder.Services.AddScoped<IEventsRepository, EventsRepository>();
 
 builder.Services.AddScoped<IInvitationUnitOfWork, InvitationUnitOfWork>();
 builder.Services.AddScoped<IInvitationRepository, InvitationRepository>();
+
+builder.Services.AddScoped<IImageUnitOfWork, ImageUnitOfWork>();
+builder.Services.AddScoped<IImagesRepository, ImagesRepository>();
 
 builder.Services.AddScoped<IInvitationEntryUnitOfWork, InvitationEntryUnitOfWork>();
 builder.Services.AddScoped<IInvitationEntryRepository, InvitationEntryRepository>();
