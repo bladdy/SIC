@@ -15,7 +15,9 @@ namespace SIC.Frontend.Pages.Album
 {
     public partial class AlbumIndex
     {
+        //ToDo: boton GenerarQR para cada evento
         [Parameter] public string? Code { get; set; }
+
         [Inject] private IRepository Repository { get; set; } = default!;
         [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
         [Inject] private NavigationManager NavigationManager { get; set; } = default!;
@@ -144,6 +146,39 @@ namespace SIC.Frontend.Pages.Album
                     TimerProgressBar = true,
                 });
                 await toast.FireAsync("Error", "Algo salio mal, intentalo de nuevo más tarde.", SweetAlertIcon.Error);
+            }
+        }
+
+        private async Task GenerateQR(string code)
+        {
+            try
+            {
+                var url = $"api/events/qr/download/{code}";
+
+                var bytes = await Repository.GetFileAsync(url);
+
+                if (bytes == null || bytes.Length == 0)
+                {
+                    await SweetAlertService.FireAsync(
+                        "Error",
+                        "No se pudo generar el QR.",
+                        SweetAlertIcon.Error
+                    );
+                    return;
+                }
+
+                await JsRuntime.DownloadFileAsync(
+                    $"QR-Event-{code}.png",
+                    bytes
+                );
+            }
+            catch (Exception ex)
+            {
+                await SweetAlertService.FireAsync(
+                    "Error",
+                    ex.Message,
+                    SweetAlertIcon.Error
+                );
             }
         }
 

@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using QRCoder;
 using SIC.Backend.Services;
 using SIC.Backend.UnitOfWork.Implemetations;
 using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using SIC.Shared.Response;
+using SkiaSharp;
 
 namespace SIC.Backend.Controllers;
 
@@ -127,5 +129,46 @@ public class EventsController : GenericController<Event>
             return Ok(action.Result);
         }
         return NotFound(action.Message);
+    }
+
+    [HttpGet("qr/download/{code}")]
+    public async Task<IActionResult> DownloadQRCodeAsync(string code)
+    {
+        try
+        {
+            var response = await _eventsUnitOfWork.GetByCodeAsync(code);
+            var events = response.Result;
+
+            if (events == null)
+                return NotFound("Invitación no encontrada.");
+
+            var codigoQr = events.Code ?? $"INV-{events.Id}-{code}";
+
+            var qrUrl = $"https://invboxv-app.com/upload-photo/{codigoQr}";
+
+            // 🔹 Generar QR (PNG bytes)
+            byte[] qrBytes = GenerateQRCodePng(qrUrl);
+
+            var fileName = $"QR_{codigoQr}.png";
+
+            return File(
+                qrBytes,
+                "image/png",
+                fileName // 👈 fuerza descarga
+            );
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    private static byte[] GenerateQRCodePng(string content)
+    {
+        using var qrGenerator = new QRCodeGenerator();
+        using var qrCodeData = qrGenerator.CreateQrCode(content, QRCodeGenerator.ECCLevel.Q);
+
+        var pngQrCode = new PngByteQRCode(qrCodeData);
+        return pngQrCode.GetGraphic(20);
     }
 }

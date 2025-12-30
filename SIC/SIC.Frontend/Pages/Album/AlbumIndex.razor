@@ -8,12 +8,12 @@
         <h2 style="margin: 0;">📸 Álbum del Evento (@EventImages!.Count)</h2>
 
         <div style="display: flex; gap: 10px;">
-            <button @onclick="() =>DownloadAllImages(Code)"
+            <button @onclick="() =>DownloadAllImages(Code!)"
                     style="padding: 0.5rem 1rem; background-color: #3C6A79; color: white; border: none; border-radius: 0.25rem; cursor: pointer;">
                 <i class="bi bi-download"></i> Descargar Imágenes
             </button>
 
-            <button style="padding: 0.5rem 1rem; background-color: #3C6A79; color: white; border: none; border-radius: 0.25rem; cursor: pointer;">
+            <button @onclick="() =>GenerateQR(Code!)" style=" padding: 0.5rem 1rem; background-color: #3C6A79; color: white; border: none; border-radius: 0.25rem; cursor: pointer;">
                 <i class="bi bi-qr-code"></i> Descargar QR
             </button>
         </div>

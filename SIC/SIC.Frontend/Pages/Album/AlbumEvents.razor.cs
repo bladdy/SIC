@@ -13,6 +13,7 @@ namespace SIC.Frontend.Pages.Album
     public partial class AlbumEvents
     {
         [Inject] private IRepository repository { get; set; } = default!;
+
         [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
         [Inject] private NavigationManager NavigationManager { get; set; } = default!;
         [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
