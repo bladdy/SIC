@@ -258,11 +258,27 @@ else
                                         <div class="col-12 col-md-4 d-flex flex-wrap align-items-center gap-2">
                                             @if (usarWhatsApp)
                                             {
+                                                <!--
                                                 <button class="btn d-inline-flex align-items-center gap-2 text-white"
                                                         style="background-color:#25d366;"
                                                         @onclick="() => EnviarInvitacion(invitation.Code!)"
                                                         disabled="@(isLoadingWhatsapp == true)">
                                                     @if (isLoadingWhatsapp == true)
+                                                    {
+                                                        <span class="spinner-border spinner-border-sm"></span>
+                                                        <span>Invitando...</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="bi bi-whatsapp"></i>
+                                                        <span>Invitar</span>
+                                                    }
+                                                </button>-->
+                                                <button class="btn d-inline-flex align-items-center gap-2 text-white"
+                                                        style="background-color:#25d366;"
+                                                        @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)"
+                                                        disabled="@(loadingWhatsappId1 == invitation.Id)">
+                                                    @if (loadingWhatsappId1 == invitation.Id)
                                                     {
                                                         <span class="spinner-border spinner-border-sm"></span>
                                                         <span>Invitando...</span>
