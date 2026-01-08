@@ -164,6 +164,10 @@
                                 <button class="btn btn-sm btn-custom flex-grow-1 d-none" @onclick="() => ConfirmDelete(even)"><i class="bi bi-trash-fill"></i> Borrar</button>
                                 <a href="@even.Url" target="_blank" class="btn btn-sm btn-custom flex-grow-1">Ver Invitación</a>
                                 <a href="/my-events/details/@even.Code" class="btn btn-sm btn-custom flex-grow-1">Invitados</a>
+                                @if (even.HasAlbum)
+                                {
+                                    <a href="/my-album/@even.Code" class="btn btn-custom w-100">Album</a>
+                                }
                             </div>
                         </div>
                     </div>
