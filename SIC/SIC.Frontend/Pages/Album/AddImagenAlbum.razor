@@ -33,7 +33,10 @@
 
                 <!-- Label que actúa como botón -->
                 <label for="fileInput" class="form-control form-control-sm text-center" style="cursor:pointer;">
-                    Elige una imagen
+                    Elige una imagen @if (selectedFiles != null && selectedFiles.Count > 0)
+                    {
+                        <strong>(@selectedFiles.Count archivo(s) seleccionado(s))</strong>
+                    }
                 </label>
 
                 <!-- Botón de carga -->
