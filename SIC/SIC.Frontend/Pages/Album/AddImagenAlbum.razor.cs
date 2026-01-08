@@ -114,6 +114,7 @@ public partial class AddImagenAlbum
                 );
 
                 await LoadEvent();
+                selectedFiles = null;
             }
             else
             {
