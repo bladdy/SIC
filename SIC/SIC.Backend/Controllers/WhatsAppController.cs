@@ -4,6 +4,8 @@ using SIC.Backend.DTOs;
 using SIC.Backend.UnitOfWork.Implemetations;
 using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.Helpers;
+using SIC.Shared.Response;
+using SIC.Shared.DTOs;
 
 namespace SIC.Backend.Controllers
 {
@@ -14,14 +16,16 @@ namespace SIC.Backend.Controllers
         private readonly WhatsAppService _whatsAppService;
         private readonly IConfiguration _configuration;
         private readonly IInvitationUnitOfWork _invitationUnitOfWork;
+        private readonly IMessageUnitOfWork _iMessageUnitOfWork;
 
         public WhatsAppController(
             WhatsAppService whatsAppService, IInvitationUnitOfWork invitationUnitOfWork,
-            IConfiguration configuration)
+            IConfiguration configuration, IMessageUnitOfWork iMessageUnitOfWork)
         {
             _whatsAppService = whatsAppService;
             _configuration = configuration;
             _invitationUnitOfWork = invitationUnitOfWork;
+            _iMessageUnitOfWork = iMessageUnitOfWork;
         }
 
         [HttpPost("enviar-invitacion/{code}")]
@@ -53,11 +57,21 @@ namespace SIC.Backend.Controllers
                 "Es-MX",
                 parametros
             );
+            await SaveMessageHistory(invitacion.Result.Code!, result);
 
             if (!result.Success)
                 return BadRequest(new { error = result });
 
             return Ok(result.Result);
+        }
+
+        private async Task<ActionResponse<bool>> SaveMessageHistory(string code, ActionResponse<WhatsAppMessageResponse> result)
+        {
+            return await _iMessageUnitOfWork.AddHistoryMessages(
+                code,
+                result.Success,
+                result.Success ? "Mensaje enviado correctamente." : result.Message
+            );
         }
     }
 }

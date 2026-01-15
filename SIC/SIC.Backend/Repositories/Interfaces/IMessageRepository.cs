@@ -16,5 +16,9 @@ namespace SIC.Backend.Repositories.Interfaces
         Task<ActionResponse<IEnumerable<MessageKey>>> GetKeysAsync();
 
         Task<ActionResponse<IEnumerable<MessageWhatsappInvitationDTO>>> GetMessageWhatsappInvitation(string code);
+
+        Task<ActionResponse<bool>> AddHistoryMessages(string code, bool Success, string? Message);
+
+        Task<ActionResponse<IEnumerable<HistoryMessages>>> GetHistoryMessagesAsync();
     }
 }

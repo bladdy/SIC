@@ -16,5 +16,9 @@ namespace SIC.Backend.UnitOfWork.Interfaces
         Task<ActionResponse<Message>> UpdateFullAsync(Message message, string eventCode);
 
         Task<ActionResponse<IEnumerable<MessageKey>>> GetKeysAsync();
+
+        Task<ActionResponse<bool>> AddHistoryMessages(string code, bool Success, string? Message);
+
+        Task<ActionResponse<IEnumerable<HistoryMessages>>> GetHistoryMessagesAsync();
     }
 }

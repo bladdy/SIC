@@ -61,4 +61,6 @@ public class Invitation
 
     // NUEVO: Lista dinámica de invitados
     public ICollection<InvitationGuest> Guests { get; set; } = new List<InvitationGuest>();
+
+    public ICollection<HistoryMessages> HistoryMessages { get; set; } = new List<HistoryMessages>();
 }

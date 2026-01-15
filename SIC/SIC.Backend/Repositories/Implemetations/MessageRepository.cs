@@ -8,6 +8,7 @@ using SIC.Backend.Repositories.Interfaces;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using SIC.Shared.Response;
+using System.Collections.Generic;
 
 namespace SIC.Backend.Repositories.Implemetations
 {
@@ -147,6 +148,62 @@ namespace SIC.Backend.Repositories.Implemetations
             {
                 Success = true,
                 Result = messageWhatsappInvitations
+            };
+        }
+
+        public async Task<ActionResponse<bool>> AddHistoryMessages(string code, bool Success, string? Message)
+        {
+            try
+            {
+                var invitations = await _context.Invitations
+                    .Include(i => i.Event)
+                    .FirstOrDefaultAsync(i => i.Code == code);
+                if (invitations == null)
+                {
+                    return new ActionResponse<bool>
+                    {
+                        Success = false,
+                        Message = "La invitación no existe."
+                    };
+                }
+                var mesage = new HistoryMessages
+                {
+                    Invitation = invitations,
+                    Event = invitations.Event!,
+                    Delivered = Success,
+                    SendDate = DateTime.Now,
+                    Send = Success,
+                    Error = !Success,
+                    //Message = Message,
+                };
+                _context.Add(mesage);
+                await _context.SaveChangesAsync();
+                return new ActionResponse<bool>
+                {
+                    Success = true,
+                    Message = "La History Messages."
+                };
+            }
+            catch (Exception)
+            {
+                return new ActionResponse<bool>
+                {
+                    Success = false,
+                    Message = "Algo paso."
+                };
+            }
+        }
+
+        public async Task<ActionResponse<IEnumerable<HistoryMessages>>> GetHistoryMessagesAsync()
+        {
+            var message = await _context.HistoryMessages
+               .Include(e => e.Event)
+               .Include(e => e.Invitation).ToListAsync();
+
+            return new ActionResponse<IEnumerable<HistoryMessages>>
+            {
+                Success = true,
+                Result = message
             };
         }
     }

@@ -79,5 +79,16 @@ namespace SIC.Backend.Controllers
             }
             return NotFound(action.Message);
         }
+
+        [HttpGet("HistoryMessages")]
+        public async Task<IActionResult> GetHistoryMessages()
+        {
+            var action = await _messageUnitOfWork.GetHistoryMessagesAsync();
+            if (action.Success)
+            {
+                return Ok(action.Result);
+            }
+            return NotFound(action.Message);
+        }
     }
 }

@@ -93,13 +93,24 @@
                                            placeholder="Numero celular..."
                                            @bind-Value="NewEvent.PlannerPhone" />
                             </div>
+                        </div>
+                        <div class="mb-3 row align-items-center">
 
                             <div class="col-auto">
-                                <div class="form-check mt-4">
+                                <div class="form-check">
                                     <InputCheckbox class="form-check-input"
                                                    @bind-Value="NewEvent.HasAlbum" />
                                     <label class="form-check-label ms-1">
                                         Álbum
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <div class="form-check">
+                                    <InputCheckbox class="form-check-input"
+                                                   @bind-Value="NewEvent.AlbumPublic" />
+                                    <label class="form-check-label ms-1">
+                                        Álbum Publico
                                     </label>
                                 </div>
                             </div>

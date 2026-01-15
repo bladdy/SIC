@@ -25,5 +25,9 @@ namespace SIC.Backend.UnitOfWork.Implemetations
         public async Task<ActionResponse<IEnumerable<MessageKey>>> GetKeysAsync() => await _messageRepository.GetKeysAsync();
 
         public async Task<ActionResponse<IEnumerable<MessageWhatsappInvitationDTO>>> GetMessageWhatsappInvitation(string code) => await _messageRepository.GetMessageWhatsappInvitation(code);
+
+        public async Task<ActionResponse<bool>> AddHistoryMessages(string code, bool Success, string? Message) => await _messageRepository.AddHistoryMessages(code, Success, Message);
+
+        public async Task<ActionResponse<IEnumerable<HistoryMessages>>> GetHistoryMessagesAsync() => await _messageRepository.GetHistoryMessagesAsync();
     }
 }

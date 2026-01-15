@@ -16,6 +16,7 @@ namespace SIC.Shared.DTOs
         public string Lugar { get; set; } = string.Empty;
         public int CantidadPersonas { get; set; }
         public int Adultos { get; set; }
+        public int Jovenes { get; set; }
         public int Niños { get; set; }
         public string MesaAsignada { get; set; } = string.Empty;
         public string CodigoQr { get; set; } = string.Empty;

@@ -142,6 +142,7 @@ public class InvitationsController : GenericController<Invitation>
                 Lugar = invitacion.Event!.Url!,
                 CantidadPersonas = invitacion.NumberAdults + invitacion.NumberChildren,
                 Niños = invitacion.NumberConfirmedChildren,
+                Jovenes = invitacion.NumberConfirmedYouths,
                 Adultos = invitacion.NumberConfirmedAdults,
                 MesaAsignada = invitacion.Table ?? "Sin asignar",
                 CodigoQr = invitacion.Code ?? $"INV-{invitacion.Id}-{evento}"

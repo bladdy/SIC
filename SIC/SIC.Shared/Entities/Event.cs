@@ -45,6 +45,7 @@ public class Event : IEntityWithName
     public string? Planner { get; set; }
     public string? PlannerPhone { get; set; }
     public bool HasAlbum { get; set; } = false;
+    public bool AlbumPublic { get; set; } = true;
 
     // 🔹 Álbum de imágenes del evento
     public ICollection<EventImage> Images { get; set; } = new List<EventImage>();
@@ -54,7 +55,7 @@ public class Event : IEntityWithName
 
     public int? EventTypeId { get; set; }
     public EventType? EventType { get; set; }
-
+    public ICollection<HistoryMessages> HistoryMessages { get; set; } = new List<HistoryMessages>();
     public ICollection<Invitation> Invitations { get; set; } = new List<Invitation>();
 
     [Display(Name = "Estado")]

@@ -1,6 +1,8 @@
 ﻿using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.JSInterop;
+using SIC.Frontend.Helpers;
 using SIC.Frontend.Repositories;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
@@ -14,17 +16,45 @@ public partial class AddImagenAlbum
     [Inject] private IRepository Repository { get; set; } = default!;
     [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
-    private string? importResult;
+    [Inject] private IJSRuntime JsRuntime { get; set; } = default!;
 
     private IReadOnlyList<IBrowserFile>? selectedFiles;
+
+    private string? importResult;
+
     private bool hasFileSelected = false;
 
     private bool isLoadingImport = false;
     public Event? Event { get; set; }
+    public List<EventImage>? EventImages { get; set; } = [];
+    private EventImage? PreviewImage;
 
     protected override async Task OnInitializedAsync()
     {
         await LoadEvent();
+        if (Event is not null && Event.AlbumPublic)
+        {
+            await LoadEventImage();
+        }
+    }
+
+    private async Task LoadEventImage()
+    {
+        var url = $"api/images/byEvent/{Code}";
+
+        var responseHttp = await Repository.GetAsync<List<EventImage>>(url);
+
+        if (responseHttp.Error)
+        {
+            if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+            {
+                NavigationManager.NavigateTo("/events");
+                var message = await responseHttp.GetErrorMessageAsync();
+                await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            }
+        }
+
+        EventImages = responseHttp?.Response ?? new List<EventImage>();
     }
 
     private async Task LoadEvent()
@@ -113,7 +143,7 @@ public partial class AddImagenAlbum
                     SweetAlertIcon.Success
                 );
 
-                await LoadEvent();
+                await LoadEventImage();
                 selectedFiles = null;
             }
             else
@@ -138,5 +168,15 @@ public partial class AddImagenAlbum
         {
             isLoadingImport = false;
         }
+    }
+
+    private void OpenPreview(EventImage eventImage)
+    {
+        PreviewImage = eventImage;
+    }
+
+    private void ClosePreview()
+    {
+        PreviewImage = null;
     }
 }

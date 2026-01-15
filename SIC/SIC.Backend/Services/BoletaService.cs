@@ -91,6 +91,8 @@ namespace SIC.Backend.Services
             AddInfo($"Hora: {data.Hora:hh:mm tt}");
 
             var invitados = $"{data.Adultos} {(data.Adultos == 1 ? "Adulto" : "Adultos")}";
+            if (data.Jovenes > 0)
+                invitados += $"  {data.Jovenes} {(data.Jovenes == 1 ? "Joven" : "Jovenes")}";
             if (data.Niños > 0)
                 invitados += $"  {data.Niños} {(data.Niños == 1 ? "Niño" : "Niños")}";
 
