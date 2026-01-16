@@ -28,23 +28,44 @@
         <div class="d-flex justify-content-center align-items-center" style="height: 200px;">
             <div class="d-flex flex-column gap-3" style="width: 300px;">
 
-                <!-- InputFile oculto -->
-                <InputFile class="d-none" id="fileInput" OnChange="HandleFileSelected" multiple accept="image/*" />
+                <!-- InputFile cámara -->
+                <InputFile class="d-none"
+                           id="cameraInput"
+                           OnChange="HandleFileSelected"
+                           accept="image/*"
+                           capture="environment" />
 
-                <!-- Label que actúa como botón -->
-                <label for="fileInput" class="form-control form-control-sm text-center" style="cursor:pointer;">
-                    Elige una imagen @if (selectedFiles != null && selectedFiles.Count > 0)
+                <button class="btn btn-sm btn-outline-secondary w-100"
+                        type="button"
+                        onclick="document.getElementById('cameraInput').click()">
+                    📷 Tomar foto
+                </button>
+                <!-- InputFile normal -->
+                <InputFile class="d-none"
+                           id="fileInput"
+                           OnChange="HandleFileSelected"
+                           multiple
+                           accept="image/*" />
+
+                <label for="fileInput"
+                       class="form-control form-control-sm text-center"
+                       style="cursor:pointer;">
+                    Elige una imagen
+                    @if (selectedFiles != null && selectedFiles.Count > 0)
                     {
-                        <strong>(@selectedFiles.Count archivo(s) seleccionado(s))</strong>
+                        <strong>(@selectedFiles.Count archivo(s))</strong>
                     }
                 </label>
 
-                <!-- Botón de carga -->
+                
+
+                <!-- Botón subir -->
                 <button class="btn btn-sm btn-custom w-100"
-                @onclick="UploadPhoto" disabled="@(!hasFileSelected || isLoadingImport)">
+                        @onclick="UploadPhoto"
+                        disabled="@(!hasFileSelected || isLoadingImport)">
                     @if (isLoadingImport)
                     {
-                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        <span class="spinner-border spinner-border-sm me-2"></span>
                         <span>Cargando...</span>
                     }
                     else
@@ -52,6 +73,26 @@
                         <span>Subir Imagen</span>
                     }
                 </button>
+
+                <div class="d-flex mb-2">
+                    <button class="btn btn-sm btn-custom w-100"
+                            type="button"
+                            data-bs-toggle="popover"
+                            data-bs-placement="bottom"
+                            data-bs-html="true"
+                            title="¿Cómo subir tu imagen?"
+                            data-bs-content="<ol style='padding-left:1rem; margin:0;'>
+                                            <li>Toma una Foto o Selecciona imágen(es)</li>
+                                            <li>Solo formatos JPG o PNG</li>
+                                            <li>Tamaño máximo recomendado: 5MB</li>
+                                            <li>Evita imágenes borrosas</li>
+                                        </ol>
+                                ">
+                            ❔ Ayuda
+                    </button>
+                </div>
+
+
 
             </div>
         </div>

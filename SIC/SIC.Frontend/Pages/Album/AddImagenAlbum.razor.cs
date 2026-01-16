@@ -85,6 +85,14 @@ public partial class AddImagenAlbum
         }
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JsRuntime.InvokeVoidAsync("initPopovers", 5000); // 5 segundos
+        }
+    }
+
     private void HandleFileSelected(InputFileChangeEventArgs e)
     {
         selectedFiles = e.GetMultipleFiles();
