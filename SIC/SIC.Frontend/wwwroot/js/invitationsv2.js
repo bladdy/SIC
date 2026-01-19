@@ -2,8 +2,8 @@
 //  VARIABLES GLOBALES
 // ===============================================================
 let invitacion = null;
-const apiUrl = "https://localhost:7141/api/Invitations"; // Cambia si es necesario
-//const apiUrl = "https://invboxv-app.com/api/Invitations"; // Cambia si es necesario
+//const apiUrl = "https://localhost:7141/api/Invitations"; // Cambia si es necesario
+const apiUrl = "https://invboxv-app.com/api/Invitations"; // Cambia si es necesario
 
 // ===============================================================
 //  CARGAR INVITACIÓN POR CÓDIGO EN LA URL
@@ -43,7 +43,6 @@ function cargarInvitacion(code) {
                     cargarQRAndPdf(invitacion.code, invitacion.event.code)
                 }
                 else if (invitacion.status === 20) {
-
                     mostrarGracias(data);
                 }
                 else {
@@ -152,7 +151,6 @@ function marcarAsistencia(index, valor) {
 //  SELECCIÓN "SÍ ASISTIRÉ / NO ASISTIRÉ"
 // ===============================================================
 function fn_asistencia(tipo) {
-
     if (tipo === "n") {
         // NO ASISTIRÁ → todos status = 20
         invitacion.status = 20;
@@ -174,8 +172,6 @@ function fn_asistencia(tipo) {
 
     document.getElementById("btnConfirmar").style.display = "block";
 }
-
-
 
 // ===============================================================
 //  ENVIAR RESPUESTA COMPLETA
@@ -199,10 +195,8 @@ async function sendRespuesta() {
         const data = await response.json();
         mostrarGracias(data);
         if (invitacion.status === 19) {
-
             cargarQRAndPdf(invitacion.code, invitacion.event.code)
         }
-
     } catch (error) {
         console.log(error)
         alert("Error al conectar con el servidor");
@@ -232,7 +226,6 @@ function mostrarNoInvitacion(code) {
 }
 
 function cargarQRAndPdf(codigoInvitacion, codigoEvento) {
-
     console.log(codigoInvitacion, codigoEvento)
     const qrUrl = `${apiUrl}/qr?codigo=${codigoInvitacion}&evento=${codigoEvento}`;
 
