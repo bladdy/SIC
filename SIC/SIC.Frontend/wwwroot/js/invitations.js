@@ -40,8 +40,7 @@ function obtenerDatosInvitacion() {
             const btnConfirmar = document.getElementById("btnConfirmar");
             if (tipoEvent === "Save the Date") {
                 btnConfirmar.style.display = "block";
-            }
-
+            } 
             mostrarDatosInvitacion(data);
 
             // 🔹 Verificar estado
@@ -92,11 +91,19 @@ function mostrarMensajeNoInvitacion(codigoInvitacion) {
 function mostrarDatosInvitacion(inv) {
     document.getElementById("rotulo_invitacion").innerText = inv.name;
     if (tipoEvent !== "Save the Date") {
+        console.log(inv.numberYouths);
         if (inv.numberChildren > 0) hayNiños = true;
         if (inv.numberYouths > 0) hayJovenes = true;
 
         document.getElementById("invitados_mayores").innerText = `${inv.numberAdults} Adulto(s)`;
-        document.getElementById("invitados_jovenes").innerText = `${inv.numberYouths} Jóven(es)`;
+        const invJovenes = document.getElementById("invitados_jovenes");
+        if (hayJovenes) {
+            invJovenes.innerText = `${inv.numberYouths} Jóven(es)`;
+        }
+        else {
+            invJovenes.style.display = "none";
+        }
+
         document.getElementById("invitados_menores").innerText = inv.numberChildren === 0
             ? "Respetuosamente NO NIÑOS"
             : `${inv.numberChildren} Niño(s)`;
