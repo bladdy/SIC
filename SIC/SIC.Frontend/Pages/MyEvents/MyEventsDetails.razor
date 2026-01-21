@@ -244,19 +244,55 @@ else
 
                                         <!-- ===== COLUMNA 2 ===== -->
                                         <div class="col-12 col-md-4 d-flex flex-column">
-                                            <div><strong>Adultos:</strong> @invitation.NumberAdults</div>
-                                            <div><strong>Jóvenes:</strong> @invitation.NumberYouths</div>
-                                            <div><strong>Niños:</strong> @invitation.NumberChildren</div>
-                                            <div><strong>Conf. Adultos:</strong> @invitation.NumberConfirmedAdults</div>
-                                            <div><strong>Conf. Jóvenes:</strong> @invitation.NumberConfirmedYouths</div>
-                                            <div><strong>Conf. Niños:</strong> @invitation.NumberConfirmedChildren</div>
+                                            @if (invitation.Guests.Any())
+                                            {
+                                                @foreach (var guest in invitation.Guests)
+                                                {
+                                                    <div><strong>@guest.GuestName</strong> (@guest.GuestType.GetDescription())</div>
+
+                                                }
+
+                                            }
                                         </div>
 
                                         <!-- ===== COLUMNA 3 ===== -->
                                         <div class="col-12 col-md-4 d-flex flex-wrap align-items-center gap-2">
                                             @if (usarWhatsApp)
                                             {
+                                                <!--
                                                 <button class="btn d-inline-flex align-items-center gap-2 text-white"
+                                                        style="background-color:#25d366;"
+                                                @onclick="() => EnviarInvitacion(invitation.Code!)"
+                                                        disabled="@(isLoadingWhatsapp == true)">
+                                                @if (isLoadingWhatsapp == true)
+                                                {
+                                                        <span class="spinner-border spinner-border-sm"></span>
+                                                        <span>Invitando...</span>
+                                                }
+                                                else
+                                                {
+                                                        <i class="bi bi-whatsapp"></i>
+                                                        <span>Invitar</span>
+                                                }
+                                                </button>
+                                                -->
+                                                <button class="btn d-inline-flex align-items-center gap-2 text-white"
+                                                        style="background-color:#25d366;"
+                                                        @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)"
+                                                        disabled="@(loadingWhatsappId1 == invitation.Id)">
+                                                    @if (loadingWhatsappId1 == invitation.Id)
+                                                    {
+                                                        <span class="spinner-border spinner-border-sm"></span>
+                                                        <span>Invitando...</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="bi bi-whatsapp"></i>
+                                                        <span>Invitar</span>
+                                                    }
+                                                </button>
+
+                                                <button class="btn d-inline-flex align-items-center gap-2 text-white d-none"
                                                         style="background-color:#25d366;"
                                                         @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)"
                                                         disabled="@(loadingWhatsappId1 == invitation.Id)">
@@ -375,10 +411,15 @@ else
                         </span>
                     </div>
                     <div class="row justify-content-between align-items-center">
-                        <p class="mb-0"><strong>Adultos:</strong> @invitation.NumberAdults (@invitation.NumberConfirmedAdults conf.)</p>
-                        <p class="mb-0"><strong>Jóvenes:</strong> @invitation.NumberYouths (@invitation.NumberConfirmedYouths conf.)</p>
-                        <p class="mb-0"><strong>Niños:</strong> @invitation.NumberChildren (@invitation.NumberConfirmedChildren conf.)</p>
+                        @if (invitation.Guests.Any())
+                        {
+                            @foreach (var guest in invitation.Guests)
+                            {
+                                <div><strong>@guest.GuestName</strong> (@guest.GuestType.GetDescription())</div>
 
+                            }
+
+                        }
                     </div>
                     <p class="mb-1"><strong>Mesa:</strong> @invitation.Table</p>
                     <p class="mb-1"><strong>Dedicatoria:</strong> @invitation.Comments</p>

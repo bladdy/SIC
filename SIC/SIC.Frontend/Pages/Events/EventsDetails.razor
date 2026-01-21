@@ -273,7 +273,8 @@ else
                                                         <i class="bi bi-whatsapp"></i>
                                                         <span>Invitar</span>
                                                     }
-                                                </button>-->
+                                                </button>
+                                                -->
                                                 <button class="btn d-inline-flex align-items-center gap-2 text-white"
                                                         style="background-color:#25d366;"
                                                         @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)"
@@ -409,10 +410,15 @@ else
                         </span>
                     </div>
                     <div class="row justify-content-between align-items-center">
-                        <p class="mb-0"><strong>Adultos:</strong> @invitation.NumberAdults (@invitation.NumberConfirmedAdults conf.)</p>
-                        <p class="mb-0"><strong>Jóvenes:</strong> @invitation.NumberYouths (@invitation.NumberConfirmedYouths conf.)</p>
-                        <p class="mb-0"><strong>Niños:</strong> @invitation.NumberChildren (@invitation.NumberConfirmedChildren conf.)</p>
+                        @if (invitation.Guests.Any())
+                        {
+                            @foreach (var guest in invitation.Guests)
+                            {
+                                <div><strong>@guest.GuestName</strong> (@guest.GuestType.GetDescription())</div>
 
+                            }
+
+                        }
                     </div>
                     <p class="mb-1"><strong>Mesa:</strong> @invitation.Table</p>
                     <p class="mb-1"><strong>Dedicatoria:</strong> @invitation.Comments</p>
