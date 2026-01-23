@@ -28,6 +28,7 @@ public class DataContext : IdentityDbContext<User>
     public DbSet<InvitationGuest> InvitationGuest { get; set; }
     public DbSet<EventImage> EventImages { get; set; }
     public DbSet<HistoryMessages> HistoryMessages { get; set; }
+    public DbSet<ResponseFromWhatsApp> ResponseFromWhatsApps { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -206,5 +206,22 @@ namespace SIC.Backend.Repositories.Implemetations
                 Result = message
             };
         }
+
+        public async Task<ActionResponse<bool>> AddReceiveMessages(string from, string? text, string? replyToMessageId)
+        {
+            var response = new ResponseFromWhatsApp
+            {
+                From = from,
+                Message = text ?? string.Empty, // Use null-coalescing operator to provide a default value
+                MessageId = replyToMessageId ?? string.Empty // Use null-coalescing operator to provide a default value
+            };
+            _context.Add(response);
+            await _context.SaveChangesAsync();
+            return new ActionResponse<bool>
+            {
+                Success = true,
+                Message = "Funcionalidad no implementada."
+            };
+        }
     }
 }

@@ -20,5 +20,7 @@ namespace SIC.Backend.Repositories.Interfaces
         Task<ActionResponse<bool>> AddHistoryMessages(string code, bool Success, string? Message);
 
         Task<ActionResponse<IEnumerable<HistoryMessages>>> GetHistoryMessagesAsync();
+
+        Task<ActionResponse<bool>> AddReceiveMessages(string from, string? text, string? replyToMessageId);
     }
 }
