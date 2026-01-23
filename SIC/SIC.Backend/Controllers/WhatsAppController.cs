@@ -61,7 +61,7 @@ namespace SIC.Backend.Controllers
             parametros.Add(invitacion.Result.Name);
             parametros.Add(invitacion.Result.Event!.Name);
             parametros.Add(invitacion.Result.Event!.SubTitle);
-            parametros.Add($"{invitacion.Result.Event!.Url!}");
+            parametros.Add($"{invitacion.Result.Event!.Url!}?codigo={code}");
             parametros.Add(fechaFormateada);
             parametros.Add(invitacion.Result.Event!.Name);
 
