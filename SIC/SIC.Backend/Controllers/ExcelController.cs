@@ -136,6 +136,7 @@ namespace SIC.Backend.Controllers
                         {
                             inv.Guests.Add(new InvitationGuest
                             {
+                                GuestName = "Adulto",
                                 GuestType = GuestType.Adult,
                                 Status = Status.Pending
                             });
@@ -146,6 +147,7 @@ namespace SIC.Backend.Controllers
                         {
                             inv.Guests.Add(new InvitationGuest
                             {
+                                GuestName = "Joven",
                                 GuestType = GuestType.Youth,
                                 Status = Status.Pending
                             });
@@ -156,6 +158,7 @@ namespace SIC.Backend.Controllers
                         {
                             inv.Guests.Add(new InvitationGuest
                             {
+                                GuestName = "Niño",
                                 GuestType = GuestType.Children,
                                 Status = Status.Pending
                             });
