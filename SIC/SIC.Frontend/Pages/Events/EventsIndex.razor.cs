@@ -198,6 +198,7 @@ namespace SIC.Frontend.Pages.Events
                 Date = evnt.Date,
                 Time = evnt.Time,
                 Url = evnt.Url,
+                CoverImageUrl = evnt.CoverImageUrl,
                 Ubication = evnt.Ubication,
                 Host = evnt.Host,
                 HostPhone = evnt.HostPhone,

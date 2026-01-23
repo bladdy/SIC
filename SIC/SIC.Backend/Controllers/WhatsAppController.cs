@@ -6,6 +6,9 @@ using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.Helpers;
 using SIC.Shared.Response;
 using SIC.Shared.DTOs;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SIC.Backend.Controllers
 {
@@ -14,38 +17,51 @@ namespace SIC.Backend.Controllers
     public class WhatsAppController : ControllerBase
     {
         private readonly WhatsAppService _whatsAppService;
-        private readonly IConfiguration _configuration;
+        private readonly IWhatsAppConfigUnitOfWork _whatsAppConfigUnitOfWork;
         private readonly IInvitationUnitOfWork _invitationUnitOfWork;
         private readonly IMessageUnitOfWork _iMessageUnitOfWork;
 
         public WhatsAppController(
             WhatsAppService whatsAppService, IInvitationUnitOfWork invitationUnitOfWork,
-            IConfiguration configuration, IMessageUnitOfWork iMessageUnitOfWork)
+            IWhatsAppConfigUnitOfWork whatsAppConfigUnitOfWork, IMessageUnitOfWork iMessageUnitOfWork)
         {
             _whatsAppService = whatsAppService;
-            _configuration = configuration;
+            _whatsAppConfigUnitOfWork = whatsAppConfigUnitOfWork;
             _invitationUnitOfWork = invitationUnitOfWork;
             _iMessageUnitOfWork = iMessageUnitOfWork;
         }
 
         [HttpPost("enviar-invitacion/{code}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(Roles = "Admin,WeddingPlanner,User")]
         public async Task<IActionResult> EnviarInvitacion(string code)
         {
-            var accessToken = _configuration["WhatsApp:AccessToken"];
-            var phoneNumberId = _configuration["WhatsApp:PhoneNumberId"];
+            // Extraer el ID del usuario autenticado desde el token JWT
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userWhatsAppConfig = await _whatsAppConfigUnitOfWork.GetByUserIdAsync(userId);
+            if (!userWhatsAppConfig.Success)
+                return BadRequest(new { error = "Este usuario no tiene permisos para hacer este envio" });
+
+            //obtener los datos del usuario
+            var accessToken = userWhatsAppConfig.Result!.AccessToken;
+            var phoneNumberId = userWhatsAppConfig.Result!.PhoneNumberId;
             List<string> parametros = new List<string>();
             var invitacion = await _invitationUnitOfWork.GetByCodeAsync(code);
             if (invitacion.Result == null)
                 return NotFound(new { error = "Invitación no encontrada." });
 
             var fecha = invitacion.Result.Event!.Date;
+            string coverImageUrl =
+                    !string.IsNullOrWhiteSpace(invitacion.Result.Event?.CoverImageUrl)
+                            ? invitacion.Result.Event.CoverImageUrl
+                            : "https://invboxv-app.com/logo.png";
 
             string fechaFormateada = FechaHelper.FormatearFechaLargaEspanol(fecha);
 
             parametros.Add(invitacion.Result.Name);
             parametros.Add(invitacion.Result.Event!.Name);
             parametros.Add(invitacion.Result.Event!.SubTitle);
-            parametros.Add($"{invitacion.Result.Event!.Url!}{invitacion.Result.Code}");
+            parametros.Add($"{invitacion.Result.Event!.Url!}");
             parametros.Add(fechaFormateada);
             parametros.Add(invitacion.Result.Event!.Name);
 
@@ -53,9 +69,11 @@ namespace SIC.Backend.Controllers
                 accessToken!,
                 phoneNumberId!,
                 invitacion.Result.PhoneNumber,
-                "Confirmacion",
-                "Es-MX",
+                "confirmaciones",
+                "es_Es",
+                coverImageUrl,
                 parametros
+
             );
             await SaveMessageHistory(invitacion.Result.Code!, result);
 

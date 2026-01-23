@@ -17,9 +17,13 @@ namespace SIC.Backend.Services
         }
 
         public async Task<ActionResponse<WhatsAppMessageResponse>> EnviarInvitacionAsync(
-            string accessToken, string phoneNumberId, string numeroDestino, string templateName,
-            string languageCode, List<string>? parametros = null
-        )
+            string accessToken,
+            string phoneNumberId,
+            string numeroDestino,
+            string templateName,
+            string languageCode,
+            string coverImageUrl,
+            List<string>? parametros = null)
         {
             try
             {
@@ -31,20 +35,40 @@ namespace SIC.Backend.Services
                 {
                     name = templateName,
                     language = new { code = languageCode },
-                    components = parametros != null && parametros.Any()
-                        ? new[]
+                    components = new List<object>
+                    {
+                        // HEADER IMAGE
+                        new
                         {
-                            new
+                            type = "header",
+                            parameters = new[]
+                            {
+                                new
+                                {
+                                    type = "image",
+                                    image = new
+                                    {
+                                        link = coverImageUrl
+                                    }
+                                }
+                            }
+                        },
+
+                        // BODY
+                        parametros != null && parametros.Any()
+                            ? new
                             {
                                 type = "body",
                                 parameters = parametros.Select(p => new
                                 {
                                     type = "text",
                                     text = p
-                                })
+                                }).ToArray()
                             }
-                        }
-                        : null
+                            : null
+                    }
+                    .Where(c => c != null) // evita nulls
+                    .ToArray()
                 };
 
                 var payload = new

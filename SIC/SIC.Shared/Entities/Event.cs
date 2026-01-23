@@ -50,7 +50,7 @@ public class Event : IEntityWithName
     // 🔹 Álbum de imágenes del evento
     public ICollection<EventImage> Images { get; set; } = new List<EventImage>();
 
-    // 🔹 Imagen principal (cover)
+    // 🔹 Miniatura de la inivitacion
     public string? CoverImageUrl { get; set; }
 
     public int? EventTypeId { get; set; }
