@@ -223,5 +223,30 @@ namespace SIC.Backend.Repositories.Implemetations
                 Message = "Funcionalidad no implementada."
             };
         }
+
+        public async Task<ActionResponse<IEnumerable<MessagesReciveDTO>>> GetAllMessagesReciveAsync()
+        {
+            var messages = await (
+                from r in _context.ResponseFromWhatsApps
+                join i in _context.Invitations
+                    on r.From.Substring(r.From.Length - 10) equals i.PhoneNumber
+                orderby r.CreatedAt descending
+                select new MessagesReciveDTO
+                {
+                    InvitationName = i.Name,
+                    InvitationCode = i.Code!,
+                    EventName = i.Event!.Name,
+                    Message = r.Message,
+                    From = r.From,
+                    CreatedAt = r.CreatedAt
+                }
+            ).ToListAsync();
+
+            return new ActionResponse<IEnumerable<MessagesReciveDTO>>
+            {
+                Success = true,
+                Result = messages
+            };
+        }
     }
 }

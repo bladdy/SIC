@@ -90,5 +90,16 @@ namespace SIC.Backend.Controllers
             }
             return NotFound(action.Message);
         }
+
+        [HttpGet("GetAllMessagesRecive")]
+        public async Task<IActionResult> GetAllMessagesReciveAsync()
+        {
+            var action = await _messageUnitOfWork.GetAllMessagesReciveAsync();
+            if (action.Success)
+            {
+                return Ok(action.Result);
+            }
+            return NotFound(action.Message);
+        }
     }
 }

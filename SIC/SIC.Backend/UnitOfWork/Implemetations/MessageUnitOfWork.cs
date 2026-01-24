@@ -31,5 +31,7 @@ namespace SIC.Backend.UnitOfWork.Implemetations
         public async Task<ActionResponse<IEnumerable<HistoryMessages>>> GetHistoryMessagesAsync() => await _messageRepository.GetHistoryMessagesAsync();
 
         public async Task<ActionResponse<bool>> AddReceiveMessages(string from, string? text, string? replyToMessageId) => await _messageRepository.AddReceiveMessages(from, text, replyToMessageId);
+
+        public async Task<ActionResponse<IEnumerable<MessagesReciveDTO>>> GetAllMessagesReciveAsync() => await _messageRepository.GetAllMessagesReciveAsync();
     }
 }
