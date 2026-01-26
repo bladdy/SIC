@@ -3,25 +3,78 @@
 @using Microsoft.AspNetCore.Components.Forms
 
 <PageTitle>Subir fotos</PageTitle>
-<div class="container-fluid min-vh-100 position-relative text-light" style=" margin: 0; padding: 0;">
+<div class="container-fluid min-vh-100 position-relative text-light" style=" margin: auto; padding: 0;">
     <!-- Contenedor principal sin margen superior -->
     <div style="width: 100%; font-family: Arial, sans-serif;">
 
         <!-- Imagen de portada con overlay -->
-        <div style="position: relative; width: 100%; height: 440px; overflow: hidden; margin: 0; padding: 0;">
-            @if (Event is not null)
+        <div style="
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 1;
+    min-height: 280px;
+    max-height: 440px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+">
+
+            @if (EventImages?.FirstOrDefault()?.Event is not null)
             {
-                <img src="@Event!.CoverImageUrl"
-                alt="Portada del evento"
-                style="width: 100%; height: 440px; object-fit: cover; object-position: center;" />
+                var ev = EventImages.First().Event;
 
-                <!-- Overlay con título y código -->
-                <div style="position: absolute; bottom: 20px; left: 20px; color: white; text-align: left;
-                            text-shadow: 0 0 10px rgba(0,0,0,0.7);">
-                    <h1 style="font-size: 2.5rem; margin: 0;">📸 Álbum del Evento: @Event.Name </h1>
-                    <p style="font-size: 1rem; margin: 5px 0 0 0;">Código del evento: <strong>@Code</strong></p>
+                <!-- Imagen -->
+                <img src="@ev.CoverAlbumImageUrl"
+                     alt="Portada del evento"
+                     style="
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                object-position: @($"{ev.CoverPositionX}% {ev.CoverPositionY}%");
+                display: block;
+                 " />
+
+                <!-- Overlay degradado (mejora legibilidad en mobile) -->
+                <div style="
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                to top,
+                rgba(0,0,0,0.6),
+                rgba(0,0,0,0)
+            );
+            "></div>
+
+                <!-- Texto -->
+                <div style="
+            position: absolute;
+            bottom: clamp(12px, 4vw, 24px);
+            left: clamp(12px, 4vw, 24px);
+            right: clamp(12px, 4vw, 24px);
+            color: white;
+            text-align: left;
+            text-shadow: 0 0 10px rgba(0,0,0,0.7);
+            max-width: 100%;
+            ">
+
+                    <p style="
+                font-size: clamp(0.85rem, 2.5vw, 1rem);
+                margin: 0 0 4px 0;
+                line-height: 1.3;
+                opacity: 0.9;
+                ">
+                        @ev.SubTitle
+                    </p>
+
+                    <h1 style="
+                font-size: clamp(1.4rem, 5vw, 2.2rem);
+                margin: 0;
+                line-height: 1.15;
+                word-break: break-word;
+                ">
+                        @ev.Name
+                    </h1>
+
                 </div>
-
             }
 
         </div>
@@ -50,7 +103,7 @@
                 <label for="fileInput"
                        class="form-control form-control-sm text-center"
                        style="cursor:pointer;">
-                    Elige una imagen
+                    Elegir imagen
                     @if (selectedFiles != null && selectedFiles.Count > 0)
                     {
                         <strong>(@selectedFiles.Count archivo(s))</strong>
@@ -76,7 +129,6 @@
 
                 <div class="d-flex mb-2">
                     <button class="btn btn-sm btn-custom w-100"
-                            type="button"
                             data-bs-toggle="popover"
                             data-bs-placement="bottom"
                             data-bs-html="true"
@@ -86,9 +138,8 @@
                                             <li>Solo formatos JPG o PNG</li>
                                             <li>Tamaño máximo recomendado: 5MB</li>
                                             <li>Evita imágenes borrosas</li>
-                                        </ol>
-                                ">
-                            ❔ Ayuda
+                                        </ol>">
+                                        Instrucciones
                     </button>
                 </div>
 
@@ -103,7 +154,7 @@
             <div style="padding: 1rem; font-family: Arial, sans-serif;">
                 <!-- Header -->
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
-                    <h2 style="margin: 0; color: black;">📸 Álbum del Evento (@EventImages!.Count)</h2>
+                    <h2 style="margin: 0; color: #3C6A79;">Galería (@EventImages!.Count)</h2>
                 </div>
 
                 <!-- Cargando / vacío / imágenes -->

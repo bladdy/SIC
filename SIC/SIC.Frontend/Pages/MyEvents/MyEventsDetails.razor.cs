@@ -10,6 +10,7 @@ using SIC.Frontend.Pages.Message;
 using SIC.Frontend.Repositories;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
+using SIC.Shared.Enums;
 using System.Net;
 
 namespace SIC.Frontend.Pages.MyEvents;
@@ -517,4 +518,11 @@ public partial class MyEventsDetails
 
         Filter = filter;
     }
+
+    private string GetStatusBadge(Status status) => status switch
+    {
+        Status.Attend => "success",
+        Status.NotAttend => "danger",
+        _ => "secondary"
+    };
 }

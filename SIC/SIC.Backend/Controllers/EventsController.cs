@@ -7,6 +7,7 @@ using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using SIC.Shared.Response;
 using SkiaSharp;
+using System.Text.Json;
 
 namespace SIC.Backend.Controllers;
 
@@ -103,7 +104,8 @@ public class EventsController : GenericController<Event>
     [HttpPost("upload-frontpage/{code}")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> PutFullAsync(
-        IFormFile file, string code)
+        IFormFile file, string code,
+        [FromForm] string cropData)
     {
         if (file == null || file.Length == 0)
             return BadRequest("Archivo inválido");
@@ -121,7 +123,11 @@ public class EventsController : GenericController<Event>
         var response = await _eventsUnitOfWork.GetByCodeAsync(code);
         if (response.Result != null)
         {
-            response.Result.CoverImageUrl = url;
+            var crop = JsonSerializer.Deserialize<CropData>(cropData);
+            response.Result.CoverPositionX = crop?.X ?? 0;
+            response.Result.CoverPositionY = crop?.Y ?? 0;
+            response.Result.CoverZoom = crop?.Width ?? 1;
+            response.Result.CoverAlbumImageUrl = url;
             action = await _eventsUnitOfWork.UpdateFullAsync(response.Result);
         }
         if (action.Success)

@@ -106,6 +106,7 @@ public partial class EventsDetails
             GuestType = GuestType.Adult,
             InvitationId = NewInvitation.Id,
             Invitation = null,
+
             // SIEMPRE null para evitar validaciones
         });
         UpdateGuestCounters(NewInvitation.Guests);
@@ -585,4 +586,11 @@ public partial class EventsDetails
 
         Filter = filter;
     }
+
+    private string GetStatusBadge(Status status) => status switch
+    {
+        Status.Attend => "success",
+        Status.NotAttend => "danger",
+        _ => "secondary"
+    };
 }

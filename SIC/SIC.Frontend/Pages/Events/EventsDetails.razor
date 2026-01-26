@@ -247,7 +247,13 @@ else
                                             {
                                                 @foreach (var guest in invitation.Guests)
                                                 {
-                                                    <div><strong>@guest.GuestName</strong> (@guest.GuestType.GetDescription())</div>
+                                                    <div>
+                                                        <strong>@guest.GuestName</strong>
+                                                        (@guest.GuestType.GetDescription())
+                                                        <span class="badge rounded-pill bg-@GetStatusBadge(guest.Status)">
+                                                            @guest.Status.GetDescription()
+                                                        </span>
+                                                    </div>
                                                 
                                                 }
                                                 
@@ -414,7 +420,13 @@ else
                         {
                             @foreach (var guest in invitation.Guests)
                             {
-                                <div><strong>@guest.GuestName</strong> (@guest.GuestType.GetDescription())</div>
+                                <div>
+                                    <strong>@guest.GuestName</strong>
+                                    (@guest.GuestType.GetDescription())
+                                    <span class="badge rounded-pill bg-@GetStatusBadge(guest.Status)">
+                                        @guest.Status.GetDescription()
+                                    </span>
+                                </div>
 
                             }
 

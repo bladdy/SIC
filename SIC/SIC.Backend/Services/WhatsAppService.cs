@@ -221,5 +221,10 @@ namespace SIC.Backend.Services
                 return (false, "", ex.Message);
             }
         }
+
+        public async Task<string?> SendTextMessageAsync(string accessToken, string phoneNumberId, SendWhatsappMessageDto dto)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

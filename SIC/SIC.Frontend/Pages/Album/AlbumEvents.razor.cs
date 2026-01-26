@@ -6,6 +6,10 @@ using SIC.Frontend.Repositories;
 using SIC.Shared.Entities;
 using System.Net;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.JSInterop;
+using SIC.Shared.DTOs;
+using System.Text;
+using System.Text.Json;
 
 namespace SIC.Frontend.Pages.Album
 {
@@ -13,7 +17,7 @@ namespace SIC.Frontend.Pages.Album
     public partial class AlbumEvents
     {
         [Inject] private IRepository repository { get; set; } = default!;
-
+        [Inject] private IJSRuntime JS { get; set; } = default!;
         [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
         [Inject] private NavigationManager NavigationManager { get; set; } = default!;
         [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
@@ -163,70 +167,101 @@ namespace SIC.Frontend.Pages.Album
             {
                 Id = evnt.Id,
                 Code = evnt.Code,
-                CoverImageUrl = evnt.CoverImageUrl
+                CoverAlbumImageUrl = evnt.CoverAlbumImageUrl
             };
 
             IsEditMode = true;
             IsModalVisible = true;
         }
 
-        private void HandleFileSelected(InputFileChangeEventArgs e)
+        private async Task HandleFileSelected(InputFileChangeEventArgs e)
         {
             selectedFile = e.File;
             hasFileSelected = selectedFile != null;
+
+            await JS.InvokeVoidAsync("previewImageFromInput");
+
+            // Espera mínima para que el src se aplique
+            await Task.Delay(50);
+
+            await JS.InvokeVoidAsync("initCropper");
         }
 
-        private void CloseModal() => IsModalVisible = false;
+        private void CloseModal()
+        {
+            NewEvent.CoverAlbumImageUrl = null;
+            IsModalVisible = false;
+        }
 
         private async Task UploadPhoto()
         {
             if (selectedFile == null) return;
-            HttpResponseWrapper<EventImage>? responseHttp;
+
             try
             {
                 isLoadingImport = true;
                 importResult = null;
 
+                // Obtener CropData desde JS
+                var cropData = await JS.InvokeAsync<CropData>("getCropData");
+
                 using var content = new MultipartFormDataContent();
-                using var stream = selectedFile.OpenReadStream(5_000_000); // 5MB max
-                content.Add(new StreamContent(stream), "file", selectedFile.Name);
-                if (content == null)
+
+                // Archivo
+                var stream = selectedFile.OpenReadStream(5_000_000);
+                content.Add(
+                    new StreamContent(stream),
+                    "file",
+                    selectedFile.Name
+                );
+
+                // CropData como JSON
+                var cropJson = JsonSerializer.Serialize(cropData);
+                content.Add(
+                    new StringContent(cropJson, Encoding.UTF8, "application/json"),
+                    "cropData"
+                );
+
+                var responseHttp = await repository.PostMultipartAsync<EventImage>(
+                    $"api/Events/upload-frontpage/{NewEvent.Code}",
+                    content
+                );
+
+                if (!responseHttp.Error)
                 {
-                    await SweetAlertService.FireAsync("Error", "Debes de seleccionar una foto.", SweetAlertIcon.Error);
+                    var toast = SweetAlertService.Mixin(new SweetAlertOptions
+                    {
+                        Toast = true,
+                        Position = SweetAlertPosition.TopEnd,
+                        ShowConfirmButton = false,
+                        Timer = 3000,
+                        TimerProgressBar = true,
+                    });
+
+                    await toast.FireAsync(
+                        "Subir foto",
+                        "La foto fue subida con éxito.",
+                        SweetAlertIcon.Success
+                    );
+
+                    CloseModal();
                 }
                 else
                 {
-                    responseHttp = await repository.UploadFileAsync<object, EventImage>(
-                            $"api/Events/upload-frontpage/{NewEvent.Code}",
-                            stream,
-                            selectedFile.Name
-                        );
-                    if (!responseHttp.Error)
-                    {
-                        // Luego mostrar la notificación
-                        var toast = SweetAlertService.Mixin(new SweetAlertOptions
-                        {
-                            Toast = true,
-                            Position = SweetAlertPosition.TopEnd,
-                            ShowConfirmButton = false,
-                            Timer = 3000,
-                            TimerProgressBar = true,
-                        });
-                        await toast.FireAsync(
-                            "Subir foto", "La foto fue subida con éxito.",
-                            SweetAlertIcon.Success
-                        );
-                        CloseModal();
-                    }
-                    else
-                    {
-                        await SweetAlertService.FireAsync("Error", "Ha ocurrido un errror, intentalo más tarde.", SweetAlertIcon.Error);
-                    }
+                    await SweetAlertService.FireAsync(
+                        "Error",
+                        "Ha ocurrido un error, inténtalo más tarde.",
+                        SweetAlertIcon.Error
+                    );
                 }
             }
             catch (Exception)
             {
-                await SweetAlertService.FireAsync("Error", "Ha ocurrido un errror, intentalo más tarde.", SweetAlertIcon.Error);
+                await SweetAlertService.FireAsync(
+                    "Error",
+                    "Ha ocurrido un error, inténtalo más tarde.",
+                    SweetAlertIcon.Error
+                );
             }
             finally
             {

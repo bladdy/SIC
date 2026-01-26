@@ -21,8 +21,12 @@ namespace SIC.Backend.UnitOfWork.Interfaces
 
         Task<ActionResponse<IEnumerable<HistoryMessages>>> GetHistoryMessagesAsync();
 
-        Task<ActionResponse<bool>> AddReceiveMessages(string from, string? text, string? replyToMessageId);
+        Task<ActionResponse<bool>> AddReceiveMessages(WhatsappIncomingMessageDto whatsappIncoming);
 
         Task<ActionResponse<IEnumerable<MessagesReciveDTO>>> GetAllMessagesReciveAsync();
+
+        Task<ActionResponse<IEnumerable<RealtimeChatMessageDto>>> GetConversationAsync(string phoneNumber);
+
+        Task<List<InboxConversationDto>> GetInboxAsync();
     }
 }

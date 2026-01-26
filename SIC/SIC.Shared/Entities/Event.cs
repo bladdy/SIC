@@ -53,6 +53,13 @@ public class Event : IEntityWithName
     // 🔹 Miniatura de la inivitacion
     public string? CoverImageUrl { get; set; }
 
+    // Corver del album
+    public string? CoverAlbumImageUrl { get; set; }
+
+    public double CoverPositionX { get; set; }
+    public double CoverPositionY { get; set; }
+    public double CoverZoom { get; set; }
+
     public int? EventTypeId { get; set; }
     public EventType? EventType { get; set; }
     public ICollection<HistoryMessages> HistoryMessages { get; set; } = new List<HistoryMessages>();

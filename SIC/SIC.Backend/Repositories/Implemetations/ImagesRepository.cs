@@ -93,7 +93,7 @@ namespace SIC.Backend.Repositories.Implemetations
 
         public async Task<ActionResponse<IEnumerable<EventImage>>> GetAsync(string code)
         {
-            var eventImages = await _context.EventImages
+            var eventImages = await _context.EventImages.Include(I => I.Event)
                 .Where(ei => ei.Event.Code == code).OrderByDescending(ei => ei.PostingDate)
                 .ToListAsync();
 

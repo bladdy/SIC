@@ -1,5 +1,4 @@
-﻿
-using iTextSharp.text;
+﻿using iTextSharp.text;
 using iTextSharp.text.pdf;
 using QRCoder;
 using SIC.Shared.DTOs;
@@ -88,7 +87,7 @@ namespace SIC.Backend.Services
 
             AddInfo($"Invitado: {data.NombreInvitado}");
             AddInfo($"Fecha: {data.Fecha:dd/MM/yyyy}");
-            AddInfo($"Hora: {data.Hora:hh:mm tt}");
+            //AddInfo($"Hora: {data.Hora:hh:mm tt}");
 
             var invitados = $"{data.Adultos} {(data.Adultos == 1 ? "Adulto" : "Adultos")}";
             if (data.Jovenes > 0)

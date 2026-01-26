@@ -30,8 +30,12 @@ namespace SIC.Backend.UnitOfWork.Implemetations
 
         public async Task<ActionResponse<IEnumerable<HistoryMessages>>> GetHistoryMessagesAsync() => await _messageRepository.GetHistoryMessagesAsync();
 
-        public async Task<ActionResponse<bool>> AddReceiveMessages(string from, string? text, string? replyToMessageId) => await _messageRepository.AddReceiveMessages(from, text, replyToMessageId);
+        public async Task<ActionResponse<bool>> AddReceiveMessages(WhatsappIncomingMessageDto whatsappIncoming) => await _messageRepository.AddReceiveMessages(whatsappIncoming);
 
         public async Task<ActionResponse<IEnumerable<MessagesReciveDTO>>> GetAllMessagesReciveAsync() => await _messageRepository.GetAllMessagesReciveAsync();
+
+        public async Task<ActionResponse<IEnumerable<RealtimeChatMessageDto>>> GetConversationAsync(string phoneNumber) => await _messageRepository.GetConversationAsync(phoneNumber);
+
+        public async Task<List<InboxConversationDto>> GetInboxAsync() => await _messageRepository.GetInboxAsync();
     }
 }

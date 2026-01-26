@@ -1,0 +1,27 @@
+﻿@page "/whatsapp/inbox"
+
+<h3>Inbox WhatsApp</h3>
+
+@if (Inbox == null)
+{
+    <p>Cargando conversaciones...</p>
+}
+else if (!Inbox.Any())
+{
+    <p>No hay conversaciones</p>
+}
+else
+{
+    @foreach (var chat in Inbox)
+    {
+        <div class="inbox-item" @onclick="() => OpenChat(chat.PhoneNumber)">
+            <b>@chat.PhoneNumber</b>
+            <p>@(chat.LastMessage ?? "")</p>
+
+            @if (chat.UnreadCount > 0)
+            {
+                <span class="badge">@chat.UnreadCount</span>
+            }
+        </div>
+    }
+}

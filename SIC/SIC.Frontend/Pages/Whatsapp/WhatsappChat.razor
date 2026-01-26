@@ -1,0 +1,17 @@
+﻿@page "/whatsapp/chat/{PhoneNumber}"
+
+<h3>Chat con @PhoneNumber</h3>
+
+<div class="chat-container">
+    @foreach (var msg in Messages)
+    {
+        <div class="chat-bubble @(msg.Direction == "IN" ? "left" : "right")">
+            @msg.Content
+        </div>
+    }
+</div>
+
+<div class="chat-input">
+    <input @bind="NewMessage" placeholder="Escribe..." />
+    <button @onclick="SendMessage">Enviar</button>
+</div>

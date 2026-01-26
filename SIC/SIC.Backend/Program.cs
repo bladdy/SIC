@@ -130,13 +130,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         RoleClaimType = ClaimTypes.Role,
         NameClaimType = ClaimTypes.NameIdentifier
     });
-
+builder.Services.AddSignalR();
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<DataContext>();
-    context.Database.Migrate();   // CREA LA TABLA __EFMigrationsHistory
+    context.Database.Migrate();
 }
 
 SeedData(app);
@@ -166,7 +166,7 @@ if (app.Environment.IsDevelopment())
         c.RoutePrefix = "swagger";
     });
 }
-
+app.MapHub<WhatsappChatHub>("/hubs/whatsapp-chat");
 app.UseHttpsRedirection();
 
 app.UseAuthentication();

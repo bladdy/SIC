@@ -207,13 +207,17 @@ namespace SIC.Backend.Repositories.Implemetations
             };
         }
 
-        public async Task<ActionResponse<bool>> AddReceiveMessages(string from, string? text, string? replyToMessageId)
+        public async Task<ActionResponse<bool>> AddReceiveMessages(WhatsappIncomingMessageDto whatsappIncoming)
         {
             var response = new ResponseFromWhatsApp
             {
-                From = from,
-                Message = text ?? string.Empty, // Use null-coalescing operator to provide a default value
-                MessageId = replyToMessageId ?? string.Empty // Use null-coalescing operator to provide a default value
+                From = whatsappIncoming.From,
+                Message = whatsappIncoming.Text ?? string.Empty, // Use null-coalescing operator to provide a default value
+                MessageId = whatsappIncoming.ReplyToMessageId ?? string.Empty, // Use null-coalescing operator to provide a default value
+                Direction = whatsappIncoming.Direction,
+                CreatedAt = DateTime.UtcNow,
+                Type = whatsappIncoming.Type,
+                Status = whatsappIncoming.Status
             };
             _context.Add(response);
             await _context.SaveChangesAsync();
@@ -247,6 +251,51 @@ namespace SIC.Backend.Repositories.Implemetations
                 Success = true,
                 Result = messages
             };
+        }
+
+        public async Task<ActionResponse<IEnumerable<RealtimeChatMessageDto>>> GetConversationAsync(string phoneNumber)
+        {
+            var messages = await _context.ResponseFromWhatsApps
+                .Where(x => x.From == phoneNumber)
+                .OrderBy(x => x.CreatedAt)
+                .Select(x => new RealtimeChatMessageDto
+                {
+                    PhoneNumber = x.From,
+                    Direction = x.Direction,
+                    Type = x.Type,
+                    Content = x.Message,
+                    Timestamp = x.CreatedAt
+                })
+                .ToListAsync();
+
+            return new ActionResponse<IEnumerable<RealtimeChatMessageDto>>
+            {
+                Success = true,
+                Result = messages
+            };
+        }
+
+        public async Task<List<InboxConversationDto>> GetInboxAsync()
+        {
+            var lastMessages = await _context.ResponseFromWhatsApps
+                .AsNoTracking()
+                .GroupBy(m => m.From)
+                .Select(g => g
+                    .OrderByDescending(m => m.CreatedAt)
+                    .First())
+                .ToListAsync(); // 👈 aquí se ejecuta en SQL
+
+            return lastMessages
+                .Select(m => new InboxConversationDto
+                {
+                    PhoneNumber = m.From,
+                    LastMessage = m.Message,
+                    LastMessageAt = m.CreatedAt,
+                    Direction = m.Direction,
+                    Type = m.Type
+                })
+                .OrderByDescending(x => x.LastMessageAt)
+                .ToList();
         }
     }
 }

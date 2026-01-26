@@ -3,109 +3,167 @@
 <PageTitle>Álbum</PageTitle>
 
 <div style="padding: 1rem; font-family: Arial, sans-serif;">
-    <!-- Header -->
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
-        <h2 style="margin: 0;">📸 Álbum del Evento (@EventImages!.Count)</h2>
 
-        <div style="display: flex; gap: 10px;">
-            <button @onclick="() =>DownloadAllImages(Code!)"
-                    style="padding: 0.5rem 1rem; background-color: #3C6A79; color: white; border: none; border-radius: 0.25rem; cursor: pointer;">
-                <i class="bi bi-download"></i> Descargar Imágenes
-            </button>
-
-            <button @onclick="() =>GenerateQR(Code!)" style=" padding: 0.5rem 1rem; background-color: #3C6A79; color: white; border: none; border-radius: 0.25rem; cursor: pointer;">
-                <i class="bi bi-qr-code"></i> Descargar QR
-            </button>
-        </div>
+    <!-- COVER -->
+    <div style="
+        width: 100%;
+        aspect-ratio: 3 / 1;
+        max-height: 320px;
+        margin-bottom: 1.5rem;
+        border-radius: 12px;
+        overflow: hidden;
+        background-image: url('@EventImages?.FirstOrDefault()?.Event?.CoverAlbumImageUrl');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position:
+        @($"{EventImages?.FirstOrDefault()?.Event?.CoverPositionX ?? 50}% {EventImages?.FirstOrDefault()?.Event?.CoverPositionY ?? 50}%");
+    ">
     </div>
 
-    <!-- Cargando / vacío / imágenes -->
+    <!-- HEADER -->
+    <div style="margin-bottom: 1.5rem;">
+
+        <!-- Fila superior -->
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+
+            <!-- Nombre -->
+            <h2 style="margin: 0; color: #3C6A79;">
+                @EventImages?.FirstOrDefault()?.Event?.Name
+            </h2>
+
+            <!-- Botones -->
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button @onclick="() => DownloadAllImages(Code!)"
+                        style="padding: 0.5rem 1rem; background-color: #3C6A79; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                    <i class="bi bi-download"></i> Descargar Imágenes
+                </button>
+
+                <button @onclick="() => GenerateQR(Code!)"
+                        style="padding: 0.5rem 1rem; background-color: #3C6A79; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                    <i class="bi bi-qr-code"></i> Descargar QR
+                </button>
+            </div>
+        </div>
+
+        <!-- Fila inferior -->
+        <h4 style="margin: 0.25rem 0 0; color: #3C6A79;">
+            Galería (@EventImages?.Count)
+        </h4>
+
+    </div>
+
+    <!-- CONTENIDO -->
     @if (EventImages == null)
     {
         <p style="color: #6c757d;">Cargando imágenes...</p>
     }
     else if (!EventImages.Any())
     {
-        <div style="padding: 2rem; text-align: center; color: #6c757d; border: 1px dashed #dee2e6; border-radius: 0.25rem;">
+        <div style="padding: 2rem; text-align: center; color: #6c757d; border: 1px dashed #dee2e6; border-radius: 6px;">
             <p>No hay imágenes en este álbum aún.</p>
         </div>
     }
     else
     {
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem;">
+        <div style="
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            ">
             @foreach (var image in EventImages)
             {
-                <div style="overflow: hidden; border-radius: 0.25rem; cursor: pointer;">
+                <div style="overflow: hidden; border-radius: 6px; cursor: pointer;">
                     <img src="@image.Url"
                          alt="Imagen del evento"
                          loading="lazy"
                          @onclick="() => OpenPreview(image)"
-                         style="width: 100%; height: 250px; display: block; object-fit: cover; border-radius: 0.25rem;" />
+                         style="
+                            width: 100%;
+                            height: 250px;
+                            display: block;
+                            object-fit: cover;
+                            border-radius: 6px;
+                                 " />
                 </div>
             }
         </div>
     }
 </div>
 
+<!-- PREVIEW -->
 @if (PreviewImage != null && !string.IsNullOrEmpty(PreviewImage.Url))
 {
     <div @onclick="ClosePreview"
-         style="position: fixed;
-                inset: 0;
-                background-color: rgba(0,0,0,0.8);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 9999;">
+         style="
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+             ">
 
-        <!-- Contenedor de la imagen -->
         <div style="position: relative;" @onclick:stopPropagation>
 
-            <!-- Botón eliminar -->
-            <button @onclick="() =>DownloadImage(PreviewImage)"
-                    style="position: absolute;
-                           top: 20px;
-                           right: 80px;
-                           background-color: #3C6A79;
-                           color: white;
-                           border: none;
-                           border-radius: 50%;
-                           width: 36px;
-                           height: 36px;
-                           cursor: pointer;
-                           font-size: 18px;
-                           display: flex;
-                           align-items: center;
-                           justify-content: center;">
+            <!-- Descargar -->
+            <button @onclick="() => DownloadImage(PreviewImage)"
+                    style="
+                        position: absolute;
+                        top: 20px;
+                        right: 80px;
+                        background-color: #3C6A79;
+                        color: white;
+                        border: none;
+                        border-radius: 50%;
+                        width: 36px;
+                        height: 36px;
+                        cursor: pointer;
+                        font-size: 18px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        ">
                 <i class="bi bi-download"></i>
             </button>
-            <button @onclick="() =>ConfirmDelete(PreviewImage)"
-                    style="position: absolute;
-                           top: 20px;
-                           right: 20px;
-                           background-color: #3C6A79;
-                           color: white;
-                           border: none;
-                           border-radius: 50%;
-                           width: 36px;
-                           height: 36px;
-                           cursor: pointer;
-                           font-size: 18px;
-                           display: flex;
-                           align-items: center;
-                           justify-content: center;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" 
-                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
-                stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-trash">
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M4 7l16 0" />
-                <path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>
+
+            <!-- Eliminar -->
+            <button @onclick="() => ConfirmDelete(PreviewImage)"
+                    style="
+                        position: absolute;
+                        top: 20px;
+                        right: 20px;
+                        background-color: #3C6A79;
+                        color: white;
+                        border: none;
+                        border-radius: 50%;
+                        width: 36px;
+                        height: 36px;
+                        cursor: pointer;
+                        font-size: 18px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        ">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M4 7l16 0" />
+                    <path d="M10 11l0 6" />
+                    <path d="M14 11l0 6" />
+                    <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                </svg>
             </button>
 
             <!-- Imagen -->
             <img src="@PreviewImage.Url"
-                 style="max-width: 90vw;
-                        max-height: 90vh;
-                        border-radius: 0.25rem;" />
+                 style="
+                    max-width: 90vw;
+                    max-height: 90vh;
+                    border-radius: 6px;
+                     " />
         </div>
     </div>
 }
