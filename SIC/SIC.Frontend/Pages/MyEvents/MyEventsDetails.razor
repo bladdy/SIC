@@ -34,11 +34,11 @@ else
 
             <!-- Botón QR: versión escritorio -->
             <a href="/events/register-event/invitations-entries/@EventDetail.Code"
-               class="btn btn-sm text-white position-absolute top-0 end-0 mt-2 me-2 d-none d-md-inline-flex align-items-center"
-               style="background-color:#1F4854; border-color:white;">
+            class="btn btn-sm text-white position-absolute top-0 end-0 mt-2 me-2 d-none d-md-inline-flex align-items-center"
+            style="background-color:#1F4854; border-color:white;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                     class="me-1">
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="me-1">
                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                     <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h3v3h3v3h-6z" />
                 </svg>
@@ -47,11 +47,11 @@ else
 
             <!-- Botón QR: versión móvil -->
             <a href="/events/register-event/invitations-entries/@EventDetail.Code"
-               class="btn btn-sm text-white mt-2 px-4 position-absolute bottom-0 end-0 mb-2 me-2 d-block d-md-none align-items-center"
-               style="background-color:#1F4854; border-color:white;">
+            class="btn btn-sm text-white mt-2 px-4 position-absolute bottom-0 end-0 mb-2 me-2 d-block d-md-none align-items-center"
+            style="background-color:#1F4854; border-color:white;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                     class="me-1">
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="me-1">
                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                     <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h3v3h3v3h-6z" />
                 </svg>
@@ -266,53 +266,75 @@ else
                                             {
                                                 <!--
                                                 <button class="btn d-inline-flex align-items-center gap-2 text-white"
-                                                        style="background-color:#25d366;"
+                                                style="background-color:#25d366;"
                                                 @onclick="() => EnviarInvitacion(invitation.Code!)"
-                                                        disabled="@(isLoadingWhatsapp == true)">
+                                                disabled="@(isLoadingWhatsapp == true)">
                                                 @if (isLoadingWhatsapp == true)
                                                 {
-                                                        <span class="spinner-border spinner-border-sm"></span>
-                                                        <span>Invitando...</span>
+                                                <span class="spinner-border spinner-border-sm"></span>
+                                                <span>Invitando...</span>
                                                 }
                                                 else
                                                 {
-                                                        <i class="bi bi-whatsapp"></i>
-                                                        <span>Invitar</span>
+                                                <i class="bi bi-whatsapp"></i>
+                                                <span>Invitar</span>
                                                 }
                                                 </button>
                                                 -->
-                                                <button class="btn d-inline-flex align-items-center gap-2 text-white"
-                                                        style="background-color:#25d366;"
-                                                        @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)"
-                                                        disabled="@(loadingWhatsappId1 == invitation.Id)">
-                                                    @if (loadingWhatsappId1 == invitation.Id)
-                                                    {
-                                                        <span class="spinner-border spinner-border-sm"></span>
-                                                        <span>Invitando...</span>
-                                                    }
-                                                    else
-                                                    {
-                                                        <i class="bi bi-whatsapp"></i>
-                                                        <span>Invitar</span>
-                                                    }
-                                                </button>
+                                                @if (EventDetail.User.UserWhatsAppConfigs != null)
+                                                {
+                                                    <button class="btn d-inline-flex align-items-center gap-2 text-white"
+                                                            style="background-color:#25d366;"
+                                                            @onclick="() => EnviarInvitacion(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)"
+                                                            disabled="@(loadingWhatsappId1 == invitation.Id)">
+                                                        @if (loadingWhatsappId1 == invitation.Id)
+                                                        {
+                                                            <span class="spinner-border spinner-border-sm"></span>
+                                                            <span>Invitando...</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <i class="bi bi-whatsapp"></i>
+                                                            <span>Invitar</span>
+                                                        }
+                                                    </button>
 
-                                                <button class="btn d-inline-flex align-items-center gap-2 text-white d-none"
-                                                        style="background-color:#25d366;"
-                                                        @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)"
-                                                        disabled="@(loadingWhatsappId1 == invitation.Id)">
-                                                    @if (loadingWhatsappId1 == invitation.Id)
-                                                    {
-                                                        <span class="spinner-border spinner-border-sm"></span>
-                                                        <span>Invitando...</span>
-                                                    }
-                                                    else
-                                                    {
-                                                        <i class="bi bi-whatsapp"></i>
-                                                        <span>Invitar</span>
-                                                    }
-                                                </button>
+                                                } else
+                                                {
+                                                    <button class="btn d-inline-flex align-items-center gap-2 text-white"
+                                                            style="background-color:#25d366;"
+                                                            @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)"
+                                                            disabled="@(loadingWhatsappId1 == invitation.Id)">
+                                                        @if (loadingWhatsappId1 == invitation.Id)
+                                                        {
+                                                            <span class="spinner-border spinner-border-sm"></span>
+                                                            <span>Invitando...</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <i class="bi bi-whatsapp"></i>
+                                                            <span>Invitar</span>
+                                                        }
+                                                    </button>
 
+                                                    <button class="btn d-inline-flex align-items-center gap-2 text-white d-none"
+                                                            style="background-color:#25d366;"
+                                                            @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)"
+                                                            disabled="@(loadingWhatsappId1 == invitation.Id)">
+                                                        @if (loadingWhatsappId1 == invitation.Id)
+                                                        {
+                                                            <span class="spinner-border spinner-border-sm"></span>
+                                                            <span>Invitando...</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <i class="bi bi-whatsapp"></i>
+                                                            <span>Invitar</span>
+                                                        }
+                                                    </button>
+
+                                                    
+                                                }
                                                 <button class="btn d-inline-flex align-items-center gap-2 text-white"
                                                         style="background-color:#25d366;"
                                                         @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 2)"

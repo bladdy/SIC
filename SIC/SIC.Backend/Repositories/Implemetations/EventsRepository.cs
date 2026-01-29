@@ -22,6 +22,7 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
         var events = await _context.Events
             .Include(i => i.Invitations)
             .Include(u => u.User)
+            .ThenInclude(uc => uc!.UserWhatsAppConfigs)
             .Include(et => et.EventType).FirstOrDefaultAsync(x => x.Code!.Contains(code));
         if (events == null)
         {

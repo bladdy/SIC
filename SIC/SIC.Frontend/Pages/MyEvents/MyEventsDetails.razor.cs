@@ -5,12 +5,14 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.JSInterop;
+using Newtonsoft.Json;
 using SIC.Frontend.Helpers;
 using SIC.Frontend.Pages.Message;
 using SIC.Frontend.Repositories;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using SIC.Shared.Enums;
+using SIC.Shared.Response;
 using System.Net;
 
 namespace SIC.Frontend.Pages.MyEvents;
@@ -508,6 +510,45 @@ public partial class MyEventsDetails
             return;
         }
         EventDetail = responseHttp?.Response;
+    }
+
+    private async Task EnviarInvitacion(string phoneNumber, string code, int invitationId, int column)
+    {
+        try
+        {
+            if (column == 1)
+            {
+                loadingWhatsappId1 = invitationId;
+                copyingId1 = null;
+            }
+            else
+            {
+                loadingWhatsappId2 = invitationId;
+                copyingId2 = null;
+            }
+            var responseHttp = await Repository.PostAsync<WhatsAppApiResponse>($"api/whatsapp/enviar-invitacion/{code}");
+
+            if (responseHttp.Error)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                var errorMessage = JsonConvert.DeserializeObject<WhatsAppApiError>(message!);
+                await SweetAlertService.FireAsync("Error", errorMessage!.error.message, SweetAlertIcon.Error);
+                return;
+            }
+            await SweetAlertService.FireAsync("Éxito", "Invitación enviada correctamente", SweetAlertIcon.Success);
+        }
+        catch (Exception ex)
+        {
+            await SweetAlertService.FireAsync("Error", "Algo ocurrio, intentalo más tarde", SweetAlertIcon.Error);
+            return;
+        }
+        finally
+        {
+            if (column == 1)
+                loadingWhatsappId1 = null;
+            else
+                loadingWhatsappId2 = null;
+        }
     }
 
     private async Task FilterCallBack(string filter)
