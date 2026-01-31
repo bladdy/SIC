@@ -23,6 +23,8 @@ namespace SIC.Backend.UnitOfWork.Interfaces
 
         Task<ActionResponse<bool>> AddReceiveMessages(WhatsappIncomingMessageDto whatsappIncoming);
 
+        Task<ActionResponse<bool>> MarkMessagesAsSeenAsync(string Psid);
+
         Task<ActionResponse<IEnumerable<MessagesReciveDTO>>> GetAllMessagesReciveAsync();
 
         Task<ActionResponse<IEnumerable<RealtimeChatMessageDto>>> GetConversationAsync(string phoneNumber);

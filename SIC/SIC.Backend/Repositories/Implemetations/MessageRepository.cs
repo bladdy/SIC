@@ -297,5 +297,35 @@ namespace SIC.Backend.Repositories.Implemetations
                 .OrderByDescending(x => x.LastMessageAt)
                 .ToList();
         }
+
+        //Tiene que marcar todos los mensajes de un psid como leidos
+        public async Task<ActionResponse<bool>> MarkMessagesAsSeenAsync(string psid)
+        {
+            try
+            {
+                var messages = await _context.ResponseFromWhatsApps
+                    .Where(x => x.From.EndsWith(psid) && x.Status != "seen")
+                    .ToListAsync();
+                foreach (var message in messages)
+                {
+                    message.Status = "seen";
+                    _context.ResponseFromWhatsApps.Update(message);
+                }
+                await _context.SaveChangesAsync();
+                return new ActionResponse<bool>
+                {
+                    Success = true,
+                    Result = true
+                };
+            }
+            catch (Exception)
+            {
+                return new ActionResponse<bool>
+                {
+                    Success = false,
+                    Message = "No se pudieron marcar los mensajes como leidos."
+                };
+            }
+        }
     }
 }

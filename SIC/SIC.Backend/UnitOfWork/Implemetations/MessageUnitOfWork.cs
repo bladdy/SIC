@@ -37,5 +37,7 @@ namespace SIC.Backend.UnitOfWork.Implemetations
         public async Task<ActionResponse<IEnumerable<RealtimeChatMessageDto>>> GetConversationAsync(string phoneNumber) => await _messageRepository.GetConversationAsync(phoneNumber);
 
         public async Task<List<InboxConversationDto>> GetInboxAsync() => await _messageRepository.GetInboxAsync();
+
+        public async Task<ActionResponse<bool>> MarkMessagesAsSeenAsync(string Psid) => await _messageRepository.MarkMessagesAsSeenAsync(Psid);
     }
 }

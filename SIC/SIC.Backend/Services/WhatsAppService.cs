@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 using Newtonsoft.Json;
 using PdfSharpCore.Pdf.Content.Objects;
 using SIC.Shared.DTOs;
@@ -224,7 +225,89 @@ namespace SIC.Backend.Services
 
         public async Task<string?> SendTextMessageAsync(string accessToken, string phoneNumberId, SendWhatsappMessageDto dto)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(accessToken))
+                throw new ArgumentException("Access token is required", nameof(accessToken));
+            if (string.IsNullOrEmpty(phoneNumberId))
+                throw new ArgumentException("Phone number ID is required", nameof(phoneNumberId));
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto));
+
+            using var httpClient = new HttpClient();
+
+            // Endpoint de la API de WhatsApp Cloud
+            var url = $"https://graph.facebook.com/v22.0/{phoneNumberId}/messages";
+
+            // Payload de la API
+            var payload = new
+            {
+                messaging_product = "whatsapp",
+                to = dto.PhoneNumber,
+                type = "text",
+                text = new
+                {
+                    body = dto.Message
+                }
+            };
+
+            // Configurar encabezados
+            httpClient.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+
+            // Enviar POST
+            var response = await httpClient.PostAsJsonAsync(url, payload);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                throw new ApplicationException($"Error sending WhatsApp message: {response.StatusCode} - {errorContent}");
+            }
+
+            // Obtener la respuesta JSON
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+
+            // Opcional: devolver el message ID generado por WhatsApp
+            using var document = JsonDocument.Parse(jsonResponse);
+            if (document.RootElement.TryGetProperty("messages", out var messagesArray) && messagesArray.GetArrayLength() > 0)
+            {
+                return messagesArray[0].GetProperty("id").GetString();
+            }
+
+            return null;
+        }
+
+        public async Task<bool> MarkMessagesAsSeenAsync(string accessToken, string phoneNumberId, MarkMessagesAsSeenDto dto)
+        {
+            if (string.IsNullOrEmpty(accessToken))
+                throw new ArgumentException("Access token is required", nameof(accessToken));
+            if (string.IsNullOrEmpty(phoneNumberId))
+                throw new ArgumentException("Phone number ID is required", nameof(phoneNumberId));
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto));
+
+            using var httpClient = new HttpClient();
+
+            // Endpoint de la API de WhatsApp Cloud
+            var url = $"https://graph.facebook.com/v22.0/{phoneNumberId}/messages";
+
+            // Payload de la API
+            var payload = new
+            {
+                recipient = new
+                {
+                    id = dto.Psid
+                },
+                sender_action = "mark_seen"
+            };
+
+            var response = await _httpClient.PutAsJsonAsync(url, payload);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                return false;
+            }
+
+            return true;
         }
     }
 }
