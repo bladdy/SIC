@@ -109,6 +109,7 @@ public partial class MyEventsDetails
             NumberConfirmedAdults = invitation.NumberConfirmedAdults,
             NumberConfirmedYouths = invitation.NumberConfirmedYouths,
             NumberConfirmedChildren = invitation.NumberConfirmedChildren,
+            Guests = invitation.Guests,
             Table = invitation.Table,
             Comments = invitation.Comments,
             SentDate = invitation.SentDate,
@@ -123,6 +124,12 @@ public partial class MyEventsDetails
     private void CloseModal()
     {
         IsModalVisible = false;
+    }
+
+    private void RemoveGuest(InvitationGuest guest)
+    {
+        NewInvitation.Guests.Remove(guest);
+        UpdateGuestCounters(NewInvitation.Guests);
     }
 
     private async Task DeleteInvitation()
@@ -217,6 +224,35 @@ public partial class MyEventsDetails
         isSavingInvitation = false;
         await LoadEvent();
         await LoadInvitations();
+    }
+
+    private void AddGuest()
+    {
+        //Cuando le de a agregar actualiza el contador de NumberAdults y hacer un changed en el select cuando se cambie el tipo de invitado
+        NewInvitation.Guests ??= new List<InvitationGuest>();
+
+        NewInvitation.Guests.Add(new InvitationGuest
+        {
+            GuestName = null,           // permitido
+            GuestType = GuestType.Adult,
+            InvitationId = NewInvitation.Id,
+            Invitation = null,
+
+            // SIEMPRE null para evitar validaciones
+        });
+        UpdateGuestCounters(NewInvitation.Guests);
+    }
+
+    private void OnGuestTypeChanged()
+    {
+        UpdateGuestCounters(NewInvitation.Guests);
+    }
+
+    private void UpdateGuestCounters(ICollection<InvitationGuest> guests)
+    {
+        NewInvitation.NumberAdults = guests.Count(g => g.GuestType == GuestType.Adult);
+        NewInvitation.NumberYouths = guests.Count(g => g.GuestType == GuestType.Youth);
+        NewInvitation.NumberChildren = guests.Count(g => g.GuestType == GuestType.Children);
     }
 
     private async Task DescargarExcel()
