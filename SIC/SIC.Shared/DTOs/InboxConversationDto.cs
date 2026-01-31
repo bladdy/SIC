@@ -13,5 +13,6 @@ namespace SIC.Shared.DTOs
         public DateTime LastMessageAt { get; set; }
         public string Direction { get; set; } = null!;
         public string? Type { get; set; }
+        public int UnreadCount { get; set; }
     }
 }
