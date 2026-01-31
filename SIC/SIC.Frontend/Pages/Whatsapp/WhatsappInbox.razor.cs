@@ -18,8 +18,8 @@ public partial class WhatsappInbox : IAsyncDisposable
         Inbox = new();
 
         SignalR.OnInboxUpdated += UpdateInbox;
-        await SignalR.StartAsync("https://localhost:7141/hubs/whatsapp-chat");
-
+        await SignalR.StartAsync("https://invboxv-app.com/hubs/whatsapp-chat");
+        //await SignalR.StartAsync("https://localhost:7141/hubs/whatsapp-chat");
         var response = await Repository.GetAsync<List<InboxConversationDto>>(
             "/api/whatsapp/webhook/whatsapp/inbox"
         );

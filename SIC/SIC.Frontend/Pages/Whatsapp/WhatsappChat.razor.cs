@@ -29,7 +29,8 @@ public partial class WhatsappChat
     protected override async Task OnInitializedAsync()
     {
         SignalR.OnMessageReceived += OnMessage;
-        await SignalR.StartAsync("https://localhost:7141/hubs/whatsapp-chat");
+        await SignalR.StartAsync("https://invboxv-app.com/hubs/whatsapp-chat");
+        //await SignalR.StartAsync("https://localhost:7141/hubs/whatsapp-chat");
     }
 
     protected override async Task OnParametersSetAsync()
