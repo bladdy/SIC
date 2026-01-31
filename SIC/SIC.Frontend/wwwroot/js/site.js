@@ -1,9 +1,7 @@
 ﻿window.initPopovers = (durationMs = 4000) => {
-
     const triggers = document.querySelectorAll('[data-bs-toggle="popover"]');
 
     triggers.forEach(el => {
-
         // Crear instancia UNA SOLA VEZ
         let instance = bootstrap.Popover.getInstance(el);
         if (!instance) {
@@ -17,7 +15,6 @@
         el._popoverBound = true;
 
         el.addEventListener('click', () => {
-
             // Limpiar timeout previo
             if (el._popoverTimeout) {
                 clearTimeout(el._popoverTimeout);
@@ -39,4 +36,8 @@
             }, durationMs);
         });
     });
+};
+window.scrollToBottom = (element) => {
+    if (element)
+        element.scrollTop = element.scrollHeight;
 };
