@@ -1,0 +1,158 @@
+﻿/* ---------- CONTAINER ---------- */
+.wa-container {
+    display: flex;
+    height: calc(100vh - 6rem); /* ✅ */
+    max-height: calc(100vh - 3.5rem);
+    background: #f0f2f5;
+    overflow: hidden;
+}
+
+
+/* ---------- INBOX ---------- */
+.wa-inbox {
+    width: 360px;
+    background: #fff;
+    border-right: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.wa-inbox-header {
+    padding: 12px;
+    background: #075e54;
+    color: #fff;
+    font-weight: 600;
+}
+
+.wa-inbox-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.wa-inbox-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+    .wa-inbox-item.active {
+        background: #e9edef;
+    }
+
+.wa-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #25d366;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.wa-text {
+    display: flex;
+    width:100%;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.wa-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* 🔥 empuja la fecha al final */
+    width: 100%;
+}
+
+.wa-title {
+    font-weight: 600;
+    min-width: 0; /* 🔥 permite ellipsis */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.wa-date {
+    font-size: 12px;
+    color: #667781;
+    margin-left: 8px;
+    flex-shrink: 0; /* 🔥 nunca se mueve */
+}
+
+
+.wa-preview {
+    font-size: 13px;
+    color: #555;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+
+/* ---------- CHAT ---------- */
+.wa-chat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.wa-chat-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: #075e54;
+    color: white;
+}
+
+.wa-chat-body {
+    flex: 1;
+    overflow: hidden;
+}
+
+/* ---------- EMPTY ---------- */
+.wa-empty {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+}
+
+/* ---------- BACK BUTTON ---------- */
+.wa-back-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* ---------- TABLET & MOBILE ---------- */
+@media (max-width: 992px) {
+    .wa-container {
+        height: calc(100vh - 11rem); /* ✅ */
+    }
+    .wa-container.chat-open .wa-inbox {
+        display: none;
+    }
+    .wa-empty{
+        display:none;
+    }
+
+    .wa-container.chat-open .wa-chat {
+        display: flex;
+        flex: 1;
+    }
+
+    .wa-back-btn {
+        display: inline-flex;
+    }
+}

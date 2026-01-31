@@ -1,5 +1,9 @@
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
 }
 /* Agregar estas reglas en el archivo wwwroot/css/app.css */
 @keyframes rotateNumber {
