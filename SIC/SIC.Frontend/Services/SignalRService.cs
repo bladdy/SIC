@@ -9,7 +9,7 @@ public class SignalRService
 
     public event Action<RealtimeChatMessageDto>? OnMessageReceived;
 
-    public event Action<WhatsappInboxItemDto>? OnInboxUpdated;
+    public event Action<InboxConversationDto>? OnInboxUpdated;
 
     public async Task StartAsync(string hubUrl)
     {
@@ -21,10 +21,10 @@ public class SignalRService
             .WithAutomaticReconnect()
             .Build();
 
-        _connection.On<RealtimeChatMessageDto>("ReceiveMessage",
+        _connection.On<RealtimeChatMessageDto>("NewMessage",
             msg => OnMessageReceived?.Invoke(msg));
 
-        _connection.On<WhatsappInboxItemDto>("InboxUpdated",
+        _connection.On<InboxConversationDto>("InboxUpdated",
             inbox => OnInboxUpdated?.Invoke(inbox));
 
         await _connection.StartAsync();
