@@ -41,9 +41,38 @@ namespace SIC.Backend.Controllers
             return Ok(response);
         }
 
+        [HttpPut("mark-seen")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> MarkMessagesAsSeen([FromBody] MarkMessagesAsSeenDto dto)
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var userWhatsAppConfig = await _whatsAppConfigUnitOfWork.GetByUserIdAsync(userId);
+                if (!userWhatsAppConfig.Success)
+                    return BadRequest(new { error = "Este usuario no tiene permisos para hacer este envio" });
+                //obtener los datos del usuario
+                var accessToken = userWhatsAppConfig.Result!.AccessToken;
+                var phoneNumberId = userWhatsAppConfig.Result!.PhoneNumberId;
+                if (dto == null)
+                    return BadRequest(new { error = "El PSID es requerido" });
+                var marked = await _whatsAppService.MarkMessagesAsSeenAsync(
+                accessToken!, phoneNumberId!, dto);
+                if (!marked)
+                    return BadRequest(new { error = "No se pudieron marcar los mensajes como leidos en WhatsApp" });
+                var response = await _messageUnitOfWork.MarkMessagesAsSeenAsync(dto.Psid);
+                if (!response.Success)
+                    return BadRequest(new { error = "No se pudieron marcar los mensajes como leidos" });
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpPost("send")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [Authorize(Roles = "Admin,WeddingPlanner,User")]
         public async Task<IActionResult> SendMessage([FromBody] SendWhatsappMessageDto dto)
         {
             try
@@ -80,16 +109,29 @@ namespace SIC.Backend.Controllers
                 if (!response.Success)
                     return BadRequest("No se pudo enviar el mensaje");
 
-                await _hub.Clients.All.SendAsync("InboxUpdated");
-                await _hub.Clients.Group(dto.PhoneNumber).SendAsync("NewMessage",
-                new RealtimeChatMessageDto
-                {
-                    PhoneNumber = dto.PhoneNumber,
-                    Direction = "OUT",
-                    MessageType = "text",
-                    Content = dto.Message,
-                    Timestamp = DateTime.UtcNow
-                });
+                await _hub.Clients.All.SendAsync(
+               "InboxUpdated",
+                    new InboxConversationDto
+                    {
+                        PhoneNumber = dto.PhoneNumber,
+                        LastMessage = dto.Message,
+                        LastMessageAt = DateTime.UtcNow,
+                        UnreadCount = 1
+                    }
+                );
+
+                // 6️⃣ Enviar mensaje SOLO al chat abierto
+                await _hub.Clients.Group(dto.PhoneNumber).SendAsync(
+                    "NewMessage",
+                    new RealtimeChatMessageDto
+                    {
+                        PhoneNumber = dto.PhoneNumber,
+                        Direction = "OUT",
+                        MessageType = "text",
+                        Content = dto.Message,
+                        Timestamp = DateTime.UtcNow
+                    }
+                );
                 return Ok();
             }
             catch (Exception ex)

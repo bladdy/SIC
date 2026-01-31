@@ -39,59 +39,10 @@ public class WhatsappWebhookController : ControllerBase
         return Unauthorized();
     }
 
-    // 📩 Recepción de mensajes
     [HttpPost]
-    public async Task<IActionResult> Receive([FromBody] WhatsappWebhookPayload payload)
+    public async Task<IActionResult> Receivev([FromBody] WhatsappWebhookPayload payload)
     {
-        var message = payload.Entry?
-            .FirstOrDefault()?
-            .Changes?
-            .FirstOrDefault()?
-            .Value?
-            .Messages?
-            .FirstOrDefault();
-
-        if (message == null)
-            return Ok();
-
-        var dto = new WhatsappIncomingMessageDto
-        {
-            MessageId = message.Id,
-            From = message.From,
-            Text = message.Text?.Body,
-            Type = message.Type,
-            ReplyToMessageId = message.Context?.Id,
-            Direction = "IN",
-            Status = ""
-        };
-
-        var response = await _iMessageUnitOfWork.AddReceiveMessages(dto);
-        if (response.Success)
-            return Ok();
-
-        return BadRequest();
-    }
-
-    [HttpGet("chat/{phoneNumber}")]
-    public async Task<IActionResult> GetChat(string phoneNumber)
-    {
-        var messages = await _iMessageUnitOfWork
-            .GetConversationAsync(phoneNumber);
-
-        return Ok(messages);
-    }
-
-    [HttpGet("whatsapp/inbox")]
-    public async Task<IActionResult> GetInbox()
-    {
-        var inbox = await _iMessageUnitOfWork.GetInboxAsync();
-        return Ok(inbox);
-    }
-
-    [HttpPost("recive")]
-    public async Task<IActionResult> Receivev2([FromBody] WhatsappWebhookPayload payload)
-    {
-        // 1️⃣ Extraemos los Value (messages + statuses viven aquí)
+        // 1️⃣ Extraer values (messages + statuses)
         var values = payload.Entry?
             .SelectMany(e => e.Changes)
             .Select(c => c.Value)
@@ -100,7 +51,7 @@ public class WhatsappWebhookController : ControllerBase
         if (values == null || !values.Any())
             return Ok();
 
-        // 2️⃣ Mensajes
+        // 2️⃣ Mensajes entrantes
         var messages = values
             .SelectMany(v => v.Messages ?? new List<MessageDTO>())
             .ToList();
@@ -108,12 +59,11 @@ public class WhatsappWebhookController : ControllerBase
         if (!messages.Any())
             return Ok();
 
-        // 3️⃣ Estados
+        // 3️⃣ Statuses (pueden o no venir)
         var statuses = values
             .SelectMany(v => v.Statuses ?? new List<MessageStatus>())
             .ToList();
 
-        // 4️⃣ Unimos mensaje + status por MessageId
         foreach (var message in messages)
         {
             var status = statuses.FirstOrDefault(s => s.Id == message.Id);
@@ -130,19 +80,51 @@ public class WhatsappWebhookController : ControllerBase
                 Status = status?.Status
             };
 
+            // 4️⃣ Guardar en BD
             await _iMessageUnitOfWork.AddReceiveMessages(dto);
-            await _hub.Clients.All.SendAsync("InboxUpdated");
-            await _hub.Clients.Group(dto.From).SendAsync("NewMessage",
-            new RealtimeChatMessageDto
-            {
-                PhoneNumber = dto.From,
-                Direction = "IN",
-                MessageType = "text",
-                Content = dto.Text,
-                Timestamp = DateTime.UtcNow
-            });
+
+            // 5️⃣ Actualizar INBOX (lista de chats)
+            await _hub.Clients.All.SendAsync(
+                "InboxUpdated",
+                new InboxConversationDto
+                {
+                    PhoneNumber = dto.From,
+                    LastMessage = dto.Text,
+                    LastMessageAt = DateTime.UtcNow,
+                    UnreadCount = 1
+                }
+            );
+
+            // 6️⃣ Enviar mensaje SOLO al chat abierto
+            await _hub.Clients.Group(dto.From).SendAsync(
+                "NewMessage",
+                new RealtimeChatMessageDto
+                {
+                    PhoneNumber = dto.From,
+                    Direction = "IN",
+                    MessageType = "text",
+                    Content = dto.Text,
+                    Timestamp = DateTime.UtcNow
+                }
+            );
         }
 
         return Ok();
+    }
+
+    [HttpGet("chat/{phoneNumber}")]
+    public async Task<IActionResult> GetChat(string phoneNumber)
+    {
+        var messages = await _iMessageUnitOfWork
+            .GetConversationAsync(phoneNumber);
+
+        return Ok(messages);
+    }
+
+    [HttpGet("whatsapp/inbox")]
+    public async Task<IActionResult> GetInbox()
+    {
+        var inbox = await _iMessageUnitOfWork.GetInboxAsync();
+        return Ok(inbox);
     }
 }
