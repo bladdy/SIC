@@ -98,9 +98,6 @@ builder.Services.AddScoped<IPlanItemRepository, PlanItemRepository>();
 builder.Services.AddScoped<IUserUnitOfWork, UserUnitOfWork>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-builder.Services.AddScoped<IUserUnitOfWork, UserUnitOfWork>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-
 builder.Services.AddScoped<IUserCreditUnitsOfWork, UserCreditUnitsOfWork>();
 builder.Services.AddScoped<IUserCreditRepository, UserCreditRepository>();
 
