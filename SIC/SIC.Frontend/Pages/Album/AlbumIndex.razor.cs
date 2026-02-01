@@ -1,15 +1,10 @@
 using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using SIC.Frontend.Helpers;
-using SIC.Frontend.Pages.Events;
 using SIC.Frontend.Repositories;
-using SIC.Frontend.Shared;
 using SIC.Shared.Entities;
 using System.Net;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace SIC.Frontend.Pages.Album
 {
@@ -23,12 +18,44 @@ namespace SIC.Frontend.Pages.Album
         [Inject] private NavigationManager NavigationManager { get; set; } = default!;
         [Inject] private IJSRuntime JsRuntime { get; set; } = default!;
         public List<EventImage>? EventImages { get; set; } = [];
-
+        public Event? Event { get; set; }
         private EventImage? PreviewImage;
 
         protected override async Task OnInitializedAsync()
         {
-            await LoadEventImage();
+            await LoadEvent();
+            if (Event is not null && Event.AlbumPublic)
+            {
+                await LoadEventImage();
+            }
+        }
+
+        private async Task LoadEvent()
+        {
+            var responseHttp = await Repository.GetAsync<Event>($"api/Events/byCode/{Code}");
+            if (responseHttp.Error)
+            {
+                if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+                {
+                    NavigationManager.NavigateTo("/");
+                    return;
+                }
+                var message = await responseHttp.GetErrorMessageAsync();
+                await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
+            }
+            Event = responseHttp?.Response;
+            if (Event == null)
+            {
+                NavigationManager.NavigateTo("/");
+            }
+            else
+            {
+                if (!Event.HasAlbum)
+                {
+                    NavigationManager.NavigateTo("/");
+                }
+            }
         }
 
         private async Task LoadEventImage()

@@ -12,11 +12,11 @@
         margin-bottom: 1.5rem;
         border-radius: 12px;
         overflow: hidden;
-        background-image: url('@EventImages?.FirstOrDefault()?.Event?.CoverAlbumImageUrl');
+        background-image: url('@Event?.CoverAlbumImageUrl');
         background-size: cover;
         background-repeat: no-repeat;
         background-position:
-        @($"{EventImages?.FirstOrDefault()?.Event?.CoverPositionX ?? 50}% {EventImages?.FirstOrDefault()?.Event?.CoverPositionY ?? 50}%");
+        @($"{Event?.CoverPositionX ?? 50}% {Event?.CoverPositionY ?? 50}%");
     ">
     </div>
 
@@ -28,7 +28,7 @@
 
             <!-- Nombre -->
             <h2 style="margin: 0; color: #3C6A79;">
-                @EventImages?.FirstOrDefault()?.Event?.Name
+                @Event?.Name
             </h2>
 
             <!-- Botones -->

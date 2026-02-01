@@ -9,27 +9,26 @@
 
         <!-- Imagen de portada con overlay -->
         <div style="
-    position: relative;
-    width: 100%;
-    aspect-ratio: 3 / 1;
-    min-height: 280px;
-    max-height: 440px;
-    overflow: hidden;
-    margin-bottom: 1.5rem;
-">
+                position: relative;
+                width: 100%;
+                aspect-ratio: 3 / 1;
+                min-height: 280px;
+                max-height: 440px;
+                overflow: hidden;
+                margin-bottom: 1.5rem;
+            ">
 
-            @if (EventImages?.FirstOrDefault()?.Event is not null)
+            @if (Event is not null && Event.CoverAlbumImageUrl is not null)
             {
-                var ev = EventImages.First().Event;
 
                 <!-- Imagen -->
-                <img src="@ev.CoverAlbumImageUrl"
+                <img src="@Event.CoverAlbumImageUrl"
                      alt="Portada del evento"
                      style="
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
-                object-position: @($"{ev.CoverPositionX}% {ev.CoverPositionY}%");
+                object-position: @($"{Event.CoverPositionX}% {Event.CoverPositionY}%");
                 display: block;
                  " />
 
@@ -62,7 +61,7 @@
                 line-height: 1.3;
                 opacity: 0.9;
                 ">
-                        @ev.SubTitle
+                        @Event.SubTitle
                     </p>
 
                     <h1 style="
@@ -71,7 +70,7 @@
                 line-height: 1.15;
                 word-break: break-word;
                 ">
-                        @ev.Name
+                        @Event.Name
                     </h1>
 
                 </div>
