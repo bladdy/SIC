@@ -84,7 +84,7 @@ public class ImagesController : ControllerBase
             {
                 CodeEvent = folder,
                 ImageUrl = url,
-                FileName = fileName
+                FileName = Path.GetFileName(new Uri(url).LocalPath)
             };
 
             var response = await _imageUnitOfWork.AddFullAsyn(image);

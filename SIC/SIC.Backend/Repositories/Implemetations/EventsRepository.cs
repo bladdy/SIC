@@ -248,6 +248,7 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
 
                 default:
                     // Por si no viene nada válido, lo dejas con un orden por defecto
+                    queryable = queryable.OrderBy(x => x.Status);
                     queryable = queryable.OrderBy(x => x.Date);
                     break;
             }
@@ -256,6 +257,7 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
         {
             // Orden por defecto si no selecciona nada
             queryable = queryable.OrderBy(x => x.Name);
+            queryable = queryable.OrderBy(x => x.Status);
         }
 
         if (pagination.Date.HasValue)

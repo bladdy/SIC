@@ -104,6 +104,9 @@ builder.Services.AddScoped<IUserCreditRepository, UserCreditRepository>();
 builder.Services.AddScoped<IWhatsAppConfigRepository, WhatsAppConfigRepository>();
 builder.Services.AddScoped<IWhatsAppConfigUnitOfWork, WhatsAppConfigUnitOfWork>();
 
+builder.Services.AddScoped<IPhotoEventRepository, PhotoEventRepository>();
+builder.Services.AddScoped<IPhotoEventUnitOfWork, PhotoEventUnitOfWork>();
+
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
     options.User.RequireUniqueEmail = true;
@@ -173,3 +176,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+//ToDo: Configurar el nginx para que agarre el SignalR
+//Iniciar ngrok con el siguiente comando:
+//ngrok http https://localhost:7141

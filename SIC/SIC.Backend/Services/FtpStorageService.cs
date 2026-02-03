@@ -1,4 +1,8 @@
 ﻿using FluentFTP;
+using Microsoft.AspNetCore.WebUtilities;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Webp;
+using SixLabors.ImageSharp.Processing;
 using System.IO.Compression;
 using System.Net;
 
@@ -16,13 +20,13 @@ public class FtpStorageService
     private FtpClient CreateClient()
     {
         //Cambiar a FtpLocal cuando sea local
-        var host = _configuration["Ftp:Host"];
-        var username = _configuration["Ftp:Username"];
-        var password = _configuration["Ftp:Password"];
+        var host = _configuration["FtpLocal:Host"];
+        var username = _configuration["FtpLocal:Username"];
+        var password = _configuration["FtpLocal:Password"];
         var client = new FtpClient(host)
         {
             Credentials = new System.Net.NetworkCredential(username, password),
-            Port = int.Parse(_configuration["Ftp:Port"] ?? "21")
+            Port = int.Parse(_configuration["FtpLocal:Port"] ?? "21")
         };
         client.Connect();
         return client;
@@ -41,6 +45,60 @@ public class FtpStorageService
         return Task.CompletedTask;
     }
 
+    public async Task<string> UploadImageAsync(
+    Stream fileStream,
+    string folder,
+    string fileName)
+    {
+        const int maxWidth = 1280;
+        using var client = CreateClient();
+
+        var directory = $"/{folder}";
+        if (!client.DirectoryExists(directory))
+        {
+            client.CreateDirectory(directory);
+        }
+
+        // 🔹 Forzar extensión .webp
+        var webpFileName = Path.ChangeExtension(fileName, ".webp");
+        var remotePath = $"{directory}/{webpFileName}";
+
+        // 🔹 Convertir a WEBP
+        using var image = await Image.LoadAsync(fileStream);
+
+        if (image.Width > maxWidth)
+        {
+            image.Mutate(x =>
+                x.Resize(new ResizeOptions
+                {
+                    Mode = ResizeMode.Max,
+                    Size = new Size(maxWidth, 0)
+                }));
+        }
+
+        // 🔹 Guardar en WEBP optimizado
+        using var webpStream = new MemoryStream();
+        await image.SaveAsync(webpStream, new WebpEncoder
+        {
+            Quality = 65,          // 👈 punto dulce
+            Method = WebpEncodingMethod.BestQuality
+        });
+
+        webpStream.Position = 0;
+
+        // 🔹 Subir al FTP
+        client.UploadStream(
+            webpStream,
+            remotePath,
+            FtpRemoteExists.Overwrite,
+            true
+        );
+
+        var baseUrl = _configuration["FtpLocal:UrlBase"];
+        return $"{baseUrl}/{folder}/{webpFileName}";
+    }
+
+    /*
     public Task<string> UploadImageAsync(
     Stream fileStream,
     string folder,
@@ -64,10 +122,10 @@ public class FtpStorageService
             true
         );
 
-        var baseUrl = _configuration["Ftp:UrlBase"];
+        var baseUrl = _configuration["FtpLocal:UrlBase"];
         return Task.FromResult($"{baseUrl}/{folder}/{fileName}");
-    }
-
+    }*/
+   //ToDo: Crear un metodo que diga si o no se borro el archivo
     public Task DeleteFileAsync(string folder, string fileName)
     {
         using var client = CreateClient();

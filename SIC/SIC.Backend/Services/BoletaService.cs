@@ -107,5 +107,85 @@ namespace SIC.Backend.Services
             var pdfBytes = msPdf.ToArray();
             return (pdfBytes, qrBytes);
         }
+
+        public byte[] GenerarPdfQrs(string evento, List<string> codigosQr)
+        {
+            using var ms = new MemoryStream();
+            using var document = new Document(PageSize.Letter, 25, 25, 25, 25);
+            PdfWriter.GetInstance(document, ms);
+
+            document.Open();
+
+            var fontTitle = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16);
+            var fontCode = FontFactory.GetFont(FontFactory.HELVETICA, 8);
+
+            // 🔹 Título
+            document.Add(new Paragraph(evento.ToUpper(), fontTitle)
+            {
+                Alignment = Element.ALIGN_CENTER,
+                SpacingAfter = 15
+            });
+
+            int index = 0;
+
+            while (index < codigosQr.Count)
+            {
+                // 🧱 4 columnas x 5 filas = 20 QR
+                var table = new PdfPTable(4)
+                {
+                    WidthPercentage = 100
+                };
+
+                table.SetWidths(new float[] { 1, 1, 1, 1 });
+
+                for (int i = 0; i < 20 && index < codigosQr.Count; i++, index++)
+                {
+                    var urlBase = "https://invboxv-app.com/photo-event";
+
+                    var contenidoQr = $"{urlBase}/{evento}/{codigosQr[index]}";
+
+                    var qrBytes = GenerateQrPng(contenidoQr);
+
+                    var qrImage = Image.GetInstance(qrBytes);
+                    qrImage.ScaleAbsolute(100, 100);
+                    qrImage.Alignment = Element.ALIGN_CENTER;
+
+                    var cell = new PdfPCell
+                    {
+                        Border = Rectangle.NO_BORDER,
+                        HorizontalAlignment = Element.ALIGN_CENTER,
+                        PaddingBottom = 5
+                    };
+
+                    cell.AddElement(qrImage);
+                    cell.AddElement(new Paragraph(codigosQr[index], fontCode)
+                    {
+                        Alignment = Element.ALIGN_CENTER,
+                    });
+
+                    table.AddCell(cell);
+                }
+
+                document.Add(table);
+
+                if (index < codigosQr.Count)
+                    document.NewPage();
+            }
+
+            document.Close();
+            return ms.ToArray();
+        }
+
+        // ============================
+        // 🔹 QR PNG
+        // ============================
+        private static byte[] GenerateQrPng(string codigo)
+        {
+            using var generator = new QRCodeGenerator();
+            using var data = generator.CreateQrCode(codigo, QRCodeGenerator.ECCLevel.Q);
+            using var qr = new PngByteQRCode(data);
+
+            return qr.GetGraphic(20);
+        }
     }
 }
