@@ -119,11 +119,22 @@ public partial class AddImagenAlbum
 
             foreach (var file in selectedFiles)
             {
-                var stream = file.OpenReadStream(5_000_000); // 5MB por imagen
+                // 🔹 Validación extra (por si acaso)
+                if (file.Size > 10 * 1024 * 1024)
+                {
+                    await SweetAlertService.FireAsync(
+                        "Archivo muy grande",
+                        $"La imagen \"{file.Name}\" supera el límite de 10 MB.",
+                        SweetAlertIcon.Warning
+                    );
+                    return;
+                }
+
+                var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
 
                 content.Add(
                     new StreamContent(stream),
-                    "files",        // 👈 DEBE coincidir con el backend
+                    "files",
                     file.Name
                 );
             }
@@ -164,8 +175,18 @@ public partial class AddImagenAlbum
                 );
             }
         }
-        catch
+        catch (IOException)
         {
+            // 🔴 Excede maxAllowedSize
+            await SweetAlertService.FireAsync(
+                "Archivo demasiado grande",
+                "Una o más imágenes superan el límite permitido de 10 MB.",
+                SweetAlertIcon.Warning
+            );
+        }
+        catch (Exception)
+        {
+            // 🔴 Cualquier otro error
             await SweetAlertService.FireAsync(
                 "Error",
                 "Ha ocurrido un error inesperado.",

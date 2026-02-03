@@ -1,0 +1,191 @@
+﻿@page "/photo-event/{Code}/{Qr?}"
+
+@layout LoginLayout
+<PageTitle>Cimaco</PageTitle>
+
+<div class="container py-3">
+
+    <!-- ========================= -->
+    <!-- PORTADA -->
+    <!-- ========================= -->
+    @if (!string.IsNullOrWhiteSpace(EventDetail?.PortadaUrl))
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <div style="
+                    width: 100%;
+                    height: 320px;
+                    border-radius: 12px;
+                    background-image: url('@EventDetail.PortadaUrl');
+                    background-size: cover;
+                    background-position: center;
+                    background-repeat: no-repeat;">
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- ========================= -->
+    <!-- FORMULARIOS -->
+    <!-- ========================= -->
+    @if (string.IsNullOrEmpty(Qr))
+    {
+        <div class="row g-4 mb-5">
+
+            <!-- GENERAR QR -->
+            <div class="col-12 col-md-6">
+                <div class="card p-4 h-100" style="box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                    <h4 class="mb-3">Generar códigos QR</h4>
+
+                    <div class="mb-3">
+                        <label class="form-label">Cantidad de QR</label>
+                        <InputNumber @bind-Value="CantidadQr"
+                                     class="form-control"
+                                     min="1" />
+                    </div>
+
+                    <button class="btn btn-primary w-100"
+                            disabled="@isLoading"
+                            @onclick="GenerarQr">
+                        @(isLoading ? "Generando..." : "Generar")
+                    </button>
+                </div>
+            </div>
+
+            <!-- ASIGNAR QR -->
+            <div class="col-12 col-md-6">
+                <div class="card p-4 h-100" style="box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                    <h4 class="mb-3">Asignar QR a fotos</h4>
+
+                    <div class="mb-3">
+                        <label class="form-label">Código QR</label>
+                        <InputText @bind-Value="CodigoQr"
+                                   class="form-control"
+                                   placeholder="Ej. QR-0001" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Seleccionar imágenes</label>
+                        <InputFile @ref="inputFileRef"
+                                   OnChange="OnFilesSelected"
+                                   multiple
+                                   accept="image/*"
+                                   class="form-control" />
+                    </div>
+
+                    <button class="btn btn-success w-100"
+                            disabled="@IsUploadDisabled"
+                            @onclick="SubirFotos">
+                        @(isLoadingImport ? "Subiendo..." : "Subir")
+                    </button>
+                </div>
+            </div>
+
+
+        </div>
+    }
+
+    <!-- ========================= -->
+    <!-- GALERÍA -->
+    <!-- ========================= -->
+    <div class="row">
+        <div class="col-12">
+
+            <h4 class="mb-3">
+                Galería
+                @if (EventDetail?.Images != null)
+                {
+                    <span style="color:#6c757d;">(@EventDetail.Images.Count)</span>
+                }
+            </h4>
+
+            @if (EventDetail?.Images == null)
+            {
+                <p style="color:#6c757d;">Cargando imágenes...</p>
+            }
+            else if (!EventDetail.Images.Any())
+            {
+                <div style="
+                    padding: 2rem;
+                    text-align: center;
+                    color: #6c757d;
+                    border: 1px dashed #dee2e6;
+                    border-radius: 8px;">
+                    No hay imágenes en este álbum aún.
+                </div>
+            }
+            else
+            {
+                <div style="
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                    gap: 1rem;">
+                    @foreach (var image in EventImages)
+                    {
+                        <div style="
+                            border-radius: 8px;
+                            overflow: hidden;
+                            cursor: pointer;"
+                             @onclick="() => OpenPreview(image)">
+
+                            <img src="@image.Url"
+                                 alt="Imagen del evento"
+                                 loading="lazy"
+                                 style="
+                                    width: 100%;
+                                    height: 220px;
+                                    object-fit: cover;
+                                    display: block;" />
+                        </div>
+                    }
+                </div>
+            }
+
+        </div>
+    </div>
+
+</div>
+
+<!-- ========================= -->
+<!-- PREVIEW -->
+<!-- ========================= -->
+@if (PreviewImage != null && !string.IsNullOrEmpty(PreviewImage.Url))
+{
+    <div @onclick="ClosePreview"
+         style="
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0,0,0,0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1050;">
+
+        <div style="position: relative;" @onclick:stopPropagation>
+
+            <button @onclick="() => DownloadImage(PreviewImage)"
+                    style="
+                        position: absolute;
+                        top: -50px;
+                        right: 0;
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        border: none;
+                        background-color: #3C6A79;
+                        color: #fff;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        cursor: pointer;">
+                <i class="bi bi-download"></i>
+            </button>
+
+            <img src="@PreviewImage.Url"
+                 style="
+                    max-width: 90vw;
+                    max-height: 90vh;
+                    border-radius: 8px;" />
+        </div>
+    </div>
+}
