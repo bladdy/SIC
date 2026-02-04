@@ -113,9 +113,10 @@ namespace SIC.Backend.Services
 
                 var responseObject = new WhatsAppMessageResponse
                 {
-                    MessageId = apiResponse!.Messages.First().Id,
+                    Wamid = apiResponse!.Messages.First().Id,
                     NumeroDestino = numeroDestino,
-                    TemplateName = templateName
+                    TemplateName = templateName,
+                    Contact = apiResponse.Contacts.First().WaId
                 };
 
                 return new ActionResponse<WhatsAppMessageResponse>

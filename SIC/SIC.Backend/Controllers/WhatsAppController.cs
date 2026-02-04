@@ -75,6 +75,23 @@ namespace SIC.Backend.Controllers
                 parametros
 
             );
+            var messageDto = new WhatsappIncomingMessageDto
+            {
+                MessageId = result.Message,
+                From = result.Result!.Contact,
+                Text = $"Invitacion enviada a {invitacion.Result.Name}, con la url {invitacion.Result.Event!.Url!}?codigo={code}",
+                Type = "text",
+                ReplyToMessageId = result.Result!.Wamid,
+                Direction = "OUT",
+                Status = "sent"
+            };
+
+            var response = await _iMessageUnitOfWork
+            .AddReceiveMessages(messageDto);
+
+            if (!response.Success)
+                return BadRequest("No se pudo enviar el mensaje");
+
             await SaveMessageHistory(invitacion.Result.Code!, result);
 
             if (!result.Success)

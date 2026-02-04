@@ -8,8 +8,9 @@ namespace SIC.Shared.DTOs
 {
     public class WhatsAppMessageResponse
     {
-        public string MessageId { get; set; } = string.Empty;
+        public string Wamid { get; set; } = string.Empty;
         public string NumeroDestino { get; set; } = string.Empty;
         public string TemplateName { get; set; } = string.Empty;
+        public string Contact { get; set; } = string.Empty;
     }
 }
