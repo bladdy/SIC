@@ -20,6 +20,8 @@ namespace SIC.Backend.UnitOfWork.Implemetations
 
         public async Task<ActionResponse<PhotoEvent>> GetByIdAsync(string code) => await _photoEventRepository.GetByIdAsync(code);
 
+        public async Task<ActionResponse<IEnumerable<PhotoEventImage>>> GetByImagenCodeAsync(string code) => await _photoEventRepository.GetByImagenCodeAsync(code);
+
         public async Task<ActionResponse<bool>> RemoveFullAsyn(int id) => await _photoEventRepository.RemoveFullAsyn(id);
     }
 }

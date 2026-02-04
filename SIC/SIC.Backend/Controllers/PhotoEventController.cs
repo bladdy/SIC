@@ -11,6 +11,7 @@ using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using System.IO.Compression;
 using static QRCoder.PayloadGenerator;
+using static System.Net.WebRequestMethods;
 
 namespace SIC.Backend.Controllers
 {
@@ -134,6 +135,45 @@ namespace SIC.Backend.Controllers
                 return Ok(response);
             }
             return BadRequest(response);
+        }
+
+        [HttpGet("download-all/{code}")]
+        public async Task<IActionResult> DownloadAllImages(string code)
+        {
+            var response = await _photoEventUnitOf.GetByImagenCodeAsync(code);
+
+            if (response?.Result == null || !response.Result.Any())
+                return NotFound("No images found");
+
+            using var zipStream = new MemoryStream();
+
+            using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Create, true))
+            {
+                foreach (var img in response.Result)
+                {
+                    if (string.IsNullOrEmpty(img.Event?.Code) || string.IsNullOrEmpty(img.FileName))
+                        continue;
+
+                    var imageStream = await _ftp.DownloadFileAsync(img.Event.Code, img.FileName);
+                    if (imageStream == null)
+                        continue;
+
+                    var zipEntry = archive.CreateEntry(img.FileName, CompressionLevel.Fastest);
+
+                    using var entryStream = zipEntry.Open();
+                    imageStream.Position = 0;
+                    await imageStream.CopyToAsync(entryStream);
+                    imageStream.Dispose();
+                }
+            }
+
+            zipStream.Position = 0;
+
+            return File(
+                zipStream.ToArray(),
+                "application/zip",
+                $"Album_{code}.zip"
+            );
         }
 
         [HttpGet("qr")]

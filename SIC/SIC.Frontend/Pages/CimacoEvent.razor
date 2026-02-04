@@ -91,13 +91,27 @@
     <div class="row">
         <div class="col-12">
 
-            <h4 class="mb-3">
-                Galería
-                @if (EventDetail?.Images != null)
-                {
-                    <span style="color:#6c757d;">(@EventDetail.Images.Count)</span>
-                }
-            </h4>
+            
+
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+
+
+                <!-- Botones -->
+                <!-- Nombre -->
+                <h4 class="mb-3">
+                    Galería
+                    @if (EventImages != null)
+                    {
+                        <span style="color:#6c757d;">(@EventImages.Count)</span>
+                    }
+                </h4>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;" class="mb-3">
+                    <button @onclick="() => DownloadAllImages(Qr!)"
+                            style="padding: 0.5rem 1rem; background-color: #3C6A79; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                        <i class="bi bi-download"></i> Descargar Imágenes
+                    </button>
+                </div>
+            </div>
 
             @if (EventDetail?.Images == null)
             {
@@ -120,7 +134,7 @@
                     display: grid;
                     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
                     gap: 1rem;">
-                    @foreach (var image in EventImages)
+                    @foreach (var image in EventImages!)
                     {
                         <div style="
                             border-radius: 8px;

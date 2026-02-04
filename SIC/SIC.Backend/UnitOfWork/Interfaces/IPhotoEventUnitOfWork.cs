@@ -13,5 +13,7 @@ namespace SIC.Backend.UnitOfWork.Interfaces
         Task<ActionResponse<PhotoEvent>> GetByIdAsync(string code);
 
         Task<ActionResponse<bool>> AddFullImageAsyn(PhotoEventImage photoEventImage);
+
+        Task<ActionResponse<IEnumerable<PhotoEventImage>>> GetByImagenCodeAsync(string code);
     }
 }

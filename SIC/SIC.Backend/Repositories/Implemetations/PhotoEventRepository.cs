@@ -98,6 +98,26 @@ namespace SIC.Backend.Repositories.Implemetations
             };
         }
 
+        public async Task<ActionResponse<IEnumerable<PhotoEventImage>>> GetByImagenCodeAsync(string code)
+        {
+            var photoEvent = await _context.PhotoEventImages.Include(e => e.Event)
+                .Where(pe => pe.Code == code)
+                .ToListAsync();
+            if (photoEvent == null)
+            {
+                return new ActionResponse<IEnumerable<PhotoEventImage>>
+                {
+                    Success = false,
+                    Message = "El evento de fotos no existe."
+                };
+            }
+            return new ActionResponse<IEnumerable<PhotoEventImage>>
+            {
+                Success = true,
+                Result = photoEvent
+            };
+        }
+
         public async Task<ActionResponse<bool>> RemoveFullAsyn(int id)
         {
             var photoEvent = await _context.PhotoEvents

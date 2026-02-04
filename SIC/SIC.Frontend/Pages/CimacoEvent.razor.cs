@@ -51,6 +51,30 @@ namespace SIC.Frontend.Pages
             await LoadEvent();
         }
 
+        private async Task DownloadAllImages(string Code)
+        {
+            try
+            {//https://localhost:7174/photo-event/V76NBN/789999
+                var content = await Repository.GetFileAsync($"api/PhotoEvent/download-all/{Code}");
+                if (content.Length > 0)
+                {
+                    await JsRuntime.DownloadFileAsync($"Evento-{Code}.zip", content);
+                }
+            }
+            catch (Exception)
+            {
+                var toast = SweetAlertService.Mixin(new SweetAlertOptions
+                {
+                    Toast = true,
+                    Position = SweetAlertPosition.TopEnd,
+                    ShowConfirmButton = false,
+                    Timer = 3000,
+                    TimerProgressBar = true,
+                });
+                await toast.FireAsync("Error", "Algo salio mal, intentalo de nuevo más tarde.", SweetAlertIcon.Error);
+            }
+        }
+
         private async Task LoadEvent()
         {
             var responseHttp = await Repository.GetAsync<PhotoEvent>($"api/PhotoEvent/{Code}");
