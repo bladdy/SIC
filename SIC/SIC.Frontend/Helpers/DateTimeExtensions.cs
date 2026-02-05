@@ -1,34 +1,41 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 
-namespace SIC.Frontend.Helpers
+namespace SIC.Frontend.Helpers;
+
+public static class DateTimeExtensions
 {
-    public static class DateTimeExtensions
+    public static string ToLocal12h(this DateTime date)
     {
-        public static string ToWhatsappDate(this DateTime date)
-            {
-                var culture = new CultureInfo("es-ES");
+        if (date.Kind != DateTimeKind.Utc)
+            date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
 
-                var now = DateTime.Now;
-                var today = now.Date;
-                var yesterday = today.AddDays(-1);
+        return date
+            .ToLocalTime()
+            .ToString("hh:mm tt");
+    }
 
-                if (date.Date == today)
-                    return date.ToString("HH:mm");
+    public static string ToWhatsappDate(this DateTime date)
+    {
+        var culture = new CultureInfo("es-ES");
 
-                if (date.Date == yesterday)
-                    return "Ayer";
+        var now = DateTime.Now;
+        var today = now.Date;
+        var yesterday = today.AddDays(-1);
 
-                var diff = (int)today.DayOfWeek - (int)DayOfWeek.Monday;
-                var startOfWeek = today.AddDays(-diff);
+        if (date.Date == today)
+            return date.ToString("HH:mm");
 
-                if (date.Date >= startOfWeek)
-                    return culture.TextInfo.ToTitleCase(
-                        date.ToString("dddd", culture)   // 🔥 CLAVE
-                    );
+        if (date.Date == yesterday)
+            return "Ayer";
 
-                return date.ToString("dd/MM/yyyy");
-            }
+        var diff = (int)today.DayOfWeek - (int)DayOfWeek.Monday;
+        var startOfWeek = today.AddDays(-diff);
 
-        }
+        if (date.Date >= startOfWeek)
+            return culture.TextInfo.ToTitleCase(
+                date.ToString("dddd", culture)   // 🔥 CLAVE
+            );
+
+        return date.ToString("dd/MM/yyyy");
+    }
 }
