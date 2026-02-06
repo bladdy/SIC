@@ -213,7 +213,7 @@ namespace SIC.Backend.Repositories.Implemetations
             {
                 From = whatsappIncoming.From,
                 Message = whatsappIncoming.Text ?? string.Empty, // Use null-coalescing operator to provide a default value
-                MessageId = whatsappIncoming.ReplyToMessageId ?? string.Empty, // Use null-coalescing operator to provide a default value
+                MessageId = whatsappIncoming.MessageId ?? string.Empty,
                 Direction = whatsappIncoming.Direction,
                 CreatedAt = DateTime.UtcNow,
                 Type = whatsappIncoming.Type,

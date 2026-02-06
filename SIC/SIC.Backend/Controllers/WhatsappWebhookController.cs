@@ -67,7 +67,7 @@ public class WhatsappWebhookController : ControllerBase
         foreach (var message in messages)
         {
             var status = statuses.FirstOrDefault(s => s.Id == message.Id);
-
+            //waid de quien envia el mensaje hay que meterlo en la base de datos
             var dto = new WhatsappIncomingMessageDto
             {
                 MessageId = message.Id,
