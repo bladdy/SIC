@@ -30,7 +30,7 @@ margin-left:10px;"
     }
     private async Task LoginWhatsApp()
     {
-        var config_id = Configuration["Facebook:configId2"];// Obtém o config_id de la base de datos
+        var config_id = Configuration["Facebook:configId3"];// Obtém o config_id de la base de datos
         await JS.InvokeVoidAsync("whatsappEmbeddedSignup", config_id);
     }
     private async Task LogoutWhatsApp()

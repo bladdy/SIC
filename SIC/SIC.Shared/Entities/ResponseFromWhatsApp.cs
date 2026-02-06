@@ -16,5 +16,12 @@ namespace SIC.Shared.Entities
         public string? Status { get; set; }
         public string Direction { get; set; } = null!; // IN / OUT
         public string? Type { get; set; }// text, template, image
+
+        /*
+        //Para poder agrupar los mensajes enviados y recibidos por Evento y Usuario, hay que agregarles estos campos
+        nombre: "Juan Pérez",
+        Evento: "José & Maria",
+        Codigo: "SG3HTU",
+        */
     }
 }

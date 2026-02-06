@@ -71,6 +71,23 @@ namespace SIC.Backend.Controllers
             }
         }
 
+        [HttpGet("templates")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> GetTemplates()
+        {
+            // Extraer el ID del usuario autenticado desde el token JWT
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return BadRequest(new { error = "Usuario no autenticado" });
+            var userWhatsAppConfig = await _whatsAppConfigUnitOfWork.GetByUserIdAsync(userId);
+            if (!userWhatsAppConfig.Success)
+                return BadRequest(new { error = "Este usuario no tiene permisos para obtener las plantillas" });
+
+            var templates = await _whatsAppService.GetTemplatesAsync(userWhatsAppConfig.Result);
+
+            return Ok(templates);
+        }
+
         [HttpPost("send")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> SendMessage([FromBody] SendWhatsappMessageDto dto)

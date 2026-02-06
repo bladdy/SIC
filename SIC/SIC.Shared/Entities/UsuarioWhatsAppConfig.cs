@@ -19,5 +19,8 @@ namespace SIC.Shared.Entities
 
         [MaxLength(20)]
         public string? PhoneNumber { get; set; } // Opcional: para mostrar el número en la UI
+
+        [MaxLength(20)]
+        public string? WabaId { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using System.Text.Json;
 using Newtonsoft.Json;
 using PdfSharpCore.Pdf.Content.Objects;
 using SIC.Shared.DTOs;
+using SIC.Shared.Entities;
 using SIC.Shared.Response;
 
 namespace SIC.Backend.Services
@@ -222,6 +223,39 @@ namespace SIC.Backend.Services
             {
                 return (false, "", ex.Message);
             }
+        }
+
+        public async Task<WhatsappTemplates?> GetTemplatesAsync(
+            UsuarioWhatsAppConfig? usuarioWhatsApp)
+        {
+            if (string.IsNullOrWhiteSpace(usuarioWhatsApp!.WabaId))
+                throw new ArgumentException("WABA_ID no configurado");
+
+            if (string.IsNullOrWhiteSpace(usuarioWhatsApp!.AccessToken))
+                throw new ArgumentException("Access Token no configurado");
+
+            using var http = new HttpClient();
+
+            http.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", usuarioWhatsApp.AccessToken);
+
+            var url =
+                $"https://graph.facebook.com/v22.0/{usuarioWhatsApp.WabaId}/message_templates";
+
+            var response = await http.GetAsync(url);
+            var json = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+                throw new Exception($"Error WhatsApp API: {json}");
+
+            var result = System.Text.Json.JsonSerializer.Deserialize<WhatsappTemplates>(
+                json,
+                new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+            return result ?? throw new InvalidOperationException("Failed to deserialize WhatsappTemplates.");
         }
 
         public async Task<string?> SendTextMessageAsync(string accessToken, string phoneNumberId, SendWhatsappMessageDto dto)

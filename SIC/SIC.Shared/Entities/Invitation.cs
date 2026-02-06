@@ -22,7 +22,7 @@ public class Invitation
     public string? Email { get; set; }
 
     [Display(Name = "Numero de Telefono")]
-    public string PhoneNumber { get; set; } = null!;
+    public string? PhoneNumber { get; set; }
 
     [Display(Name = "Numero de Adultos")]
     public int NumberAdults { get; set; }
