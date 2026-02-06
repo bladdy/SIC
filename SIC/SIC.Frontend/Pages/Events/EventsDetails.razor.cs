@@ -308,12 +308,10 @@ public partial class EventsDetails
         if (column == 1)
         {
             loadingWhatsappId1 = invitationId;
-            copyingId1 = null;
         }
         else
         {
             loadingWhatsappId2 = invitationId;
-            copyingId2 = null;
         }
 
         var responseHttp = await Repository.GetAsync<SIC.Shared.Entities.Message>($"api/Messages/byCode/{Code}/{code}");
@@ -359,59 +357,59 @@ public partial class EventsDetails
     private async Task CopiarInvitacion(string codeinvitation, int invitationId, int column)
     {
         string mensaje;
+
         if (column == 1)
         {
-            loadingWhatsappId1 = invitationId;
-            copyingId1 = null;
+            copyingId1 = invitationId; // ✅ AQUÍ estaba el error
         }
         else
         {
-            loadingWhatsappId2 = invitationId;
-            copyingId2 = null;
+            copyingId2 = invitationId;
         }
-        copyButtonText = "Copiando mensaje...";
 
-        var responseHttp = await Repository.GetAsync<SIC.Shared.Entities.Message>($"api/Messages/byCode/{Code}/{codeinvitation}");
+        StateHasChanged(); // 🔥 fuerza render inmediato
+
+        var responseHttp = await Repository.GetAsync<SIC.Shared.Entities.Message>(
+            $"api/Messages/byCode/{Code}/{codeinvitation}");
 
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();
             await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            ResetCopyState(column);
             return;
         }
-        if (responseHttp.Response != null)
+
+        if (responseHttp.Response == null)
         {
-            if (column == 1)
-            {
-                mensaje = responseHttp.Response.MessageInvitation;
-            }
-            else
-            {
-                mensaje = responseHttp.Response.MessageConfirmation;
-            }
-        }
-        else
-        {
-            await SweetAlertService.FireAsync("Error", "No se encontró el mensaje de invitación.", SweetAlertIcon.Error);
-            if (column == 1)
-                copyingId1 = null;
-            else
-                copyingId2 = null;
-            copyButtonText = "Copiar Invitación";
+            await SweetAlertService.FireAsync(
+                "Error",
+                "No se encontró el mensaje de invitación.",
+                SweetAlertIcon.Error);
+
+            ResetCopyState(column);
             return;
         }
+
+        mensaje = column == 1
+            ? responseHttp.Response.MessageInvitation
+            : responseHttp.Response.MessageConfirmation;
 
         await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", mensaje);
 
-        await Task.Delay(1000); // Mostrar el loading
-        copyButtonText = "Mensaje copiado";
+        await Task.Delay(1500);
 
-        await Task.Delay(1500); // Mostrar el mensaje copiado un momento
-        copyButtonText = "Copiar Invitación";
+        ResetCopyState(column);
+    }
+
+    private void ResetCopyState(int column)
+    {
         if (column == 1)
             copyingId1 = null;
         else
             copyingId2 = null;
+
+        StateHasChanged();
     }
 
     private void HandleFileSelected(InputFileChangeEventArgs e)
