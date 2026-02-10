@@ -276,6 +276,7 @@ namespace SIC.Backend.Repositories.Implemetations
                 .OrderBy(x => x.CreatedAt)
                 .Select(x => new RealtimeChatMessageDto
                 {
+                    EventCode = x.EventCode!,
                     Name = x.NameConversation!,
                     MessageId = x.MessageId,
                     PhoneNumber = x.From,

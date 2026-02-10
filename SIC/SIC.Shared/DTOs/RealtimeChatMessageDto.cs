@@ -8,6 +8,7 @@ namespace SIC.Shared.DTOs
 {
     public class RealtimeChatMessageDto
     {
+        public string EventCode { get; set; } = null!;
         public string Name { get; set; } = null!;
         public string MessageId { get; set; } = null!;
         public string PhoneNumber { get; set; } = null!;

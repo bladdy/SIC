@@ -15,8 +15,12 @@ public partial class WhatsappInboxPage : IAsyncDisposable
 
     protected override async Task OnInitializedAsync()
     {
+        var response = await Repository.GetAsync<WhatsAppManualConfigDto>(
+                "/api/whatsapp/configurar"
+            );
         SignalR.OnInboxUpdated += UpdateInbox;
         await SignalR.StartAsync("https://invboxv-app.com/hubs/whatsapp-chat");
+        await SignalR.JoinEventInbox(response.Response!.PhoneNumber, SelectedEventCode!);
         await LoadInbox();
     }
 
@@ -63,7 +67,6 @@ public partial class WhatsappInboxPage : IAsyncDisposable
             StateHasChanged();
         });
     }
-
 
     public async ValueTask DisposeAsync()
     {

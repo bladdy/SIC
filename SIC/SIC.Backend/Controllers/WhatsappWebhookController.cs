@@ -92,35 +92,35 @@ public class WhatsappWebhookController : ControllerBase
 
                 // 💾 Guardar mensaje
                 await _iMessageUnitOfWork.AddReceiveMessages(dto);
-
+                var eventCode = await _iMessageUnitOfWork.GetConversationAsync(dto.From);
                 // 📥 Actualizar inbox SOLO del usuario dueño
                 await _hub.Clients
-                    .Group($"user_{phone}")
+                    .Group($"inbox_phone_{phone}_event_{eventCode}")
                     .SendAsync(
                         "InboxUpdated",
                         new InboxConversationDto
                         {
+                            EventCode = eventCode.Result!.LastOrDefault()!.EventCode,           // 🔥 OBLIGATORIO
                             PhoneNumber = dto.From,
                             LastMessage = dto.Text!,
                             LastMessageAt = dto.Timestamp,
                             UnreadCount = 1
                         }
                     );
-
                 // 💬 Enviar mensaje en tiempo real SOLO al chat abierto
                 await _hub.Clients
-                    .Group($"chat_{phone}_{dto.From}")
-                    .SendAsync(
-                        "NewMessage",
-                        new RealtimeChatMessageDto
-                        {
-                            PhoneNumber = dto.From,
-                            Direction = "IN",
-                            MessageType = dto.Type,
-                            Content = dto.Text,
-                            Timestamp = dto.Timestamp
-                        }
-                    );
+                .Group($"chat_{phone}_{dto.From}")
+                .SendAsync(
+                    "NewMessage",
+                    new RealtimeChatMessageDto
+                    {
+                        PhoneNumber = dto.From,
+                        Direction = "IN",
+                        MessageType = dto.Type,
+                        Content = dto.Text,
+                        Timestamp = dto.Timestamp
+                    }
+                );
             }
         }
 

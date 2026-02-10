@@ -1,4 +1,4 @@
-using CurrieTechnologies.Razor.SweetAlert2;
+﻿using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
@@ -9,11 +9,13 @@ using SIC.Shared.Response;
 
 namespace SIC.Frontend.Pages.Whatsapp.Components;
 
-public partial class WhatsappChat
-    : ComponentBase, IAsyncDisposable
+public partial class WhatsappChat : ComponentBase, IAsyncDisposable
 {
     [Parameter, EditorRequired]
-    public string PhoneNumber { get; set; } = null!;
+    public string OwnerPhone { get; set; } = null!; // 📌 número del inbox
+
+    [Parameter, EditorRequired]
+    public string PhoneNumber { get; set; } = null!; // 📌 contacto
 
     [Inject] private IJSRuntime JS { get; set; } = default!;
     [Inject] private IRepository Repository { get; set; } = default!;
@@ -24,31 +26,34 @@ public partial class WhatsappChat
     protected string NewMessage { get; set; } = string.Empty;
     protected ElementReference ChatBodyRef;
 
-    private string? _currentPhone;
+    private string? _currentContact;
 
     protected override async Task OnInitializedAsync()
     {
         SignalR.OnMessageReceived += OnMessage;
-        await SignalR.StartAsync("https://invboxv-app.com/hubs/whatsapp-chat");
-        //await SignalR.StartAsync("https://localhost:7141/hubs/whatsapp-chat");
+
+        await SignalR.StartAsync(
+            "https://invboxv-app.com/hubs/whatsapp-chat"
+        // "https://localhost:7141/hubs/whatsapp-chat"
+        );
     }
 
     protected override async Task OnParametersSetAsync()
     {
-        // ?? solo si cambi� el chat
-        if (_currentPhone == PhoneNumber)
+        // 🔁 solo si cambió el contacto
+        if (_currentContact == PhoneNumber)
             return;
 
-        if (_currentPhone != null)
+        if (_currentContact != null)
         {
-            await SignalR.LeaveChat(_currentPhone);
+            await SignalR.LeaveChat(OwnerPhone, _currentContact);
         }
 
-        _currentPhone = PhoneNumber;
-
+        _currentContact = PhoneNumber;
         Messages.Clear();
 
-        await SignalR.JoinChat(PhoneNumber);
+        // 🔥 Join correcto al grupo del chat
+        await SignalR.JoinChat(OwnerPhone, PhoneNumber);
 
         var response =
             await Repository.GetAsync<ActionResponse<List<RealtimeChatMessageDto>>>(
@@ -64,22 +69,35 @@ public partial class WhatsappChat
             );
             return;
         }
-        Messages = response.Response.Result?.ToList() ?? new();
-        var listMessageId = Messages.Where(m => !string.IsNullOrEmpty(m.MessageId) && m.Direction == "IN" && m.Status != "seen").Select(m => m.MessageId).ToList();
 
-        if (listMessageId.Count > 0)
+        Messages = response.Response.Result?.ToList() ?? new();
+
+        var unseenIds = Messages
+            .Where(m =>
+                !string.IsNullOrEmpty(m.MessageId)
+                && m.Direction == "IN"
+                && m.Status != "seen"
+            )
+            .Select(m => m.MessageId!)
+            .ToList();
+
+        if (unseenIds.Count > 0)
         {
-            await MarkMessagesAsyc(listMessageId);
+            await MarkMessagesAsync(unseenIds);
         }
+
         await InvokeAsync(StateHasChanged);
     }
 
-    private async Task MarkMessagesAsyc(List<string> listMessageId)
+    private async Task MarkMessagesAsync(List<string> messageIds)
     {
-        await Repository.PutAsync("/api/whatsapp/chat/mark-seen", new MarkMessagesAsSeenDto
-        {
-            Psid = listMessageId
-        });
+        await Repository.PutAsync(
+            "/api/whatsapp/chat/mark-seen",
+            new MarkMessagesAsSeenDto
+            {
+                Psid = messageIds
+            }
+        );
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -90,13 +108,10 @@ public partial class WhatsappChat
         }
     }
 
-    protected void OnMessage(RealtimeChatMessageDto msg)
+    private void OnMessage(RealtimeChatMessageDto msg)
     {
-        if (msg.PhoneNumber == PhoneNumber)
-        {
-            Messages.Add(msg);
-            InvokeAsync(StateHasChanged);
-        }
+        Messages.Add(msg);
+        InvokeAsync(StateHasChanged);
     }
 
     protected async Task HandleEnter(KeyboardEventArgs e)
@@ -110,11 +125,14 @@ public partial class WhatsappChat
         if (string.IsNullOrWhiteSpace(NewMessage))
             return;
 
-        await Repository.PostAsync("/api/whatsapp/chat/send", new
-        {
-            PhoneNumber,
-            Message = NewMessage
-        });
+        await Repository.PostAsync(
+            "/api/whatsapp/chat/send",
+            new
+            {
+                PhoneNumber = PhoneNumber,
+                Message = NewMessage
+            }
+        );
 
         NewMessage = string.Empty;
     }
@@ -123,7 +141,9 @@ public partial class WhatsappChat
     {
         SignalR.OnMessageReceived -= OnMessage;
 
-        if (_currentPhone != null)
-            await SignalR.LeaveChat(_currentPhone);
+        if (_currentContact != null)
+        {
+            await SignalR.LeaveChat(OwnerPhone, _currentContact);
+        }
     }
 }
