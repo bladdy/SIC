@@ -110,6 +110,10 @@ public partial class WhatsappChat : ComponentBase, IAsyncDisposable
 
     private void OnMessage(RealtimeChatMessageDto msg)
     {
+        // 🔐 solo mensajes del chat abierto
+        if (msg.PhoneNumber != PhoneNumber)
+            return;
+
         Messages.Add(msg);
         InvokeAsync(StateHasChanged);
     }

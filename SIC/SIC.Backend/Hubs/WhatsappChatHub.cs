@@ -5,27 +5,27 @@ namespace SIC.Backend.Hubs
 {
     public class WhatsappChatHub : Hub
     {
-        // 🔑 Helpers para nombres de grupos
+        // 🔑 ÚNICA FUENTE DE VERDAD
         private static string ChatGroup(string phone, string contact)
-            => $"chat:{phone}:{contact}";
+            => $"chat-{phone}-{contact}";
 
         private static string EventInboxGroup(string phone, string eventCode)
-            => $"inbox:{phone}:{eventCode}";
+            => $"event-inbox-{phone}-{eventCode}";
 
         // 💬 Chat activo
-        public async Task JoinChat(string phone, string contactPhone)
+        public async Task JoinChat(string ownerPhone, string contactPhone)
         {
             await Groups.AddToGroupAsync(
                 Context.ConnectionId,
-                ChatGroup(phone, contactPhone)
+                ChatGroup(ownerPhone, contactPhone)
             );
         }
 
-        public async Task LeaveChat(string phone, string contactPhone)
+        public async Task LeaveChat(string ownerPhone, string contactPhone)
         {
             await Groups.RemoveFromGroupAsync(
                 Context.ConnectionId,
-                ChatGroup(phone, contactPhone)
+                ChatGroup(ownerPhone, contactPhone)
             );
         }
 

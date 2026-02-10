@@ -116,12 +116,15 @@ public class WhatsappWebhookController : ControllerBase
                     "NewMessage",
                     new RealtimeChatMessageDto
                     {
+                        MessageId = dto.MessageId,
                         PhoneNumber = dto.From,
                         Direction = "IN",
                         MessageType = dto.Type,
                         Content = dto.Text,
-                        Timestamp = dto.Timestamp
+                        Timestamp = dto.Timestamp,
+                        Status = "delivered"
                     }
+
                 );
             }
         }
