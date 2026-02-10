@@ -1,14 +1,10 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 using SIC.Backend.Data;
 using SIC.Backend.Helpers;
 using SIC.Backend.Repositories.Interfaces;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using SIC.Shared.Response;
-using System.Collections.Generic;
 
 namespace SIC.Backend.Repositories.Implemetations
 {
@@ -209,15 +205,35 @@ namespace SIC.Backend.Repositories.Implemetations
 
         public async Task<ActionResponse<bool>> AddReceiveMessages(WhatsappIncomingMessageDto whatsappIncoming)
         {
+            var from = whatsappIncoming.From;
+            // limpiar a solo números
+            var fromDigits = new string(from.Where(char.IsDigit).ToArray());
+
+            // últimos 10 dígitos
+            var last10 = fromDigits.Length > 10
+                ? fromDigits.Substring(fromDigits.Length - 10)
+                : fromDigits;
+
+            var guest = await _context.Invitations
+                .Include(e => e.Event)
+                .FirstOrDefaultAsync(x =>
+                    x.PhoneNumber != null &&
+                    x.PhoneNumber.Length >= 10 &&
+                    x.PhoneNumber.Substring(x.PhoneNumber.Length - 10) == last10
+                );
             var response = new ResponseFromWhatsApp
             {
+                EventCode = guest?.Event?.Code,
+                EventName = guest?.Event?.Name,
+                NameConversation = guest?.Name,
+                PhoneNumber = whatsappIncoming.PhoneNumber,
                 From = whatsappIncoming.From,
                 Message = whatsappIncoming.Text ?? string.Empty, // Use null-coalescing operator to provide a default value
                 MessageId = whatsappIncoming.MessageId ?? string.Empty,
                 Direction = whatsappIncoming.Direction,
                 CreatedAt = DateTime.UtcNow,
                 Type = whatsappIncoming.Type,
-                Status = whatsappIncoming.Status
+                Status = whatsappIncoming.Status//chk porque llega null
             };
             _context.Add(response);
             await _context.SaveChangesAsync();
@@ -260,9 +276,12 @@ namespace SIC.Backend.Repositories.Implemetations
                 .OrderBy(x => x.CreatedAt)
                 .Select(x => new RealtimeChatMessageDto
                 {
+                    Name = x.NameConversation!,
+                    MessageId = x.MessageId,
                     PhoneNumber = x.From,
                     Direction = x.Direction,
                     Type = x.Type,
+                    Status = x.Status,
                     Content = x.Message,
                     Timestamp = x.CreatedAt
                 })
@@ -275,36 +294,13 @@ namespace SIC.Backend.Repositories.Implemetations
             };
         }
 
-        public async Task<List<InboxConversationDto>> GetInboxAsync()
-        {
-            var lastMessages = await _context.ResponseFromWhatsApps
-                .AsNoTracking()
-                .GroupBy(m => m.From)
-                .Select(g => g
-                    .OrderByDescending(m => m.CreatedAt)
-                    .First())
-                .ToListAsync(); // 👈 aquí se ejecuta en SQL
-
-            return lastMessages
-                .Select(m => new InboxConversationDto
-                {
-                    PhoneNumber = m.From,
-                    LastMessage = m.Message,
-                    LastMessageAt = m.CreatedAt,
-                    Direction = m.Direction,
-                    Type = m.Type
-                })
-                .OrderByDescending(x => x.LastMessageAt)
-                .ToList();
-        }
-
         //Tiene que marcar todos los mensajes de un psid como leidos
         public async Task<ActionResponse<bool>> MarkMessagesAsSeenAsync(string psid)
         {
             try
             {
                 var messages = await _context.ResponseFromWhatsApps
-                    .Where(x => x.From.EndsWith(psid) && x.Status != "seen")
+                    .Where(x => x.MessageId == psid && x.Status != "seen")
                     .ToListAsync();
                 foreach (var message in messages)
                 {
@@ -326,6 +322,90 @@ namespace SIC.Backend.Repositories.Implemetations
                     Message = "No se pudieron marcar los mensajes como leidos."
                 };
             }
+        }
+
+        public async Task<List<InboxConversationDto>> GetInboxAsync(string phoneNumber, string eventC)
+        {
+            var lastMessages = await _context.ResponseFromWhatsApps
+                    .AsNoTracking()
+                    .Where(m => m.PhoneNumber == phoneNumber && m.EventCode == eventC) // Filtrar por usuario
+                    .GroupBy(m => new
+                    {
+                        m.From,
+                        m.EventCode,
+                        m.EventName,
+                        m.NameConversation
+                    })
+                    .Select(g => g
+                        .OrderByDescending(m => m.CreatedAt)
+                        .First())
+                    .ToListAsync(); // 👈 aquí se ejecuta en SQL
+
+            return lastMessages
+                .Select(m => new InboxConversationDto
+                {
+                    PhoneNumber = m.From,
+                    EventCode = m.EventCode,
+                    EventName = m.EventName,
+                    NameConversation = m.NameConversation,
+
+                    LastMessage = m.Message,
+                    LastMessageAt = m.CreatedAt,
+                    Direction = m.Direction,
+                    Type = m.Type,
+
+                    UnreadCount = _context.ResponseFromWhatsApps.Count(x =>
+                        x.From == m.From &&
+                        x.EventCode == m.EventCode &&
+                        x.NameConversation == m.NameConversation &&
+                        x.Direction == "IN" &&
+                        !string.IsNullOrEmpty(x.MessageId) &&
+                        //!string.IsNullOrEmpty(x.Status) &&
+                        x.Status != "seen"
+                    )
+                })
+                .OrderByDescending(x => x.LastMessageAt)
+                .ToList();
+        }
+
+        public async Task<List<InboxConversationDto>> GetInboxAsync(string phoneNumber)
+        {
+            var lastMessages = await _context.ResponseFromWhatsApps
+                .AsNoTracking()
+                .Where(m => m.PhoneNumber != null && m.PhoneNumber == phoneNumber)
+                .GroupBy(m => new
+                {
+                    m.EventCode
+                })
+                .Select(g => g
+                    .OrderByDescending(m => m.CreatedAt)
+                    .First())
+                .ToListAsync();
+            // 👈 aquí se ejecuta en SQL
+
+            return lastMessages
+                .Select(m => new InboxConversationDto
+                {
+                    PhoneNumber = m.From,
+                    EventCode = m.EventCode,
+                    EventName = m.EventName,
+                    NameConversation = m.NameConversation,
+
+                    LastMessage = m.Message,
+                    LastMessageAt = m.CreatedAt,
+                    Direction = m.Direction,
+                    Type = m.Type,
+
+                    UnreadCount = _context.ResponseFromWhatsApps.Count(x =>
+                        x.EventCode == m.EventCode &&
+                        x.Direction == "IN" &&
+                        !string.IsNullOrEmpty(x.MessageId) &&
+                        //!string.IsNullOrEmpty(x.Status) &&
+                        x.Status != "seen"
+                    )
+                })
+                .OrderByDescending(x => x.LastMessageAt)
+                .ToList();
         }
     }
 }

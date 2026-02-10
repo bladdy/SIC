@@ -310,35 +310,38 @@ namespace SIC.Backend.Services
             return null;
         }
 
-        public async Task<bool> MarkMessagesAsSeenAsync(string accessToken, string phoneNumberId, MarkMessagesAsSeenDto dto)
+        public async Task<bool> MarkMessageAsReadAsync(
+            string accessToken,
+            string phoneNumberId,
+            string messageId)
         {
             if (string.IsNullOrEmpty(accessToken))
-                throw new ArgumentException("Access token is required", nameof(accessToken));
+                throw new ArgumentException("Access token is required");
             if (string.IsNullOrEmpty(phoneNumberId))
-                throw new ArgumentException("Phone number ID is required", nameof(phoneNumberId));
-            if (dto == null)
-                throw new ArgumentNullException(nameof(dto));
+                throw new ArgumentException("Phone number ID is required");
+            if (string.IsNullOrEmpty(messageId))
+                throw new ArgumentException("Message ID is required");
 
             using var httpClient = new HttpClient();
 
-            // Endpoint de la API de WhatsApp Cloud
+            httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", accessToken);
+
             var url = $"https://graph.facebook.com/v22.0/{phoneNumberId}/messages";
 
-            // Payload de la API
             var payload = new
             {
-                recipient = new
-                {
-                    id = dto.Psid
-                },
-                sender_action = "mark_seen"
+                messaging_product = "whatsapp",
+                status = "read",
+                message_id = messageId
             };
 
-            var response = await _httpClient.PutAsJsonAsync(url, payload);
+            var response = await httpClient.PostAsJsonAsync(url, payload);
 
             if (!response.IsSuccessStatusCode)
             {
                 var error = await response.Content.ReadAsStringAsync();
+                Console.WriteLine(error);
                 return false;
             }
 

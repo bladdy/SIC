@@ -27,7 +27,10 @@ namespace SIC.Backend.Repositories.Interfaces
 
         Task<ActionResponse<IEnumerable<RealtimeChatMessageDto>>> GetConversationAsync(string phoneNumber);
 
-        Task<List<InboxConversationDto>> GetInboxAsync();
+        Task<List<InboxConversationDto>> GetInboxAsync(string phoneNumber);
+
         Task<ActionResponse<bool>> MarkMessagesAsSeenAsync(string psid);
+
+        Task<List<InboxConversationDto>> GetInboxAsync(string phoneNumber, string eventC);
     }
 }

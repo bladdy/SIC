@@ -33,11 +33,11 @@ namespace SIC.Backend.Repositories.Implemetations
                 Result = events
             };
         }
-
         public async Task<ActionResponse<UsuarioWhatsAppConfig>> AddFullAsync(UsuarioWhatsAppConfig whatsAppConfig)
         {
             try
             {
+                // 1️⃣ Validar usuario
                 var user = await _context.Users.FindAsync(whatsAppConfig.UsuarioId);
                 if (user == null)
                 {
@@ -47,24 +47,53 @@ namespace SIC.Backend.Repositories.Implemetations
                         Message = "Usuario no existe."
                     };
                 }
-                whatsAppConfig.Usuario = user;
-                _context.Add(whatsAppConfig);
+
+                // 2️⃣ Buscar configuración existente
+                var existingConfig = await _context.UsuarioWhatsAppConfigs
+                    .FirstOrDefaultAsync(x => x.UsuarioId == whatsAppConfig.UsuarioId);
+
+                if (existingConfig != null)
+                {
+                    // 🔁 ACTUALIZAR
+                    existingConfig.BusinessId = whatsAppConfig.BusinessId;
+                    existingConfig.WabaId = whatsAppConfig.WabaId;
+                    existingConfig.PhoneNumberId = whatsAppConfig.PhoneNumberId;
+                    existingConfig.SystemUserId = whatsAppConfig.SystemUserId;
+                    existingConfig.AccessToken = whatsAppConfig.AccessToken;
+                    existingConfig.PhoneNumber = whatsAppConfig.PhoneNumber;
+                    existingConfig.IsActive = true;
+                    existingConfig.RevokedAt = null;
+
+                    _context.Update(existingConfig);
+                }
+                else
+                {
+                    // ➕ CREAR
+                    whatsAppConfig.Usuario = user;
+                    whatsAppConfig.IsActive = true;
+                    whatsAppConfig.CreatedAt = DateTime.UtcNow;
+
+                    _context.UsuarioWhatsAppConfigs.Add(whatsAppConfig);
+                }
+
                 await _context.SaveChangesAsync();
+
                 return new ActionResponse<UsuarioWhatsAppConfig>
                 {
                     Success = true,
-                    Result = null
+                    Result = existingConfig ?? whatsAppConfig
                 };
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
                 return new ActionResponse<UsuarioWhatsAppConfig>
                 {
                     Success = false,
-                    Message = exception.Message
+                    Message = ex.Message
                 };
             }
         }
+
 
         public async Task<ActionResponse<UsuarioWhatsAppConfig>> UpdateFullAsync(UsuarioWhatsAppConfig whatsAppConfig)
         {
