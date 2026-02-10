@@ -42,25 +42,28 @@ public partial class WhatsappInboxPage : IAsyncDisposable
         if (string.IsNullOrWhiteSpace(item.EventCode))
             return;
 
-        var ev = Inbox.FirstOrDefault(x => x.EventCode == item.EventCode);
-
-        if (ev == null)
+        _ = InvokeAsync(() =>
         {
-            // 🆕 nuevo evento
-            Inbox.Insert(0, item);
-        }
-        else
-        {
-            ev.LastMessage = item.LastMessage;
-            ev.LastMessageAt = item.LastMessageAt;
-            ev.UnreadCount++;
+            var ev = Inbox.FirstOrDefault(x => x.EventCode == item.EventCode);
 
-            Inbox.Remove(ev);
-            Inbox.Insert(0, ev);
-        }
+            if (ev == null)
+            {
+                Inbox.Insert(0, item);
+            }
+            else
+            {
+                ev.LastMessage = item.LastMessage;
+                ev.LastMessageAt = item.LastMessageAt;
+                ev.UnreadCount++;
 
-        InvokeAsync(StateHasChanged);
+                Inbox.Remove(ev);
+                Inbox.Insert(0, ev);
+            }
+
+            StateHasChanged();
+        });
     }
+
 
     public async ValueTask DisposeAsync()
     {
