@@ -92,24 +92,26 @@ public class WhatsappWebhookController : ControllerBase
 
                 // 💾 Guardar mensaje
                 await _iMessageUnitOfWork.AddReceiveMessages(dto);
-                var eventCode = await _iMessageUnitOfWork.GetConversationAsync(dto.From);
-                // 📥 Actualizar inbox SOLO del usuario dueño
+                var conversation = await _iMessageUnitOfWork.GetConversationAsync(dto.From);
+                var eventCode = conversation.Result!.LastOrDefault()!.EventCode;
+                // 📥 Inbox
                 await _hub.Clients
-                    .Group($"inbox_phone_{phone}_event_{eventCode}")
+                    .Group($"event-inbox-{phone}-{eventCode}")
                     .SendAsync(
                         "InboxUpdated",
                         new InboxConversationDto
                         {
-                            EventCode = eventCode.Result!.LastOrDefault()!.EventCode,           // 🔥 OBLIGATORIO
+                            EventCode = eventCode,
                             PhoneNumber = dto.From,
                             LastMessage = dto.Text!,
                             LastMessageAt = dto.Timestamp,
                             UnreadCount = 1
                         }
                     );
+
                 // 💬 Enviar mensaje en tiempo real SOLO al chat abierto
                 await _hub.Clients
-                .Group($"chat_{phone}_{dto.From}")
+                .Group($"chat-{phone}-{dto.From}")
                 .SendAsync(
                     "NewMessage",
                     new RealtimeChatMessageDto
