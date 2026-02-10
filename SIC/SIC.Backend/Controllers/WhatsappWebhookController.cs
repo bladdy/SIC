@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using SIC.Backend.Hubs;
-using SIC.Backend.UnitOfWork.Implemetations;
 using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.DTOs;
-using SIC.Shared.Enums;
-using System.Threading.Tasks;
+using System.Security.Claims;
+
+namespace SIC.Backend.Controllers;
 
 [ApiController]
 [Route("api/whatsapp/webhook")]
@@ -14,17 +16,22 @@ public class WhatsappWebhookController : ControllerBase
     private readonly IConfiguration _configuration;
     private readonly IMessageUnitOfWork _iMessageUnitOfWork;
     private readonly IHubContext<WhatsappChatHub> _hub;
+    private readonly IUsuarioWhatsAppConfigUnitOfWork _repo;
+    private readonly IWhatsAppConfigUnitOfWork _whatsAppConfigUnitOfWork;
 
-    public WhatsappWebhookController(IConfiguration configuration, IMessageUnitOfWork iMessageUnitOfWork, IHubContext<WhatsappChatHub> hub)
+    public WhatsappWebhookController(IConfiguration configuration, IMessageUnitOfWork iMessageUnitOfWork, IHubContext<WhatsappChatHub> hub, IUsuarioWhatsAppConfigUnitOfWork repo, IWhatsAppConfigUnitOfWork whatsAppConfigUnitOfWork)
     {
         _hub = hub;
         _iMessageUnitOfWork = iMessageUnitOfWork;
         _configuration = configuration;
+        _repo = repo;
+        _whatsAppConfigUnitOfWork = whatsAppConfigUnitOfWork;
     }
 
     // 🔐 Verificación inicial de Meta
-    [HttpGet]
+    [HttpGet("{phone}")]
     public IActionResult VerifyWebhook(
+        string phone,
         [FromQuery(Name = "hub.mode")] string mode,
         [FromQuery(Name = "hub.verify_token")] string token,
         [FromQuery(Name = "hub.challenge")] string challenge)
@@ -39,74 +46,82 @@ public class WhatsappWebhookController : ControllerBase
         return Unauthorized();
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Receivev([FromBody] WhatsappWebhookPayload payload)
+    // ✅ POST con ID en la ruta
+    [HttpPost("{phone}")]
+    public async Task<IActionResult> Receive(
+        string phone,
+        [FromBody] WhatsappWebhookPayload payload)
     {
-        // 1️⃣ Extraer values (messages + statuses)
-        var values = payload.Entry?
+        var changes = payload.Entry?
             .SelectMany(e => e.Changes)
-            .Select(c => c.Value)
             .ToList();
 
-        if (values == null || !values.Any())
+        if (changes == null || !changes.Any())
             return Ok();
 
-        // 2️⃣ Mensajes entrantes
-        var messages = values
-            .SelectMany(v => v.Messages ?? new List<MessageDTO>())
-            .ToList();
-
-        if (!messages.Any())
-            return Ok();
-
-        // 3️⃣ Statuses (pueden o no venir)
-        var statuses = values
-            .SelectMany(v => v.Statuses ?? new List<MessageStatus>())
-            .ToList();
-
-        foreach (var message in messages)
+        foreach (var change in changes)
         {
-            var status = statuses.FirstOrDefault(s => s.Id == message.Id);
-            //waid de quien envia el mensaje hay que meterlo en la base de datos
-            var dto = new WhatsappIncomingMessageDto
+            var value = change.Value;
+
+            // 🔑 CLAVE: phone_number_id identifica al cliente
+            var phoneNumberId = value.Metadata?.PhoneNumberId;
+            if (string.IsNullOrEmpty(phoneNumberId))
+                continue;
+
+            var messages = value.Messages ?? new List<MessageDTO>();
+            var statuses = value.Statuses ?? new List<MessageStatus>();
+
+            foreach (var message in messages)
             {
-                MessageId = message.Id,
-                From = message.From,
-                Text = message.Text?.Body,
-                Type = message.Type,
-                ReplyToMessageId = message.Context?.Id,
-                Timestamp = DateTime.UtcNow,
-                Direction = "IN",
-                Status = status?.Status
-            };
+                var status = statuses.FirstOrDefault(s => s.Id == message.Id);
 
-            // 4️⃣ Guardar en BD
-            await _iMessageUnitOfWork.AddReceiveMessages(dto);
-
-            // 5️⃣ Actualizar INBOX (lista de chats)
-            await _hub.Clients.All.SendAsync(
-                "InboxUpdated",
-                new InboxConversationDto
+                // 📦 DTO COMPLETO (multi-tenant)
+                var dto = new WhatsappIncomingMessageDto
                 {
-                    PhoneNumber = dto.From,
-                    LastMessage = dto.Text,
-                    LastMessageAt = DateTime.UtcNow,
-                    UnreadCount = 1
-                }
-            );
-
-            // 6️⃣ Enviar mensaje SOLO al chat abierto
-            await _hub.Clients.Group(dto.From).SendAsync(
-                "NewMessage",
-                new RealtimeChatMessageDto
-                {
-                    PhoneNumber = dto.From,
+                    MessageId = message.Id,
+                    From = message.From,
+                    PhoneNumberId = phoneNumberId,
+                    PhoneNumber = phone,   // 🔑 dueño del número
+                    Text = message.Text?.Body,
+                    Type = message.Type,
+                    ReplyToMessageId = message.Context?.Id,
+                    Timestamp = DateTime.UtcNow,
                     Direction = "IN",
-                    MessageType = "text",
-                    Content = dto.Text,
-                    Timestamp = DateTime.UtcNow
-                }
-            );
+                    Status = status?.Status
+                };
+
+                // 💾 Guardar mensaje
+                await _iMessageUnitOfWork.AddReceiveMessages(dto);
+
+                // 📥 Actualizar inbox SOLO del usuario dueño
+                await _hub.Clients
+                    .Group($"user_{phone}")
+                    .SendAsync(
+                        "InboxUpdated",
+                        new InboxConversationDto
+                        {
+                            PhoneNumber = dto.From,
+                            LastMessage = dto.Text!,
+                            LastMessageAt = dto.Timestamp,
+                            UnreadCount = 1
+                        }
+                    );
+
+                // 💬 Enviar mensaje en tiempo real SOLO al chat abierto
+                await _hub.Clients
+                    .Group($"chat_{phone}_{dto.From}")
+                    .SendAsync(
+                        "NewMessage",
+                        new RealtimeChatMessageDto
+                        {
+                            PhoneNumber = dto.From,
+                            Direction = "IN",
+                            MessageType = dto.Type,
+                            Content = dto.Text,
+                            Timestamp = dto.Timestamp
+                        }
+                    );
+            }
         }
 
         return Ok();
@@ -121,10 +136,31 @@ public class WhatsappWebhookController : ControllerBase
         return Ok(messages);
     }
 
+    [HttpGet("whatsapp/inbox/{eventC}")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<IActionResult> GetInbox(string eventC)
+    {
+        var usuarioId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (usuarioId == null)
+            return Unauthorized();
+        var userWhatsAppConfig = await _whatsAppConfigUnitOfWork.GetByUserIdAsync(usuarioId);
+        if (userWhatsAppConfig.Result == null)
+            return NotFound();
+        var inbox = await _iMessageUnitOfWork.GetInboxAsync(userWhatsAppConfig.Result.PhoneNumber!, eventC);
+        return Ok(inbox);
+    }
+
     [HttpGet("whatsapp/inbox")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> GetInbox()
     {
-        var inbox = await _iMessageUnitOfWork.GetInboxAsync();
+        var usuarioId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (usuarioId == null)
+            return Unauthorized();
+        var userWhatsAppConfig = await _whatsAppConfigUnitOfWork.GetByUserIdAsync(usuarioId);
+        if (userWhatsAppConfig.Result == null)
+            return NotFound();
+        var inbox = await _iMessageUnitOfWork.GetInboxAsync(userWhatsAppConfig.Result.PhoneNumber!);
         return Ok(inbox);
     }
 }

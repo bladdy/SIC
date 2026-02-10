@@ -56,13 +56,19 @@ namespace SIC.Backend.Controllers
                 var phoneNumberId = userWhatsAppConfig.Result!.PhoneNumberId;
                 if (dto == null)
                     return BadRequest(new { error = "El PSID es requerido" });
-                var marked = await _whatsAppService.MarkMessagesAsSeenAsync(
-                accessToken!, phoneNumberId!, dto);
-                if (!marked)
-                    return BadRequest(new { error = "No se pudieron marcar los mensajes como leidos en WhatsApp" });
-                var response = await _messageUnitOfWork.MarkMessagesAsSeenAsync(dto.Psid);
-                if (!response.Success)
-                    return BadRequest(new { error = "No se pudieron marcar los mensajes como leidos" });
+
+                foreach (var messageId in dto.Psid)
+                {
+                    if (string.IsNullOrEmpty(messageId))
+                        return BadRequest(new { error = "El ID del mensaje no puede estar vacio" });
+                    var marked = await _whatsAppService.MarkMessageAsReadAsync(
+                    accessToken!, phoneNumberId!, messageId);
+                    if (!marked)
+                        return BadRequest(new { error = "No se pudieron marcar los mensajes como leidos en WhatsApp" });
+                    var response = await _messageUnitOfWork.MarkMessagesAsSeenAsync(messageId);
+                    if (!response.Success)
+                        return BadRequest(new { error = "No se pudieron marcar los mensajes como leidos" });
+                }
                 return Ok();
             }
             catch (Exception ex)
@@ -103,6 +109,7 @@ namespace SIC.Backend.Controllers
                 //obtener los datos del usuario
                 var accessToken = userWhatsAppConfig.Result!.AccessToken;
                 var phoneNumberId = userWhatsAppConfig.Result!.PhoneNumberId;
+                var phoneNumber = userWhatsAppConfig.Result!.PhoneNumber;
                 var wamid = await _whatsAppService.SendTextMessageAsync(
                 accessToken!, phoneNumberId!, dto);
 
@@ -111,6 +118,7 @@ namespace SIC.Backend.Controllers
 
                 var messageDto = new WhatsappIncomingMessageDto
                 {
+                    PhoneNumber = phoneNumber,
                     MessageId = wamid,
                     From = dto.PhoneNumber,
                     Text = dto.Message,

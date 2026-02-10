@@ -81,7 +81,7 @@ public class EventsController : GenericController<Event>
 
     [HttpPost("full")]
     public async Task<IActionResult> PostFullAsync(Event events)
-    {
+    {//chequear un error al crear evento
         var action = await _eventsUnitOfWork.AddFullAsync(events);
         if (action.Success)
         {
