@@ -12,6 +12,9 @@ namespace SIC.Shared.DTOs
 
         public string From { get; set; } = null!;
 
+        public string? PhoneNumberId { get; set; }   // 🔴 CLAVE
+        public string? PhoneNumber { get; set; }       // 🔴 CLAVE
+
         public string? Text { get; set; }
 
         public string? Type { get; set; }

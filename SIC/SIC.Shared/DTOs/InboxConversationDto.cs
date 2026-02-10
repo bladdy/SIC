@@ -14,5 +14,8 @@ namespace SIC.Shared.DTOs
         public string Direction { get; set; } = null!;
         public string? Type { get; set; }
         public int UnreadCount { get; set; }
+        public string? EventCode { get; set; }
+        public string? EventName { get; set; }
+        public string? NameConversation { get; set; }
     }
 }

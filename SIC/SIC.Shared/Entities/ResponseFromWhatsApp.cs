@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SIC.Shared.Entities
 {
@@ -16,7 +12,12 @@ namespace SIC.Shared.Entities
         public string? Status { get; set; }
         public string Direction { get; set; } = null!; // IN / OUT
         public string? Type { get; set; }// text, template, image
+        public string? NameConversation { get; set; }
+        public string? EventCode { get; set; }
+        public string? EventName { get; set; }
+        public string? PhoneNumber { get; set; }
 
+        /*
         /*
         //Para poder agrupar los mensajes enviados y recibidos por Evento y Usuario, hay que agregarles estos campos
         nombre: "Juan Pérez",

@@ -8,5 +8,5 @@ namespace SIC.Shared.DTOs;
 
 public class MarkMessagesAsSeenDto
 {
-    public string Psid { get; set; } = null!;
+    public List<string> Psid { get; set; } = null!;
 }
