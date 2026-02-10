@@ -65,6 +65,7 @@ builder.Services.AddTransient<SeedDb>();
 builder.Services.AddScoped<WhatsAppService>();
 builder.Services.AddScoped<BoletaService>();
 builder.Services.AddScoped<FtpStorageService>();
+builder.Services.AddScoped<MetaAuthService>();
 
 // Inyeccion de dependencias gen�rica
 
@@ -106,6 +107,9 @@ builder.Services.AddScoped<IWhatsAppConfigUnitOfWork, WhatsAppConfigUnitOfWork>(
 
 builder.Services.AddScoped<IPhotoEventRepository, PhotoEventRepository>();
 builder.Services.AddScoped<IPhotoEventUnitOfWork, PhotoEventUnitOfWork>();
+
+builder.Services.AddScoped<IUsuarioWhatsAppConfigRepository, UsuarioWhatsAppConfigRepository>();
+builder.Services.AddScoped<IUsuarioWhatsAppConfigUnitOfWork, UsuarioWhatsAppConfigUnitOfWork>();
 
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
@@ -177,6 +181,6 @@ app.MapControllers();
 
 app.Run();
 
-//ToDo: Configurar el nginx para que agarre el SignalR
+//Para probar webhooks de WhatsApp localmente con ngrok
 //Iniciar ngrok con el siguiente comando:
 //ngrok http https://localhost:7141
