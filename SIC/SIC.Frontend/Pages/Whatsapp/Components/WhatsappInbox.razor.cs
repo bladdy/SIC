@@ -12,6 +12,9 @@ public partial class WhatsappInbox : IAsyncDisposable
 
     [Parameter] public string? EventCode { get; set; } // 🔑 CLAVE
 
+    [Parameter, EditorRequired]
+    public string OwnerPhone { get; set; } = null!;
+
     private List<InboxConversationDto> Inbox = new();
     private string? SelectedPhone;
 
@@ -23,8 +26,14 @@ public partial class WhatsappInbox : IAsyncDisposable
 
     protected override async Task OnParametersSetAsync()
     {
-        Inbox = new();
+        if (string.IsNullOrWhiteSpace(EventCode))
+            return;
+
+        Inbox.Clear();
         SelectedPhone = null;
+
+        // 🔥 UNIRSE AL GRUPO DEL EVENTO
+        await SignalR.JoinEventInbox(OwnerPhone, EventCode);
 
         var response = await Repository.GetAsync<List<InboxConversationDto>>(
             $"/api/whatsapp/webhook/whatsapp/inbox/{EventCode}"
@@ -78,5 +87,8 @@ public partial class WhatsappInbox : IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         SignalR.OnInboxUpdated -= UpdateInbox;
+
+        if (!string.IsNullOrWhiteSpace(EventCode))
+            await SignalR.LeaveEventInbox(OwnerPhone, EventCode);
     }
 }

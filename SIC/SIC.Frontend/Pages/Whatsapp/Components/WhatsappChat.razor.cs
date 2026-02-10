@@ -129,7 +129,7 @@ public partial class WhatsappChat : ComponentBase, IAsyncDisposable
             "/api/whatsapp/chat/send",
             new
             {
-                PhoneNumber = PhoneNumber,
+                PhoneNumber,
                 Message = NewMessage
             }
         );

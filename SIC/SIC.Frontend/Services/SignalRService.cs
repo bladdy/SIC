@@ -81,6 +81,20 @@ public class SignalRService
         }
     }
 
+    public async Task LeaveEventInbox(string ownerPhone, string eventCode)
+    {
+        _phone = ownerPhone;
+        _eventCode = eventCode;
+        if (_connection?.State == HubConnectionState.Connected)
+        {
+            await _connection.SendAsync(
+                "LeaveEventInbox",
+                ownerPhone,
+                eventCode
+            );
+        }
+    }
+
     // 💬 Chat activo
     public async Task JoinChat(string phone, string contactPhone)
     {

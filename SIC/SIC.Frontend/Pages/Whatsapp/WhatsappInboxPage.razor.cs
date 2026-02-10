@@ -12,15 +12,16 @@ public partial class WhatsappInboxPage : IAsyncDisposable
 
     private List<InboxConversationDto> Inbox = new();
     private string? SelectedEventCode;
+    private string? OwnerPhone;
 
     protected override async Task OnInitializedAsync()
     {
         var response = await Repository.GetAsync<WhatsAppManualConfigDto>(
                 "/api/whatsapp/configurar"
             );
+        OwnerPhone = response.Response!.PhoneNumber;
         SignalR.OnInboxUpdated += UpdateInbox;
         await SignalR.StartAsync("https://invboxv-app.com/hubs/whatsapp-chat");
-        await SignalR.JoinEventInbox(response.Response!.PhoneNumber, SelectedEventCode!);
         await LoadInbox();
     }
 
@@ -33,9 +34,21 @@ public partial class WhatsappInboxPage : IAsyncDisposable
         Inbox = response.Response ?? new();
     }
 
-    private void SelectEvent(string eventCode)
+    private async Task SelectEvent(string eventCode)
     {
+        if (SelectedEventCode == eventCode)
+            return;
+
+        // salir del evento anterior
+        if (!string.IsNullOrEmpty(SelectedEventCode))
+        {
+            await SignalR.LeaveEventInbox(OwnerPhone!, SelectedEventCode);
+        }
+
         SelectedEventCode = eventCode;
+
+        // 🔥 unirse al evento correcto
+        await SignalR.JoinEventInbox(OwnerPhone!, eventCode);
     }
 
     /// <summary>
