@@ -1,0 +1,54 @@
+﻿﻿
+@page "/whatsapp/inbox"
+@using SIC.Frontend.Pages.Whatsapp.Components
+
+<div class="wa-container @(SelectedEventCode != null ? "chat-open" : "")">
+
+    <!-- EVENTOS -->
+    <div class="wa-inbox">
+        <div class="wa-inbox-header">
+            Eventos
+        </div>
+
+        <div class="wa-inbox-list">
+            @foreach (var ev in Inbox)
+            {
+                <div @onclick="() => SelectEvent(ev.EventCode!)"
+                     class="wa-inbox-item @(SelectedEventCode == ev.EventCode ? "active" : "")">
+
+                    <div class="wa-avatar">
+                        @ev.EventCode?[^2..]
+                    </div>
+
+                    <div class="wa-text">
+                        <span class="wa-title">@ev.EventCode</span>
+                        <div class="wa-preview">@ev.EventName</div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2">
+                        @if (ev.UnreadCount > 0)
+                        {
+                            <span class="wa-unread-badge">@ev.UnreadCount</span>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- INBOX -->
+    <div class="wa-chat">
+        @if (SelectedEventCode == null)
+        {
+            <div class="wa-empty">
+                Selecciona un evento
+            </div>
+        }
+        else
+        {
+            <WhatsappInbox EventCode="@SelectedEventCode" />
+        }
+    </div>
+
+</div>
+

@@ -1,0 +1,69 @@
+﻿
+<div class="wa-container @(SelectedPhone != null ? "chat-open" : "")">
+    <!-- INBOX -->
+    <div class="wa-inbox">
+        <div class="wa-inbox-header">
+            WhatsApp Inbox
+        </div>
+
+        <div class="wa-inbox-list">
+            @if (Inbox == null || !Inbox.Any())
+            {
+                <div class="wa-empty">No hay conversaciones</div>
+            }
+            else
+            {
+                @foreach (var chat in Inbox)
+                {
+                    <div @onclick="() => SelectChat(chat.PhoneNumber)"
+                         class="wa-inbox-item @(SelectedPhone == chat.PhoneNumber ? "active" : "")">
+
+                        <div class="wa-avatar">
+                            @chat.PhoneNumber[^2..]
+                        </div>
+
+                        <div class="wa-text">
+                            <div class="wa-header-row">
+                                <span class="wa-title">@chat.NameConversation</span>
+
+                                <div class="d-flex align-items-center gap-2">
+                                    @if (chat.UnreadCount > 0)
+                                    {
+                                        <span class="wa-unread-badge">@chat.UnreadCount</span>
+                                    }
+
+                                    <span class="wa-date">
+                                        @chat.LastMessageAt.ToWhatsappDate()
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="wa-preview">
+                                @chat.LastMessage
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+
+    <!-- CHAT -->
+    <div class="wa-chat">
+        @if (SelectedPhone == null)
+        {
+            <div class="wa-empty">Selecciona una conversación</div>
+        }
+        else
+        {
+            <div class="wa-chat-header">
+                <button class="wa-back-btn" @onclick="BackToInbox">←</button>
+                <span>@SelectedPhone</span>
+            </div>
+
+            <div class="wa-chat-body">
+                <WhatsappChat PhoneNumber="@SelectedPhone" />
+            </div>
+        }
+    </div>
+</div>

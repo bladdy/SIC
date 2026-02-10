@@ -7,7 +7,7 @@ using SIC.Frontend.Services;
 using SIC.Shared.DTOs;
 using SIC.Shared.Response;
 
-namespace SIC.Frontend.Pages.Whatsapp;
+namespace SIC.Frontend.Pages.Whatsapp.Components;
 
 public partial class WhatsappChat
     : ComponentBase, IAsyncDisposable
@@ -64,9 +64,22 @@ public partial class WhatsappChat
             );
             return;
         }
-
         Messages = response.Response.Result?.ToList() ?? new();
+        var listMessageId = Messages.Where(m => !string.IsNullOrEmpty(m.MessageId) && m.Direction == "IN" && m.Status != "seen").Select(m => m.MessageId).ToList();
+
+        if (listMessageId.Count > 0)
+        {
+            await MarkMessagesAsyc(listMessageId);
+        }
         await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task MarkMessagesAsyc(List<string> listMessageId)
+    {
+        await Repository.PutAsync("/api/whatsapp/chat/mark-seen", new MarkMessagesAsSeenDto
+        {
+            Psid = listMessageId
+        });
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

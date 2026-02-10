@@ -4,16 +4,13 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
-using SIC.Backend.DTOs;
 using SIC.Frontend.Helpers;
 using SIC.Frontend.Repositories;
-using SIC.Frontend.Shared.Component;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using SIC.Shared.Enums;
 using SIC.Shared.Response;
 using System.Net;
-using static System.Net.WebRequestMethods;
 
 namespace SIC.Frontend.Pages.Events;
 
@@ -22,6 +19,12 @@ public partial class EventsDetails
 {
     // Estados dinámicos por ID
     private int? loadingWhatsappId1;
+
+    private Dictionary<int, bool> SelectedInvitations = new();
+    private bool SelectAll = false;
+    private bool IsSendingMassive = false;
+
+    private bool HasSelectedInvitations = false;
 
     private bool isLoadingWhatsapp = false;
     private int? loadingWhatsappId2;
@@ -498,6 +501,9 @@ public partial class EventsDetails
         {
             await LoadPagesAsync();
         }
+
+        SelectedInvitations = Invitations!
+        .ToDictionary(i => i.Id, _ => false);
     }
 
     private async Task CleanFilterAsync()
@@ -537,6 +543,76 @@ public partial class EventsDetails
 
         Invitations = responseHttp?.Response ?? new List<Invitation>();
         return true;
+    }
+
+    private async Task EnviarInvitacionesMasivas()
+    {
+        var seleccionados = Invitations!
+            .Where(i => SelectedInvitations.TryGetValue(i.Id, out var selected) && selected)
+            .Select(i => i.Code!)
+            .ToList();
+
+        if (!seleccionados.Any())
+            return;
+
+        IsSendingMassive = true;
+
+        var dto = new MasiveSendTemplateDTO
+        {
+            TemplateName = "confirmaciones", // o el que venga de la UI
+            Codes = seleccionados
+        };
+
+        var response = await Repository.PostAsync<object>(
+            "api/whatsapp/enviar-invitacion",
+            dto
+        );
+
+        IsSendingMassive = false;
+
+        if (response.Error)
+        {
+            var msg = await response.GetErrorMessageAsync();
+            await SweetAlertService.FireAsync(
+                "Error",
+                msg,
+                SweetAlertIcon.Error
+            );
+            return;
+        }
+
+        await SweetAlertService.FireAsync(
+            "Envío masivo finalizado",
+            $"Invitaciones enviadas: {seleccionados.Count}",
+            SweetAlertIcon.Success
+        );
+
+        // limpiar selección
+        SelectAll = false;
+        foreach (var key in SelectedInvitations.Keys.ToList())
+            SelectedInvitations[key] = false;
+    }
+
+    private void ToggleSelectAll(bool value)
+    {
+        SelectAll = value;
+
+        foreach (var key in SelectedInvitations.Keys.ToList())
+            SelectedInvitations[key] = value;
+
+        HasSelectedInvitations = value;
+
+        StateHasChanged();
+    }
+
+    private void OnItemSelectionChanged(int id, bool value)
+    {
+        SelectedInvitations[id] = value;
+
+        HasSelectedInvitations = SelectedInvitations.Values.Any(v => v);
+        SelectAll = SelectedInvitations.Values.All(v => v);
+
+        StateHasChanged();
     }
 
     private async Task LoadPagesAsync()

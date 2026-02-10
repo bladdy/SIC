@@ -1,41 +1,226 @@
 ﻿@page "/whatsapp/config"
+@using SIC.Shared.DTOs
+<div class="d-none">
+    <button
+        style="background-color: #1877f2; border: 0; border-radius: 4px; color: #fff; cursor: pointer; font-family: Helvetica, Arial, sans-serif; font-size: 16px; font-weight: bold; height: 40px; padding: 0 24px;" @onclick ="LoginWhatsApp">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-brand-facebook"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3" /></svg>
+        Conectar WhatsApp
+    </button>
 
-<h3>WhatsappConfigPage</h3>
+    <button style="background-color:#dc3545;border:0;border-radius:4px;color:#fff;
+    cursor:pointer;font-family:Helvetica,Arial,sans-serif;
+    font-size:14px;font-weight:bold;height:36px;padding:0 20px;
+    margin-left:10px;"
+            @onclick="LogoutWhatsApp">
+        Desloguear Meta
+    </button>
 
-<button
-    style="background-color: #1877f2; border: 0; border-radius: 4px; color: #fff; cursor: pointer; font-family: Helvetica, Arial, sans-serif; font-size: 16px; font-weight: bold; height: 40px; padding: 0 24px;" @onclick ="LoginWhatsApp">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-brand-facebook"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3" /></svg>
-    Conectar WhatsApp
-</button>
+</div>
 
-<button style="background-color:#dc3545;border:0;border-radius:4px;color:#fff;
-cursor:pointer;font-family:Helvetica,Arial,sans-serif;
-font-size:14px;font-weight:bold;height:36px;padding:0 20px;
-margin-left:10px;"
-        @onclick="LogoutWhatsApp">
-    Desloguear Meta
-</button>
+<EditForm Model="@Model" OnValidSubmit="GuardarConfiguracion">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
 
-@inject IJSRuntime JS
-@inject IConfiguration Configuration
+    <div class="card p-4 shadow-sm mb-4">
+        <h5 class="mb-3">
+            <i class="bi bi-whatsapp text-success"></i>
+            Configuración manual de WhatsApp
+        </h5>
 
-@code {
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            var appId = Configuration["Facebook:AppId"];// Obtém o App ID do Facebook de la base de datos
-            await JS.InvokeVoidAsync("initFacebookSdk", appId);
-        }
-    }
-    private async Task LoginWhatsApp()
-    {
-        var config_id = Configuration["Facebook:configId3"];// Obtém o config_id de la base de datos
-        await JS.InvokeVoidAsync("whatsappEmbeddedSignup", config_id);
-    }
-    private async Task LogoutWhatsApp()
-    {
-        await JS.InvokeVoidAsync("logoutFacebook");
+        <!-- Business ID (opcional) -->
+        <div class="mb-3">
+            <label class="form-label">
+                Business ID (opcional)
+            </label>
 
-    }
-}
+            <InputText class="form-control"
+                       @bind-Value="Model.BusinessId"
+                       placeholder="Ej: 123456789012345" />
+        </div>
+
+        <!-- WABA ID (requerido) -->
+        <div class="mb-3">
+            <label class="form-label">
+                WABA ID <span class="text-danger">*</span>
+            </label>
+
+            <InputText class="form-control"
+                       @bind-Value="Model.WabaId"
+                       placeholder="WhatsApp Business Account ID" />
+
+            <ValidationMessage For="@(() => Model.WabaId)" />
+        </div>
+
+        <!-- Phone Number ID (requerido) -->
+        <div class="mb-3">
+            <label class="form-label">
+                Phone Number ID <span class="text-danger">*</span>
+            </label>
+
+            <InputText class="form-control"
+                       @bind-Value="Model.PhoneNumberId"
+                       placeholder="ID del número en Meta" />
+
+            <ValidationMessage For="@(() => Model.PhoneNumberId)" />
+        </div>
+
+        <!-- Phone Number (requerido) -->
+        <div class="mb-3">
+            <label class="form-label">
+                Número de WhatsApp <span class="text-danger">*</span>
+            </label>
+
+            <InputText class="form-control"
+                       @bind-Value="Model.PhoneNumber"
+                       placeholder="525512345678" />
+
+            <ValidationMessage For="@(() => Model.PhoneNumber)" />
+        </div>
+
+        <!-- Access Token (requerido) -->
+        <div class="mb-3">
+            <label class="form-label">
+                Access Token permanente <span class="text-danger">*</span>
+            </label>
+
+            <div class="input-group">
+                <InputText class="form-control"
+                           type="@TokenInputType"
+                           @bind-Value="Model.AccessToken"
+                           placeholder="EAAJZC..." />
+
+                <button type="button"
+                        class="btn btn-custom"
+                        @onclick="ToggleToken">
+                    <i class="bi @(ShowToken ? "bi-eye-slash" : "bi-eye")"></i>
+                </button>
+            </div>
+
+            <ValidationMessage For="@(() => Model.AccessToken)" />
+        </div>
+
+        <!-- Botón Guardar -->
+        <button class="btn btn-custom"
+                disabled="@IsSaving">
+            @if (IsSaving)
+            {
+                <span class="spinner-border spinner-border-sm"></span>
+                <span class="ms-2">Guardando...</span>
+            }
+            else
+            {
+                <i class="bi bi-save"></i>
+                <span class="ms-2">Guardar configuración</span>
+            }
+        </button>
+    </div>
+</EditForm>
+
+
+<div class="card mb-4 shadow-sm">
+    <div class="card-body text-center">
+        <h3 class="card-title mb-2">
+            ¡Tu bandeja de entrada está lista!
+        </h3>
+
+        <p>
+            Ahora puedes comunicarte con los invitados de tus eventos a través de tu nuevo número de WhatsApp,
+            responder sus inquietudes y gestionar las conversaciones directamente desde la aplicación.
+            <br /><br />
+            Para completar la integración, es necesario configurar la <strong>URL del Webhook</strong> y el
+            <strong>Token de verificación</strong> en el portal de <strong>Facebook Developers</strong>,
+            utilizando los valores que se muestran a continuación.
+            <br /><br />
+            Esta configuración permitirá recibir mensajes, confirmaciones y notificaciones en tiempo real
+            relacionadas con tus eventos.
+        </p>
+        <div class="mb-3">
+            <label class="form-label">Webhook URL</label>
+
+            <div class="input-group">
+                <InputText class="form-control"
+                           @bind-Value="Model.WebhookUrl"
+                           readonly />
+
+                <button type="button"
+                        class="btn btn-custom"
+                        title="Copiar"
+                        @onclick="() => CopyToClipboard(Model.WebhookUrl)">
+                    <i class="bi bi-clipboard"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Webhook Verification Token</label>
+
+            <div class="input-group">
+                <InputText class="form-control"
+                           @bind-Value="Model.WebhookVerificationToken"
+                           placeholder="MiTokenSeguro123"
+                           readonly />
+
+                <button type="button"
+                        class="btn btn-custom"
+                        title="Copiar"
+                        @onclick="() => CopyToClipboard(Model.WebhookVerificationToken)">
+                    <i class="bi bi-clipboard"></i>
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+    <div class="card-body">
+        <h3 class="card-title mb-2">
+            <i class="bi bi-whatsapp me-2 text-success"></i>
+            Configuración de WhatsApp
+        </h3>
+
+        <p class="text-muted mb-3">
+            Configura los datos necesarios para integrar WhatsApp Cloud API con tu aplicación.
+            Estos valores se obtienen desde el panel de desarrolladores de Meta y permiten
+            autenticar tu número, recibir y enviar mensajes.
+        </p>
+
+        <ul class="list-unstyled small">
+            <li class="mb-2">
+                <strong>🔐 Access Token permanente:</strong><br />
+                Token usado para autenticar las peticiones a la API de WhatsApp.<br />
+                <a href="https://developers.facebook.com/docs/whatsapp/cloud-api/get-started"
+                   target="_blank">
+                    Ver documentación
+                </a>
+            </li>
+
+            <li class="mb-2">
+                <strong>📞 Phone Number ID:</strong><br />
+                Identificador del número registrado en WhatsApp Cloud API.<br />
+                <a href="https://developers.facebook.com/docs/whatsapp/cloud-api/phone-numbers"
+                   target="_blank">
+                    Dónde encontrarlo
+                </a>
+            </li>
+
+            <li class="mb-2">
+                <strong>🌐 Webhook URL:</strong><br />
+                Endpoint público que recibirá los eventos de WhatsApp (mensajes, estados, etc).<br />
+                <a href="https://developers.facebook.com/docs/whatsapp/cloud-api/webhooks"
+                   target="_blank">
+                    Configurar Webhooks
+                </a>
+            </li>
+
+            <li>
+                <strong>🪪 Webhook Verification Token:</strong><br />
+                Token definido por ti para validar el webhook durante la configuración inicial.<br />
+                <a href="https://developers.facebook.com/docs/graph-api/webhooks/getting-started"
+                   target="_blank">
+                    Cómo funciona la verificación
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>

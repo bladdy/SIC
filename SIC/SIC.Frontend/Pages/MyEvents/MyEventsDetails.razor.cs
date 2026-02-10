@@ -1,13 +1,10 @@
-﻿//@page "/my-events/details/{Code}"
-using CurrieTechnologies.Razor.SweetAlert2;
+﻿using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using SIC.Frontend.Helpers;
-using SIC.Frontend.Pages.Message;
 using SIC.Frontend.Repositories;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
@@ -23,6 +20,13 @@ public partial class MyEventsDetails
     // Estados dinámicos por ID
     private int? loadingWhatsappId1;
 
+    private Dictionary<int, bool> SelectedInvitations = new();
+    private bool SelectAll = false;
+    private bool IsSendingMassive = false;
+
+    private bool HasSelectedInvitations = false;
+
+    private bool isLoadingWhatsapp = false;
     private int? loadingWhatsappId2;
     private int? copyingId1;
     private int? copyingId2;
@@ -91,7 +95,43 @@ public partial class MyEventsDetails
 
     private void NavegateToMessage()
     {
-        NavigationManager.NavigateTo($"/events/message-my-events/{EventDetail!.Code}");
+        NavigationManager.NavigateTo($"/events/message-events/{EventDetail!.Code}");
+    }
+
+    private void AddGuest()
+    {
+        //Cuando le de a agregar actualiza el contador de NumberAdults y hacer un changed en el select cuando se cambie el tipo de invitado
+        NewInvitation.Guests ??= new List<InvitationGuest>();
+
+        NewInvitation.Guests.Add(new InvitationGuest
+        {
+            GuestName = null,           // permitido
+            GuestType = GuestType.Adult,
+            InvitationId = NewInvitation.Id,
+            Invitation = null,
+
+            // SIEMPRE null para evitar validaciones
+        });
+        UpdateGuestCounters(NewInvitation.Guests);
+    }
+
+    // Método para manejar el cambio de tipo de invitado
+    private void OnGuestTypeChanged()
+    {
+        UpdateGuestCounters(NewInvitation.Guests);
+    }
+
+    private void UpdateGuestCounters(ICollection<InvitationGuest> guests)
+    {
+        NewInvitation.NumberAdults = guests.Count(g => g.GuestType == GuestType.Adult);
+        NewInvitation.NumberYouths = guests.Count(g => g.GuestType == GuestType.Youth);
+        NewInvitation.NumberChildren = guests.Count(g => g.GuestType == GuestType.Children);
+    }
+
+    private void RemoveGuest(InvitationGuest guest)
+    {
+        NewInvitation.Guests.Remove(guest);
+        UpdateGuestCounters(NewInvitation.Guests);
     }
 
     private void ShowEditModal(Invitation invitation)
@@ -124,12 +164,6 @@ public partial class MyEventsDetails
     private void CloseModal()
     {
         IsModalVisible = false;
-    }
-
-    private void RemoveGuest(InvitationGuest guest)
-    {
-        NewInvitation.Guests.Remove(guest);
-        UpdateGuestCounters(NewInvitation.Guests);
     }
 
     private async Task DeleteInvitation()
@@ -226,35 +260,6 @@ public partial class MyEventsDetails
         await LoadInvitations();
     }
 
-    private void AddGuest()
-    {
-        //Cuando le de a agregar actualiza el contador de NumberAdults y hacer un changed en el select cuando se cambie el tipo de invitado
-        NewInvitation.Guests ??= new List<InvitationGuest>();
-
-        NewInvitation.Guests.Add(new InvitationGuest
-        {
-            GuestName = null,           // permitido
-            GuestType = GuestType.Adult,
-            InvitationId = NewInvitation.Id,
-            Invitation = null,
-
-            // SIEMPRE null para evitar validaciones
-        });
-        UpdateGuestCounters(NewInvitation.Guests);
-    }
-
-    private void OnGuestTypeChanged()
-    {
-        UpdateGuestCounters(NewInvitation.Guests);
-    }
-
-    private void UpdateGuestCounters(ICollection<InvitationGuest> guests)
-    {
-        NewInvitation.NumberAdults = guests.Count(g => g.GuestType == GuestType.Adult);
-        NewInvitation.NumberYouths = guests.Count(g => g.GuestType == GuestType.Youth);
-        NewInvitation.NumberChildren = guests.Count(g => g.GuestType == GuestType.Children);
-    }
-
     private async Task DescargarExcel()
     {
         try
@@ -273,6 +278,33 @@ public partial class MyEventsDetails
         }
     }
 
+    private async Task EnviarInvitacion(string code)
+    {
+        try
+        {
+            isLoadingWhatsapp = true;
+            var responseHttp = await Repository.PostAsync<WhatsAppApiResponse>($"api/whatsapp/enviar-invitacion/{code}");
+
+            if (responseHttp.Error)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                var errorMessage = JsonConvert.DeserializeObject<WhatsAppApiError>(message!);
+                await SweetAlertService.FireAsync("Error", errorMessage!.error.message, SweetAlertIcon.Error);
+                return;
+            }
+            await SweetAlertService.FireAsync("Éxito", "Invitación enviada correctamente", SweetAlertIcon.Success);
+        }
+        catch (Exception ex)
+        {
+            await SweetAlertService.FireAsync("Error", "Algo ocurrio, intentalo más tarde", SweetAlertIcon.Error);
+            return;
+        }
+        finally
+        {
+            isLoadingWhatsapp = false;
+        }
+    }
+
     private async Task AbrirWhatsapp(string phoneNumber, string code, int invitationId, int column)
     {
         string mensaje;
@@ -284,6 +316,7 @@ public partial class MyEventsDetails
         {
             loadingWhatsappId2 = invitationId;
         }
+
         var responseHttp = await Repository.GetAsync<SIC.Shared.Entities.Message>($"api/Messages/byCode/{Code}/{code}");
 
         if (responseHttp.Error)
@@ -468,6 +501,9 @@ public partial class MyEventsDetails
         {
             await LoadPagesAsync();
         }
+
+        SelectedInvitations = Invitations!
+        .ToDictionary(i => i.Id, _ => false);
     }
 
     private async Task CleanFilterAsync()
@@ -509,6 +545,76 @@ public partial class MyEventsDetails
         return true;
     }
 
+    private async Task EnviarInvitacionesMasivas()
+    {
+        var seleccionados = Invitations!
+            .Where(i => SelectedInvitations.TryGetValue(i.Id, out var selected) && selected)
+            .Select(i => i.Code!)
+            .ToList();
+
+        if (!seleccionados.Any())
+            return;
+
+        IsSendingMassive = true;
+
+        var dto = new MasiveSendTemplateDTO
+        {
+            TemplateName = "confirmaciones", // o el que venga de la UI
+            Codes = seleccionados
+        };
+
+        var response = await Repository.PostAsync<object>(
+            "api/whatsapp/enviar-invitacion",
+            dto
+        );
+
+        IsSendingMassive = false;
+
+        if (response.Error)
+        {
+            var msg = await response.GetErrorMessageAsync();
+            await SweetAlertService.FireAsync(
+                "Error",
+                msg,
+                SweetAlertIcon.Error
+            );
+            return;
+        }
+
+        await SweetAlertService.FireAsync(
+            "Envío masivo finalizado",
+            $"Invitaciones enviadas: {seleccionados.Count}",
+            SweetAlertIcon.Success
+        );
+
+        // limpiar selección
+        SelectAll = false;
+        foreach (var key in SelectedInvitations.Keys.ToList())
+            SelectedInvitations[key] = false;
+    }
+
+    private void ToggleSelectAll(bool value)
+    {
+        SelectAll = value;
+
+        foreach (var key in SelectedInvitations.Keys.ToList())
+            SelectedInvitations[key] = value;
+
+        HasSelectedInvitations = value;
+
+        StateHasChanged();
+    }
+
+    private void OnItemSelectionChanged(int id, bool value)
+    {
+        SelectedInvitations[id] = value;
+
+        HasSelectedInvitations = SelectedInvitations.Values.Any(v => v);
+        SelectAll = SelectedInvitations.Values.All(v => v);
+
+        StateHasChanged();
+    }
+
     private async Task LoadPagesAsync()
     {
         var url = $"api/Invitations/totalRecords?Id={EventDetail!.Id}";
@@ -544,45 +650,6 @@ public partial class MyEventsDetails
             return;
         }
         EventDetail = responseHttp?.Response;
-    }
-
-    private async Task EnviarInvitacion(string phoneNumber, string code, int invitationId, int column)
-    {
-        try
-        {
-            if (column == 1)
-            {
-                loadingWhatsappId1 = invitationId;
-                copyingId1 = null;
-            }
-            else
-            {
-                loadingWhatsappId2 = invitationId;
-                copyingId2 = null;
-            }
-            var responseHttp = await Repository.PostAsync<WhatsAppApiResponse>($"api/whatsapp/enviar-invitacion/{code}");
-
-            if (responseHttp.Error)
-            {
-                var message = await responseHttp.GetErrorMessageAsync();
-                var errorMessage = JsonConvert.DeserializeObject<WhatsAppApiError>(message!);
-                await SweetAlertService.FireAsync("Error", errorMessage!.error.message, SweetAlertIcon.Error);
-                return;
-            }
-            await SweetAlertService.FireAsync("Éxito", "Invitación enviada correctamente", SweetAlertIcon.Success);
-        }
-        catch (Exception ex)
-        {
-            await SweetAlertService.FireAsync("Error", "Algo ocurrio, intentalo más tarde", SweetAlertIcon.Error);
-            return;
-        }
-        finally
-        {
-            if (column == 1)
-                loadingWhatsappId1 = null;
-            else
-                loadingWhatsappId2 = null;
-        }
     }
 
     private async Task FilterCallBack(string filter)

@@ -23,7 +23,9 @@ public static class DateTimeExtensions
         var yesterday = today.AddDays(-1);
 
         if (date.Date == today)
-            return date.ToString("HH:mm");
+            return date
+            .ToLocalTime()
+            .ToString("hh:mm tt");
 
         if (date.Date == yesterday)
             return "Ayer";
