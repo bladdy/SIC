@@ -7,7 +7,7 @@ public class SignalRService
 {
     private HubConnection? _connection;
 
-    private string? _phone;
+    private string? _ownerPhone;
     private string? _eventCode;
     private string? _chatContact;
 
@@ -17,7 +17,8 @@ public class SignalRService
 
     public async Task StartAsync(string hubUrl)
     {
-        if (_connection != null)
+        if (_connection != null &&
+            _connection.State == HubConnectionState.Connected)
             return;
 
         _connection = new HubConnectionBuilder()
@@ -38,44 +39,44 @@ public class SignalRService
         // 🔁 Rejoin automático después de reconectar
         _connection.Reconnected += async _ =>
         {
-            if (_phone != null)
-                await JoinPhoneInbox(_phone);
+            if (_connection.State != HubConnectionState.Connected)
+                return;
 
-            if (_phone != null && _eventCode != null)
-                await JoinEventInbox(_phone, _eventCode);
+            if (!string.IsNullOrEmpty(_ownerPhone) &&
+                !string.IsNullOrEmpty(_eventCode))
+            {
+                await _connection.InvokeAsync(
+                    "JoinEventInbox",
+                    _ownerPhone,
+                    _eventCode
+                );
+            }
 
-            if (_phone != null && _chatContact != null)
-                await JoinChat(_phone, _chatContact);
+            if (!string.IsNullOrEmpty(_ownerPhone) &&
+                !string.IsNullOrEmpty(_chatContact))
+            {
+                await _connection.InvokeAsync(
+                    "JoinChat",
+                    _ownerPhone,
+                    _chatContact
+                );
+            }
         };
 
         await _connection.StartAsync();
     }
 
-    // 📥 Inbox general del número
-    public async Task JoinPhoneInbox(string phone)
-    {
-        _phone = phone;
-
-        if (_connection?.State == HubConnectionState.Connected)
-        {
-            await _connection.InvokeAsync(
-                "JoinPhoneInbox",
-                phone
-            );
-        }
-    }
-
     // 📥 Inbox por evento
-    public async Task JoinEventInbox(string phone, string eventCode)
+    public async Task JoinEventInbox(string ownerPhone, string eventCode)
     {
-        _phone = phone;
+        _ownerPhone = ownerPhone;
         _eventCode = eventCode;
 
         if (_connection?.State == HubConnectionState.Connected)
         {
             await _connection.InvokeAsync(
                 "JoinEventInbox",
-                phone,
+                ownerPhone,
                 eventCode
             );
         }
@@ -83,11 +84,12 @@ public class SignalRService
 
     public async Task LeaveEventInbox(string ownerPhone, string eventCode)
     {
-        _phone = ownerPhone;
-        _eventCode = eventCode;
+        if (_eventCode == eventCode)
+            _eventCode = null;
+
         if (_connection?.State == HubConnectionState.Connected)
         {
-            await _connection.SendAsync(
+            await _connection.InvokeAsync(
                 "LeaveEventInbox",
                 ownerPhone,
                 eventCode
@@ -96,30 +98,31 @@ public class SignalRService
     }
 
     // 💬 Chat activo
-    public async Task JoinChat(string phone, string contactPhone)
+    public async Task JoinChat(string ownerPhone, string contactPhone)
     {
-        _phone = phone;
+        _ownerPhone = ownerPhone;
         _chatContact = contactPhone;
 
         if (_connection?.State == HubConnectionState.Connected)
         {
             await _connection.InvokeAsync(
                 "JoinChat",
-                phone,
+                ownerPhone,
                 contactPhone
             );
         }
     }
 
-    public async Task LeaveChat(string phone, string contactPhone)
+    public async Task LeaveChat(string ownerPhone, string contactPhone)
     {
-        _chatContact = null;
+        if (_chatContact == contactPhone)
+            _chatContact = null;
 
         if (_connection?.State == HubConnectionState.Connected)
         {
             await _connection.InvokeAsync(
                 "LeaveChat",
-                phone,
+                ownerPhone,
                 contactPhone
             );
         }
@@ -133,5 +136,9 @@ public class SignalRService
             await _connection.DisposeAsync();
             _connection = null;
         }
+
+        _ownerPhone = null;
+        _eventCode = null;
+        _chatContact = null;
     }
 }

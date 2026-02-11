@@ -98,71 +98,80 @@ namespace SIC.Backend.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> SendMessage([FromBody] SendWhatsappMessageDto dto)
         {
-            try
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var config = await _whatsAppConfigUnitOfWork.GetByUserIdAsync(userId);
+            if (!config.Success)
+                return BadRequest("Este usuario no tiene permisos para hacer este envio");
+
+            var ownerPhone = config.Result!.PhoneNumber;
+            var phoneNumberId = config.Result!.PhoneNumberId;
+            var accessToken = config.Result!.AccessToken;
+
+            // 1️⃣ Enviar a WhatsApp
+            var wamid = await _whatsAppService.SendTextMessageAsync(
+                accessToken!,
+                phoneNumberId!,
+                dto
+            );
+
+            if (wamid == null)
+                return BadRequest("No se pudo enviar el mensaje");
+
+            // 2️⃣ Guardar mensaje
+            var message = new WhatsappIncomingMessageDto
             {
-                // Extraer el ID del usuario autenticado desde el token JWT
-                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                var userWhatsAppConfig = await _whatsAppConfigUnitOfWork.GetByUserIdAsync(userId);
-                if (!userWhatsAppConfig.Success)
-                    return BadRequest(new { error = "Este usuario no tiene permisos para hacer este envio" });
+                PhoneNumber = ownerPhone,
+                From = dto.PhoneNumber,
+                MessageId = wamid,
+                Text = dto.Message,
+                Type = "text",
+                Direction = "OUT",
+                Status = "sent",
+                Timestamp = DateTime.UtcNow
+            };
 
-                //obtener los datos del usuario
-                var accessToken = userWhatsAppConfig.Result!.AccessToken;
-                var phoneNumberId = userWhatsAppConfig.Result!.PhoneNumberId;
-                var phoneNumber = userWhatsAppConfig.Result!.PhoneNumber;
-                var wamid = await _whatsAppService.SendTextMessageAsync(
-                accessToken!, phoneNumberId!, dto);
+            var save = await _messageUnitOfWork.AddReceiveMessages(message);
+            if (!save.Success)
+                return BadRequest("No se pudo guardar el mensaje");
 
-                if (wamid == null)
-                    return NotFound();
+            // 3️⃣ Obtener evento de la conversación
+            var conversation = await _messageUnitOfWork.GetConversationAsync(dto.PhoneNumber);
+            var eventCode = conversation.Result!.LastOrDefault()!.EventCode;
 
-                var messageDto = new WhatsappIncomingMessageDto
-                {
-                    PhoneNumber = phoneNumber,
-                    MessageId = wamid,
-                    From = dto.PhoneNumber,
-                    Text = dto.Message,
-                    Type = "text",
-                    ReplyToMessageId = wamid,
-                    Direction = "OUT",
-                    Status = "sent"
-                };
-
-                var response = await _messageUnitOfWork
-                .AddReceiveMessages(messageDto);
-
-                if (!response.Success)
-                    return BadRequest("No se pudo enviar el mensaje");
-
-                await _hub.Clients.All.SendAsync(
-               "InboxUpdated",
+            // 4️⃣ 🔔 Notificar inbox SOLO del evento correcto
+            await _hub.Clients
+                .Group(SignalRGroups.EventInbox(ownerPhone, eventCode))
+                .SendAsync(
+                    "InboxUpdated",
                     new InboxConversationDto
                     {
+                        EventCode = eventCode,
                         PhoneNumber = dto.PhoneNumber,
                         LastMessage = dto.Message,
                         LastMessageAt = DateTime.UtcNow,
-                        UnreadCount = 1
+                        UnreadCount = 0 // 🔥 es OUT
                     }
                 );
 
-                // 6️⃣ Enviar mensaje SOLO al chat abierto
-                await _hub.Clients.Group(dto.PhoneNumber).SendAsync(
+            // 5️⃣ 💬 Notificar chat SOLO si está abierto
+            await _hub.Clients
+                .Group(SignalRGroups.Chat(ownerPhone, dto.PhoneNumber))
+                .SendAsync(
                     "NewMessage",
                     new RealtimeChatMessageDto
                     {
+                        MessageId = wamid,
                         PhoneNumber = dto.PhoneNumber,
                         Direction = "OUT",
                         MessageType = "text",
                         Content = dto.Message,
-                        Timestamp = DateTime.UtcNow
+                        Timestamp = DateTime.UtcNow,
+                        Status = "sent"
                     }
                 );
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+
+            return Ok();
         }
     }
 }

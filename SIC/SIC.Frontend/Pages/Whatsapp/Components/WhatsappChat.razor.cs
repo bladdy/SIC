@@ -83,21 +83,21 @@ public partial class WhatsappChat : ComponentBase, IAsyncDisposable
 
         if (unseenIds.Count > 0)
         {
-            await MarkMessagesAsync(unseenIds);
+            MarkMessagesAsync(unseenIds);
         }
 
         await InvokeAsync(StateHasChanged);
     }
 
-    private async Task MarkMessagesAsync(List<string> messageIds)
+    private void MarkMessagesAsync(List<string> messageIds)
     {
-        await Repository.PutAsync(
-            "/api/whatsapp/chat/mark-seen",
-            new MarkMessagesAsSeenDto
-            {
-                Psid = messageIds
-            }
-        );
+        Repository.PutAsync(
+           "/api/whatsapp/chat/mark-seen",
+           new MarkMessagesAsSeenDto
+           {
+               Psid = messageIds
+           }
+       );
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -129,16 +129,33 @@ public partial class WhatsappChat : ComponentBase, IAsyncDisposable
         if (string.IsNullOrWhiteSpace(NewMessage))
             return;
 
+        var messageText = NewMessage;
+
+        // 🔥 1️⃣ Pintar inmediatamente el mensaje en el chat
+        var tempMessage = new RealtimeChatMessageDto
+        {
+            PhoneNumber = PhoneNumber,
+            Direction = "OUT",
+            MessageType = "text",
+            Content = messageText,
+            Timestamp = DateTime.UtcNow,
+            Status = "sending"
+        };
+
+        Messages.Add(tempMessage);
+        await InvokeAsync(StateHasChanged);
+
+        NewMessage = string.Empty;
+
+        // 🔥 2️⃣ Enviar al backend
         await Repository.PostAsync(
             "/api/whatsapp/chat/send",
             new
             {
                 PhoneNumber,
-                Message = NewMessage
+                Message = messageText
             }
         );
-
-        NewMessage = string.Empty;
     }
 
     public async ValueTask DisposeAsync()
