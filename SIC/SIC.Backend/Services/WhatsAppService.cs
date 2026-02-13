@@ -1,11 +1,10 @@
-﻿using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
-using Newtonsoft.Json;
-using PdfSharpCore.Pdf.Content.Objects;
+﻿using Newtonsoft.Json;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using SIC.Shared.Response;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 
 namespace SIC.Backend.Services
 {
@@ -18,6 +17,162 @@ namespace SIC.Backend.Services
             _httpClient = new HttpClient();
         }
 
+        //Dinamico
+
+        public async Task<ActionResponse<WhatsAppMessageResponse>> EnviarTemplateDinamicoAsync(
+            string accessToken,
+            string phoneNumberId,
+            string numeroDestino,
+            string templateName,
+            string languageCode,
+            List<TemplateComponentRequest> components)
+        {
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", accessToken);
+
+                var templateComponents = new List<object>();
+
+                foreach (var component in components)
+                {
+                    // 🔥 BUTTON
+                    if (component.Type == "button")
+                    {
+                        var buttonParams = new List<object>();
+
+                        if (component.Parameters != null)
+                        {
+                            foreach (var p in component.Parameters)
+                            {
+                                buttonParams.Add(new
+                                {
+                                    type = "text",
+                                    text = p.Text
+                                });
+                            }
+                        }
+
+                        templateComponents.Add(new
+                        {
+                            type = "button",
+                            sub_type = component.SubType,
+                            index = component.Index?.ToString(),
+                            parameters = buttonParams
+                        });
+
+                        continue;
+                    }
+
+                    // 🔥 HEADER o BODY
+                    var parametersList = new List<object>();
+
+                    if (component.Parameters != null)
+                    {
+                        foreach (var p in component.Parameters)
+                        {
+                            if (p.Type == "text")
+                            {
+                                parametersList.Add(new
+                                {
+                                    type = "text",
+                                    text = p.Text
+                                });
+                            }
+                            else if (p.Type == "image")
+                            {
+                                parametersList.Add(new
+                                {
+                                    type = "image",
+                                    image = new { link = p.Link }
+                                });
+                            }
+                            else if (p.Type == "video")
+                            {
+                                parametersList.Add(new
+                                {
+                                    type = "video",
+                                    video = new { link = p.Link }
+                                });
+                            }
+                            else if (p.Type == "document")
+                            {
+                                parametersList.Add(new
+                                {
+                                    type = "document",
+                                    document = new { link = p.Link }
+                                });
+                            }
+                        }
+                    }
+
+                    templateComponents.Add(new
+                    {
+                        type = component.Type,
+                        parameters = parametersList
+                    });
+                }
+
+                var payload = new
+                {
+                    messaging_product = "whatsapp",
+                    to = numeroDestino,
+                    type = "template",
+                    template = new
+                    {
+                        name = templateName,
+                        language = new { code = languageCode },
+                        components = templateComponents
+                    }
+                };
+
+                var jsonPayload = JsonConvert.SerializeObject(
+                    payload,
+                    new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }
+                );
+
+                var response = await _httpClient.PostAsync(
+                    $"https://graph.facebook.com/v22.0/{phoneNumberId}/messages",
+                    new StringContent(jsonPayload, Encoding.UTF8, "application/json")
+                );
+
+                var json = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return new ActionResponse<WhatsAppMessageResponse>
+                    {
+                        Success = false,
+                        Message = json
+                    };
+                }
+
+                var apiResponse = JsonConvert.DeserializeObject<WhatsAppApiResponse>(json);
+
+                return new ActionResponse<WhatsAppMessageResponse>
+                {
+                    Success = true,
+                    Result = new WhatsAppMessageResponse
+                    {
+                        Wamid = apiResponse!.Messages.First().Id,
+                        NumeroDestino = numeroDestino,
+                        TemplateName = templateName,
+                        Contact = apiResponse.Contacts.First().WaId
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ActionResponse<WhatsAppMessageResponse>
+                {
+                    Success = false,
+                    Message = ex.Message
+                };
+            }
+        }
+
+        //Estatico
         public async Task<ActionResponse<WhatsAppMessageResponse>> EnviarInvitacionAsync(
             string accessToken,
             string phoneNumberId,

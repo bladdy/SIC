@@ -66,6 +66,7 @@ builder.Services.AddScoped<WhatsAppService>();
 builder.Services.AddScoped<BoletaService>();
 builder.Services.AddScoped<FtpStorageService>();
 builder.Services.AddScoped<MetaAuthService>();
+builder.Services.AddScoped<IWhatsAppTemplateBuilderService, WhatsAppTemplateBuilderService>();
 
 // Inyeccion de dependencias gen�rica
 
@@ -110,6 +111,9 @@ builder.Services.AddScoped<IPhotoEventUnitOfWork, PhotoEventUnitOfWork>();
 
 builder.Services.AddScoped<IUsuarioWhatsAppConfigRepository, UsuarioWhatsAppConfigRepository>();
 builder.Services.AddScoped<IUsuarioWhatsAppConfigUnitOfWork, UsuarioWhatsAppConfigUnitOfWork>();
+
+builder.Services.AddScoped<IWhatsAppTemplateRepository, WhatsAppTemplateRepository>();
+builder.Services.AddScoped<IWhatsAppTemplateUnitOfWork, WhatsAppTemplateUnitOfWork>();
 
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {

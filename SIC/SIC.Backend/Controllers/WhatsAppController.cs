@@ -10,6 +10,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using SIC.Shared.Entities;
+using SIC.Backend.Repositories.Interfaces;
 
 namespace SIC.Backend.Controllers
 {
@@ -21,15 +22,19 @@ namespace SIC.Backend.Controllers
         private readonly IWhatsAppConfigUnitOfWork _whatsAppConfigUnitOfWork;
         private readonly IInvitationUnitOfWork _invitationUnitOfWork;
         private readonly IMessageUnitOfWork _iMessageUnitOfWork;
+        private readonly IWhatsAppTemplateBuilderService _templateBuilderService;
+        private readonly IWhatsAppTemplateRepository _templateRepository;
 
         public WhatsAppController(
-            WhatsAppService whatsAppService, IInvitationUnitOfWork invitationUnitOfWork,
+            WhatsAppService whatsAppService, IInvitationUnitOfWork invitationUnitOfWork, IWhatsAppTemplateBuilderService templateBuilderService, IWhatsAppTemplateRepository templateRepository,
             IWhatsAppConfigUnitOfWork whatsAppConfigUnitOfWork, IMessageUnitOfWork iMessageUnitOfWork)
         {
             _whatsAppService = whatsAppService;
+            _templateBuilderService = templateBuilderService;
             _whatsAppConfigUnitOfWork = whatsAppConfigUnitOfWork;
             _invitationUnitOfWork = invitationUnitOfWork;
             _iMessageUnitOfWork = iMessageUnitOfWork;
+            _templateRepository = templateRepository;
         }
 
         //ToDo:Agregar una tabla para ver si se envio o no la invitacion, para evitar enviar varias veces la misma invitacion a un mismo numero, y agregar un campo de fecha de envio para llevar un control de cuando se envio la invitacion
@@ -120,6 +125,104 @@ namespace SIC.Backend.Controllers
 
                     // ⏱️ DELAY ANTI BLOQUEO (RECOMENDADO)
                     await Task.Delay(1200); // 1.2 segundos
+                }
+                catch (Exception ex)
+                {
+                    fallidos++;
+                    errores.Add(new { Code = code, Error = ex.Message });
+                }
+            }
+
+            return Ok(new
+            {
+                success = true,
+                enviados,
+                fallidos,
+                total = sendTemplateDTO.Codes.Count,
+                errores
+            });
+        }
+
+        [HttpGet("get-templates")]
+        public async Task<IActionResult> GetTemplates()
+        {
+            var templates = await _templateRepository.GetAllAsync();
+            return Ok(templates.Result);
+        }
+
+        [HttpPost("enviar-invitacion-dina")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(Roles = "Admin,WeddingPlanner,User")]
+        public async Task<IActionResult> EnviarInvitacionMasivaTemplateDinamica(
+            [FromBody] MasiveSendTemplateDTO sendTemplateDTO)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return BadRequest(new { error = "Usuario no autenticado" });
+
+            var userWhatsAppConfig = await _whatsAppConfigUnitOfWork.GetByUserIdAsync(userId);
+            if (!userWhatsAppConfig.Success)
+                return BadRequest(new { error = "Este usuario no tiene WhatsApp configurado" });
+
+            var accessToken = userWhatsAppConfig.Result!.AccessToken;
+            var phoneNumberId = userWhatsAppConfig.Result.PhoneNumberId;
+
+            int enviados = 0;
+            int fallidos = 0;
+            var errores = new List<object>();
+
+            foreach (var code in sendTemplateDTO.Codes)
+            {
+                try
+                {
+                    var invitacion = await _invitationUnitOfWork.GetByCodeAsync(code);
+
+                    if (!invitacion.Success || invitacion.Result == null)
+                    {
+                        fallidos++;
+                        errores.Add(new { Code = code, Error = "Invitación no encontrada" });
+                        continue;
+                    }
+
+                    var ev = invitacion.Result.Event!;
+
+                    // 🔥 Obtener plantilla desde BD
+                    var template = await _templateRepository.GetByNameAsync(sendTemplateDTO.TemplateName);
+
+                    if (template == null)
+                    {
+                        fallidos++;
+                        errores.Add(new { Code = code, Error = "Plantilla no encontrada en BD" });
+                        continue;
+                    }
+
+                    // 🔥 Construcción dinámica automática
+                    var components = _templateBuilderService.BuildComponents(
+                        template,
+                        invitacion.Result,
+                        ev,
+                        code
+                    );
+
+                    var result = await _whatsAppService.EnviarTemplateDinamicoAsync(
+                        accessToken,
+                        phoneNumberId,
+                        invitacion.Result.PhoneNumber,
+                        template.Name,
+                        template.Language,
+                        components
+                    );
+                    await SaveMessageHistory(invitacion.Result.Code!, result);
+
+                    if (!result.Success)
+                    {
+                        fallidos++;
+                        errores.Add(new { Code = code, Error = result.Message });
+                        continue;
+                    }
+                    enviados++;
+
+                    await Task.Delay(1200);
                 }
                 catch (Exception ex)
                 {

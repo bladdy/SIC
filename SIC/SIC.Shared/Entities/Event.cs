@@ -56,6 +56,9 @@ public class Event : IEntityWithName
     // Corver del album
     public string? CoverAlbumImageUrl { get; set; }
 
+    [Display(Name = "URL del Confirmacion")]
+    public string? UrlConfirmation { get; set; }
+
     public double CoverPositionX { get; set; }
     public double CoverPositionY { get; set; }
     public double CoverZoom { get; set; }

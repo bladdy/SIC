@@ -13,6 +13,10 @@ public static class DateTimeExtensions
             .ToLocalTime()
             .ToString("hh:mm tt");
     }
+    public static string ToDateLocal12h(this DateTime date)
+    {
+        return date.ToString("dd/MM/yyyy hh:mm tt");
+    }
 
     public static string ToWhatsappDate(this DateTime date)
     {

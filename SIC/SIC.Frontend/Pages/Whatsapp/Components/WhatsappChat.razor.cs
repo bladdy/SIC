@@ -7,6 +7,7 @@ using SIC.Frontend.Services;
 using SIC.Shared.DTOs;
 using SIC.Shared.Response;
 
+//Ya actualiza el chat, falta que actualice laa conversación del inbox y el evevto cuando se marca como visto, y que desde el evento se vea el cambio en el chat, y que se actualice el estado del mensaje a visto porque no se actualiza el estado del mensaje a visto, y que se actualice el estado del mensaje a enviado, porque no se actualiza el estado del mensaje a enviado, y que se actualice el estado del mensaje a error, porque no se actualiza el estado del mensaje a error
 namespace SIC.Frontend.Pages.Whatsapp.Components;
 
 public partial class WhatsappChat : ComponentBase, IAsyncDisposable

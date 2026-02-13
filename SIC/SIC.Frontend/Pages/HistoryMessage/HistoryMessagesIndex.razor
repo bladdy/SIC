@@ -9,11 +9,13 @@
                 <tr class="text-center">
                     <th>Nombre</th>
                     <th>Invitacion</th>
+                    <th>Telefono</th>
                     <th>Evento</th>
                     <th>Fecha Envio</th>
                     <th>Enviado</th>
                     <th>Entregado</th>
                     <th>Error</th>
+                    <th>Mensaje</th>
                 </tr>
             </thead>
             <tbody>
@@ -23,12 +25,41 @@
 
                         <td>@HistoryMessage.Invitation.Name</td>
                         <td>@HistoryMessage.Invitation.Code</td>
+                        <td>@HistoryMessage.Invitation.PhoneNumber</td>
                         <td>@HistoryMessage.Event.Name</td>
 
-                        <td>@HistoryMessage.SendDate.ToString("dd/MM/yyyy")</td>
-                        <td>@HistoryMessage.Send</td>
-                        <td>@HistoryMessage.Delivered</td>
-                        <td>@HistoryMessage.Error</td>
+                        <td>@HistoryMessage.SendDate.ToDateLocal12h()</td>
+                        <td>
+                            @if (HistoryMessage.Send)
+                            {
+                                <span class="badge bg-success">Si</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">No</span>
+                            }
+                        </td>
+                        <td>
+                            @if (HistoryMessage.Delivered)
+                            {
+                                <span class="badge bg-success">Si</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">No</span>
+                            }
+                        </td>
+                        <td>
+                            @if (HistoryMessage.Error)
+                            {
+                                <span class="badge bg-success" >Si</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">No</span>
+                            }
+                            </td>
+                        <td>@HistoryMessage.Message</td>
                         
                     </tr>
                 }

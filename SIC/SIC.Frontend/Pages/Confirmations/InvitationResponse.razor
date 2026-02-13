@@ -1,0 +1,146 @@
+﻿@page "/invitacion/{Code}"
+@layout LoginLayout
+@using Microsoft.AspNetCore.Components.Forms
+
+<div class="d-flex justify-content-center align-items-center min-vh-100">
+    <div class="card p-4 shadow position-relative"
+         style="max-width: 500px; width: 90%; min-height: 400px;">
+
+        <div class="text-center">
+
+            @if (MostrarFormulario)
+            {
+                <div>
+                    <h2 class="fw-bold mb-3">@Invitacion?.Name</h2>
+
+                    <div class="mb-3">
+                        <p class="fw-bold mb-1">Adultos invitados: @Adultos</p>
+
+                        @if (Jovenes > 0)
+                        {
+                            <p class="fw-bold mb-1">Jóvenes invitados: @Jovenes</p>
+                        }
+
+                        <p class="fw-bold mb-2">
+                            @(Menores == 0 ? "Respetuosamente NO NIÑOS"
+                                : $"Niños invitados: {Menores}")
+                        </p>
+                    </div>
+
+                    @if (MostrarListadoInvitados)
+                    {
+                        <div class="mb-3">
+                            <p class="mb-2">Elija su respuesta:</p>
+
+                            <InputRadioGroup @bind-Value="Asistira"
+                                             class="d-flex justify-content-center align-items-center gap-4">
+
+                                <div class="form-check form-check-inline custom-radio">
+                                    <InputRadio class="form-check-input custom-radio"
+                                                Value="true" />
+                                    <label class="form-check-label">
+                                        Sí Asistiré
+                                    </label>
+                                </div>
+
+                                <div class="form-check form-check-inline">
+                                    <InputRadio class="form-check-input custom-radio"
+                                                Value="false" />
+                                    <label class="form-check-label">
+                                        No Asistiré
+                                    </label>
+                                </div>
+
+                            </InputRadioGroup>
+                            <div class="row fw-bold border-bottom">
+                                <div class="col-6">Invitado</div>
+                                <div class="col-6">¿Asistirá?</div>
+                            </div>
+
+                            @if (Invitacion?.Guests != null && Invitacion.Guests.Any())
+                            {
+                                int contador = 1;
+
+                                @foreach (var guest in Invitacion.Guests)
+                                {
+                                    <div class="row align-items-center py-2 fw-bold">
+                                        <div class="col-6">
+                                            @(guest.GuestName ?? $"Invitado {contador}")
+                                        </div>
+
+                                        <div class="col-6 d-flex gap-4 justify-content-center">
+
+                                            <input class="form-check-input"
+                                                   type="radio"
+                                                   name="guest_@guest.Id"
+                                                   checked="@(guest.Status == Status.Attend)"
+                                                   @onclick="() => guest.Status = Status.Attend" /> Sí
+
+                                            <input class="form-check-input"
+                                                   type="radio"
+                                                   name="guest_@guest.Id"
+                                                   checked="@(guest.Status == Status.NotAttend)"
+                                                   @onclick="() => guest.Status = Status.NotAttend" /> No
+                                        </div>
+                                    </div>
+
+                                    contador++;
+                                }
+                            }
+                        </div>
+                    }
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Dedicatoria</label>
+                        <textarea class="form-control"
+                                  rows="3"
+                                  maxlength="1500"
+                                  @bind="Comentarios">
+                            </textarea>
+                    </div>
+
+                    @if (MostrarBotonConfirmar)
+                    {
+                        <div class="d-flex justify-content-center">
+                            <button class="btn btn-custom w-50 fw-bold"
+                                    @onclick="EnviarRespuesta">
+                                Enviar Respuesta
+                            </button>
+                        </div>
+                    }
+                </div>
+            }
+
+            @if (MostrarGracias)
+            {
+                <div class="mt-4">
+                    <h5 class="fw-bold">¡Gracias por confirmar tu asistencia!</h5>
+
+                    @if (!string.IsNullOrEmpty(QrBase64))
+                    {
+                        <img src="@($"data:image/png;base64,{QrBase64}")"
+                             style="width:150px; display:block; margin:auto;" />
+                    }
+
+                    @if (!string.IsNullOrEmpty(PdfBase64))
+                    {
+                        <a class="btn btn-secondary btn-sm mt-2"
+                           href="@($"data:application/pdf;base64,{PdfBase64}")"
+                           download="Boleta.pdf">
+                            Descargar boleta PDF
+                        </a>
+                    }
+                </div>
+            }
+
+            @if (MostrarNoInvitacion)
+            {
+                <div class="mt-4 text-center">
+                    <h5 class="fw-bold text-danger">No se encontró la invitación</h5>
+                    <p>Código: <b>@CodigoNoEncontrado</b></p>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>

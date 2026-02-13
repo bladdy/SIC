@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 
 namespace SIC.Backend.Data;
@@ -10,6 +11,7 @@ public class DataContext : IdentityDbContext<User>
     {
     }
 
+    public DbSet<WhatsAppTemplate> WhatsAppTemplates { get; set; }
     public DbSet<EventType> EventTypes { get; set; }
     public DbSet<Invitation> Invitations { get; set; }
     public DbSet<Item> Items { get; set; }

@@ -1,0 +1,354 @@
+﻿@page "/whatsapp_templates/template-builder"
+@using SIC.Frontend.Models
+
+<div class="row">
+
+    <!-- ================= LEFT PANEL ================= -->
+    <div class="col-md-9">
+
+        <div class="card p-4">
+
+            <h4>Nombre e idioma</h4>
+
+            <div class="mb-3">
+                <label>Nombre de la plantilla</label>
+                <input class="form-control"
+                       @bind="Model.Name"
+                       @bind:event="oninput" />
+            </div>
+
+            <div class="mb-3">
+                <label>Idioma</label>
+                <select class="form-select" @bind="Model.Language">
+                    <option value="es_ES">Spanish (SPA)</option>
+                    <option value="en_US">English (US)</option>
+                </select>
+            </div>
+
+            <hr />
+
+            <!-- ================= HEADER ================= -->
+
+            <h5>Encabezado</h5>
+
+            <select class="form-select mb-2" @bind="HeaderType">
+                <option value="">Sin encabezado</option>
+                <option value="TEXT">Texto</option>
+            </select>
+
+            @if (HeaderType == "TEXT")
+            {
+                <input class="form-control"
+                       placeholder="Texto del encabezado"
+                       @bind="HeaderText"
+                       @bind:event="oninput" />
+            }
+
+            <hr />
+
+            <!-- ================= MEDIA ================= -->
+
+            <h5>Muestra de contenido multimedia</h5>
+
+            <select class="form-select mb-2"
+                    @bind="Model.MediaType">
+                <option value="">Sin multimedia</option>
+                <option value="IMAGE">Imagen</option>
+                <option value="VIDEO">Video</option>
+                <option value="DOCUMENT">Documento</option>
+            </select>
+
+            @if (!string.IsNullOrEmpty(Model.MediaType))
+            {
+                <input class="form-control mb-2"
+                       placeholder="URL del archivo"
+                       @bind="Model.MediaUrl"
+                       @bind:event="oninput" />
+
+                <input class="form-control"
+                       placeholder="Texto alternativo / nombre archivo"
+                       @bind="Model.MediaCaption"
+                       @bind:event="oninput" />
+            }
+
+            <hr />
+
+            <!-- ================= BODY ================= -->
+
+            <h5>Contenido</h5>
+
+            <textarea class="form-control"
+                      rows="5"
+                      placeholder="Ej: Hola {{1}}, tu pedido {{2}} está listo"
+                      value="@Model.Body"
+                      @oninput="OnBodyChanged">
+            </textarea>
+
+            <div class="mt-2">
+                <button type="button"
+                        class="btn btn-sm btn-custom"
+                        @onclick="AddVariable">
+                    + Agregar variable
+                </button>
+            </div>
+
+            @if (Model.BodyExamples.Any())
+            {
+                <div class="mt-3">
+                    <h6>Muestras de variables</h6>
+
+                    @for (int i = 0; i < Model.BodyExamples.Count; i++)
+                    {
+                        var index = i;
+
+                        <div class="input-group mb-2">
+                            <span class="input-group-text">{{@(index + 1)}}</span>
+
+                            <input class="form-control"
+                                   value="@Model.BodyExamples[index]"
+                                   @oninput="(e => OnExampleChanged(e, index))" />
+                        </div>
+                    }
+                </div>
+            }
+
+            <hr />
+
+            <!-- ================= FOOTER ================= -->
+
+            <h5>Pie de página</h5>
+            <input class="form-control"
+                   @bind="Model.Footer"
+                   @bind:event="oninput" />
+
+            <hr />
+
+            <!-- ================= BUTTONS ================= -->
+
+            <h5>Botones</h5>
+
+            <button class="btn btn-custom mb-3"
+                    @onclick="AddButton">
+                + Agregar botón
+            </button>
+
+            @foreach (var button in Model.Buttons)
+            {
+                <div class="card p-3 mb-2">
+
+                    <select class="form-select mb-2"
+                            @bind="button.Type">
+                        <option value="URL">Ir al sitio web</option>
+                        <option value="QUICK_REPLY">Respuesta rápida</option>
+                    </select>
+
+                    <input class="form-control mb-2"
+                           placeholder="Texto del botón"
+                           @bind="button.Text"
+                           @bind:event="oninput" />
+
+                    @if (button.Type == "URL")
+                    {
+                        <select class="form-select mb-2"
+                                @bind="button.UrlType">
+                            <option value="STATIC">Estática</option>
+                            <option value="DYNAMIC">Dinámica</option>
+                        </select>
+
+                        @if (button.UrlType == "STATIC")
+                        {
+                            <input class="form-control"
+                                   placeholder="https://midominio.com"
+                                   @bind="button.Url"
+                                   @bind:event="oninput" />
+                        }
+                        else
+                        {
+                            <input class="form-control mb-2"
+                                   placeholder="https://midominio.com/"
+                                   @bind="button.UrlBase"
+                                   @bind:event="oninput" />
+
+                            <input class="form-control"
+                                   placeholder="Ejemplo dinámico"
+                                   @bind="button.DynamicExample"
+                                   @bind:event="oninput" />
+                        }
+                    }
+
+                </div>
+            }
+
+        </div>
+    </div>
+
+    <!-- ================= PREVIEW ================= -->
+
+    <div class="col-md-3">
+
+        <div class="phone-frame">
+            <div class="whatsapp-header">
+                Vista previa
+            </div>
+
+            <div class="chat-area">
+
+                <div class="message-bubble">
+
+                    @if (!string.IsNullOrEmpty(Model.MediaType))
+                    {
+                        <div class="mb-2 text-center">
+
+                            @if (Model.MediaType == "IMAGE")
+                            {
+                                <img src="@Model.MediaUrl"
+                                     style="max-width:100%; border-radius:8px;" />
+                            }
+                            else if (Model.MediaType == "VIDEO")
+                            {
+                                <div style="background:#000;color:white;padding:20px;border-radius:8px;">
+                                    🎥 Vista previa de video
+                                </div>
+                            }
+                            else if (Model.MediaType == "DOCUMENT")
+                            {
+                                <div style="border:1px solid #ccc;padding:10px;border-radius:8px;">
+                                    📄 @Model.MediaCaption
+                                </div>
+                            }
+
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(HeaderText))
+                    {
+                        <div class="fw-bold mb-2">
+                            @HeaderText
+                        </div>
+                    }
+
+                    <div>
+                        @((MarkupString)RenderPreviewBody())
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.Footer))
+                    {
+                        <div class="footer-text mt-2">
+                            @Model.Footer
+                        </div>
+                    }
+
+                    @if (Model.Buttons.Any())
+                    {
+                        <div class="mt-3">
+                            @foreach (var btn in Model.Buttons)
+                            {
+                                <div class="preview-button">
+                                    @btn.Text
+                                </div>
+                            }
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+    .phone-frame {
+        border: 10px solid #111;
+        border-radius: 30px;
+        height: 100vh;
+        background: #e5ddd5;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .whatsapp-header {
+        background: #075E54;
+        color: white;
+        padding: 15px;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .chat-area {
+        padding: 20px;
+        flex-grow: 1;
+    }
+
+    .message-bubble {
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+    }
+
+    .footer-text {
+        font-size: 12px;
+        color: gray;
+    }
+
+    .preview-button {
+        border: 1px solid #25D366;
+        color: #25D366;
+        padding: 8px;
+        text-align: center;
+        border-radius: 8px;
+        margin-top: 5px;
+    }
+</style>
+
+@code {
+
+    private CreateTemplateModel Model = new();
+    private string HeaderType = "";
+    private string? HeaderText;
+
+    private void OnBodyChanged(ChangeEventArgs e)
+    {
+        Model.Body = e.Value?.ToString() ?? "";
+    }
+
+    private void AddVariable()
+    {
+        var nextIndex = Model.BodyExamples.Count + 1;
+        Model.Body += $" {{{{{nextIndex}}}}}";
+        Model.BodyExamples.Add("");
+    }
+
+    private void OnExampleChanged(ChangeEventArgs e, int index)
+    {
+        if (index >= 0 && index < Model.BodyExamples.Count)
+            Model.BodyExamples[index] = e.Value?.ToString() ?? "";
+    }
+
+    private void AddButton()
+    {
+        Model.Buttons.Add(new ButtonModel());
+    }
+
+    private string RenderPreviewBody()
+    {
+        if (string.IsNullOrEmpty(Model.Body))
+            return "";
+
+        var result = Model.Body;
+
+        for (int i = 0; i < Model.BodyExamples.Count; i++)
+        {
+            var variable = $"{{{{{i + 1}}}}}";
+            var value = string.IsNullOrEmpty(Model.BodyExamples[i])
+                ? $"[Var{i + 1}]"
+                : Model.BodyExamples[i];
+
+            result = result.Replace(variable, $"<b>{value}</b>");
+        }
+
+        return result.Replace("\n", "<br>");
+    }
+}

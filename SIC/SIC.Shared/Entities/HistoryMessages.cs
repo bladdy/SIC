@@ -17,5 +17,6 @@ namespace SIC.Shared.Entities
         public bool Send { get; set; }
         public bool Delivered { get; set; }
         public bool Error { get; set; }
+        public string? Message { get; set; }
     }
 }

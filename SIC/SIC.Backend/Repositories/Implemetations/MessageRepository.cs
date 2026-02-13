@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using SIC.Backend.Data;
 using SIC.Backend.Helpers;
 using SIC.Backend.Repositories.Interfaces;
@@ -151,6 +152,32 @@ namespace SIC.Backend.Repositories.Implemetations
         {
             try
             {
+                string mensajeMostrar;
+
+                if (!string.IsNullOrWhiteSpace(Message) && Message.Trim().StartsWith("{"))
+                {
+                    try
+                    {
+                        dynamic? errorObject = JsonConvert.DeserializeObject<dynamic>(Message);
+
+                        string? mensajePrincipal = errorObject?.error?.message?.ToString();
+                        string? detalle = errorObject?.error?.error_data?.details?.ToString();
+
+                        mensajeMostrar = detalle ?? mensajePrincipal ?? "Error desconocido";
+                    }
+                    catch
+                    {
+                        mensajeMostrar = Message; // Si falla el parseo, devuelve el texto original
+                    }
+                }
+                else
+                {
+                    mensajeMostrar = Message ?? "Error desconocido";
+                }
+
+
+                Console.WriteLine(mensajeMostrar);
+
                 var invitations = await _context.Invitations
                     .Include(i => i.Event)
                     .FirstOrDefaultAsync(i => i.Code == code);
@@ -170,7 +197,7 @@ namespace SIC.Backend.Repositories.Implemetations
                     SendDate = DateTime.Now,
                     Send = Success,
                     Error = !Success,
-                    //Message = Message,
+                    Message = mensajeMostrar,
                 };
                 _context.Add(mesage);
                 await _context.SaveChangesAsync();

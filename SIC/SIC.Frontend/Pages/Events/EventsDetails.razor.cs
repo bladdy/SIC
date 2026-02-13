@@ -20,6 +20,9 @@ public partial class EventsDetails
     // Estados dinámicos por ID
     private int? loadingWhatsappId1;
 
+    private string? SelectedTemplateName;
+    private string SelectedTemplateDisplay = "Seleccionar plantilla";
+
     private Dictionary<int, bool> SelectedInvitations = new();
     private bool SelectAll = false;
     private bool IsSendingMassive = false;
@@ -40,7 +43,6 @@ public partial class EventsDetails
     private bool isLoadingImport = false;
     private bool hasFileSelected = false;
     private IBrowserFile? selectedFile;
-
     private string? importResult;
 
     private Invitation NewInvitation = new();
@@ -51,6 +53,7 @@ public partial class EventsDetails
     private DateTime MinAllowedDate { get; set; } = new DateTime(2023, 1, 1); // Sets January 1, 2023 as the minimum
     public Event? EventDetail { get; set; }
     public List<Invitation>? Invitations { get; set; }
+    public List<WhatsAppTemplate>? Templates { get; set; }
     [Inject] private IRepository Repository { get; set; } = default!;
     [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
@@ -67,12 +70,41 @@ public partial class EventsDetails
     {
         await LoadEvent();
         await LoadInvitations();
+        await LoadTemplates();
+    }
+
+    private async Task LoadTemplates()
+    {
+        var url = $"api/whatsapp/get-templates";
+
+        if (!string.IsNullOrWhiteSpace(Filter))
+        {
+            url += $"&Filter={Filter}";
+        }
+
+        //.GetAsync<List<Invitation>>
+        var responseHttp = await Repository.GetAsync<List<WhatsAppTemplate>>(url);
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        // Backend ya devuelve total de páginas, no de registros
+        Templates = responseHttp.Response ?? new List<WhatsAppTemplate>();
     }
 
     private async Task SelectedPageAsync(int page)
     {
         currentPage = page;
         await LoadInvitations(currentPage);
+    }
+
+    private void SeleccionarTemplate(WhatsAppTemplate template)
+    {
+        SelectedTemplateName = template.Name;
+        SelectedTemplateDisplay = template.DisplayName;
     }
 
     private async Task ShowCreateModal()
@@ -275,33 +307,6 @@ public partial class EventsDetails
         finally
         {
             isLoading = false;
-        }
-    }
-
-    private async Task EnviarInvitacion(string code)
-    {
-        try
-        {
-            isLoadingWhatsapp = true;
-            var responseHttp = await Repository.PostAsync<WhatsAppApiResponse>($"api/whatsapp/enviar-invitacion/{code}");
-
-            if (responseHttp.Error)
-            {
-                var message = await responseHttp.GetErrorMessageAsync();
-                var errorMessage = JsonConvert.DeserializeObject<WhatsAppApiError>(message!);
-                await SweetAlertService.FireAsync("Error", errorMessage!.error.message, SweetAlertIcon.Error);
-                return;
-            }
-            await SweetAlertService.FireAsync("Éxito", "Invitación enviada correctamente", SweetAlertIcon.Success);
-        }
-        catch (Exception ex)
-        {
-            await SweetAlertService.FireAsync("Error", "Algo ocurrio, intentalo más tarde", SweetAlertIcon.Error);
-            return;
-        }
-        finally
-        {
-            isLoadingWhatsapp = false;
         }
     }
 
@@ -545,7 +550,61 @@ public partial class EventsDetails
         return true;
     }
 
-    private async Task EnviarInvitacionesMasivas()
+    private async Task EnviarInvitacion(string code, string template, int invitationId)
+    {
+        try
+        {
+            loadingWhatsappId1 = invitationId;
+
+            var codes = new List<string> { code };
+
+            var dto = new MasiveSendTemplateDTO
+            {
+                TemplateName = template,
+                Codes = codes
+            };
+
+            var response = await Repository.PostAsync<object>(
+                "api/whatsapp/enviar-invitacion-dina",
+                dto
+            );
+
+            if (response.Error)
+            {
+                var message = await response.GetErrorMessageAsync();
+                var errorMessage = JsonConvert.DeserializeObject<WhatsAppApiError>(message!);
+
+                await SweetAlertService.FireAsync(
+                    "Error",
+                    errorMessage!.error.message,
+                    SweetAlertIcon.Error
+                );
+                return;
+            }
+
+            await SweetAlertService.FireAsync(
+                "Éxito",
+                "Invitación enviada correctamente",
+                SweetAlertIcon.Success
+            );
+        }
+        catch
+        {
+            await SweetAlertService.FireAsync(
+                "Error",
+                "Algo ocurrió, inténtalo más tarde",
+                SweetAlertIcon.Error
+            );
+        }
+        finally
+        {
+            loadingWhatsappId1 = null;
+            StateHasChanged();
+        }
+    }
+
+
+    private async Task EnviarInvitacionesMasivas(string templateName)
     {
         var seleccionados = Invitations!
             .Where(i => SelectedInvitations.TryGetValue(i.Id, out var selected) && selected)
@@ -559,12 +618,12 @@ public partial class EventsDetails
 
         var dto = new MasiveSendTemplateDTO
         {
-            TemplateName = "confirmaciones", // o el que venga de la UI
+            TemplateName = templateName, // 👈 ahora dinámico
             Codes = seleccionados
         };
 
         var response = await Repository.PostAsync<object>(
-            "api/whatsapp/enviar-invitacion",
+            "api/whatsapp/enviar-invitacion-dina",
             dto
         );
 
@@ -586,13 +645,13 @@ public partial class EventsDetails
             $"Invitaciones enviadas: {seleccionados.Count}",
             SweetAlertIcon.Success
         );
-
-        // limpiar selección
+        HasSelectedInvitations = false;
         SelectAll = false;
         foreach (var key in SelectedInvitations.Keys.ToList())
             SelectedInvitations[key] = false;
     }
 
+    //ToDo: que sea acumulativos
     private void ToggleSelectAll(bool value)
     {
         SelectAll = value;

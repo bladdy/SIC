@@ -207,23 +207,41 @@ else
         </div>
         @if (EventDetail.User.UserWhatsAppConfigs != null)
         {
-            <button class="btn btn-success d-flex align-items-center gap-2"
-            disabled="@(!HasSelectedInvitations || IsSendingMassive ? true : false)"
-            @onclick="EnviarInvitacionesMasivas">
-
-
-
-                @if (IsSendingMassive)
-                {
-                    <span class="spinner-border spinner-border-sm"></span>
-                    <span>Enviando...</span>
-                }
-                else
-                {
-                    <i class="bi bi-whatsapp"></i>
-                    <span>Enviar seleccionados</span>
-                }
-            </button>
+            @if (Templates != null && Templates.Any())
+            {
+                <div class="dropdown">
+                    <button class="btn btn-success dropdown-toggle d-flex align-items-center gap-2"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            disabled="@(!HasSelectedInvitations || IsSendingMassive)">
+                        @if (IsSendingMassive)
+                        {
+                            <span class="spinner-border spinner-border-sm"></span>
+                            <span>Enviando...</span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-whatsapp"></i>
+                            <span>Enviar seleccionados</span>
+                        }
+                    </button>
+                    <ul class="dropdown-menu">
+                        @if (Templates != null)
+                        {
+                            @foreach (var template in Templates)
+                            {
+                                <li>
+                                    <button type="button"
+                                            class="dropdown-item"
+                                            @onclick="() => EnviarInvitacionesMasivas(template.Name)">
+                                        @template.DisplayName
+                                    </button>
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+            }
         }
 
     </div>
@@ -307,21 +325,61 @@ else
                                             {
                                                 @if (EventDetail.User.UserWhatsAppConfigs != null)
                                                 {
+                                                    <!--
+
                                                     <button class="btn d-inline-flex align-items-center gap-2 text-white"
-                                                    style="background-color:#25d366;"
-                                                    @onclick="() => EnviarInvitacion(invitation.Code!)"
-                                                    disabled="@(loadingWhatsappId1 == invitation.Id)">
-                                                        @if (loadingWhatsappId1 == invitation.Id)
-                                                        {
-                                                            <span class="spinner-border spinner-border-sm"></span>
-                                                            <span>Invitando...</span>
-                                                        }
-                                                        else
-                                                        {
-                                                            <i class="bi bi-whatsapp"></i>
-                                                            <span>Invitar</span>
-                                                        }
+                                                        style="background-color:#25d366;"
+                                                        @onclick="() => EnviarInvitacion(invitation.Code!)"
+                                                        disabled="@(loadingWhatsappId1 == invitation.Id)">
+                                                            @if (loadingWhatsappId1 == invitation.Id)
+                                                            {
+                                                                <span class="spinner-border spinner-border-sm"></span>
+                                                                <span>Invitando...</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <i class="bi bi-whatsapp"></i>
+                                                                <span>Invitar</span>
+                                                            }
                                                     </button>
+                                                    -->
+
+                                                    @if (Templates != null && Templates.Any())
+                                                    {
+                                                        <div class="dropdown">
+                                                            <button class="btn btn-success dropdown-toggle d-flex align-items-center gap-2"
+                                                                    type="button"
+                                                                    data-bs-toggle="dropdown"
+                                                                    disabled="@(loadingWhatsappId1 == invitation.Id)">
+                                                                @if (IsSendingMassive)
+                                                                {
+                                                                    <span class="spinner-border spinner-border-sm"></span>
+                                                                    <span>Enviando...</span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <i class="bi bi-whatsapp"></i>
+                                                                    <span>Seleccionar Plantilla</span>
+                                                                }
+                                                            </button>
+                                                            <ul class="dropdown-menu">
+                                                                @if (Templates != null)
+                                                                {
+                                                                    @foreach (var template in Templates)
+                                                                    {
+                                                                        <li>
+                                                                            <button type="button"
+                                                                                    class="dropdown-item"
+                                                                                    @onclick="() => EnviarInvitacion(invitation.Code!, template.Name, invitation.Id)"
+                                                                                    >
+                                                                                @template.DisplayName
+                                                                            </button>
+                                                                        </li>
+                                                                    }
+                                                                }
+                                                            </ul>
+                                                        </div>
+                                                    }
 
                                                 }
                                                 else
