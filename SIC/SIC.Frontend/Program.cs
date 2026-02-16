@@ -14,7 +14,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 // Detectar si estamos corriendo dentro de Docker
 var isDocker = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
 
-string backendUrl = "https://localhost:7141/";//"http://localhost:5000/";
+string backendUrl = "http://localhost:5000/";//"https://localhost:7141/";
 /*if (isDocker)
 {
     // Contenedores Docker: usar nombre del servicio y puerto interno
