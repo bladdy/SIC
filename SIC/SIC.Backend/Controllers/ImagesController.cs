@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SIC.Backend.Services;
+using SIC.Backend.UnitOfWork.Implemetations;
 using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
@@ -12,46 +13,15 @@ public class ImagesController : ControllerBase
 {
     private readonly FtpStorageService _ftp;
     private readonly IImageUnitOfWork _imageUnitOfWork;
+    private readonly IEventsUnitOfWork _eventsUnitOfWork;
 
     //IImagesRepository
-    public ImagesController(FtpStorageService ftp, IImageUnitOfWork imageUnitOf)
+    public ImagesController(FtpStorageService ftp, IImageUnitOfWork imageUnitOf, IEventsUnitOfWork eventsUnitOfWork)
     {
         _ftp = ftp;
         _imageUnitOfWork = imageUnitOf;
+        _eventsUnitOfWork = eventsUnitOfWork;
     }
-
-    /*[HttpPost("upload/{folder}")]
-    [Consumes("multipart/form-data")]
-    public async Task<IActionResult> Upload(
-        IFormFile file, string folder)
-    {
-        if (file == null || file.Length == 0)
-            return BadRequest("Archivo inválido");
-
-        if (string.IsNullOrWhiteSpace(folder))
-            return BadRequest("La carpeta es obligatoria");
-
-        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
-
-        using var stream = file.OpenReadStream();
-        var url = await _ftp.UploadImageAsync(stream, folder, fileName);
-        if (string.IsNullOrWhiteSpace(url))
-            return BadRequest("Error al subir la imagen");
-
-        var imagene = new EventImageDTO
-        {
-            CodeEvent = folder,
-            ImageUrl = url,
-            FileName = fileName,
-        };
-
-        var response = await _imageUnitOfWork.AddFullAsyn(imagene);
-        if (response.Success)
-        {
-            return Ok(response.Result);
-        }
-        return NotFound();
-    }*/
 
     [HttpPost("upload/{folder}")]
     [Consumes("multipart/form-data")]
@@ -130,6 +100,44 @@ public class ImagesController : ControllerBase
         {
             return Ok(response.Result);
         }
+        return NotFound();
+    }
+
+    [HttpDelete("Album/{folder}")]
+    public async Task<IActionResult> DeleteAlbum(string folder)
+    {
+        var response = await _imageUnitOfWork.GetAsync(folder);
+        if (response.Success && response.Result != null)
+        {
+            foreach (var image in response.Result)
+            {
+                if (string.IsNullOrWhiteSpace(folder) || string.IsNullOrWhiteSpace(image.FileName))
+                    return BadRequest("Folder y fileName son obligatorios");
+                await _ftp.DeleteFileAsync(folder, image.FileName);
+                var responseDelete = await _imageUnitOfWork.DeleteAsync(Convert.ToInt32(image.Id));
+            }
+            var responseEvent = await _eventsUnitOfWork.GetByCodeAsync(folder);
+            Uri uri = new(responseEvent.Result?.CoverAlbumImageUrl ?? string.Empty);
+            string fileName = Path.GetFileName(uri.LocalPath);
+            await _ftp.DeleteFileAsync("FrontPages", fileName);
+
+            var eventup = responseEvent.Result;
+            if (eventup != null)
+            {
+                eventup.CoverAlbumImageUrl = null;
+                eventup.CoverPositionX = 0;
+                eventup.CoverPositionY = 0;
+                eventup.CoverZoom = 1;
+                eventup.AlbumPublic = false;
+                eventup.HasAlbum = false;
+                await _eventsUnitOfWork.UpdateFullAsync(eventup);
+            }
+            if (response.Success)
+            {
+                return Ok(response.Result);
+            }
+        }
+
         return NotFound();
     }
 

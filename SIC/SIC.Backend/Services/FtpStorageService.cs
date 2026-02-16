@@ -1,10 +1,8 @@
 ﻿using FluentFTP;
-using Microsoft.AspNetCore.WebUtilities;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.Processing;
 using System.IO.Compression;
-using System.Net;
 
 namespace SIC.Backend.Services;
 
@@ -20,13 +18,13 @@ public class FtpStorageService
     private FtpClient CreateClient()
     {
         //Cambiar a FtpLocal cuando sea local
-        var host = _configuration["Ftp:Host"];
-        var username = _configuration["Ftp:Username"];
-        var password = _configuration["Ftp:Password"];
+        var host = _configuration["FtpLocal:Host"];
+        var username = _configuration["FtpLocal:Username"];
+        var password = _configuration["FtpLocal:Password"];
         var client = new FtpClient(host)
         {
             Credentials = new System.Net.NetworkCredential(username, password),
-            Port = int.Parse(_configuration["Ftp:Port"] ?? "21")
+            Port = int.Parse(_configuration["FtpLocal:Port"] ?? "21")
         };
         client.Connect();
         return client;
@@ -94,37 +92,9 @@ public class FtpStorageService
             true
         );
 
-        var baseUrl = _configuration["Ftp:UrlBase"];
+        var baseUrl = _configuration["FtpLocal:UrlBase"];
         return $"{baseUrl}/{folder}/{webpFileName}";
     }
-
-    /*
-    public Task<string> UploadImageAsync(
-    Stream fileStream,
-    string folder,
-    string fileName)
-    {
-        using var client = CreateClient();
-
-        var directory = $"/{folder}";
-        if (!client.DirectoryExists(directory))
-        {
-            client.CreateDirectory(directory);
-        }
-
-        var remotePath = $"{directory}/{fileName}";
-
-        // ✅ UploadStream ES SINCRÓNICO
-        client.UploadStream(
-            fileStream,
-            remotePath,
-            FtpRemoteExists.Overwrite,
-            true
-        );
-
-        var baseUrl = _configuration["FtpLocal:UrlBase"];
-        return Task.FromResult($"{baseUrl}/{folder}/{fileName}");
-    }*/
 
     //ToDo: Crear un metodo que diga si o no se borro el archivo
     public Task DeleteFileAsync(string folder, string fileName)

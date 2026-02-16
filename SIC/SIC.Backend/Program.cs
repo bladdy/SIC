@@ -58,7 +58,7 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddDbContext<DataContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection")));
 builder.Services.AddTransient<SeedDb>();
 
 // Registrar el servicio de WhatsAppService

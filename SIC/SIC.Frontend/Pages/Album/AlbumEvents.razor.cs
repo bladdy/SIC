@@ -105,6 +105,48 @@ namespace SIC.Frontend.Pages.Album
             totalPages = responseHttp.Response;
         }
 
+        private async Task DeleteEvents(string code)
+        {
+            var result = await SweetAlertService.FireAsync(new SweetAlertOptions
+            {
+                Title = "¿Está seguro?",
+                Text = $"Se eliminara esta foto. Esta acción no se puede deshacer.",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Sí, borrar",
+                CancelButtonText = "Cancelar"
+            });
+
+            if (!string.IsNullOrEmpty(result.Value))
+            {
+                await DeleteEventImage(code);
+            }
+        }
+
+        private async Task DeleteEventImage(string code)
+        {
+            var responseHttp = await repository.DeleteAsync<EventImage>($"api/images/Album/{code}");
+
+            if (responseHttp.Error)
+            {
+                var message = await responseHttp.GetErrorMessageAsync() ?? "No se pudo eliminar la foto.";
+                await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
+            }
+
+            var toast = SweetAlertService.Mixin(new SweetAlertOptions
+            {
+                Toast = true,
+                Position = SweetAlertPosition.TopEnd,
+                ShowConfirmButton = false,
+                Timer = 3000,
+                TimerProgressBar = true,
+            });
+            await toast.FireAsync("Eliminado", "El album fue eliminado correctamente.", SweetAlertIcon.Success);
+            await LoadEvents(currentPage);
+            StateHasChanged();
+        }
+
         private async Task<bool> LoadListAsync(int page)
         {
             var url = $"api/Events/paginated?PageNumber={page}&PageSize={RecordsNumber}";

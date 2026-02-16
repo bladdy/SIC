@@ -129,8 +129,8 @@ namespace SIC.Backend.Controllers
                 await _ftp.DeleteFileAsync(folder, image.FileName);
             }
 
-            var response2 = await _photoEventUnitOf.RemoveFullAsyn(response.Result.Id);
-            if (response2.Success)
+            //var response2 = await _photoEventUnitOf.RemoveFullAsyn(response.Result.Id);
+            if (response.Success)
             {
                 return Ok(response);
             }
