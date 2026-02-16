@@ -18,13 +18,13 @@ public class FtpStorageService
     private FtpClient CreateClient()
     {
         //Cambiar a FtpLocal cuando sea local
-        var host = _configuration["Local:Host"];
-        var username = _configuration["Local:Username"];
-        var password = _configuration["Local:Password"];
+        var host = _configuration["Ftp:Host"];
+        var username = _configuration["Ftp:Username"];
+        var password = _configuration["Ftp:Password"];
         var client = new FtpClient(host)
         {
             Credentials = new System.Net.NetworkCredential(username, password),
-            Port = int.Parse(_configuration["Local:Port"] ?? "21")
+            Port = int.Parse(_configuration["Ftp:Port"] ?? "21")
         };
         client.Connect();
         return client;
@@ -92,7 +92,7 @@ public class FtpStorageService
             true
         );
 
-        var baseUrl = _configuration["Local:UrlBase"];
+        var baseUrl = _configuration["Ftp:UrlBase"];
         return $"{baseUrl}/{folder}/{webpFileName}";
     }
 
