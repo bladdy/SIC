@@ -211,9 +211,9 @@ else
             {
                 <div class="dropdown">
                     <button class="btn btn-success dropdown-toggle d-flex align-items-center gap-2"
-                            type="button"
-                            data-bs-toggle="dropdown"
-                            disabled="@(!HasSelectedInvitations || IsSendingMassive)">
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    disabled="@(!HasSelectedInvitations || IsSendingMassive)">
                         @if (IsSendingMassive)
                         {
                             <span class="spinner-border spinner-border-sm"></span>
@@ -232,8 +232,8 @@ else
                             {
                                 <li>
                                     <button type="button"
-                                            class="dropdown-item"
-                                            @onclick="() => EnviarInvitacionesMasivas(template.Name)">
+                                    class="dropdown-item"
+                                    @onclick="() => EnviarInvitacionesMasivas(template.Name)">
                                         @template.DisplayName
                                     </button>
                                 </li>
@@ -328,19 +328,19 @@ else
                                                     <!--
 
                                                     <button class="btn d-inline-flex align-items-center gap-2 text-white"
-                                                        style="background-color:#25d366;"
-                                                        @onclick="() => EnviarInvitacion(invitation.Code!)"
-                                                        disabled="@(loadingWhatsappId1 == invitation.Id)">
-                                                            @if (loadingWhatsappId1 == invitation.Id)
-                                                            {
-                                                                <span class="spinner-border spinner-border-sm"></span>
-                                                                <span>Invitando...</span>
-                                                            }
-                                                            else
-                                                            {
-                                                                <i class="bi bi-whatsapp"></i>
-                                                                <span>Invitar</span>
-                                                            }
+                                                    style="background-color:#25d366;"
+                                                    @onclick="() => EnviarInvitacion(invitation.Code!)"
+                                                    disabled="@(loadingWhatsappId1 == invitation.Id)">
+                                                    @if (loadingWhatsappId1 == invitation.Id)
+                                                    {
+                                                    <span class="spinner-border spinner-border-sm"></span>
+                                                    <span>Invitando...</span>
+                                                    }
+                                                    else
+                                                    {
+                                                    <i class="bi bi-whatsapp"></i>
+                                                    <span>Invitar</span>
+                                                    }
                                                     </button>
                                                     -->
 
@@ -348,9 +348,9 @@ else
                                                     {
                                                         <div class="dropdown">
                                                             <button class="btn btn-success dropdown-toggle d-flex align-items-center gap-2"
-                                                                    type="button"
-                                                                    data-bs-toggle="dropdown"
-                                                                    disabled="@(loadingWhatsappId1 == invitation.Id)">
+                                                            type="button"
+                                                            data-bs-toggle="dropdown"
+                                                            disabled="@(loadingWhatsappId1 == invitation.Id)">
                                                                 @if (IsSendingMassive)
                                                                 {
                                                                     <span class="spinner-border spinner-border-sm"></span>
@@ -369,9 +369,9 @@ else
                                                                     {
                                                                         <li>
                                                                             <button type="button"
-                                                                                    class="dropdown-item"
-                                                                                    @onclick="() => EnviarInvitacion(invitation.Code!, template.Name, invitation.Id)"
-                                                                                    >
+                                                                            class="dropdown-item"
+                                                                            @onclick="() => EnviarInvitacion(invitation.Code!, template.Name, invitation.Id)"
+                                                                            >
                                                                                 @template.DisplayName
                                                                             </button>
                                                                         </li>
@@ -385,9 +385,9 @@ else
                                                 else
                                                 {
                                                     <button class="btn d-inline-flex align-items-center gap-2 text-white"
-                                                            style="background-color:#25d366;"
-                                                            @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)"
-                                                            disabled="@(loadingWhatsappId1 == invitation.Id)">
+                                                    style="background-color:#25d366;"
+                                                    @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)"
+                                                    disabled="@(loadingWhatsappId1 == invitation.Id)">
                                                         @if (loadingWhatsappId1 == invitation.Id)
                                                         {
                                                             <span class="spinner-border spinner-border-sm"></span>
@@ -399,13 +399,13 @@ else
                                                             <span>Invitar</span>
                                                         }
                                                     </button> 
-                                                    
+
                                                 }
 
                                                 <button class="btn d-inline-flex align-items-center gap-2 text-white d-none"
-                                                        style="background-color:#25d366;"
-                                                        @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)"
-                                                        disabled="@(loadingWhatsappId1 == invitation.Id)">
+                                                style="background-color:#25d366;"
+                                                @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)"
+                                                disabled="@(loadingWhatsappId1 == invitation.Id)">
                                                     @if (loadingWhatsappId1 == invitation.Id)
                                                     {
                                                         <span class="spinner-border spinner-border-sm"></span>
@@ -419,9 +419,9 @@ else
                                                 </button>
 
                                                 <button class="btn d-inline-flex align-items-center gap-2 text-white"
-                                                        style="background-color:#25d366;"
-                                                        @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 2)"
-                                                        disabled="@(loadingWhatsappId2 == invitation.Id)">
+                                                style="background-color:#25d366;"
+                                                @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 2)"
+                                                disabled="@(loadingWhatsappId2 == invitation.Id)">
                                                     @if (loadingWhatsappId2 == invitation.Id)
                                                     {
                                                         <span class="spinner-border spinner-border-sm"></span>
@@ -437,8 +437,8 @@ else
                                             else
                                             {
                                                 <button class="btn btn-info d-inline-flex align-items-center gap-2 text-white"
-                                                        @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 1)"
-                                                        disabled="@(copyingId1 == invitation.Id)">
+                                                @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 1)"
+                                                disabled="@(copyingId1 == invitation.Id)">
                                                     @if (copyingId1 == invitation.Id)
                                                     {
                                                         <span class="spinner-border spinner-border-sm"></span>
@@ -452,8 +452,8 @@ else
                                                 </button>
 
                                                 <button class="btn btn-info d-inline-flex align-items-center gap-2 text-white"
-                                                        @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 2)"
-                                                        disabled="@(copyingId2 == invitation.Id)">
+                                                @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 2)"
+                                                disabled="@(copyingId2 == invitation.Id)">
                                                     @if (copyingId2 == invitation.Id)
                                                     {
                                                         <span class="spinner-border spinner-border-sm"></span>
@@ -510,12 +510,31 @@ else
 
     <!-- ✅ Vista móvil tipo “detalle” -->
     <div class="d-block d-md-none">
+        <div class="form-check pb-2">
+            <input type="checkbox"
+            class="form-check-input"
+            checked="@SelectAll"
+            @onchange="e => ToggleSelectAll((bool)e.Value!)" />
+            <label class="form-check-label" for="flexCheckDefault">
+                Seleccionar todos
+            </label>
+        </div>
+
         @foreach (var invitation in Invitations!)
         {
             <div class="card mb-3 shadow-sm">
                 <div class="card-body">
+
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h5 class="card-title mb-0">@invitation.Name</h5>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="checkbox" @key="invitation.Id"
+                            class="form-check-input"
+                            checked="@SelectedInvitations[invitation.Id]"
+                            @onchange="e => OnItemSelectionChanged(invitation.Id, (bool)e.Value!)" />
+
+                            <h5 class="card-title mb-0">@invitation.Name</h5>
+                        </div>
+
                         <span class="badge bg-@(invitation.Status == Status.Attend ? "success" : invitation.Status == Status.NotAttend ? "danger" : "secondary")">
                             @invitation.Status.GetDescription()
                         </span>
@@ -543,10 +562,49 @@ else
                     <div class="d-flex flex-wrap gap-1 mt-3">
                         @if (usarWhatsApp)
                         {
-                            <button class="btn d-flex align-items-center gap-1 flex-fill" style="background-color:#25d366; color:white;"
-                                    @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)">
-                                <i class="bi bi-whatsapp"></i> Invitar
-                            </button>
+
+                            @if (Templates != null && Templates.Any())
+                            {
+                                <div class="dropdown">
+                                    <button class="btn btn-success dropdown-toggle d-flex align-items-center gap-2"
+                                    type="button"
+                                    data-bs-toggle="dropdown"
+                                    disabled="@(loadingWhatsappId1 == invitation.Id)">
+                                        @if (IsSendingMassive)
+                                        {
+                                            <span class="spinner-border spinner-border-sm"></span>
+                                            <span>Enviando...</span>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-whatsapp"></i>
+                                            <span>Seleccionar Plantilla</span>
+                                        }
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        @if (Templates != null)
+                                        {
+                                            @foreach (var template in Templates)
+                                            {
+                                                <li>
+                                                    <button type="button"
+                                                    class="dropdown-item"
+                                                    @onclick="() => EnviarInvitacion(invitation.Code!, template.Name, invitation.Id)">
+                                                        @template.DisplayName
+                                                    </button>
+                                                </li>
+                                            }
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                            else
+                            {
+                                <button class="btn d-flex align-items-center gap-1 flex-fill" style="background-color:#25d366; color:white;"
+                                        @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)">
+                                    <i class="bi bi-whatsapp"></i> Invitar
+                                </button>
+                            }
                             <button class="btn d-flex align-items-center gap-1 flex-fill" style="background-color:#25d366; color:white;"
                                     @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 2)">
                                 <i class="bi bi-whatsapp"></i> Aviso
