@@ -116,26 +116,28 @@ public class ImagesController : ControllerBase
                 await _ftp.DeleteFileAsync(folder, image.FileName);
                 var responseDelete = await _imageUnitOfWork.DeleteAsync(Convert.ToInt32(image.Id));
             }
-            var responseEvent = await _eventsUnitOfWork.GetByCodeAsync(folder);
+        }
+        var responseEvent = await _eventsUnitOfWork.GetByCodeAsync(folder);
+        if (!string.IsNullOrEmpty(responseEvent.Result?.CoverAlbumImageUrl))
+        {
             Uri uri = new(responseEvent.Result?.CoverAlbumImageUrl ?? string.Empty);
             string fileName = Path.GetFileName(uri.LocalPath);
             await _ftp.DeleteFileAsync("FrontPages", fileName);
-
-            var eventup = responseEvent.Result;
-            if (eventup != null)
-            {
-                eventup.CoverAlbumImageUrl = null;
-                eventup.CoverPositionX = 0;
-                eventup.CoverPositionY = 0;
-                eventup.CoverZoom = 1;
-                eventup.AlbumPublic = false;
-                eventup.HasAlbum = false;
-                await _eventsUnitOfWork.UpdateFullAsync(eventup);
-            }
-            if (response.Success)
-            {
-                return Ok(response.Result);
-            }
+        }
+        var eventup = responseEvent.Result;
+        if (eventup != null)
+        {
+            eventup.CoverAlbumImageUrl = null;
+            eventup.CoverPositionX = 0;
+            eventup.CoverPositionY = 0;
+            eventup.CoverZoom = 1;
+            eventup.AlbumPublic = false;
+            eventup.HasAlbum = false;
+            await _eventsUnitOfWork.UpdateFullAsync(eventup);
+        }
+        if (response.Success)
+        {
+            return Ok(response.Result);
         }
 
         return NotFound();
