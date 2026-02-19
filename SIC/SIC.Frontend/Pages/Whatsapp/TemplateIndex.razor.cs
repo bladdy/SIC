@@ -27,7 +27,7 @@ namespace SIC.Frontend.Pages.Whatsapp
 
             if (responseHttp.Error)
             {
-                if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+                if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound || responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.BadRequest)
                 {
                     NavigationManager.NavigateTo("/");
                     var message = await responseHttp.GetErrorMessageAsync();

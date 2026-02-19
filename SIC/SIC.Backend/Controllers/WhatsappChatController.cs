@@ -84,10 +84,10 @@ namespace SIC.Backend.Controllers
             // Extraer el ID del usuario autenticado desde el token JWT
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
-                return BadRequest(new { error = "Usuario no autenticado" });
+                return BadRequest("Usuario no autenticado");
             var userWhatsAppConfig = await _whatsAppConfigUnitOfWork.GetByUserIdAsync(userId);
-            if (!userWhatsAppConfig.Success)
-                return BadRequest(new { error = "Este usuario no tiene permisos para obtener las plantillas" });
+            if (!userWhatsAppConfig.Success || userWhatsAppConfig.Result == null)
+                return BadRequest("Este usuario no tiene permisos para obtener las plantillas");
 
             var templates = await _whatsAppService.GetTemplatesAsync(userWhatsAppConfig.Result);
 

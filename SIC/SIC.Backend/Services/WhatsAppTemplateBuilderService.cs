@@ -35,13 +35,13 @@ namespace SIC.Backend.Services
                 {
                     Type = "header",
                     Parameters = new List<TemplateParameterRequest>
-                {
-                    new TemplateParameterRequest
                     {
-                        Type = structure.Header.Type,
-                        Link = headerValue
+                        new TemplateParameterRequest
+                        {
+                            Type = structure.Header.Type,
+                            Link = headerValue
+                        }
                     }
-                }
                 });
             }
 
@@ -72,13 +72,13 @@ namespace SIC.Backend.Services
                         SubType = btn.Type,
                         Index = btn.Index,
                         Parameters = new List<TemplateParameterRequest>
-                    {
-                        new TemplateParameterRequest
                         {
-                            Type = "text",
-                            Text = GetDynamicValue(btn.Source, invitation, ev, code)
+                            new TemplateParameterRequest
+                            {
+                                Type = "text",
+                                Text = GetDynamicValue(btn.Source, invitation, ev, code)
+                            }
                         }
-                    }
                     });
                 }
             }
@@ -95,8 +95,9 @@ namespace SIC.Backend.Services
                 "Event.Name" => ev.Name,
                 "Event.SubTitle" => ev.SubTitle,
                 "Event.CoverImageUrl" => ev.CoverImageUrl ?? "",
+                "Invitation.Table" => invitation.Table ?? "",
                 "Event.DateFormatted" => FechaHelper.FormatearFechaLargaEspanol(ev.Date),
-                "Event.UrlWithCode" => $"{ev.Url}?codigo={code}",
+                "Event.Url" => $"{ev.Url}?codigo={code}",
                 "Event.UrlConfirmation" => code,
                 _ => ""
             };

@@ -19,6 +19,7 @@
 
         public string? MediaUrl { get; set; }
         public string? MediaCaption { get; set; }
+        public List<string> BodyExampleTypes { get; set; } = new();
     }
 
     public class HeaderModel

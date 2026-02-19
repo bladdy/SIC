@@ -19,10 +19,14 @@ public partial class WhatsappInboxPage : IAsyncDisposable
         var response = await Repository.GetAsync<WhatsAppManualConfigDto>(
                 "/api/whatsapp/configurar"
             );
-        OwnerPhone = response.Response!.PhoneNumber;
-        SignalR.OnInboxUpdated += UpdateInbox;
-        await SignalR.StartAsync("https://invboxv-app.com/hubs/whatsapp-chat");
-        await LoadInbox();
+        if (response.Response != null)
+        {
+            OwnerPhone = response.Response!.PhoneNumber;
+            SignalR.OnInboxUpdated += UpdateInbox;
+            await SignalR.StartAsync("https://invboxv-app.com/hubs/whatsapp-chat");
+            await LoadInbox();
+            
+        }
     }
 
     private async Task LoadInbox()

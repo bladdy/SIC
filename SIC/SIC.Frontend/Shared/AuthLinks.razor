@@ -8,17 +8,14 @@
             var userName = context.User.Identity?.Name;
         }
 
-        <div class="d-flex justify-content-center align-items-center">
-            <p class="m-0 p-0">Hola,</p>
-            <a href="/users/edit/@userId" class="nav-link btn btn-link text-black m-0 p-0">
-                @userName
-            </a>
+        <div class="d-flex justify-content-center align-items-center gap-3">
+            <p class="m-0 p-0 fw-bold">Hola, @userName</p>
+            <a href="Logout" class="btn btn-custom d-none d-md-block text-decoration-none">Cerrar Sesión</a>
         </div>
 
-        <a href="Logout" class="nav-link btn btn-link d-none d-md-block">Cerrar Sesión</a>
     </Authorized>
 
     <NotAuthorized>
-        <a href="login" class="nav-link btn btn-link">Iniciar Sesión</a>
+        <button href="login" class="btn btn-custom">Iniciar Sesión</button>
     </NotAuthorized>
 </AuthorizeView>

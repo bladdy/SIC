@@ -122,6 +122,8 @@ namespace SIC.Backend.Controllers
             {
                 try
                 {
+
+                    //ToDo: revisar el cargado del excel con los guest
                     var response = await _invitationUnitOfWork.GetByCodeAsync(inv.Code!);
                     var existing = response.Result;
 
