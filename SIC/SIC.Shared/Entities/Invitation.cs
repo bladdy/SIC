@@ -21,6 +21,9 @@ public class Invitation
     [Display(Name = "Correo Electrónico")]
     public string? Email { get; set; }
 
+    [Display(Name = "Codigo de país")]
+    public string CountryCode { get; set; } = "+52";
+
     [Display(Name = "Numero de Telefono")]
     public string? PhoneNumber { get; set; }
 

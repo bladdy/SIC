@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SIC.Backend.Services;
-using SIC.Backend.DTOs;
-using SIC.Backend.UnitOfWork.Implemetations;
 using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.Helpers;
 using SIC.Shared.Response;
@@ -11,6 +9,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using SIC.Shared.Entities;
 using SIC.Backend.Repositories.Interfaces;
+using SIC.Shared.Request;
+using System.Text.Json;
+using SIC.Backend.Helpers;
+using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 
 namespace SIC.Backend.Controllers
 {
@@ -150,11 +153,323 @@ namespace SIC.Backend.Controllers
             return Ok(templates.Result);
         }
 
+        [HttpPost("create-templates")]
+        public async Task<IActionResult> CreateTemplate([FromBody] CreateTemplateModel model)
+        {/*
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return BadRequest(new { error = "Usuario no autenticado" });
+
+            var userWhatsAppConfig = await _whatsAppConfigUnitOfWork.GetByUserIdAsync(userId);
+            if (!userWhatsAppConfig.Success)
+                return BadRequest(new { error = "Este usuario no tiene WhatsApp configurado" });*/
+
+            var accessToken = "EAAUu8FHu8ZAwBQsU6ZAoXcUw8GZClIsc7h1JGvgz0ZBQdWO7XxIMkafA1TzRls0Jn1ZCMeQRkg95Cj4PeUkuCAR3YvpzpWCuEr3HmdL3D5w0meDRVqwZC5vE9O4fK1MVnrHT64UsfQQb25BWATpEm2nEa822WdceVjoFe9lHYlcxlb4BkGpyYK3uEIoZCzkfggiMgZDZD";//userWhatsAppConfig.Result!.AccessToken;
+            var wabaId = "1265194188987559";//userWhatsAppConfig.Result.WabaId;
+            var request = BuildWhatsappTemplateJson(model);
+
+            var result = await _whatsAppService.CreateWhatsAppTemplateAsync(accessToken, wabaId, request, model.MediaUrl);
+
+            return result ? Ok() : StatusCode(500, new { error = "Error al crear plantilla en WhatsApp" });
+        }
+
+        private string BuildWhatsappTemplateJson(CreateTemplateModel model)
+        {
+            if (model.Components == null || !model.Components.Any())
+                throw new Exception("El template debe tener al menos un componente");
+
+            var componentsList = new List<Dictionary<string, object>>();
+
+            // =========================
+            // HEADER
+            // =========================
+            if (!string.IsNullOrEmpty(model.MediaUrl))
+            {
+                componentsList.Add(new Dictionary<string, object>
+                {
+                    ["type"] = "HEADER",
+                    ["format"] = model.MediaType?.ToUpper(),
+                    ["example"] = new
+                    {
+                        header_handle = new List<string> { model.MediaUrl }
+                    }
+                });
+            }
+            else if (model.Header != null && !string.IsNullOrWhiteSpace(model.Header.Text))
+            {
+                componentsList.Add(new Dictionary<string, object>
+                {
+                    ["type"] = "HEADER",
+                    ["format"] = "TEXT",
+                    ["text"] = model.Header.Text
+                });
+            }
+
+            // =========================
+            // BODY
+            // =========================
+            var bodyComponent = model.Components
+                .FirstOrDefault(c => c.Type.Equals("body", StringComparison.OrdinalIgnoreCase));
+
+            if (bodyComponent == null || string.IsNullOrWhiteSpace(bodyComponent.Text))
+                throw new Exception("El componente BODY debe tener texto");
+
+            var bodyComp = new Dictionary<string, object>
+            {
+                ["type"] = "BODY",
+                ["text"] = bodyComponent.Text
+            };
+
+            // Detectar variables {{param}}
+            var matches = Regex.Matches(bodyComponent.Text, "{{(.*?)}}");
+
+            if (matches.Count > 0)
+            {
+                var namedParams = matches
+                    .Select(m => m.Groups[1].Value.Trim())
+                    .Distinct()
+                    .Select(p => new
+                    {
+                        param_name = p,
+                        example = "Ejemplo"
+                    })
+                    .ToList();
+
+                bodyComp["example"] = new
+                {
+                    body_text_named_params = namedParams
+                };
+            }
+
+            componentsList.Add(bodyComp);
+
+            // =========================
+            // FOOTER
+            // =========================
+            if (!string.IsNullOrWhiteSpace(model.Footer))
+            {
+                componentsList.Add(new Dictionary<string, object>
+                {
+                    ["type"] = "FOOTER",
+                    ["text"] = model.Footer
+                });
+            }
+
+            // =========================
+            // BUTTONS
+            // =========================
+            var buttonsList = new List<ButtonRequest>();
+
+            var buttonsComponent = model.Components
+                .FirstOrDefault(c => c.Type.Equals("buttons", StringComparison.OrdinalIgnoreCase));
+
+            if (buttonsComponent?.Buttons != null)
+                buttonsList.AddRange(buttonsComponent.Buttons);
+
+            if (model.Buttons != null)
+                buttonsList.AddRange(model.Buttons.Select(b => new ButtonRequest
+                {
+                    Type = b.Type,
+                    Text = b.Text,
+                    Url = b.Url
+                }));
+
+            if (buttonsList.Any())
+            {
+                var formattedButtons = new List<Dictionary<string, object>>();
+
+                foreach (var b in buttonsList)
+                {
+                    var typeUpper = b.Type?.ToUpper();
+
+                    var btn = new Dictionary<string, object>
+                    {
+                        ["type"] = typeUpper,
+                        ["text"] = b.Text
+                    };
+
+                    if (typeUpper == "URL" && !string.IsNullOrWhiteSpace(b.Url))
+                    {
+                        btn["url"] = b.Url;
+
+                        // Si la URL tiene {{param}}, es dinámica → necesita example
+                        if (b.Url.Contains("{{"))
+                        {
+                            var match = Regex.Match(b.Url, "{{(.*?)}}");
+                            if (match.Success)
+                            {
+                                btn["example"] = new List<string> { "EJEMPLO" };
+                            }
+                        }
+                    }
+
+                    if (typeUpper == "PHONE_NUMBER" && !string.IsNullOrWhiteSpace(b.Url))
+                    {
+                        btn["phone_number"] = b.Url;
+                    }
+
+                    formattedButtons.Add(btn);
+                }
+
+                componentsList.Add(new Dictionary<string, object>
+                {
+                    ["type"] = "BUTTONS",
+                    ["buttons"] = formattedButtons
+                });
+            }
+
+            // =========================
+            // FINAL OBJECT
+            // =========================
+            var finalObj = new
+            {
+                name = NormalizeStrings.NormalizeTemplateName(model.Name),
+                language = model.Language,
+                category = model.Category,
+                parameter_format = "NAMED",
+                components = componentsList
+            };
+
+            return JsonSerializer.Serialize(finalObj, new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            });
+        }
+
+        /*
+        private string BuildWhatsappTemplateJson(CreateTemplateModel model)
+        {
+            if (model.Components == null || !model.Components.Any())
+                throw new Exception("El template debe tener al menos un componente");
+
+            var componentsList = new List<Dictionary<string, object>>();
+
+            // HEADER (imagen o texto)
+            if (!string.IsNullOrEmpty(model.MediaUrl))
+            {
+                componentsList.Add(new Dictionary<string, object>
+                {
+                    ["type"] = "header",
+                    ["format"] = model.MediaType.ToLower(), // image, video, document
+                    ["example"] = new { header_handle = new List<string> { model.MediaUrl } }
+                });
+            }
+            else if (model.Header != null && !string.IsNullOrEmpty(model.Header.Text))
+            {
+                componentsList.Add(new Dictionary<string, object>
+                {
+                    ["type"] = "header",
+                    ["format"] = "text",
+                    ["text"] = model.Header.Text
+                });
+            }
+
+            // BODY
+            var bodyComponent = model.Components.FirstOrDefault(c => c.Type.ToLower() == "body");
+            if (bodyComponent == null || string.IsNullOrWhiteSpace(bodyComponent.Text))
+                throw new Exception("El componente BODY debe tener texto");
+
+            var bodyComp = new Dictionary<string, object>
+            {
+                ["type"] = "body",
+                ["text"] = bodyComponent.Text
+            };
+
+            // CREAR body_text_named_params basado en {{param}}
+            var matches = Regex.Matches(bodyComponent.Text, "{{(.*?)}}");
+            if (matches.Count > 0)
+            {
+                var namedParams = matches
+                    .Select(m => new
+                    {
+                        param_name = m.Groups[1].Value.Trim(),
+                        example = "Ejemplo"
+                    })
+                    .DistinctBy(p => p.param_name)
+                    .ToList();
+
+                bodyComp["example"] = new { body_text_named_params = namedParams };
+            }
+
+            componentsList.Add(bodyComp);
+
+            // FOOTER
+            if (!string.IsNullOrWhiteSpace(model.Footer))
+            {
+                componentsList.Add(new Dictionary<string, object>
+                {
+                    ["type"] = "footer",
+                    ["text"] = model.Footer
+                });
+            }
+
+            // BUTTONS (desde el componente o desde la lista general)
+            List<ButtonRequest> buttonsList = new List<ButtonRequest>();
+            var buttonsComponent = model.Components.FirstOrDefault(c => c.Type.ToLower() == "buttons");
+            if (buttonsComponent?.Buttons != null)
+                buttonsList.AddRange(buttonsComponent.Buttons);
+
+            if (model.Buttons != null)
+                buttonsList.AddRange(model.Buttons.Select(b => new ButtonRequest
+                {
+                    Type = b.Type,
+                    Text = b.Text,
+                    Url = b.Url,
+                    UrlType = b.UrlType,
+                    UrlBase = b.UrlBase,
+                    DynamicExample = b.DynamicExample,
+                    //Example = b.Example
+                }));
+
+            if (buttonsList.Any())
+            {
+                var buttonsComp = new Dictionary<string, object>
+                {
+                    ["type"] = "buttons",
+                    ["buttons"] = buttonsList.Select(b =>
+                    {
+                        var btn = new Dictionary<string, object>
+                        {
+                            ["type"] = b.Type.ToLower(),
+                            ["text"] = b.Text
+                        };
+
+                        if (b.Type.ToLower() == "url" && !string.IsNullOrEmpty(b.Url))
+                            btn["url"] = b.Url;
+
+                        /*if (b.Type.ToLower() == "phone_number" && !string.IsNullOrEmpty(b.PhoneNumber))
+                            btn["phone_number"] = b.PhoneNumber;
+
+                        return btn;
+                    }).ToList()
+                };
+
+                componentsList.Add(buttonsComp);
+            }
+
+            // Objeto final
+            var finalObj = new
+            {
+                name = NormalizeStrings.NormalizeTemplateName(model.Name),
+                language = model.Language,
+                category = model.Category,
+                parameter_format = "NAMED",
+                components = componentsList
+            };
+
+            return JsonSerializer.Serialize(finalObj, new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            });
+        }*/
+
         [HttpPost("enviar-invitacion-dina")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [Authorize(Roles = "Admin,WeddingPlanner,User")]
         public async Task<IActionResult> EnviarInvitacionMasivaTemplateDinamica(
-            [FromBody] MasiveSendTemplateDTO sendTemplateDTO)
+                [FromBody] MasiveSendTemplateDTO sendTemplateDTO)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
@@ -400,5 +715,18 @@ namespace SIC.Backend.Controllers
                 result.Success ? "Mensaje enviado correctamente." : result.Message
             );
         }
+    }
+
+    // The issue arises because the `ComponentRequest` class has duplicate property names for `Type` and `Format`.
+    // To resolve this, we need to ensure that the properties in the `ComponentRequest` class have unique names.
+    // Below is the corrected `ComponentRequest` class with unique property names.
+
+    public class ComponentRequest
+    {
+        public string ComponentType { get; set; } // Renamed from 'Type' to 'ComponentType'
+        public string? ComponentFormat { get; set; } // Renamed from 'Format' to 'ComponentFormat'
+        public string? Text { get; set; }
+        public BodyExample? Example { get; set; }
+        public List<ButtonRequest>? Buttons { get; set; }
     }
 }

@@ -1,5 +1,5 @@
 ﻿@page "/whatsapp_templates/template-builder"
-@using SIC.Frontend.Models
+@using SIC.Shared.Request
 
 <div class="row">
 
@@ -13,8 +13,8 @@
             <div class="mb-3">
                 <label>Nombre de la plantilla</label>
                 <input class="form-control"
-                @bind="Model.Name"
-                @bind:event="oninput" />
+                       @bind="Model.Name"
+                       @bind:event="oninput" />
             </div>
 
             <div class="mb-3">
@@ -39,9 +39,9 @@
             @if (HeaderType == "TEXT")
             {
                 <input class="form-control"
-                placeholder="Texto del encabezado"
-                @bind="HeaderText"
-                @bind:event="oninput" />
+                       placeholder="Texto del encabezado"
+                       @bind="HeaderText"
+                       @bind:event="oninput" />
             }
 
             <hr />
@@ -51,7 +51,7 @@
             <h5>Muestra de contenido multimedia</h5>
 
             <select class="form-select mb-2"
-            @bind="Model.MediaType">
+                    @bind="Model.MediaType">
                 <option value="">Sin multimedia</option>
                 <option value="IMAGE">Imagen</option>
                 <option value="VIDEO">Video</option>
@@ -61,14 +61,14 @@
             @if (!string.IsNullOrEmpty(Model.MediaType))
             {
                 <input class="form-control mb-2"
-                placeholder="URL del archivo"
-                @bind="Model.MediaUrl"
-                @bind:event="oninput" />
+                       placeholder="URL del archivo"
+                       @bind="Model.MediaUrl"
+                       @bind:event="oninput" />
 
                 <input class="form-control"
-                placeholder="Texto alternativo / nombre archivo"
-                @bind="Model.MediaCaption"
-                @bind:event="oninput" />
+                       placeholder="Texto alternativo / nombre archivo"
+                       @bind="Model.MediaCaption"
+                       @bind:event="oninput" />
             }
 
             <hr />
@@ -78,16 +78,16 @@
             <h5>Contenido</h5>
 
             <textarea class="form-control"
-            rows="5"
-            placeholder="Ej: Hola {{1}}, tu pedido {{2}} está listo"
-            value="@Model.Body"
-            @oninput="OnBodyChanged">
+                      rows="5"
+                      placeholder="Ej: Hola {{1}}, tu pedido {{2}} está listo"
+                      value="@Model.Components"
+                      @oninput="OnBodyChanged">
             </textarea>
 
             <div class="mt-2">
                 <button type="button"
-                class="btn btn-sm btn-custom"
-                @onclick="AddVariable">
+                        class="btn btn-sm btn-custom"
+                        @onclick="AddVariable">
                     + Agregar variable
                 </button>
             </div>
@@ -105,8 +105,8 @@
                             <span class="input-group-text">@((index + 1))</span>
 
                             <input class="form-control"
-                            value="@Model.BodyExamples[index]"
-                            @oninput="(e => OnExampleChanged(e, index))" />
+                                   value="@Model.BodyExamples[index]"
+                                   @oninput="(e => OnExampleChanged(e, index))" />
 
                             <select class="form-select form-select-sm"
                                     style="max-width: 200px;"
@@ -115,6 +115,7 @@
                                 <option value="">Selecciona una variable</option>
                                 <option value="Date">Nombre Invitado</option>
                                 <option value="Date">Codigo de Invitacion</option>
+                                <option value="Date">Fecha del Evento</option>
                                 <option value="">Nombre del Evento</option>
                                 <option value="Text">Titulo Evento</option>
                                 <option value="Number">Url de la Invitacion</option>
@@ -132,8 +133,8 @@
 
             <h5>Pie de página</h5>
             <input class="form-control"
-            @bind="Model.Footer"
-            @bind:event="oninput" />
+                   @bind="Model.Footer"
+                   @bind:event="oninput" />
 
             <hr />
 
@@ -142,7 +143,7 @@
             <h5>Botones</h5>
 
             <button class="btn btn-custom mb-3"
-            @onclick="AddButton">
+                    @onclick="AddButton">
                 + Agregar botón
             </button>
 
@@ -151,20 +152,20 @@
                 <div class="card p-3 mb-2">
 
                     <select class="form-select mb-2"
-                    @bind="button.Type">
+                            @bind="button.Type">
                         <option value="URL">Ir al sitio web</option>
                         <option value="QUICK_REPLY">Respuesta rápida</option>
                     </select>
 
                     <input class="form-control mb-2"
-                    placeholder="Texto del botón"
-                    @bind="button.Text"
-                    @bind:event="oninput" />
+                           placeholder="Texto del botón"
+                           @bind="button.Text"
+                           @bind:event="oninput" />
 
                     @if (button.Type == "URL")
                     {
                         <select class="form-select mb-2"
-                        @bind="button.UrlType">
+                                @bind="button.UrlType">
                             <option value="STATIC">Estática</option>
                             <option value="DYNAMIC">Dinámica</option>
                         </select>
@@ -172,21 +173,21 @@
                         @if (button.UrlType == "STATIC")
                         {
                             <input class="form-control"
-                            placeholder="https://midominio.com"
-                            @bind="button.Url"
-                            @bind:event="oninput" />
+                                   placeholder="https://midominio.com"
+                                   @bind="button.Url"
+                                   @bind:event="oninput" />
                         }
                         else
                         {
                             <input class="form-control mb-2"
-                            placeholder="https://midominio.com/"
-                            @bind="button.UrlBase"
-                            @bind:event="oninput" />
+                                   placeholder="https://midominio.com/"
+                                   @bind="button.UrlBase"
+                                   @bind:event="oninput" />
 
                             <input class="form-control"
-                            placeholder="Ejemplo dinámico"
-                            @bind="button.DynamicExample"
-                            @bind:event="oninput" />
+                                   placeholder="Ejemplo dinámico"
+                                   @bind="button.DynamicExample"
+                                   @bind:event="oninput" />
                         }
                     }
 
@@ -216,7 +217,7 @@
                             @if (Model.MediaType == "IMAGE")
                             {
                                 <img src="@Model.MediaUrl"
-                                style="max-width:100%; border-radius:8px;" />
+                                     style="max-width:100%; border-radius:8px;" />
                             }
                             else if (Model.MediaType == "VIDEO")
                             {
@@ -275,45 +276,45 @@
 
 <style>
     .phone-frame {
-    border: 10px solid #111;
-    border-radius: 30px;
-    height: 100vh;
-    background: #e5ddd5;
-    display: flex;
-    flex-direction: column;
+        border: 10px solid #111;
+        border-radius: 30px;
+        height: 100vh;
+        background: #e5ddd5;
+        display: flex;
+        flex-direction: column;
     }
 
     .whatsapp-header {
-    background: #075E54;
-    color: white;
-    padding: 15px;
-    font-weight: bold;
-    text-align: center;
+        background: #075E54;
+        color: white;
+        padding: 15px;
+        font-weight: bold;
+        text-align: center;
     }
 
     .chat-area {
-    padding: 20px;
-    flex-grow: 1;
+        padding: 20px;
+        flex-grow: 1;
     }
 
     .message-bubble {
-    background: white;
-    padding: 15px;
-    border-radius: 10px;
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
     }
 
     .footer-text {
-    font-size: 12px;
-    color: gray;
+        font-size: 12px;
+        color: gray;
     }
 
     .preview-button {
-    border: 1px solid #25D366;
-    color: #25D366;
-    padding: 8px;
-    text-align: center;
-    border-radius: 8px;
-    margin-top: 5px;
+        border: 1px solid #25D366;
+        color: #25D366;
+        padding: 8px;
+        text-align: center;
+        border-radius: 8px;
+        margin-top: 5px;
     }
 </style>
 
@@ -325,13 +326,43 @@
 
     private void OnBodyChanged(ChangeEventArgs e)
     {
-        Model.Body = e.Value?.ToString() ?? "";
+        var text = e.Value?.ToString() ?? "";
+
+        // Siempre mantenemos una sola componente BODY
+        if (!Model.Components.Any(c => c.Type == "BODY"))
+        {
+            Model.Components.Add(new ComponentRequest
+                {
+                    Type = "BODY",
+                    Text = text
+                });
+        }
+        else
+        {
+            var bodyComp = Model.Components.First(c => c.Type == "BODY");
+            bodyComp.Text = text;
+        }
     }
 
     private void AddVariable()
     {
         var nextIndex = Model.BodyExamples.Count + 1;
-        Model.Body += $" {{{{{nextIndex}}}}}";
+
+        // Asegurarse que exista la componente BODY
+        if (!Model.Components.Any(c => c.Type == "BODY"))
+        {
+            Model.Components.Add(new ComponentRequest
+                {
+                    Type = "BODY",
+                    Text = $"{{{{{nextIndex}}}}}"
+                });
+        }
+        else
+        {
+            var bodyComp = Model.Components.First(c => c.Type == "BODY");
+            bodyComp.Text += $" {{{{{nextIndex}}}}}";
+        }
+
         Model.BodyExamples.Add("");
         Model.BodyExampleTypes.Add("");
     }
@@ -352,10 +383,10 @@
 
     private string RenderPreviewBody()
     {
-        if (string.IsNullOrEmpty(Model.Body))
+        if (!Model.Components.Any(c => c.Type == "BODY"))
             return "";
 
-        var result = Model.Body;
+        var result = Model.Components.First(c => c.Type == "BODY").Text ?? "";
 
         for (int i = 0; i < Model.BodyExamples.Count; i++)
         {

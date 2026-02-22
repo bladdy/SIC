@@ -20,4 +20,8 @@
     <ProjectReference Include="..\SIC.Shared\SIC.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
+
 </Project>

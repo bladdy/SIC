@@ -13,6 +13,7 @@ namespace SIC.Shared.Entities
         public string DisplayName { get; set; } = null!;
         public string Language { get; set; } = "es_ES";
 
+        //Agregar usuario que creó la plantilla
         // JSON con la estructura completa
         public string StructureJson { get; set; } = null!;
     }

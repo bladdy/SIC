@@ -184,6 +184,7 @@ public partial class EventsDetails
             Guests = invitation.Guests,
             Table = invitation.Table,
             Comments = invitation.Comments,
+            CountryCode =invitation.CountryCode,
             SentDate = invitation.SentDate,
             ConfirmationDate = invitation.ConfirmationDate,
             Name = invitation.Name,

@@ -26,6 +26,10 @@ public class Event : IEntityWithName
     [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd hh:mm tt}")]
     public DateTime Date { get; set; } = DateTime.Now;
 
+    [Display(Name = "Fecha Limite")]
+    [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd hh:mm tt}")]
+    public DateTime? DeadLine { get; set; }
+
     [Display(Name = "Hora")]
     [DisplayFormat(DataFormatString = "{0:hh:mm}")]
     public TimeSpan Time { get; set; }

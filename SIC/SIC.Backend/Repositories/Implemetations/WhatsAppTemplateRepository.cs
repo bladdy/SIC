@@ -16,6 +16,29 @@ namespace SIC.Backend.Repositories.Implemetations
             _context = context;
         }
 
+        public async Task<ActionResponse<bool>> CreateTemplates(WhatsAppTemplate entity)
+        {
+            bool exists = await _context.WhatsAppTemplates.AnyAsync(t => t.Name == entity.Name);
+            if (exists)
+            {
+                return new ActionResponse<bool>
+                {
+                    Success = false,
+                    Message = "Ya existe una plantilla con ese nombre."
+                };
+            }
+            else
+            {
+                _context.WhatsAppTemplates.Add(entity);
+                await _context.SaveChangesAsync();
+                return new ActionResponse<bool>
+                {
+                    Success = true,
+                    Result = true
+                };
+            }
+        }
+
         public async Task<ActionResponse<IEnumerable<WhatsAppTemplate?>>> GetAllAsync()
         {
             var entities = await _context.WhatsAppTemplates.ToListAsync();

@@ -1,10 +1,13 @@
 ﻿using Newtonsoft.Json;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
+using SIC.Shared.Request;
 using SIC.Shared.Response;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
+using static QRCoder.PayloadGenerator;
 
 namespace SIC.Backend.Services
 {
@@ -502,5 +505,272 @@ namespace SIC.Backend.Services
 
             return true;
         }
+
+        public async Task<bool> CreateWhatsAppTemplateAsync(
+            string accessToken,
+            string wabaId,
+            string requestJson,
+            string imageUrl)
+        {
+            if (string.IsNullOrEmpty(accessToken))
+                throw new ArgumentException("Access token is required");
+
+            if (string.IsNullOrEmpty(wabaId))
+                throw new ArgumentException("wabaId is required");
+
+            // 1️⃣ Subir imagen y obtener handle válido
+            var mediaHandle = await UploadTemplateImageAsync(accessToken, imageUrl);
+
+            // 2️⃣ Reemplazar en JSON
+            var requestObj = JsonNode.Parse(requestJson);
+
+            var components = requestObj["components"].AsArray();
+
+            var header = components
+                .FirstOrDefault(c =>
+                    c["type"]?.ToString()
+                    .Equals("HEADER", StringComparison.OrdinalIgnoreCase) == true);
+
+            if (header == null)
+                throw new Exception("El template no contiene componente HEADER.");
+
+            // Asegurar estructura example.header_handle
+            if (header["example"] == null)
+                header["example"] = new JsonObject();
+
+            header["example"]["header_handle"] = new JsonArray(mediaHandle);
+
+            var finalJson = requestObj.ToJsonString();
+
+            using var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", accessToken);
+
+            var url = $"https://graph.facebook.com/v22.0/{wabaId}/message_templates";
+
+            var content = new StringContent(finalJson, Encoding.UTF8, "application/json");
+            var response = await httpClient.PostAsync(url, content);
+
+            var responseBody = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Error Meta:");
+                Console.WriteLine(responseBody);
+                return false;
+            }
+
+            Console.WriteLine("Template creado correctamente:");
+            Console.WriteLine(responseBody);
+            return true;
+        }
+
+        public async Task<string> UploadTemplateImageAsync(string accessToken, string imageUrl)
+        {
+            using var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", accessToken);
+
+            // 1️⃣ Descargar imagen
+            var imageResponse = await httpClient.GetAsync(imageUrl);
+            if (!imageResponse.IsSuccessStatusCode)
+                throw new Exception("No se pudo descargar la imagen.");
+
+            var imageBytes = await imageResponse.Content.ReadAsByteArrayAsync();
+            var fileLength = imageBytes.Length;
+
+            var contentType = imageResponse.Content.Headers.ContentType?.MediaType
+                              ?? "image/jpeg";
+
+            // Detectar extensión real
+            var extension = contentType.Contains("png") ? "png" : "jpg";
+            var fileName = $"header.{extension}";
+
+            // 2️⃣ Crear sesión upload
+            var createSessionBody = new
+            {
+                file_name = fileName,
+                file_length = fileLength,
+                file_type = contentType
+            };
+
+            var sessionResponse = await httpClient.PostAsync(
+                "https://graph.facebook.com/v22.0/app/uploads",
+                new StringContent(
+                    System.Text.Json.JsonSerializer.Serialize(createSessionBody),
+                    Encoding.UTF8,
+                    "application/json"));
+
+            var sessionJson = await sessionResponse.Content.ReadAsStringAsync();
+
+            if (!sessionResponse.IsSuccessStatusCode)
+                throw new Exception("Error creando sesión upload: " + sessionJson);
+
+            var sessionData = JsonDocument.Parse(sessionJson);
+            var uploadSessionId = sessionData.RootElement
+                .GetProperty("id")
+                .GetString();
+
+            if (string.IsNullOrWhiteSpace(uploadSessionId))
+                throw new Exception("Meta no devolvió upload session id.");
+
+            // 3️⃣ Subir archivo correctamente como multipart/form-data
+            var uploadUrl = $"https://graph.facebook.com/v22.0/{uploadSessionId}";
+
+            using var form = new MultipartFormDataContent();
+
+            var fileContent = new ByteArrayContent(imageBytes);
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+
+            // IMPORTANTE: el nombre del campo debe ser "file"
+            form.Add(fileContent, "file", fileName);
+
+            var uploadResponse = await httpClient.PostAsync(uploadUrl, form);
+            var uploadJson = await uploadResponse.Content.ReadAsStringAsync();
+
+            if (!uploadResponse.IsSuccessStatusCode)
+                throw new Exception("Error subiendo imagen: " + uploadJson);
+
+            var uploadData = JsonDocument.Parse(uploadJson);
+
+            var mediaHandle = uploadData.RootElement
+                .GetProperty("h")
+                .GetString();
+
+            if (string.IsNullOrWhiteSpace(mediaHandle))
+                throw new Exception("Meta no devolvió media handle.");
+
+            return mediaHandle;
+        }
     }
 }
+
+/*
+
+{
+  "name": "confirmacion_internas",
+  "nanguage": "es_ES",
+  "category": "MARKETING",
+  "components": [
+    {
+      "type": "HEADER",
+      "format": "TEXT",
+      "text": "Invitación"
+    },
+    {
+      "type": "BODY",
+      "text": "Hola {{1}}, te informamos que tu pedido con número {{2}} ya se encuentra listo para ser retirado en nuestra sucursal.",
+      "example": {
+        "body_text": [
+          ["Juan", "ABC123"]
+        ]
+      }
+    },
+    {
+      "type": "FOOTER",
+      "text": "Te esperamos"
+    },
+    {
+      "type": "BUTTONS",
+      "buttons": [
+        {
+          "type": "URL",
+          "text": "Confirmar",
+          "url": "https://www.luckyshrub.com/shop?promo={{1}}",
+          "example": [
+            "summer2023"
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+
+
+
+
+{
+  "name": "promo_descuento_febrero",
+  "language": "es_ES",
+  "category": "MARKETING",
+  "header": {
+    "type": "image",
+    "text": ""
+  },
+  "components": [
+    {
+      "type": "body",
+      "format": "text",
+      "text": "Hola {{nombre}}, tenemos un {{porcentaje}} de descuento exclusivo para ti. Usa el código {{codigo}} antes del {{fecha_limite}}.",
+      "bodyExampleParams": [
+        {
+          "paramName": "nombre",
+          "exampleValue": "Carlos"
+        },
+        {
+          "paramName": "porcentaje",
+          "exampleValue": "25%"
+        },
+        {
+          "paramName": "codigo",
+          "exampleValue": "FEB25"
+        },
+        {
+          "paramName": "fecha_limite",
+          "exampleValue": "28/02/2026"
+        }
+      ],
+      "buttons": [
+        {
+          "type": "url",
+          "text": "Comprar ahora",
+          "url": "https://midominio.com/oferta/{{codigo}}",
+          "urlType": "DYNAMIC",
+          "urlBase": "https://midominio.com/oferta/",
+          "dynamicExample": "FEB25",
+          "example": [
+            "FEB25"
+          ]
+        },
+        {
+          "type": "quick_reply",
+          "text": "No me interesa",
+          "url": "",
+          "urlType": "",
+          "urlBase": "",
+          "dynamicExample": "",
+          "example": []
+        }
+      ]
+    }
+  ],
+  "footer": "Promoción válida por tiempo limitado.",
+  "bodyExamples": [],
+  "bodyExampleTypes": [],
+  "buttons": [
+    {
+      "type": "url",
+      "text": "Comprar ahora",
+      "urlType": "DYNAMIC",
+      "url": "https://midominio.com/oferta/{{codigo}}",
+      "phoneNumber": "",
+      "urlBase": "https://midominio.com/oferta/",
+      "dynamicExample": "FEB25"
+    },
+    {
+      "type": "quick_reply",
+      "text": "No me interesa",
+      "urlType": "",
+      "url": "",
+      "phoneNumber": "",
+      "urlBase": "",
+      "dynamicExample": ""
+    }
+  ],
+  "mediaType": "IMAGE",
+  "mediaUrl": "https://invboxv-app.com/files/5AYWC5/5a6049d9-ae7e-4d04-aaeb-527263f340a7.jpg",
+  "mediaCaption": ""
+}
+
+*/

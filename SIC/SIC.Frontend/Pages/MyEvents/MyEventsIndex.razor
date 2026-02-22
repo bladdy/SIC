@@ -238,107 +238,10 @@
                                 <InputTime CssClass="form-control" @bind-Value="NewEvent.Time" />
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">URL Invitacion</label>
-                            <InputText class="form-control" @bind-Value="NewEvent.Url" placeholder="Ej. https://mi-invitacion.com.." />
-                        </div>
-                        <div class="mb-3 d-none">
-                            <label class="form-label">Ubicación</label>
-                            <InputText class="form-control" @bind-Value="NewEvent.Ubication" placeholder="Ej. https://www.google.com/maps/....." />
-                        </div>
-                        <div class="mb-3 row d-none">
-
-                            <div class="col-auto">
-                                <label class="form-label">Anfitrión</label>
-                                <InputText class="form-control" @bind-Value="NewEvent.Host" />
-                            </div>
-
-                            <div class="col-auto">
-                                <label class="form-label">Teléfono Anfitrión</label>
-                                <InputText class="form-control" @bind-Value="NewEvent.HostPhone" />
-                            </div>
-                        </div>
-                        <div class="mb-3 row d-none">
-                            <div class="col-auto">
-                                <label class="form-label">Planner</label>
-                                <InputText class="form-control" placeholder="Nombre..." @bind-Value="NewEvent.Planner" />
-                            </div>
-
-                            <div class="col-auto">
-                                <label class="form-label">Teléfono Planner</label>
-                                <InputText class="form-control" placeholder="Numero celular..." @bind-Value="NewEvent.PlannerPhone" />
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Estado</label>
-                            <InputSelect class="form-select" @bind-Value="NewEvent.Status">
-                                <option value="">-- Selecciona un Estado --</option>
-                                @foreach (var status in Enum.GetValues<Status>())
-                                {
-                                    <option value="@status">@status.GetDescription()</option>
-                                }
-                            </InputSelect>
-                            <ValidationMessage For="@(() => NewEvent.Status)" />
-                        </div>
-
-                        <!-- Footer -->
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-custom">Guardar</button>
-                            <button type="button" class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
-                        </div>
-                    </EditForm>
-                </div>
-            </div>
-        </div>
-    </div>
-}
-
-<!-- Modal -->
-@if (IsModalVisible)
-{
-    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">@((IsEditMode ? $"Editar Evento: {NewEvent.Code}" : "Crear Evento"))</h5>
-                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
-                </div>
-                <div class="modal-body">
-                    <EditForm Model="@NewEvent" OnValidSubmit="@SaveEvent">
-                        <DataAnnotationsValidator />
-                        <ValidationSummary />
-
-                        
-
-
-                        <!-- Campos estándar -->
-                        <div class="mb-3">
-                            <label class="form-label">Tipo de Evento</label>
-                            <InputSelect class="form-select" @bind-Value="NewEvent.EventTypeId">
-                                <option value="">-- Selecciona un tipo --</option>
-                                @if (EventTypes != null)
-                                {
-                                    @foreach (var type in EventTypes)
-                                    {
-                                        <option value="@type.Id">@type.Name</option>
-                                    }
-                                }
-                            </InputSelect>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Anfitrión(es)</label>
-                            <InputText class="form-control" @bind-Value="NewEvent.Name" placeholder="Ej. Fernanda & Raúl" />
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Nombre del Evento</label>
-                            <InputText class="form-control" @bind-Value="NewEvent.SubTitle" placeholder="Ej. Nuestra Boda" />
-                        </div>
-
                         <div class="mb-3 row">
                             <div class="col">
-                                <label class="form-label">Fecha</label>
-                                <InputDate class="form-control" @bind-Value="NewEvent.Date" />
+                                <label class="form-label">Fecha Limite</label>
+                                <InputDate class="form-control" @bind-Value="NewEvent.DeadLine" />
                             </div>
                             <div class="col d-none">
                                 <label class="form-label">Hora</label>
@@ -349,6 +252,10 @@
                             <label class="form-label">URL Invitacion</label>
                             <InputText class="form-control" @bind-Value="NewEvent.Url" placeholder="Ej. https://mi-invitacion.com.." />
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">Miniatura Invitacion</label>
+                            <InputText class="form-control" @bind-Value="NewEvent.CoverImageUrl" placeholder="Ej. https://mi-invitacion.com.." />
+                        </div>
                         <div class="mb-3 d-none">
                             <label class="form-label">Ubicación</label>
                             <InputText class="form-control" @bind-Value="NewEvent.Ubication" placeholder="Ej. https://www.google.com/maps/....." />
@@ -377,7 +284,7 @@
                             </div>
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-3 d-none">
                             <label class="form-label">Estado</label>
                             <InputSelect class="form-select" @bind-Value="NewEvent.Status">
                                 <option value="">-- Selecciona un Estado --</option>
@@ -400,3 +307,4 @@
         </div>
     </div>
 }
+

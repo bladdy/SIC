@@ -2,7 +2,7 @@
 @layout LoginLayout
 @using Microsoft.AspNetCore.Components.Forms
 
-<div class="d-flex justify-content-center align-items-center min-vh-100">
+<div class="d-flex justify-content-center align-items-center min-vh-100" style="background-color">
     <div class="card p-4 shadow position-relative"
          style="max-width: 500px; width: 90%; min-height: 400px;">
 
@@ -113,23 +113,63 @@
 
             @if (MostrarGracias)
             {
-                <div class="mt-4">
-                    <h5 class="fw-bold">¡Gracias por confirmar tu asistencia!</h5>
+                <div class="card shadow-lg border-0 mt-4 mx-auto" >
 
-                    @if (!string.IsNullOrEmpty(QrBase64))
+                    <!-- Imagen del evento -->
+                    @if (!string.IsNullOrEmpty(Invitacion?.Event?.CoverImageUrl))
                     {
-                        <img src="@($"data:image/png;base64,{QrBase64}")"
-                             style="width:150px; display:block; margin:auto;" />
+                        <img src="@Invitacion.Event.CoverImageUrl"
+                             class="card-img-top"
+                             style="height: 200px; object-fit: cover; border-top-left-radius:15px; border-top-right-radius:15px;" />
                     }
 
-                    @if (!string.IsNullOrEmpty(PdfBase64))
-                    {
-                        <a class="btn btn-secondary btn-sm mt-2"
-                           href="@($"data:application/pdf;base64,{PdfBase64}")"
-                           download="Boleta.pdf">
-                            Descargar boleta PDF
-                        </a>
-                    }
+                    <div class="card-body text-center">
+
+                        <h5 class="fw-bold text-uppercase mb-3 text-success">
+                            🎉 ¡Gracias por confirmar tu asistencia!
+                        </h5>
+
+                        @if (!string.IsNullOrEmpty(QrBase64))
+                        {
+                            <div class="my-3">
+                                <img src="@($"data:image/png;base64,{QrBase64}")"
+                                     class="img-fluid"
+                                     style="max-width: 220px;" />
+                            </div>
+                        }
+
+                        @if (Invitacion?.Guests != null && Invitacion.Guests.Any())
+                        {
+                            int contador = 1;
+                            <h5 class="fw-bold text-uppercase mb-3">
+                                ¡Lista de invitados!
+                            </h5>
+
+                            @foreach (var guest in Invitacion.Guests.Where(s => s.Status == Status.Attend))
+                            {
+                                <div class="row align-items-center py-2 fw-bold text-capitalize">
+                                    <div class="col-6">
+                                        @(guest.GuestName ?? $"Invitado {contador}")
+                                    </div>
+                                </div>
+
+                            }
+                        }
+                        <p class="fw-semibold text-muted small">
+                            Este código QR es tu acceso al evento.
+                            Descárgalo y preséntalo en la entrada.
+                        </p>
+
+                        @if (!string.IsNullOrEmpty(PdfBase64))
+                        {
+                            <a class="btn btn-dark w-100 mt-3"
+                               href="@($"data:application/pdf;base64,{PdfBase64}")"
+                               download="Boleta.pdf">
+                                ⬇ Descargar QR
+                            </a>
+                        }
+
+                    </div>
                 </div>
             }
 
