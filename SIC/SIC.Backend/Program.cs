@@ -14,6 +14,7 @@ using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.Entities;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 //ToDo: Agregar la deshabilitacion de los botones Editar y Crear para los Clientes y los Wedding Planner
@@ -22,7 +23,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers()
-    .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.DefaultIgnoreCondition =
+           JsonIgnoreCondition.WhenWritingNull;
+    });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
