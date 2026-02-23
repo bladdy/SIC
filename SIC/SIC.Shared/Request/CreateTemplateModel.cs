@@ -5,7 +5,7 @@
     {
         public string Name { get; set; } = "";
         public string Language { get; set; } = "es_ES";
-        public string Category { get; set; } = "MARKETING"; // MARKETING / UTILITY / AUTHENTICATION
+        public string Category { get; set; } = "MARKETING"; // MARKETING / UTILITY / AUTHENTICATION / SERVICE
         public HeaderModel? Header { get; set; }
         public List<ComponentRequest> Components { get; set; } = new(); // Lista de componentes
         public string? Footer { get; set; }
@@ -68,7 +68,6 @@
         public List<string>? Example { get; set; }
     }
 }
-
 
 /*
  var templateExample = new CreateTemplateModel

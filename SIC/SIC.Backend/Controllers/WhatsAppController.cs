@@ -95,7 +95,7 @@ namespace SIC.Backend.Controllers
                     var result = await _whatsAppService.EnviarInvitacionAsync(
                         accessToken,
                         phoneNumberId,
-                        invitacion.Result.PhoneNumber,
+                        invitacion.Result.PhoneNumber!,
                         templateName,
                         "es_ES",
                         coverImageUrl,
@@ -115,7 +115,7 @@ namespace SIC.Backend.Controllers
                     {
                         PhoneNumber = userWhatsAppConfig.Result.PhoneNumber,
                         MessageId = result.Result!.Wamid,
-                        From = invitacion.Result.PhoneNumber,
+                        From = invitacion.Result.PhoneNumber!,
                         Text = $"Invitación enviada a {invitacion.Result.Name}",
                         Type = "template",
                         Direction = "OUT",

@@ -5,7 +5,7 @@
         <div class="col-md-3">
             <div class="card shadow-sm text-center">
                 <div class="card-body">
-                    <h6>Mis Creditos</h6>
+                    <h6>Mis Creditos Disponibles</h6>
                     <h3>@UserCreditDTO?.AvailableCredits</h3>
                 </div>
             </div>
@@ -13,8 +13,16 @@
         <div class="col-md-3">
             <div class="card shadow-sm text-center">
                 <div class="card-body">
-                    <h6>Mis Eventos</h6>
-                    <h3>@PlannerDashboards.MyEventsCount</h3>
+                    <h6>Mis Eventos Activos</h6>
+                    <h3>@PlannerDashboards.MyEventsActive</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center">
+                <div class="card-body">
+                    <h6>Mis Eventos Completados</h6>
+                    <h3>@PlannerDashboards.MyEventsCompleted</h3>
                 </div>
             </div>
         </div>
@@ -28,6 +36,7 @@
                 </div>
             </div>
         </div>
+
 
         <div class="col-md-3 d-none">
             <div class="card shadow-sm text-center">
@@ -101,10 +110,13 @@
                             <div class="mb-3">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
                                     <div>
-                                        <strong>@e.EventName</strong><br />
+                                        <a href="/my-events/details/@e.Code" style="text-decoration:none;">
+                                            <strong>@e.EventName</strong><br />
+
+                                        </a>
                                         <small class="text-muted">@e.Date.ToString("dd/MM/yyyy")</small>
                                     </div>
-                                    <small>@e.ConfirmedGuests confirmados / @e.TotalGuests invitados</small>
+                                    <small>@e.ConfirmedGuests Asistirán / @e.TotalGuests invitados</small>
                                 </div>
 
                                 <div class="progress" style="height: 22px;">

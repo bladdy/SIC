@@ -200,7 +200,7 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
             Result = totalPages
         };
     }
-
+    //ToDo: Formatear la fecha al ingles
     public override async Task<ActionResponse<IEnumerable<Event>>> GetAsync(PaginationDTO pagination)
     {
         var queryable = _context.Events.Include(e => e.EventType).Include(u => u.User).Include(i => i.Images).AsQueryable();

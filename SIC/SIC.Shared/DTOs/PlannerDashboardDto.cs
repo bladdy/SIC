@@ -9,6 +9,8 @@ namespace SIC.Shared.DTOs
     public class PlannerDashboardDto
     {
         public int MyEventsCount { get; set; }
+        public int MyEventsCompleted { get; set; }
+        public int MyEventsActive { get; set; }
         public int MyInvitationsTotal { get; set; }
         public int MyInvitationsConfirmed { get; set; }
         public int TotalGuests { get; set; }

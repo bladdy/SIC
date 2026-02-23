@@ -33,7 +33,8 @@ public partial class MyEventsDetails
     private int? loadingWhatsappId2;
     private int? copyingId1;
     private int? copyingId2;
-
+    private int? copyingIdm1;
+    private int? copyingIdm2;
     private string copyButtonText = "Copiar Invitación";
     private bool usarWhatsApp = true;
     private bool isSavingInvitation = false;
@@ -137,7 +138,7 @@ public partial class MyEventsDetails
 
         NewInvitation.Guests.Add(new InvitationGuest
         {
-            GuestName = null,           // permitido
+            GuestName = $"Invitado {NewInvitation.Guests.Count + 1}",           // permitido
             GuestType = GuestType.Adult,
             InvitationId = NewInvitation.Id,
             Invitation = null,
@@ -147,10 +148,32 @@ public partial class MyEventsDetails
         UpdateGuestCounters(NewInvitation.Guests);
     }
 
+    private void OnStatusChanged()
+    {
+        foreach (var guest in NewInvitation.Guests)
+        {
+            guest.Status = NewInvitation.Status;
+
+        }
+        UpdateGuestStatusCounters(NewInvitation.Guests);
+    }
+
     // Método para manejar el cambio de tipo de invitado
     private void OnGuestTypeChanged()
     {
         UpdateGuestCounters(NewInvitation.Guests);
+    }
+
+    private void OnGuestStatusChanged()
+    {
+        UpdateGuestStatusCounters(NewInvitation.Guests);
+    }
+
+    private void UpdateGuestStatusCounters(ICollection<InvitationGuest> guests)
+    {
+        NewInvitation.NumberConfirmedAdults = guests.Count(g => g.GuestType == GuestType.Adult && g.Status == Status.Attend);
+        NewInvitation.NumberConfirmedYouths = guests.Count(g => g.GuestType == GuestType.Youth && g.Status == Status.Attend);
+        NewInvitation.NumberConfirmedChildren = guests.Count(g => g.GuestType == GuestType.Children && g.Status == Status.Attend);
     }
 
     private void UpdateGuestCounters(ICollection<InvitationGuest> guests)
@@ -407,6 +430,63 @@ public partial class MyEventsDetails
         await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", mensaje);
 
         await Task.Delay(1500);
+
+        ResetCopyState(column);
+    }
+
+    private async Task CopiarInvitacionm(string codeinvitation, int invitationId, int column)
+    {
+        string mensaje;
+
+        if (column == 1)
+        {
+            copyingIdm1 = invitationId; // ✅ AQUÍ estaba el error
+        }
+        else
+        {
+            copyingIdm2 = invitationId;
+        }
+
+        StateHasChanged(); // 🔥 fuerza render inmediato
+
+        var responseHttp = await Repository.GetAsync<SIC.Shared.Entities.Message>(
+            $"api/Messages/byCode/{Code}/{codeinvitation}");
+
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            ResetCopyState(column);
+            return;
+        }
+
+        if (responseHttp.Response == null)
+        {
+            await SweetAlertService.FireAsync(
+                "Error",
+                "No se encontró el mensaje de invitación.",
+                SweetAlertIcon.Error);
+
+            ResetCopyState(column);
+            return;
+        }
+
+        mensaje = column == 1
+            ? responseHttp.Response.MessageInvitation
+            : responseHttp.Response.MessageConfirmation;
+
+        await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", mensaje);
+
+        await Task.Delay(1500);
+
+        if (column == 1)
+        {
+            copyingIdm1 = null; // ✅ AQUÍ estaba el error
+        }
+        else
+        {
+            copyingIdm2 = null;
+        }
 
         ResetCopyState(column);
     }

@@ -170,6 +170,9 @@ public class DashboardReporsitory : IDashboardReporsitory
 
         var myEventsCount = await myEventsQuery.CountAsync();
 
+        var myEventsCompleted = await myEventsQuery.Where(e => e.Status == Status.Completed).CountAsync();
+        var myEventsActive = await myEventsQuery.Where(e => e.Status == Status.Active).CountAsync();
+
         // 🔹 Próximos eventos con TotalGuests
         var upcomingEventsRaw = await myEventsQuery
                                     .Where(e => e.Date >= DateTime.Now && e.Status == Status.Active)// para traiga todos los eventos de todos
@@ -215,16 +218,16 @@ public class DashboardReporsitory : IDashboardReporsitory
                 NotAttending = e.Invitations.Count(i => i.Status == Status.NotAttend),
                 Date = e.Date,
                 // 🔹 Invitados (adultos + niños)
-                TotalGuests = e.Invitations.Sum(i => i.NumberAdults + i.NumberChildren),
+                TotalGuests = e.Invitations.Sum(i => i.NumberAdults + i.NumberChildren+ i.NumberYouths),
                 ConfirmedGuests = e.Invitations
                     .Where(i => i.Status == Status.Attend)
-                    .Sum(i => i.NumberConfirmedAdults + i.NumberConfirmedChildren),
+                    .Sum(i => i.NumberConfirmedAdults + i.NumberConfirmedChildren + i.NumberConfirmedYouths),
                 PendingGuests = e.Invitations
                     .Where(i => i.Status == Status.Pending)
-                    .Sum(i => i.NumberAdults + i.NumberChildren),
+                    .Sum(i => i.NumberAdults + i.NumberChildren + i.NumberYouths),
                 NotAttendingGuests = e.Invitations
                     .Where(i => i.Status == Status.NotAttend)
-                    .Sum(i => i.NumberAdults + i.NumberChildren)
+                    .Sum(i => i.NumberAdults + i.NumberChildren + i.NumberYouths)
             })
             .ToListAsync();
 
@@ -238,6 +241,8 @@ public class DashboardReporsitory : IDashboardReporsitory
         var dto = new PlannerDashboardDto
         {
             MyEventsCount = myEventsCount,
+            MyEventsCompleted = myEventsCompleted,
+            MyEventsActive = myEventsActive,
 
             UpcomingEvents = upcomingEventsRaw
                 .Select(x => new PlannerDashboardDto.EventSummary

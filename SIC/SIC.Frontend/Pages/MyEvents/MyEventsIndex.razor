@@ -51,7 +51,6 @@
         <option value="FechaDesc">Fecha Descendente</option>
         <option value="Nombre">Nombre Alfabetico</option>
         <option value="Evento">Tipo de Evento</option>
-        <option value="Estado">Estado</option>
     </InputSelect>
 
     <!-- Botones -->
@@ -73,7 +72,7 @@
                         <th class="text-start">Detalle del Evento</th>
                         <th>Estado</th>
                         <th>Fecha</th>
-                        <th class="d-none">Acciones</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -86,15 +85,15 @@
                                     <div class="container-fluid">
                                         <div class="row g-3 small text-secondary">
                                             <div class="col-12 col-md-4 d-flex flex-column">
-                                                <div class="mb-2">
+                                                <div class="fw-bold fs-6 text-dark mb-1">@even.Name</div>
+                                                <div class="mb-2 d-none">
                                                     <strong>Código:</strong>
                                                     <a class="text-decoration-none text-primary">@even.Code</a>
                                                 </div>
                                                 <div><strong>Tipo:</strong> @even.EventType!.Name</div>
-                                                <div><strong>@even.User!.UserType.GetDescription():</strong> @even.User!.FullName</div>
-                                            </div>
-                                            <div class="col-12 col-md-4">
-                                                <div class="fw-bold fs-6 text-dark mb-1">@even.Name</div>
+                                                <div class="d-none"><strong>@even.User!.UserType.GetDescription():</strong> @even.User!.FullName</div>
+                                            </div> 
+                                            <div class="col-12 col-md-4 d-none">
                                                 @if (!string.IsNullOrWhiteSpace(even.SubTitle))
                                                 {
                                                     <div class="text-muted small mb-2">@even.SubTitle</div>
@@ -119,11 +118,11 @@
                                 <td class="text-center">
                                     <div class="fw-semibold text-dark">@even.Date.ToString("dd/MM/yyyy")</div>
                                 </td>
-                                <td class="text-center d-none">
+                                <td class="text-center">
                                     <button class="btn btn-sm btn-custom mb-1" @onclick="() => ShowEditModal(even)">
                                         <i class="bi bi-pencil-fill"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-custom mb-1" @onclick="() => ConfirmDelete(even)">
+                                    <button class="btn btn-sm btn-custom mb-1 d-none" @onclick="() => ConfirmDelete(even)">
                                         <i class="bi bi-trash-fill"></i>
                                     </button>
                                 </td>
@@ -147,10 +146,10 @@
                             <h5 class="card-title fw-bold">@even.Name</h5>
                             @if (!string.IsNullOrWhiteSpace(even.SubTitle))
                             {
-                                <p class="card-subtitle text-muted small mb-2">@even.SubTitle</p>
+                                <p class="card-subtitle text-muted small mb-2 d-none">@even.SubTitle</p>
                             }
-                            <p class="mb-1"><strong>@even.User!.UserType.GetDescription():</strong> @even.User!.FullName</p>
-                            <p class="mb-1"><strong>Código:</strong> @even.Code</p>
+                            <p class="mb-1 d-none"><strong>@even.User!.UserType.GetDescription():</strong> @even.User!.FullName</p>
+                            <p class="mb-1 d-none"><strong>Código:</strong> @even.Code</p>
                             <p class="mb-1"><strong>Tipo:</strong> @even.EventType!.Name</p>
                             <p class="mb-1">
                                 <strong>Estado:</strong>
@@ -160,7 +159,7 @@
                             </p>
                             <p class="mb-2"><strong>Fecha:</strong> @even.Date.ToString("dd/MM/yyyy")</p>
                             <div class="d-flex gap-2 flex-wrap">
-                                <button class="btn btn-sm btn-custom flex-grow-1 d-none" @onclick="() => ShowEditModal(even)"><i class="bi bi-pencil-fill"></i> Editar</button>
+                                <button class="btn btn-sm btn-custom flex-grow-1" @onclick="() => ShowEditModal(even)"><i class="bi bi-pencil-fill"></i> Editar</button>
                                 <button class="btn btn-sm btn-custom flex-grow-1 d-none" @onclick="() => ConfirmDelete(even)"><i class="bi bi-trash-fill"></i> Borrar</button>
                                 <a href="@even.Url" target="_blank" class="btn btn-sm btn-custom flex-grow-1">Ver Invitación</a>
                                 <a href="/my-events/details/@even.Code" class="btn btn-sm btn-custom flex-grow-1">Invitados</a>
@@ -231,30 +230,31 @@
                         <div class="mb-3 row">
                             <div class="col">
                                 <label class="form-label">Fecha</label>
-                                <InputDate class="form-control" @bind-Value="NewEvent.Date" />
+                                <InputDate class="form-control" @bind-Value="NewEvent.Date" readonly="@IsEditMode" />
                             </div>
                             <div class="col d-none">
                                 <label class="form-label">Hora</label>
                                 <InputTime CssClass="form-control" @bind-Value="NewEvent.Time" />
                             </div>
                         </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">URL Invitación</label>
+                            <InputText class="form-control" @bind-Value="NewEvent.Url" placeholder="Ej. https://mi-invitacion.com.." />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Miniatura (Foto de Portada)</label>
+                            <InputText class="form-control" @bind-Value="NewEvent.CoverImageUrl" placeholder="Ej. https://mi-invitacion.com.." />
+                        </div>
                         <div class="mb-3 row">
                             <div class="col">
-                                <label class="form-label">Fecha Limite</label>
+                                <label class="form-label">Fecha Limite Para Confirmar Evento</label>
                                 <InputDate class="form-control" @bind-Value="NewEvent.DeadLine" />
                             </div>
                             <div class="col d-none">
                                 <label class="form-label">Hora</label>
                                 <InputTime CssClass="form-control" @bind-Value="NewEvent.Time" />
                             </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">URL Invitacion</label>
-                            <InputText class="form-control" @bind-Value="NewEvent.Url" placeholder="Ej. https://mi-invitacion.com.." />
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Miniatura Invitacion</label>
-                            <InputText class="form-control" @bind-Value="NewEvent.CoverImageUrl" placeholder="Ej. https://mi-invitacion.com.." />
                         </div>
                         <div class="mb-3 d-none">
                             <label class="form-label">Ubicación</label>
