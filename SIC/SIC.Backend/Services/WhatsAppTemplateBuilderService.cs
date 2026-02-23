@@ -95,10 +95,10 @@ namespace SIC.Backend.Services
                 "Event.Name" => ev.Name,
                 "Event.SubTitle" => ev.SubTitle,
                 "Event.CoverImageUrl" => ev.CoverImageUrl ?? "",
-                "Invitation.Table" => invitation.Table ?? "",
                 "Event.DateFormatted" => FechaHelper.FormatearFechaLargaEspanol(ev.Date),
-                "Event.Url" => $"{ev.Url}?codigo={code}",
+                "Event.UrlWithCode" => $"{ev.Url}?codigo={code}",
                 "Event.UrlConfirmation" => code,
+                //"Invitation.Table" => invitation.Table ?? "N/A",
                 _ => ""
             };
         }
