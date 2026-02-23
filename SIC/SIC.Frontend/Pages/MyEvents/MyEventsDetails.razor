@@ -569,41 +569,44 @@ else
                     <div class="d-flex flex-wrap gap-1 mt-3">
                         @if (usarWhatsApp)
                         {
-
-                            @if (Templates != null && Templates.Any())
+                            @if (EventDetail.User.UserWhatsAppConfigs != null)
                             {
-                                <div class="dropdown">
-                                    <button class="btn btn-success dropdown-toggle d-flex align-items-center gap-2"
-                                    type="button"
-                                    data-bs-toggle="dropdown"
-                                    disabled="@(loadingWhatsappId1 == invitation.Id)">
-                                        @if (IsSendingMassive)
-                                        {
-                                            <span class="spinner-border spinner-border-sm"></span>
-                                            <span>Enviando...</span>
-                                        }
-                                        else
-                                        {
-                                            <i class="bi bi-whatsapp"></i>
-                                            <span>Seleccionar Plantilla</span>
-                                        }
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        @if (Templates != null)
-                                        {
-                                            @foreach (var template in Templates)
+                                
+                                @if (Templates != null && Templates.Any() )
+                                {
+                                    <div class="dropdown">
+                                        <button class="btn btn-success dropdown-toggle d-flex align-items-center gap-2"
+                                        type="button"
+                                        data-bs-toggle="dropdown"
+                                        disabled="@(loadingWhatsappId1 == invitation.Id)">
+                                            @if (IsSendingMassive)
                                             {
-                                                <li>
-                                                    <button type="button"
-                                                    class="dropdown-item"
-                                                    @onclick="() => EnviarInvitacion(invitation.Code!, template.Name, invitation.Id)">
-                                                        @template.DisplayName
-                                                    </button>
-                                                </li>
+                                                <span class="spinner-border spinner-border-sm"></span>
+                                                <span>Enviando...</span>
                                             }
-                                        }
-                                    </ul>
-                                </div>
+                                            else
+                                            {
+                                                <i class="bi bi-whatsapp"></i>
+                                                <span>Seleccionar Plantilla</span>
+                                            }
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            @if (Templates != null)
+                                            {
+                                                @foreach (var template in Templates)
+                                                {
+                                                    <li>
+                                                        <button type="button"
+                                                        class="dropdown-item"
+                                                        @onclick="() => EnviarInvitacion(invitation.Code!, template.Name, invitation.Id)">
+                                                            @template.DisplayName
+                                                        </button>
+                                                    </li>
+                                                }
+                                            }
+                                        </ul>
+                                    </div>
+                                }
                             }
                             else
                             {
