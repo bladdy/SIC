@@ -14,6 +14,7 @@ using System.Text.Json;
 using SIC.Backend.Helpers;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using SIC.Backend.UnitOfWork.Implemetations;
 
 namespace SIC.Backend.Controllers
 {
@@ -528,7 +529,20 @@ namespace SIC.Backend.Controllers
                         components
                     );
                     await SaveMessageHistory(invitacion.Result.Code!, result);
+                    var messageDto = new WhatsappIncomingMessageDto
+                    {
+                        PhoneNumber = userWhatsAppConfig.Result.PhoneNumber,
+                        MessageId = result.Result!.Wamid,
+                        From = result.Result!.Contact,
+                        Text = $"Invitacion enviada a {invitacion.Result.Name}, con la url {invitacion.Result.Event!.Url!}?codigo={code}",
+                        Type = "template",
+                        ReplyToMessageId = result.Result!.Wamid,
+                        Direction = "OUT",
+                        Status = "sent"
+                    };
 
+                    var response = await _iMessageUnitOfWork
+                    .AddReceiveMessages(messageDto);
                     if (!result.Success)
                     {
                         fallidos++;
