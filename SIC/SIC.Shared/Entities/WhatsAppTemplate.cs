@@ -16,5 +16,7 @@ namespace SIC.Shared.Entities
         //Agregar usuario que creó la plantilla
         // JSON con la estructura completa
         public string StructureJson { get; set; } = null!;
+
+        public int OrderTemplate { get; set; }
     }
 }

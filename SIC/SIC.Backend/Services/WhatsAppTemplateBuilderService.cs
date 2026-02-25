@@ -99,7 +99,9 @@ namespace SIC.Backend.Services
                 "Event.UrlWithCode" => $"{ev.Url}?codigo={code}",
                 "Event.UrlConfirmation" => code,
                 "Event.DateLimitFormatted" => FechaHelper.FormatearFechaLargaEspanol((DateTime)ev.DeadLine!),
-                "Invitation.Table" => invitation.Table ?? "N/A",
+                "Event.Table" => string.IsNullOrWhiteSpace(invitation.Table)
+                        ? "Sin asignar"
+                        : invitation.Table,
                 "Event.AnotherSupplier" => ev.Url ?? "N/A",
                 _ => ""
             };
