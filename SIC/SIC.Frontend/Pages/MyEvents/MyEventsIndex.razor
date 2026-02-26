@@ -72,7 +72,10 @@
                         <th class="text-start">Detalle del Evento</th>
                         <th>Estado</th>
                         <th>Fecha</th>
-                        <th>Acciones</th>
+                        @if (_userRol == "WeddingPlanner")
+                        {
+                            <th>Acciones</th>
+                        }
                     </tr>
                 </thead>
                 <tbody>
@@ -118,14 +121,17 @@
                                 <td class="text-center">
                                     <div class="fw-semibold text-dark">@even.Date.ToString("dd/MM/yyyy")</div>
                                 </td>
-                                <td class="text-center">
-                                    <button class="btn btn-sm btn-custom mb-1" @onclick="() => ShowEditModal(even)">
-                                        <i class="bi bi-pencil-fill"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-custom mb-1 d-none" @onclick="() => ConfirmDelete(even)">
-                                        <i class="bi bi-trash-fill"></i>
-                                    </button>
-                                </td>
+                                @if (_userRol == "WeddingPlanner")
+                                {
+                                    <td class="text-center">
+                                        <button class="btn btn-sm btn-custom mb-1" @onclick="() => ShowEditModal(even)">
+                                            <i class="bi bi-pencil-fill"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-custom mb-1 d-none" @onclick="() => ConfirmDelete(even)">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
+                                    </td>
+                                }
                             </tr>
                         }
                     }
