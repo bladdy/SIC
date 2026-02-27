@@ -1,0 +1,278 @@
+﻿@page "/status-events/{Code}"
+@layout LoginLayout
+
+@using SIC.Frontend.Shared
+<PageTitle>Detalles del Evento</PageTitle>
+<!--
+<h3 class="mb-2">Detalle del Evento</h3>-->
+@if (EventDetail is null)
+{
+    <div class="alert alert-info">Cargando evento...</div>
+}
+else
+{
+    <div class="card shadow-lg border-0 mb-3 ">
+        <!-- Header: título, subtítulo, tipo y estado -->
+        <div class="card-header text-white position-relative" style="background-color:#3C6A79;">
+            <div class="d-flex justify-content-between align-items-stretch flex-wrap">
+                <div>
+                    <h4 class="mb-0">@EventDetail.Name</h4>
+                    <small>@EventDetail.SubTitle</small>
+                    <div class="d-none"><strong>@EventDetail.User!.UserType.GetDescription():</strong> @EventDetail.User!.FullName</div>
+                    <p class="mb-1 d-none"><strong>Evento:</strong> @EventDetail.EventType?.Name</p>
+                    <p class="mb-1"><strong>Fecha:</strong> @EventDetail.Date.ToString("dd/MM/yyyy")</p>
+                </div>
+
+                <div class="text-end d-flex flex-column justify-content-end">
+                    <p class="mb-1">
+                        <strong>Estado:</strong>
+                        <span class="badge bg-@(EventDetail.Status == Status.Active ? "success" : "secondary")">
+                            @EventDetail.Status.GetDescription()
+                        </span>
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- Body: Información detallada -->
+        <div class="card-body">
+
+            <!-- ======================== -->
+            <!-- SECCIÓN 2: Invitados -->
+            <!-- ======================== -->
+            <div class="row text-center align-items-stretch g-1 g-md-3 mt-0">
+                <!-- Invitados -->
+                <div class="col-12 col-md-3 mb-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white" style="background-color:#3C6A79;">
+                        <strong>Invitados:</strong>
+                        <span>@(EventDetail.NumberAdults + EventDetail.NumberYouths + EventDetail.NumberChildren)</span>
+                    </p>
+                </div>
+                <!-- Adultos -->
+                <div class="col-6 col-md-3">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#3C6A79;">
+                        <strong>Adultos:</strong>
+                        <span>@EventDetail.NumberAdults</span>
+                    </p>
+                </div>
+                <div class="col-6 col-md-3">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#3C6A79;">
+                        <strong>Jóvenes:</strong>
+                        <span>@EventDetail.NumberYouths</span>
+                    </p>
+                </div>
+
+                <!-- Niños -->
+                <div class="col-6 col-md-3">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#3C6A79;">
+                        <strong>Niños:</strong>
+                        <span>@EventDetail.NumberChildren</span>
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- ======================== -->
+            <!-- SECCIÓN 3: Confirmaciones -->
+            <!-- ======================== -->
+            <div class="row text-center align-items-stretch g-1 g-md-3 mt-0">
+                <!-- (Sí asistiré) -->
+                <div class="col-12 col-md-3 m-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-success">
+                        <strong>Total SÍ ASISTIRÉ:</strong>
+                        <span>@(EventDetail.NumberAdultsConfirmed + EventDetail.NumberChildrenConfirmed + EventDetail.NumberYouthsConfirmed)</span>
+                    </p>
+                </div>
+
+                <!-- Adultos (Sí asistiré) -->
+                <div class="col-6 col-md-3 m-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-success ">
+                        <strong>Adultos:</strong>
+                        <span>@EventDetail.NumberAdultsConfirmed</span>
+                    </p>
+                </div>
+
+                <!-- Jóvenes (Sí asistiré) -->
+                <div class="col-6 col-md-3 m-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-success ">
+                        <strong>Jóvenes:</strong>
+                        <span>@EventDetail.NumberYouthsConfirmed</span>
+                    </p>
+                </div>
+
+                <!-- Niños (Sí asistiré) -->
+                <div class="col-6 col-md-3 m-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-success ">
+                        <strong>Niños:</strong>
+                        <span>@EventDetail.NumberChildrenConfirmed</span>
+                    </p>
+                </div>
+
+                <!-- No asistiré -->
+                <div class="col-12 col-md-4 m-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-danger ">
+                        <strong>Total NO ASISTIRÉ:</strong>
+                        <span>@(EventDetail.NumberAdultsNotAttend + EventDetail.NumberChildrenNotAttend + EventDetail.NumberYouthNotAttend)</span>
+                    </p>
+                </div>
+
+                <!-- Pendientes -->
+                <div class="col-12 col-md-4 m-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-warning ">
+                        <strong>Pendientes:</strong>
+                        <span>@(EventDetail.NumberAdultsPending + EventDetail.NumberChildrenPending + EventDetail.NumberYouthPending)</span>
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <h4 class="mb-0 px-2">Lista de Invitados</h4>
+    ﻿﻿
+    
+    ﻿﻿<div class="mb-2 gap-2 p-2" style="display: flex; flex-wrap:wrap; align-items: center;">
+        <input style="width:400px;" type="text" class="form-control" placeholder="Buscar Invitacion..." @bind-value="Filter">
+        <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center; justify-content: start;">
+            <button type="button" class="btn btn-custom" style="display: flex; align-items: center; gap: 4px;" @onclick="ApplyFilterAsync"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-search"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg> Buscar</button>
+            <button type="button" class="btn btn-custom" style="display: flex; align-items: center; gap: 4px;" @onclick="CleanFilterAsync"><i class="bi bi-x-circle" /> Limpiar</button>
+
+
+
+        </div>
+    </div>
+
+    <!-- ====== VERSIÓN DE ESCRITORIO ====== -->
+    <div class="table-responsive d-none d-md-block">
+        <table class="table table-hover align-middle mb-0">
+            <thead style="background-color:#3C6A79; color:white;">
+                <tr class="text-center">
+
+                    <th class="text-start">Detalle del Invitado</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Invitations != null && Invitations.Any())
+                {
+                    @foreach (var invitation in Invitations)
+                    {
+                        <tr class="border-top">
+                            <!-- ======== COLUMNA 1: INFORMACIÓN GENERAL ======== -->
+                            <td style="white-space: normal; vertical-align: top;">
+                                <div class="container-fluid">
+                                    <div class="row g-3 small text-secondary">
+                                        <!-- ===== COLUMNA 1 ===== -->
+                                        <div class="col-12 col-md-4 d-flex flex-column">
+                                            <div><h5><strong>@invitation.Name</strong></h5></div>
+                                            <div><strong>Móvil:</strong> @invitation.PhoneNumber</div>
+                                            <div><strong>Mesa:</strong> @invitation.Table</div>
+                                        </div>
+
+                                        <!-- ===== COLUMNA 2 ===== -->
+                                        <div class="col-12 col-md-4 d-flex flex-column">
+                                            @if (invitation.Guests.Any())
+                                            {
+                                                @foreach (var guest in invitation.Guests)
+                                                {
+                                                    <div>
+                                                        <strong>@guest.GuestName</strong>
+                                                        (@guest.GuestType.GetDescription())
+                                                        <span class="badge rounded-pill bg-@GetStatusBadge(guest.Status)">
+                                                            @guest.Status.GetDescription()
+                                                        </span>
+                                                    </div>
+
+                                                }
+
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- ======== COLUMNA 2: ESTADO ======== -->
+                            <td class="text-center">
+                                <span class="px-3 py-2 fs-6 badge @(invitation.Status == Status.Attend ? "bg-success" : invitation.Status == Status.NotAttend ? "bg-danger" : "bg-secondary")">
+                                    @invitation.Status.GetDescription()
+                                </span>
+                            </td>
+
+                        </tr>
+
+                        <!-- ======== FILA PARA DEDICATORIA ======== -->
+                        @if (!string.IsNullOrEmpty(invitation.Comments))
+                        {
+                            <tr>
+                                <td colspan="3" class="text-secondary" style="word-wrap: break-word;">
+                                    <strong>Dedicatoria:</strong> @invitation.Comments
+                                </td>
+                            </tr>
+                        }
+
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="3" class="text-center text-muted py-4">No hay invitados registrados.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ✅ Vista móvil tipo “detalle” -->
+    <div class="d-block d-md-none px-2" >
+
+
+        @foreach (var invitation in Invitations!)
+        {
+            <div class="card mb-3 shadow-sm">
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+
+                        <div class="d-flex align-items-center gap-2">
+                            <h5 class="card-title mb-0">@invitation.Name</h5>
+                        </div>
+
+                        <span class="badge bg-@(invitation.Status == Status.Attend ? "success" : invitation.Status == Status.NotAttend ? "danger" : "secondary")">
+                            @invitation.Status.GetDescription()
+                        </span>
+                    </div>
+                    <div class="row justify-content-between align-items-center">
+                        @if (invitation.Guests.Any())
+                        {
+                            @foreach (var guest in invitation.Guests)
+                            {
+                                <div>
+                                    <strong>@guest.GuestName</strong>
+                                    (@guest.GuestType.GetDescription())
+                                    <span class="badge rounded-pill bg-@GetStatusBadge(guest.Status)">
+                                        @guest.Status.GetDescription()
+                                    </span>
+                                </div>
+
+                            }
+
+                        }
+                    </div>
+                    <p class="mb-1"><strong>Mesa:</strong> @invitation.Table</p>
+                    <p class="mb-1"><strong>Dedicatoria:</strong> @invitation.Comments</p>
+
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="d-flex justify-content-center my-3">
+        <Pagination CurrentPage="currentPage"
+                    TotalPages="totalPages"
+                    SelectedPage="SelectedPageAsync" />
+
+    </div>
+}

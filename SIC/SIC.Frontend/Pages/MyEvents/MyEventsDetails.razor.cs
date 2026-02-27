@@ -26,6 +26,7 @@ public partial class MyEventsDetails
     private Dictionary<int, bool> SelectedInvitations = new();
     private bool SelectAll = false;
     private bool IsSendingMassive = false;
+    private bool IsCopyURl = false;
 
     private bool HasSelectedInvitations = false;
 
@@ -153,7 +154,6 @@ public partial class MyEventsDetails
         foreach (var guest in NewInvitation.Guests)
         {
             guest.Status = NewInvitation.Status;
-
         }
         UpdateGuestStatusCounters(NewInvitation.Guests);
     }
@@ -332,6 +332,16 @@ public partial class MyEventsDetails
         {
             isLoading = false;
         }
+    }
+
+    private async Task CopiarEventUrl()
+    {
+        IsCopyURl = true;
+        var url = $"{NavigationManager.BaseUri}status-events/{Code}";
+
+        await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", url);
+        await Task.Delay(1500);
+        IsCopyURl = false;
     }
 
     private async Task AbrirWhatsapp(string phoneNumber, string code, int invitationId, int column)

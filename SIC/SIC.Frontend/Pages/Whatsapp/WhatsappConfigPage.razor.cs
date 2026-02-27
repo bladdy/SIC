@@ -42,7 +42,7 @@ namespace SIC.Frontend.Pages.Whatsapp
                     await LoadConfiguraitons();
                     userID = user.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
                     Model.WebhookVerificationToken = "invboxv_wh_7F9KpQ2eA8LxM4RZCwN6DHyT5B"; // Usa el userID como token de verificación del webhook
-                    Model.WebhookUrl = $"{NavigationManager.BaseUri}api/whatsapp/webhook/{Model.PhoneNumber}"; // Establece la URL del webhook apuntando a tu API
+                    Model.WebhookUrl = $"{NavigationManager.BaseUri}api/whatsapp/webhook"; // Establece la URL del webhook apuntando a tu API
 
                     //Model.WebhookUrl = $"https://nonmanifest-dangly-johnetta.ngrok-free.dev/api/whatsapp/webhook/{Model.PhoneNumber}";
                 }

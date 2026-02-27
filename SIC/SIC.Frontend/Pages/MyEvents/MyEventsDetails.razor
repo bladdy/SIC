@@ -182,6 +182,19 @@ else
                     <div>
                         <button class="btn btn-sm btn-custom" @onclick="ShowCreateModal">Agregar Invitado</button>
                     </div>
+                    <div class="d-flex justify-content-center gap-2 mb-2 mb-lg-0">
+                        <button class="btn btn-sm btn-custom" @onclick="CopiarEventUrl" disabled="@IsCopyURl">
+                            @if (IsCopyURl)
+                            {
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                <span> Copiando... </span>
+                            }
+                            else
+                            {
+                                <span>Compartir Evento</span>
+                            }
+                        </button>
+                    </div>
                 </div>
             </div>
 
