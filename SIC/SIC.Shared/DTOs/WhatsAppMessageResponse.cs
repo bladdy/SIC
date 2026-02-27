@@ -12,5 +12,7 @@ namespace SIC.Shared.DTOs
         public string NumeroDestino { get; set; } = string.Empty;
         public string TemplateName { get; set; } = string.Empty;
         public string Contact { get; set; } = string.Empty;
+        public string Imagen { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
     }
 }

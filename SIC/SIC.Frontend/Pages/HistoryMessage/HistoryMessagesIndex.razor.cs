@@ -4,7 +4,7 @@ using SIC.Frontend.Repositories;
 using SIC.Shared.Entities;
 using System.Net;
 
-//ToDo: agregar numero de telefono hora fecha, cambiar los bool por si y no, agregar el mensaje de error, agregar el mensaje enviado, agregar el mensaje entregado
+//ToDo: agregar filtros y paginacion
 namespace SIC.Frontend.Pages.HistoryMessage
 {
     public partial class HistoryMessagesIndex

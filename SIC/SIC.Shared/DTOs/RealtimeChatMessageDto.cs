@@ -16,6 +16,7 @@ namespace SIC.Shared.DTOs
         public string MessageType { get; set; } = null!;
         public string Type { get; set; } = null!;
         public string? Content { get; set; }
+        public string? Imagen { get; set; }
         public string? Status { get; set; }
         public DateTime Timestamp { get; set; }
     }

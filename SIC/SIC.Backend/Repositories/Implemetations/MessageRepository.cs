@@ -175,7 +175,6 @@ namespace SIC.Backend.Repositories.Implemetations
                     mensajeMostrar = Message ?? "Error desconocido";
                 }
 
-
                 Console.WriteLine(mensajeMostrar);
 
                 var invitations = await _context.Invitations
@@ -260,7 +259,8 @@ namespace SIC.Backend.Repositories.Implemetations
                 Direction = whatsappIncoming.Direction,
                 CreatedAt = DateTime.UtcNow,
                 Type = whatsappIncoming.Type,
-                Status = whatsappIncoming.Status//chk porque llega null
+                Status = whatsappIncoming.Status,//chk porque llega null
+                Imagen = whatsappIncoming.Imagen
             };
             _context.Add(response);
             await _context.SaveChangesAsync();
@@ -311,6 +311,7 @@ namespace SIC.Backend.Repositories.Implemetations
                     Type = x.Type,
                     Status = x.Status,
                     Content = x.Message,
+                    Imagen = x.Imagen,
                     Timestamp = x.CreatedAt
                 })
                 .ToListAsync();

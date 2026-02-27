@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
+using SIC.Shared.Helpers;
 using SIC.Shared.Request;
 using SIC.Shared.Response;
 using System.Net.Http.Headers;
@@ -28,6 +29,7 @@ namespace SIC.Backend.Services
             string numeroDestino,
             string templateName,
             string languageCode,
+            string templateContent,
             List<TemplateComponentRequest> components)
         {
             try
@@ -150,7 +152,10 @@ namespace SIC.Backend.Services
                         Message = json
                     };
                 }
-
+                string finalMessage = WhatsAppTemplateParser.ReplaceTemplateVariables(
+                    jsonPayload,
+                    templateContent
+                );
                 var apiResponse = JsonConvert.DeserializeObject<WhatsAppApiResponse>(json);
 
                 return new ActionResponse<WhatsAppMessageResponse>
@@ -161,7 +166,11 @@ namespace SIC.Backend.Services
                         Wamid = apiResponse!.Messages.First().Id,
                         NumeroDestino = numeroDestino,
                         TemplateName = templateName,
-                        Contact = apiResponse.Contacts.First().WaId
+                        Contact = apiResponse.Contacts.First().WaId,
+                        Imagen = components
+                            .SelectMany(c => c.Parameters ?? new List<TemplateParameterRequest>())
+                            .FirstOrDefault(p => p.Type == "image")?.Link ?? "",
+                        Message = finalMessage
                     }
                 };
             }
@@ -685,10 +694,6 @@ namespace SIC.Backend.Services
     }
   ]
 }
-
-
-
-
 
 {
   "name": "promo_descuento_febrero",

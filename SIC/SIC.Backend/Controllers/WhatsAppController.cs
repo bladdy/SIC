@@ -466,6 +466,10 @@ namespace SIC.Backend.Controllers
             });
         }*/
 
+        /*
+        {"messaging_product":"whatsapp","to":"+528661425258","type":"template","template":{"name":"enviar_invitacion_invbovx","language":{"code":"en"},"components":[{"type":"header","parameters":[{"type":"image","image":{"link":"https://xvinvboxv.com/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-19-at-4.33.06-PM-1.jpeg"}}]},{"type":"body","parameters":[{"type":"text","text":"Test"},{"type":"text","text":"Ana TEST"},{"type":"text","text":"Nuestra Boda"},{"type":"text","text":"https://xvinvboxv.com/mis-xv-regina-vazquez?codigo=0C8BE1"},{"type":"text","text":"Sábado 07 de marzo del 2026"},{"type":"text","text":"Ana TEST"}]}]}}
+            */
+
         [HttpPost("enviar-invitacion-dina")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [Authorize(Roles = "Admin,WeddingPlanner,User")]
@@ -519,26 +523,30 @@ namespace SIC.Backend.Controllers
                         ev,
                         code
                     );
+                    var fullnumber = string.Concat(invitacion.Result.CountryCode, invitacion.Result.PhoneNumber);
 
                     var result = await _whatsAppService.EnviarTemplateDinamicoAsync(
                         accessToken,
                         phoneNumberId,
-                        invitacion.Result.PhoneNumber,
+                        fullnumber,
                         template.Name,
                         template.Language,
+                        template.Content,
                         components
                     );
                     await SaveMessageHistory(invitacion.Result.Code!, result);
+
                     var messageDto = new WhatsappIncomingMessageDto
                     {
                         PhoneNumber = userWhatsAppConfig.Result.PhoneNumber,
                         MessageId = result.Result!.Wamid,
                         From = result.Result!.Contact,
-                        Text = $"Invitacion enviada a {invitacion.Result.Name}, con la url {invitacion.Result.Event!.Url!}?codigo={code}",
+                        Text = result.Result.Message,
                         Type = "template",
                         ReplyToMessageId = result.Result!.Wamid,
                         Direction = "OUT",
-                        Status = "sent"
+                        Status = "sent",
+                        Imagen = result.Result!.Imagen,
                     };
 
                     var response = await _iMessageUnitOfWork

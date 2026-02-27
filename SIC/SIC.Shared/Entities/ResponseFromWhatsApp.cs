@@ -16,7 +16,7 @@ namespace SIC.Shared.Entities
         public string? EventCode { get; set; }
         public string? EventName { get; set; }
         public string? PhoneNumber { get; set; }
-
+        public string? Imagen { get; set; }
         /*
         /*
         //Para poder agrupar los mensajes enviados y recibidos por Evento y Usuario, hay que agregarles estos campos

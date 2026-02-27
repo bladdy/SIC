@@ -25,5 +25,6 @@ namespace SIC.Shared.DTOs
         public string? Status { get; set; } // sent | delivered | read | null
 
         public string Direction { get; set; } = null!; // IN / OUT
+        public string? Imagen { get; set; }
     }
 }

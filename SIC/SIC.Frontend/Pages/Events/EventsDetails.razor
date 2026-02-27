@@ -16,8 +16,8 @@ else
                 <div>
                     <h4 class="mb-0">@EventDetail.Name</h4>
                     <small>@EventDetail.SubTitle</small>
-                    <div><strong>@EventDetail.User!.UserType.GetDescription():</strong> @EventDetail.User!.FullName</div>
-                    <p class="mb-1"><strong>Evento:</strong> @EventDetail.EventType?.Name</p>
+                    <div class="d-none"><strong>@EventDetail.User!.UserType.GetDescription():</strong> @EventDetail.User!.FullName</div>
+                    <p class="mb-1 d-none"><strong>Evento:</strong> @EventDetail.EventType?.Name</p>
                     <p class="mb-1"><strong>Fecha:</strong> @EventDetail.Date.ToString("dd/MM/yyyy")</p>
                 </div>
 
@@ -33,11 +33,11 @@ else
 
             <!-- Botón QR: versión escritorio -->
             <a href="/events/register-event/invitations-entries/@EventDetail.Code"
-            class="btn btn-sm text-white position-absolute top-0 end-0 mt-2 me-2 d-none d-md-inline-flex align-items-center"
-            style="background-color:#1F4854; border-color:white;">
+               class="btn btn-sm text-white position-absolute top-0 end-0 mt-2 me-2 d-none d-md-inline-flex align-items-center"
+               style="background-color:#1F4854; border-color:white;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                class="me-1">
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     class="me-1">
                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                     <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h3v3h3v3h-6z" />
                 </svg>
@@ -46,11 +46,11 @@ else
 
             <!-- Botón QR: versión móvil -->
             <a href="/events/register-event/invitations-entries/@EventDetail.Code"
-            class="btn btn-sm text-white mt-2 px-4 position-absolute bottom-0 end-0 mb-2 me-2 d-block d-md-none align-items-center"
-            style="background-color:#1F4854; border-color:white;">
+               class="btn btn-sm text-white mt-2 px-4 position-absolute bottom-0 end-0 mb-2 me-2 d-block d-md-none align-items-center"
+               style="background-color:#1F4854; border-color:white;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                class="me-1">
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     class="me-1">
                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                     <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h3v3h3v3h-6z" />
                 </svg>
@@ -196,7 +196,11 @@ else
         <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center; justify-content: start;">
             <button type="button" class="btn btn-custom" style="display: flex; align-items: center; gap: 4px;" @onclick="ApplyFilterAsync"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-search"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg> Buscar</button>
             <button type="button" class="btn btn-custom" style="display: flex; align-items: center; gap: 4px;" @onclick="CleanFilterAsync"><i class="bi bi-x-circle" /> Limpiar</button>
-            <button type="button" class="btn btn-custom mt-2 mt-lg-0" style="display: flex; align-items: center; gap: 4px;" @onclick="NavegateToMessage"> <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-mail"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" /><path d="M3 7l9 6l9 -6" /></svg>Mensajes</button>
+
+            @if (!usarWhatsApp)
+            {
+                <button type="button" class="btn btn-custom mt-2 mt-lg-0" style="display: flex; align-items: center; gap: 4px;" @onclick="NavegateToMessage"> <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-mail"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" /><path d="M3 7l9 6l9 -6" /></svg>Mensajes</button>
+            }
 
         </div>
         <div class="form-check form-switch">
@@ -205,15 +209,15 @@ else
                 @(usarWhatsApp ? "Modo: Enviar por WhatsApp" : "Modo: Copiar al Portapapeles")
             </label>
         </div>
-        @if (EventDetail.User.UserWhatsAppConfigs != null)
+        @if (EventDetail.User.UserWhatsAppConfigs != null && usarWhatsApp)
         {
             @if (Templates != null && Templates.Any())
             {
                 <div class="dropdown">
                     <button class="btn btn-success dropdown-toggle d-flex align-items-center gap-2"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    disabled="@(!HasSelectedInvitations || IsSendingMassive)">
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            disabled="@(!HasSelectedInvitations || IsSendingMassive)">
                         @if (IsSendingMassive)
                         {
                             <span class="spinner-border spinner-border-sm"></span>
@@ -232,8 +236,8 @@ else
                             {
                                 <li>
                                     <button type="button"
-                                    class="dropdown-item"
-                                    @onclick="() => EnviarInvitacionesMasivas(template.Name)">
+                                            class="dropdown-item"
+                                            @onclick="() => EnviarInvitacionesMasivas(template.Name)">
                                         @template.DisplayName
                                     </button>
                                 </li>
@@ -255,9 +259,9 @@ else
                     {
                         <th>
                             <input type="checkbox"
-                            class="form-check-input"
-                            checked="@SelectAll"
-                            @onchange="e => ToggleSelectAll((bool)e.Value!)" />
+                                   class="form-check-input"
+                                   checked="@SelectAll"
+                                   @onchange="e => ToggleSelectAll((bool)e.Value!)" />
 
                         </th>
                     }
@@ -272,14 +276,14 @@ else
                 {
                     @foreach (var invitation in Invitations)
                     {
-                        <tr class="border-top" >
+                        <tr class="border-top">
                             @if (EventDetail.User.UserWhatsAppConfigs != null)
                             {
                                 <td class="text-center">
                                     <input type="checkbox" @key="invitation.Id"
-                                    class="form-check-input"
-                                    checked="@SelectedInvitations[invitation.Id]"
-                                    @onchange="e => OnItemSelectionChanged(invitation.Id, (bool)e.Value!)" />
+                                           class="form-check-input"
+                                           checked="@SelectedInvitations[invitation.Id]"
+                                           @onchange="e => OnItemSelectionChanged(invitation.Id, (bool)e.Value!)" />
 
                                 </td>
                             }
@@ -289,13 +293,13 @@ else
                                     <div class="row g-3 small text-secondary">
                                         <!-- ===== COLUMNA 1 ===== -->
                                         <div class="col-12 col-md-4 d-flex flex-column">
-                                            <div>
+                                            <div class="d-none">
                                                 <strong>Código:</strong>
                                                 <a style="color:#3C6A79; cursor:pointer;" @onclick="() => ShowEditModal(invitation)">
                                                     @invitation.Code
                                                 </a>
                                             </div>
-                                            <div><strong>Nombre:</strong> @invitation.Name</div>
+                                            <div><h5><strong>@invitation.Name</strong></h5></div>
                                             <div><strong>Móvil:</strong> @invitation.PhoneNumber</div>
                                             <div><strong>Mesa:</strong> @invitation.Table</div>
                                         </div>
@@ -343,14 +347,13 @@ else
                                                     }
                                                     </button>
                                                     -->
-
                                                     @if (Templates != null && Templates.Any())
                                                     {
                                                         <div class="dropdown">
                                                             <button class="btn btn-success dropdown-toggle d-flex align-items-center gap-2"
-                                                            type="button"
-                                                            data-bs-toggle="dropdown"
-                                                            disabled="@(loadingWhatsappId1 == invitation.Id)">
+                                                                    type="button"
+                                                                    data-bs-toggle="dropdown"
+                                                                    disabled="@(loadingWhatsappId1 == invitation.Id)">
                                                                 @if (IsSendingMassive)
                                                                 {
                                                                     <span class="spinner-border spinner-border-sm"></span>
@@ -369,9 +372,8 @@ else
                                                                     {
                                                                         <li>
                                                                             <button type="button"
-                                                                            class="dropdown-item"
-                                                                            @onclick="() => EnviarInvitacion(invitation.Code!, template.Name, invitation.Id)"
-                                                                            >
+                                                                                    class="dropdown-item"
+                                                                                    @onclick="() => EnviarInvitacion(invitation.Code!, template.Name, invitation.Id)">
                                                                                 @template.DisplayName
                                                                             </button>
                                                                         </li>
@@ -385,9 +387,9 @@ else
                                                 else
                                                 {
                                                     <button class="btn d-inline-flex align-items-center gap-2 text-white"
-                                                    style="background-color:#25d366;"
-                                                    @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)"
-                                                    disabled="@(loadingWhatsappId1 == invitation.Id)">
+                                                            style="background-color:#25d366;"
+                                                            @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)"
+                                                            disabled="@(loadingWhatsappId1 == invitation.Id)">
                                                         @if (loadingWhatsappId1 == invitation.Id)
                                                         {
                                                             <span class="spinner-border spinner-border-sm"></span>
@@ -398,14 +400,14 @@ else
                                                             <i class="bi bi-whatsapp"></i>
                                                             <span>Invitar</span>
                                                         }
-                                                    </button> 
+                                                    </button>
 
                                                 }
 
                                                 <button class="btn d-inline-flex align-items-center gap-2 text-white d-none"
-                                                style="background-color:#25d366;"
-                                                @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)"
-                                                disabled="@(loadingWhatsappId1 == invitation.Id)">
+                                                        style="background-color:#25d366;"
+                                                        @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)"
+                                                        disabled="@(loadingWhatsappId1 == invitation.Id)">
                                                     @if (loadingWhatsappId1 == invitation.Id)
                                                     {
                                                         <span class="spinner-border spinner-border-sm"></span>
@@ -419,9 +421,9 @@ else
                                                 </button>
 
                                                 <button class="btn d-inline-flex align-items-center gap-2 text-white"
-                                                style="background-color:#25d366;"
-                                                @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 2)"
-                                                disabled="@(loadingWhatsappId2 == invitation.Id)">
+                                                        style="background-color:#25d366;"
+                                                        @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 2)"
+                                                        disabled="@(loadingWhatsappId2 == invitation.Id)">
                                                     @if (loadingWhatsappId2 == invitation.Id)
                                                     {
                                                         <span class="spinner-border spinner-border-sm"></span>
@@ -437,8 +439,8 @@ else
                                             else
                                             {
                                                 <button class="btn btn-info d-inline-flex align-items-center gap-2 text-white"
-                                                @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 1)"
-                                                disabled="@(copyingId1 == invitation.Id)">
+                                                        @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 1)"
+                                                        disabled="@(copyingId1 == invitation.Id)">
                                                     @if (copyingId1 == invitation.Id)
                                                     {
                                                         <span class="spinner-border spinner-border-sm"></span>
@@ -452,8 +454,8 @@ else
                                                 </button>
 
                                                 <button class="btn btn-info d-inline-flex align-items-center gap-2 text-white"
-                                                @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 2)"
-                                                disabled="@(copyingId2 == invitation.Id)">
+                                                        @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 2)"
+                                                        disabled="@(copyingId2 == invitation.Id)">
                                                     @if (copyingId2 == invitation.Id)
                                                     {
                                                         <span class="spinner-border spinner-border-sm"></span>
@@ -512,9 +514,9 @@ else
     <div class="d-block d-md-none">
         <div class="form-check pb-2">
             <input type="checkbox"
-            class="form-check-input"
-            checked="@SelectAll"
-            @onchange="e => ToggleSelectAll((bool)e.Value!)" />
+                   class="form-check-input"
+                   checked="@SelectAll"
+                   @onchange="e => ToggleSelectAll((bool)e.Value!)" />
             <label class="form-check-label" for="flexCheckDefault">
                 Seleccionar todos
             </label>
@@ -526,11 +528,16 @@ else
                 <div class="card-body">
 
                     <div class="d-flex justify-content-between align-items-center mb-2">
+
                         <div class="d-flex align-items-center gap-2">
-                            <input type="checkbox" @key="invitation.Id"
-                            class="form-check-input"
-                            checked="@SelectedInvitations[invitation.Id]"
-                            @onchange="e => OnItemSelectionChanged(invitation.Id, (bool)e.Value!)" />
+                            @if (EventDetail.User.UserWhatsAppConfigs != null)
+                            {
+                                <input type="checkbox" @key="invitation.Id"
+                                       class="form-check-input"
+                                       checked="@SelectedInvitations[invitation.Id]"
+                                       @onchange="e => OnItemSelectionChanged(invitation.Id, (bool)e.Value!)" />
+
+                            }
 
                             <h5 class="card-title mb-0">@invitation.Name</h5>
                         </div>
@@ -562,41 +569,44 @@ else
                     <div class="d-flex flex-wrap gap-1 mt-3">
                         @if (usarWhatsApp)
                         {
-
-                            @if (Templates != null && Templates.Any())
+                            @if (EventDetail.User.UserWhatsAppConfigs != null)
                             {
-                                <div class="dropdown">
-                                    <button class="btn btn-success dropdown-toggle d-flex align-items-center gap-2"
-                                    type="button"
-                                    data-bs-toggle="dropdown"
-                                    disabled="@(loadingWhatsappId1 == invitation.Id)">
-                                        @if (IsSendingMassive)
-                                        {
-                                            <span class="spinner-border spinner-border-sm"></span>
-                                            <span>Enviando...</span>
-                                        }
-                                        else
-                                        {
-                                            <i class="bi bi-whatsapp"></i>
-                                            <span>Seleccionar Plantilla</span>
-                                        }
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        @if (Templates != null)
-                                        {
-                                            @foreach (var template in Templates)
+
+                                @if (Templates != null && Templates.Any())
+                                {
+                                    <div class="dropdown">
+                                        <button class="btn btn-success dropdown-toggle d-flex align-items-center gap-2"
+                                                type="button"
+                                                data-bs-toggle="dropdown"
+                                                disabled="@(loadingWhatsappId1 == invitation.Id)">
+                                            @if (IsSendingMassive)
                                             {
-                                                <li>
-                                                    <button type="button"
-                                                    class="dropdown-item"
-                                                    @onclick="() => EnviarInvitacion(invitation.Code!, template.Name, invitation.Id)">
-                                                        @template.DisplayName
-                                                    </button>
-                                                </li>
+                                                <span class="spinner-border spinner-border-sm"></span>
+                                                <span>Enviando...</span>
                                             }
-                                        }
-                                    </ul>
-                                </div>
+                                            else
+                                            {
+                                                <i class="bi bi-whatsapp"></i>
+                                                <span>Seleccionar Plantilla</span>
+                                            }
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            @if (Templates != null)
+                                            {
+                                                @foreach (var template in Templates)
+                                                {
+                                                    <li>
+                                                        <button type="button"
+                                                                class="dropdown-item"
+                                                                @onclick="() => EnviarInvitacion(invitation.Code!, template.Name, invitation.Id)">
+                                                            @template.DisplayName
+                                                        </button>
+                                                    </li>
+                                                }
+                                            }
+                                        </ul>
+                                    </div>
+                                }
                             }
                             else
                             {
@@ -612,13 +622,46 @@ else
                         }
                         else
                         {
+                            <!--
+
                             <button class="btn btn-info d-flex align-items-center gap-1 flex-fill text-white"
-                                    @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 1)">
-                                <i class="bi bi-clipboard"></i> Invitar
+                            @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 1)">
+                            <i class="bi bi-clipboard"></i> Invitar
                             </button>
                             <button class="btn btn-info fd-flex align-items-center gap-1 flex-fill text-white"
-                                    @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 2)">
-                                <i class="bi bi-clipboard"></i> Aviso
+                            @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 2)">
+                            <i class="bi bi-clipboard"></i> Aviso
+                            </button>
+                            -->
+
+                            <button class="btn btn-info fd-flex align-items-center gap-1 flex-fill text-white"
+                                    @onclick="() => CopiarInvitacionm(invitation.Code!, invitation.Id, 1)"
+                                    disabled="@(copyingIdm1 == invitation.Id)">
+                                @if (copyingIdm1 == invitation.Id)
+                                {
+                                    <span class="spinner-border spinner-border-sm"></span>
+                                    <span>Copiando...</span>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-clipboard"></i>
+                                    <span>Invitar</span>
+                                }
+                            </button>
+
+                            <button class="btn btn-info d-inline-flex align-items-center gap-2 text-white"
+                                    @onclick="() => CopiarInvitacionm(invitation.Code!, invitation.Id, 2)"
+                                    disabled="@(copyingIdm2 == invitation.Id)">
+                                @if (copyingIdm2 == invitation.Id)
+                                {
+                                    <span class="spinner-border spinner-border-sm"></span>
+                                    <span>Copiando...</span>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-clipboard"></i>
+                                    <span>Avisar</span>
+                                }
                             </button>
                         }
 
@@ -761,71 +804,75 @@ else
                                 <label class="form-label fw-bold">Invitados</label>
                                 <button type="button" class="btn btn-custom rounded-circle p-2" @onclick="AddGuest">
 
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
-                                    stroke-linecap="round" stroke-linejoin="round" >
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                    <path d="M5 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
-                                    <path d="M3 21v-2a4 4 0 0 1 4 -4h4c.96 0 1.84 .338 2.53 .901" />
-                                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                                    <path d="M16 19h6" />
-                                    <path d="M19 16v6" />
-                                </svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                         stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <path d="M5 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
+                                        <path d="M3 21v-2a4 4 0 0 1 4 -4h4c.96 0 1.84 .338 2.53 .901" />
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                        <path d="M16 19h6" />
+                                        <path d="M19 16v6" />
+                                    </svg>
                                 </button>
                             </div>
-
-                            @foreach (var guest in NewInvitation.Guests)
+                            @if (!IsEditMode)
                             {
-                                <div class="d-flex align-items-center gap-2 mb-3">
+                                @foreach (var guest in NewInvitation.Guests)
+                                {
+                                    <div class="d-flex align-items-center gap-2 mb-3">
 
-                                    <!-- INPUT con menos prioridad -->
-                                    <div style="flex: 1 1 160px;">
-                                        <InputText class="form-control"
-                                                   @bind-Value="guest.GuestName"
-                                                   placeholder="Nombre del invitado" />
-                                    </div>
+                                        <!-- INPUT con menos prioridad -->
+                                        <div style="flex: 1 1 160px;">
+                                            <InputText class="form-control"
+                                                       @bind-Value="guest.GuestName"
+                                                       placeholder="Nombre del invitado" />
+                                        </div>
 
-                                    <!-- SELECT auto width -->
-                                    <div style="flex: 0 0 auto;">
-                                        <InputSelect class="form-select w-auto"
-                                                     @bind-Value="guest.GuestType"
-                                                     @bind-Value:after="OnGuestTypeChanged">
-                                            @foreach (var status in Enum.GetValues<GuestType>())
-                                            {
-                                                <option value="@status">
-                                                    @status.GetDescription()
-                                                </option>
-                                            }
-                                        </InputSelect>
-                                    </div>
+                                        <!-- SELECT auto width -->
+                                        <div style="flex: 0 0 auto;">
+                                            <InputSelect class="form-select w-auto"
+                                                         @bind-Value="guest.GuestType"
+                                                         @bind-Value:after="OnGuestTypeChanged">
+                                                @foreach (var status in Enum.GetValues<GuestType>())
+                                                {
+                                                    <option value="@status">
+                                                        @status.GetDescription()
+                                                    </option>
+                                                }
+                                            </InputSelect>
+                                        </div>
 
-                                    <div style="flex: 0 0 auto;">
-                                        <InputSelect class="form-select w-auto"
-                                                     @bind-Value="guest.Status">
-                                            @foreach (var status in Enum.GetValues<Status>()
+                                        <div style="flex: 0 0 auto;" class="d-none">
+                                            <InputSelect class="form-select w-auto"
+                                                         @bind-Value="guest.Status">
+                                                @foreach (var status in Enum.GetValues<Status>()
                                     .Where(s => s == Status.NotAttend || s == Status.Pending || s == Status.Attend))
-                                            {
-                                                <option value="@status">@status.GetDescription()</option>
-                                            }
-                                        </InputSelect>
+                                                {
+                                                    <option value="@status">@status.GetDescription()</option>
+                                                }
+                                            </InputSelect>
+                                        </div>
+
+                                        <div>
+                                            <button type="button" class="btn btn-danger rounded-circle p-2"
+                                                    @onclick="() => RemoveGuest(guest)">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                    <path d="M4 7l16 0" />
+                                                    <path d="M10 11l0 6" />
+                                                    <path d="M14 11l0 6" />
+                                                    <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                                                </svg>
+                                            </button>
+                                        </div>
+
                                     </div>
 
-                                    <div>
-                                        <button type="button" class="btn btn-danger rounded-circle p-2" 
-                                        @onclick="() => RemoveGuest(guest)"> 
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
-                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" /> 
-                                                <path d="M4 7l16 0" /><path d="M10 11l0 6" /> 
-                                                <path d="M14 11l0 6" /> 
-                                                <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /> 
-                                                <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /> 
-                                            </svg> 
-                                        </button>
-                                    </div>
-
-                                </div>
+                                }
 
                             }
 
@@ -833,17 +880,17 @@ else
                         <div class="mb-3 row col-12">
                             <div class="col-4">
                                 <label class="form-label">Adultos</label>
-                                <InputNumber class="form-control" @bind-Value="NewInvitation.NumberAdults" />
+                                <InputNumber class="form-control" @bind-Value="NewInvitation.NumberAdults" disabled="true" />
                                 <ValidationMessage For="@(() => NewInvitation.NumberAdults)" />
                             </div>
                             <div class="col-4">
                                 <label class="form-label">Jóvenes</label>
-                                <InputNumber class="form-control" @bind-Value="NewInvitation.NumberYouths" />
+                                <InputNumber class="form-control" @bind-Value="NewInvitation.NumberYouths" disabled="true" />
                                 <ValidationMessage For="@(() => NewInvitation.NumberYouths)" />
                             </div>
                             <div class="col-4">
                                 <label class="form-label">Niños</label>
-                                <InputNumber class="form-control" @bind-Value="NewInvitation.NumberChildren" />
+                                <InputNumber class="form-control" @bind-Value="NewInvitation.NumberChildren" disabled="true" />
                                 <ValidationMessage For="@(() => NewInvitation.NumberChildren)" />
                             </div>
                         </div>
@@ -854,37 +901,95 @@ else
 
                             <div class="mb-3">
                                 <label class="form-label">Estado</label>
-                                <InputSelect class="form-select" @bind-Value="NewInvitation.Status">
+                                <InputSelect class="form-select" @bind-Value="NewInvitation.Status"
+                                             @bind-Value:after="OnStatusChanged">
                                     <option value="">-- Selecciona un Estado --</option>
                                     @foreach (var status in Enum.GetValues<Status>()
-                                    .Where(s => s == Status.NotAttend || s == Status.Pending || s == Status.Attend || s == Status.Warned))
+                            .Where(s => s == Status.NotAttend || s == Status.Pending || s == Status.Attend || s == Status.Warned))
                                     {
                                         <option value="@status">@status.GetDescription()</option>
                                     }
                                 </InputSelect>
                                 <ValidationMessage For="@(() => NewInvitation.Status)" />
                             </div>
+                            @if (IsEditMode)
+                            {
+                                @foreach (var guest in NewInvitation.Guests)
+                                {
+                                    <div class="d-flex align-items-center gap-2 mb-3">
 
+                                        <!-- INPUT con menos prioridad -->
+                                        <div style="flex: 1 1 160px;">
+                                            <InputText class="form-control"
+                                                       @bind-Value="guest.GuestName"
+                                                       placeholder="Nombre del invitado" />
+                                        </div>
+
+                                        <!-- SELECT auto width -->
+                                        <div style="flex: 0 0 auto;">
+                                            <InputSelect class="form-select w-auto"
+                                                         @bind-Value="guest.GuestType"
+                                                         @bind-Value:after="OnGuestTypeChanged">
+                                                @foreach (var status in Enum.GetValues<GuestType>())
+                                                {
+                                                    <option value="@status">
+                                                        @status.GetDescription()
+                                                    </option>
+                                                }
+                                            </InputSelect>
+                                        </div>
+
+                                        <div style="flex: 0 0 auto;">
+                                            <InputSelect class="form-select w-auto"
+                                                         @bind-Value="guest.Status"
+                                                         @bind-Value:after="OnGuestStatusChanged">
+                                                @foreach (var status in Enum.GetValues<Status>()
+                                .Where(s => s == Status.NotAttend || s == Status.Pending || s == Status.Attend))
+                                                {
+                                                    <option value="@status">@status.GetDescription()</option>
+                                                }
+                                            </InputSelect>
+                                        </div>
+
+                                        <div>
+                                            <button type="button" class="btn btn-danger rounded-circle p-2"
+                                                    @onclick="() => RemoveGuest(guest)">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                    <path d="M4 7l16 0" />
+                                                    <path d="M10 11l0 6" />
+                                                    <path d="M14 11l0 6" />
+                                                    <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                                                </svg>
+                                            </button>
+                                        </div>
+
+                                    </div>
+
+                                }
+
+                            }
                             <div class="mb-3 row col-12">
                                 <div class="col-4">
                                     <label class="form-label">Adultos</label>
-                                    <InputNumber class="form-control" @bind-Value="NewInvitation.NumberConfirmedAdults" />
+                                    <InputNumber class="form-control" @bind-Value="NewInvitation.NumberConfirmedAdults" disabled="true" />
                                     <ValidationMessage For="@(() => NewInvitation.NumberConfirmedAdults)" />
                                 </div>
                                 <div class="col-4">
                                     <label class="form-label">Jóvenes</label>
-                                    <InputNumber class="form-control" @bind-Value="NewInvitation.NumberConfirmedYouths" />
+                                    <InputNumber class="form-control" @bind-Value="NewInvitation.NumberConfirmedYouths" disabled="true" />
                                     <ValidationMessage For="@(() => NewInvitation.NumberConfirmedYouths)" />
                                 </div>
                                 <div class="col-4">
                                     <label class="form-label">Niños</label>
-                                    <InputNumber class="form-control" @bind-Value="NewInvitation.NumberConfirmedChildren" />
+                                    <InputNumber class="form-control" @bind-Value="NewInvitation.NumberConfirmedChildren" disabled="true" />
                                     <ValidationMessage For="@(() => NewInvitation.NumberConfirmedChildren)" />
                                 </div>
 
                             </div>
-
-
                             <div class="mb-3">
                                 <label class="form-label">Mesa</label>
                                 <InputText class="form-control" @bind-Value="NewInvitation.Table" />

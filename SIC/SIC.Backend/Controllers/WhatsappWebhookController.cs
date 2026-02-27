@@ -29,9 +29,8 @@ public class WhatsappWebhookController : ControllerBase
     }
 
     // 🔐 Verificación inicial de Meta
-    [HttpGet("{phone}")]
+    [HttpGet()]
     public IActionResult VerifyWebhook(
-        string phone,
         [FromQuery(Name = "hub.mode")] string mode,
         [FromQuery(Name = "hub.verify_token")] string token,
         [FromQuery(Name = "hub.challenge")] string challenge)
@@ -47,9 +46,8 @@ public class WhatsappWebhookController : ControllerBase
     }
 
     // ✅ POST con ID en la ruta
-    [HttpPost("{phone}")]
+    [HttpPost]
     public async Task<IActionResult> Receive(
-        string phone,
         [FromBody] WhatsappWebhookPayload payload)
     {
         var changes = payload.Entry?
@@ -68,6 +66,10 @@ public class WhatsappWebhookController : ControllerBase
             if (string.IsNullOrEmpty(phoneNumberId))
                 continue;
 
+            var owner = await _repo.GetByPhoneNumberIdAsync(phoneNumberId);
+            if (owner == null)
+                continue;
+
             var messages = value.Messages ?? new List<MessageDTO>();
             var statuses = value.Statuses ?? new List<MessageStatus>();
 
@@ -81,7 +83,7 @@ public class WhatsappWebhookController : ControllerBase
                     MessageId = message.Id,
                     From = message.From,
                     PhoneNumberId = phoneNumberId,
-                    PhoneNumber = phone,   // 🔑 dueño del número
+                    PhoneNumber = owner.PhoneNumber,   // 🔑 dueño del número
                     Text = message.Text?.Body,
                     Type = message.Type,
                     ReplyToMessageId = message.Context?.Id,
@@ -96,7 +98,7 @@ public class WhatsappWebhookController : ControllerBase
                 var eventCode = conversation.Result!.LastOrDefault()!.EventCode;
                 // 📥 Inbox
                 await _hub.Clients
-                    .Group($"event-inbox-{phone}-{eventCode}")
+                    .Group($"event-inbox-{owner.PhoneNumber}-{eventCode}")
                     .SendAsync(
                         "InboxUpdated",
                         new InboxConversationDto
@@ -111,7 +113,7 @@ public class WhatsappWebhookController : ControllerBase
 
                 // 💬 Enviar mensaje en tiempo real SOLO al chat abierto
                 await _hub.Clients
-                .Group($"chat-{phone}-{dto.From}")
+                .Group($"chat-{owner.PhoneNumber}-{dto.From}")
                 .SendAsync(
                     "NewMessage",
                     new RealtimeChatMessageDto
