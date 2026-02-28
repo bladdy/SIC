@@ -399,42 +399,65 @@ namespace SIC.Backend.Repositories.Implemetations
 
         public async Task<List<InboxConversationDto>> GetInboxAsync(string phoneNumber)
         {
-            var lastMessages = await _context.ResponseFromWhatsApps
-                .AsNoTracking()
-                .Where(m => m.PhoneNumber != null && m.PhoneNumber == phoneNumber)
-                .GroupBy(m => new
-                {
-                    m.EventCode
-                })
-                .Select(g => g
-                    .OrderByDescending(m => m.CreatedAt)
-                    .First())
-                .ToListAsync();
-            // 👈 aquí se ejecuta en SQL
+            try
+            {
+                if (string.IsNullOrWhiteSpace(phoneNumber))
+                    return new List<InboxConversationDto>();
 
-            return lastMessages
-                .Select(m => new InboxConversationDto
-                {
-                    PhoneNumber = m.From,
-                    EventCode = m.EventCode,
-                    EventName = m.EventName,
-                    NameConversation = m.NameConversation,
+                var baseQuery = _context.ResponseFromWhatsApps
+                    .AsNoTracking()
+                    .Where(m => m.PhoneNumber != null && m.PhoneNumber == phoneNumber);
 
-                    LastMessage = m.Message,
-                    LastMessageAt = m.CreatedAt,
-                    Direction = m.Direction,
-                    Type = m.Type,
+                var lastMessages = await baseQuery
+                    .GroupBy(m => m.EventCode)
+                    .Select(g => g
+                        .OrderByDescending(m => m.CreatedAt)
+                        .FirstOrDefault())
+                    .ToListAsync();
 
-                    UnreadCount = _context.ResponseFromWhatsApps.Count(x =>
-                        x.EventCode == m.EventCode &&
+                if (lastMessages == null || !lastMessages.Any())
+                    return new List<InboxConversationDto>();
+
+                // Obtener conteos en una sola consulta
+                var unreadCounts = await baseQuery
+                    .Where(x =>
                         x.Direction == "IN" &&
                         !string.IsNullOrEmpty(x.MessageId) &&
-                        //!string.IsNullOrEmpty(x.Status) &&
-                        x.Status != "seen"
-                    )
-                })
-                .OrderByDescending(x => x.LastMessageAt)
-                .ToList();
+                        x.Status != "seen")
+                    .GroupBy(x => x.EventCode)
+                    .Select(g => new
+                    {
+                        EventCode = g.Key,
+                        Count = g.Count()
+                    })
+                    .ToDictionaryAsync(x => x.EventCode, x => x.Count);
+
+                return lastMessages
+                    .Where(m => m != null)
+                    .Select(m => new InboxConversationDto
+                    {
+                        PhoneNumber = m.From ?? "",
+                        EventCode = m.EventCode ?? "",
+                        EventName = m.EventName ?? "",
+                        NameConversation = m.NameConversation ?? "",
+
+                        LastMessage = m.Message ?? "",
+                        LastMessageAt = m.CreatedAt,
+                        Direction = m.Direction ?? "",
+                        Type = m.Type ?? "",
+
+                        UnreadCount = unreadCounts.ContainsKey(m.EventCode)
+                            ? unreadCounts[m.EventCode]
+                            : 0
+                    })
+                    .OrderByDescending(x => x.LastMessageAt)
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al obtener el inbox: {ex.Message}");
+                return new List<InboxConversationDto>();
+            }
         }
     }
 }
