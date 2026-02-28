@@ -190,6 +190,40 @@ else
 
                                             }
                                         </div>
+                                        <div class="col-12 col-md-3 d-flex align-items-center">
+
+                                            @{
+                                                var sentTemplates = invitation.TemplateSents
+                                                .Select(t => t.TemplateNumber)
+                                                .ToList();
+                                            }
+
+                                            <div class="steps-wrapper">
+                                                <div class="steps-container">
+
+                                                    <div class="step-circle @(sentTemplates.Contains(1) ? "active-step" : "inactive-step")">
+                                                        <!-- SVG 1 -->
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circle-number-1"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 10l2 -2v8" /></svg>
+                                                    </div>
+
+                                                    <div class="step-circle @(sentTemplates.Contains(2) ? "active-step" : "inactive-step")">
+                                                        <!-- SVG 2 -->
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circle-number-2"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 8h3a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 0 -1 1v2a1 1 0 0 0 1 1h3" /></svg>
+                                                    </div>
+
+                                                    <div class="step-circle @(sentTemplates.Contains(3) ? "active-step" : "inactive-step")">
+                                                        <!-- SVG 3 -->
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circle-number-3"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 9a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1" /></svg>
+                                                    </div>
+
+                                                    <div class="step-circle @(sentTemplates.Contains(4) ? "active-step" : "inactive-step")">
+                                                        <!-- SVG 4 -->
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circle-number-4"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 8v3a1 1 0 0 0 1 1h3" /><path d="M14 8v8" /></svg>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </td>
@@ -263,6 +297,40 @@ else
                     </div>
                     <p class="mb-1"><strong>Mesa:</strong> @invitation.Table</p>
                     <p class="mb-1"><strong>Dedicatoria:</strong> @invitation.Comments</p>
+                    <div class="row m-2">
+
+                        @{
+                            var sentTemplates = invitation.TemplateSents
+                            .Select(t => t.TemplateNumber)
+                            .ToList();
+                        }
+
+                        <div class="steps-wrapper">
+                            <div class="steps-container">
+
+                                <div class="step-circle @(sentTemplates.Contains(1) ? "active-step" : "inactive-step")">
+                                    <!-- SVG 1 -->
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circle-number-1"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 10l2 -2v8" /></svg>
+                                </div>
+
+                                <div class="step-circle @(sentTemplates.Contains(2) ? "active-step" : "inactive-step")">
+                                    <!-- SVG 2 -->
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circle-number-2"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 8h3a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 0 -1 1v2a1 1 0 0 0 1 1h3" /></svg>
+                                </div>
+
+                                <div class="step-circle @(sentTemplates.Contains(3) ? "active-step" : "inactive-step")">
+                                    <!-- SVG 3 -->
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circle-number-3"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 9a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1" /></svg>
+                                </div>
+
+                                <div class="step-circle @(sentTemplates.Contains(4) ? "active-step" : "inactive-step")">
+                                    <!-- SVG 4 -->
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circle-number-4"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 8v3a1 1 0 0 0 1 1h3" /><path d="M14 8v8" /></svg>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
 
                 </div>
             </div>
@@ -276,3 +344,95 @@ else
 
     </div>
 }
+
+<style>
+    .steps-wrapper {
+        background-color: #3C6A79;
+        padding: 12px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 12px;
+    }
+
+    /* Contenedor horizontal fijo */
+    .steps-container {
+        display: flex;
+        flex-direction: row;
+        gap: 12px;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: nowrap;
+    }
+
+    /* Círculo base (Desktop) */
+    .step-circle {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+    }
+
+    /* Cuando fue enviado */
+    .active-step {
+        background-color: #098f09;
+    }
+
+    /* Cuando NO fue enviado */
+    .inactive-step {
+        background-color: #6c757d; /* secondary */
+        opacity: 0.6;
+    }
+
+    .step-circle svg {
+        width: 20px;
+        height: 20px;
+        stroke: white;
+    }
+
+    /* Hover */
+    .step-circle:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* ===== Tablet ===== */
+    @@media (max-width: 768px) {
+        .steps-container {
+            gap: 8px;
+        }
+
+        .step-circle {
+            width: 32px;
+            height: 32px;
+        }
+
+            .step-circle svg {
+                width: 15px;
+                height: 15px;
+            }
+    }
+
+    /* ===== Mobile ===== */
+    @@media (max-width: 480px) {
+        .steps-container {
+            gap: 6px;
+        }
+
+
+        .step-circle {
+            width: 30px;
+            height: 30px;
+        }
+
+            .step-circle svg {
+                width: 20px;
+                height: 20px;
+            }
+    }
+
+</style>
