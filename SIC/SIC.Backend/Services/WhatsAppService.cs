@@ -157,7 +157,9 @@ namespace SIC.Backend.Services
                     templateContent
                 );
                 var apiResponse = JsonConvert.DeserializeObject<WhatsAppApiResponse>(json);
-
+                var imagenFromComponents = components
+                            .SelectMany(c => c.Parameters ?? new List<TemplateParameterRequest>())
+                            .FirstOrDefault(p => p.Type == "image")?.Link ?? "";
                 return new ActionResponse<WhatsAppMessageResponse>
                 {
                     Success = true,
@@ -167,10 +169,8 @@ namespace SIC.Backend.Services
                         NumeroDestino = numeroDestino,
                         TemplateName = templateName,
                         Contact = apiResponse.Contacts.First().WaId,
-                        Imagen = components
-                            .SelectMany(c => c.Parameters ?? new List<TemplateParameterRequest>())
-                            .FirstOrDefault(p => p.Type == "image")?.Link ?? "",
-                        Message = finalMessage
+                        Message = finalMessage,
+                        Imagen = imagenFromComponents
                     }
                 };
             }

@@ -267,7 +267,7 @@ namespace SIC.Backend.Repositories.Implemetations
             return new ActionResponse<bool>
             {
                 Success = true,
-                Message = "Funcionalidad no implementada."
+                Message = "Mensaje Guardado."
             };
         }
 

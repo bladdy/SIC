@@ -537,24 +537,27 @@ namespace SIC.Backend.Controllers
                         components
                     );
                     await SaveMessageHistory(invitacion.Result.Code!, result);
-                    // Asociar la template enviada con la invitacion para llevar un control de que plantilla se envio a cada invitacion, y evitar enviar varias veces la misma plantilla a una misma invitacion
-
-                    await _templateRepository.AddSentTemplateAsync(template.TemplateNumber, invitacion.Result.Id);
-                    var messageDto = new WhatsappIncomingMessageDto
+                    if (result.Success)
                     {
-                        PhoneNumber = userWhatsAppConfig.Result.PhoneNumber,
-                        MessageId = result.Result!.Wamid,
-                        From = result.Result!.Contact,
-                        Text = result.Result.Message,
-                        Type = "template",
-                        ReplyToMessageId = result.Result!.Wamid,
-                        Direction = "OUT",
-                        Status = "sent",
-                        Imagen = result.Result!.Imagen,
-                    };
+                        // Asociar la template enviada con la invitacion para llevar un control de que plantilla se envio a cada invitacion, y evitar enviar varias veces la misma plantilla a una misma invitacion
+                        await _templateRepository.AddSentTemplateAsync(template.TemplateNumber, invitacion.Result.Id);
+                        var messageDto = new WhatsappIncomingMessageDto
+                        {
+                            PhoneNumber = userWhatsAppConfig.Result.PhoneNumber,
+                            MessageId = result.Result!.Wamid,
+                            From = result.Result!.Contact,
+                            Text = result.Result.Message,
+                            Type = "template",
+                            ReplyToMessageId = result.Result!.Wamid,
+                            Direction = "OUT",
+                            Status = "sent",
+                            Imagen = result.Result!.Imagen,
+                        };
 
-                    var response = await _iMessageUnitOfWork
-                    .AddReceiveMessages(messageDto);
+                        var response = await _iMessageUnitOfWork
+                        .AddReceiveMessages(messageDto);
+                        
+                    }
                     if (!result.Success)
                     {
                         fallidos++;
