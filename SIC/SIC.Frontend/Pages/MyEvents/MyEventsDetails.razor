@@ -454,7 +454,7 @@ else
 
                                                 <button class="btn d-inline-flex align-items-center gap-2 text-white d-none"
                                                 style="background-color:#25d366;"
-                                                @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)"
+                                                @onclick="() => AbrirWhatsapp(invitation.CountryCode+invitation.PhoneNumber , invitation.Code!, invitation.Id, 1)"
                                                 disabled="@(loadingWhatsappId1 == invitation.Id)">
                                                     @if (loadingWhatsappId1 == invitation.Id)
                                                     {
@@ -470,7 +470,7 @@ else
 
                                                 <button class="btn d-inline-flex align-items-center gap-2 text-white"
                                                 style="background-color:#25d366;"
-                                                @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 2)"
+                                                @onclick="() => AbrirWhatsapp(invitation.CountryCode+invitation.PhoneNumber, invitation.Code!, invitation.Id, 2)"
                                                 disabled="@(loadingWhatsappId2 == invitation.Id)">
                                                     @if (loadingWhatsappId2 == invitation.Id)
                                                     {
@@ -659,12 +659,12 @@ else
                             else
                             {
                                 <button class="btn d-flex align-items-center gap-1 flex-fill" style="background-color:#25d366; color:white;"
-                                @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)">
+                                        @onclick="() => AbrirWhatsapp(invitation.CountryCode+invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)">
                                     <i class="bi bi-whatsapp"></i> Invitar
                                 </button>
                             }
                             <button class="btn d-flex align-items-center gap-1 flex-fill" style="background-color:#25d366; color:white;"
-                            @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 2)">
+                                    @onclick="() => AbrirWhatsapp(invitation.CountryCode+invitation.PhoneNumber, invitation.Code!, invitation.Id, 2)">
                                 <i class="bi bi-whatsapp"></i> Aviso
                             </button>
                         }
