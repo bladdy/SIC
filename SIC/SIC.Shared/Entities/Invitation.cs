@@ -66,4 +66,5 @@ public class Invitation
     public ICollection<InvitationGuest> Guests { get; set; } = new List<InvitationGuest>();
 
     public ICollection<HistoryMessages> HistoryMessages { get; set; } = new List<HistoryMessages>();
+    public ICollection<TemplateSent> TemplateSents { get; set; } = new List<TemplateSent>();
 }

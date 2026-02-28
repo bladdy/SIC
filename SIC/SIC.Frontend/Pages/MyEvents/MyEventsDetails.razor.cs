@@ -690,6 +690,7 @@ public partial class MyEventsDetails
         finally
         {
             loadingWhatsappId1 = null;
+            await LoadInvitations(currentPage);
             StateHasChanged();
         }
     }

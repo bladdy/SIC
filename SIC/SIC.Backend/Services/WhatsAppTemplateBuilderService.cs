@@ -14,27 +14,31 @@ namespace SIC.Backend.Services
             Event ev,
             string code)
         {
-            var components = new List<TemplateComponentRequest>();
-
-            var structure = JsonSerializer.Deserialize<TemplateStructure>(
-            template.StructureJson,
-            new JsonSerializerOptions
+            try
             {
-                PropertyNameCaseInsensitive = true
-            });
 
-            if (structure == null)
-                return components;
 
-            // HEADER
-            if (structure.Header != null)
-            {
-                var headerValue = GetDynamicValue(structure.Header.Source, invitation, ev, code);
+                var components = new List<TemplateComponentRequest>();
 
-                components.Add(new TemplateComponentRequest
+                var structure = JsonSerializer.Deserialize<TemplateStructure>(
+                template.StructureJson,
+                new JsonSerializerOptions
                 {
-                    Type = "header",
-                    Parameters = new List<TemplateParameterRequest>
+                    PropertyNameCaseInsensitive = true
+                });
+
+                if (structure == null)
+                    return components;
+
+                // HEADER
+                if (structure.Header != null)
+                {
+                    var headerValue = GetDynamicValue(structure.Header.Source, invitation, ev, code);
+
+                    components.Add(new TemplateComponentRequest
+                    {
+                        Type = "header",
+                        Parameters = new List<TemplateParameterRequest>
                     {
                         new TemplateParameterRequest
                         {
@@ -42,36 +46,36 @@ namespace SIC.Backend.Services
                             Link = headerValue
                         }
                     }
-                });
-            }
+                    });
+                }
 
-            // BODY
-            if (structure.Body?.Any() == true)
-            {
-                var bodyParams = structure.Body.Select(b => new TemplateParameterRequest
+                // BODY
+                if (structure.Body?.Any() == true)
                 {
-                    Type = b.Type,
-                    Text = GetDynamicValue(b.Source, invitation, ev, code)
-                }).ToList();
+                    var bodyParams = structure.Body.Select(b => new TemplateParameterRequest
+                    {
+                        Type = b.Type,
+                        Text = GetDynamicValue(b.Source, invitation, ev, code)
+                    }).ToList();
 
-                components.Add(new TemplateComponentRequest
-                {
-                    Type = "body",
-                    Parameters = bodyParams
-                });
-            }
-
-            // BUTTONS
-            if (structure.Buttons?.Any() == true)
-            {
-                foreach (var btn in structure.Buttons)
-                {
                     components.Add(new TemplateComponentRequest
                     {
-                        Type = "button",
-                        SubType = btn.Type,
-                        Index = btn.Index,
-                        Parameters = new List<TemplateParameterRequest>
+                        Type = "body",
+                        Parameters = bodyParams
+                    });
+                }
+
+                // BUTTONS
+                if (structure.Buttons?.Any() == true)
+                {
+                    foreach (var btn in structure.Buttons)
+                    {
+                        components.Add(new TemplateComponentRequest
+                        {
+                            Type = "button",
+                            SubType = btn.Type,
+                            Index = btn.Index,
+                            Parameters = new List<TemplateParameterRequest>
                         {
                             new TemplateParameterRequest
                             {
@@ -79,11 +83,17 @@ namespace SIC.Backend.Services
                                 Text = GetDynamicValue(btn.Source, invitation, ev, code)
                             }
                         }
-                    });
+                        });
+                    }
                 }
-            }
 
-            return components;
+                return components;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al construir la platilla", ex);
+            }
         }
 
         private string GetDynamicValue(string source, Invitation invitation, Event ev, string code)

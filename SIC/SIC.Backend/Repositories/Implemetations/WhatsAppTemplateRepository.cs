@@ -16,6 +16,36 @@ namespace SIC.Backend.Repositories.Implemetations
             _context = context;
         }
 
+        public async Task<ActionResponse<bool>> AddSentTemplateAsync(int templateNumber, int id)
+        {
+            var exists = await _context.TemplateSents.AnyAsync(t => t.InvitationId == id && t.TemplateNumber == templateNumber);
+
+            if (exists)
+            {
+                return new ActionResponse<bool>
+                {
+                    Success = true,
+                    Message = "Ya se envio esta plantilla.",
+                    Result = true
+                };
+            }
+            else
+            {
+                var entity = new TemplateSent
+                {
+                    TemplateNumber = templateNumber,
+                    InvitationId = id
+                };
+                _context.TemplateSents.Add(entity);
+                await _context.SaveChangesAsync();
+                return new ActionResponse<bool>
+                {
+                    Success = true,
+                    Result = true
+                };
+            }
+        }
+
         public async Task<ActionResponse<bool>> CreateTemplates(WhatsAppTemplate entity)
         {
             bool exists = await _context.WhatsAppTemplates.AnyAsync(t => t.Name == entity.Name);

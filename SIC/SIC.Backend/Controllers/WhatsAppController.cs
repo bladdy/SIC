@@ -523,6 +523,8 @@ namespace SIC.Backend.Controllers
                         ev,
                         code
                     );
+                    if (components == null)
+                        continue;
                     var fullnumber = string.Concat(invitacion.Result.CountryCode, invitacion.Result.PhoneNumber);
 
                     var result = await _whatsAppService.EnviarTemplateDinamicoAsync(
@@ -535,7 +537,9 @@ namespace SIC.Backend.Controllers
                         components
                     );
                     await SaveMessageHistory(invitacion.Result.Code!, result);
+                    // Asociar la template enviada con la invitacion para llevar un control de que plantilla se envio a cada invitacion, y evitar enviar varias veces la misma plantilla a una misma invitacion
 
+                    await _templateRepository.AddSentTemplateAsync(template.TemplateNumber, invitacion.Result.Id);
                     var messageDto = new WhatsappIncomingMessageDto
                     {
                         PhoneNumber = userWhatsAppConfig.Result.PhoneNumber,

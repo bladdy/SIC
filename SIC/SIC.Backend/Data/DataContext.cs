@@ -33,6 +33,7 @@ public class DataContext : IdentityDbContext<User>
     public DbSet<ResponseFromWhatsApp> ResponseFromWhatsApps { get; set; }
     public DbSet<PhotoEvent> PhotoEvents { get; set; }
     public DbSet<PhotoEventImage> PhotoEventImages { get; set; }
+    public DbSet<TemplateSent> TemplateSents { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
