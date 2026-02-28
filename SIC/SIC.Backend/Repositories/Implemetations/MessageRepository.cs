@@ -421,13 +421,14 @@ namespace SIC.Backend.Repositories.Implemetations
                 // Obtener conteos en una sola consulta
                 var unreadCounts = await baseQuery
                     .Where(x =>
+                        x.EventCode != null &&   // 🔥 FIX
                         x.Direction == "IN" &&
                         !string.IsNullOrEmpty(x.MessageId) &&
                         x.Status != "seen")
                     .GroupBy(x => x.EventCode)
                     .Select(g => new
                     {
-                        EventCode = g.Key,
+                        EventCode = g.Key!,
                         Count = g.Count()
                     })
                     .ToDictionaryAsync(x => x.EventCode, x => x.Count);
