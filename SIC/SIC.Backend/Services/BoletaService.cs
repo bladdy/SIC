@@ -1,6 +1,7 @@
 ﻿using iTextSharp.text;
 using iTextSharp.text.pdf;
 using QRCoder;
+using SIC.Frontend.Helpers;
 using SIC.Shared.DTOs;
 
 namespace SIC.Backend.Services
@@ -108,6 +109,130 @@ namespace SIC.Backend.Services
             return (pdfBytes, qrBytes);
         }
 
+        public async Task<byte[]> GenerarBoletaEstiloCard(BoletaInvitacionDto data, byte[] qrBytes)
+        {
+            byte[]? coverBytes = null;
+            using var ms = new MemoryStream();
+            using var document = new Document(PageSize.A4, 40, 40, 40, 40);
+            PdfWriter.GetInstance(document, ms);
+            document.Open();
+
+            // ==============================
+            // 🎨 COLORES tipo Bootstrap
+            // ==============================
+            var darkColor = new BaseColor(33, 37, 41);      // btn-dark
+            var mutedColor = new BaseColor(108, 117, 125);  // text-muted
+            var borderColor = new BaseColor(222, 226, 230); // border
+
+            // ==============================
+            // 🔠 FUENTES
+            // ==============================
+            var fontTitle = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.Black);
+            var fontMuted = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 11, mutedColor);
+            var fontNormal = FontFactory.GetFont(FontFactory.HELVETICA, 12, BaseColor.Black);
+            var fontSmall = FontFactory.GetFont(FontFactory.HELVETICA, 9, mutedColor);
+
+            // ==============================
+            // 📦 CONTENEDOR CARD
+            // ==============================
+            var cardTable = new PdfPTable(1)
+            {
+                WidthPercentage = 60
+            };
+
+            var cardCell = new PdfPCell
+            {
+                BorderColor = borderColor,
+                BorderWidth = 1,
+                Padding = 15,
+                BackgroundColor = BaseColor.White
+            };
+
+            // ==============================
+            // 🖼 IMAGEN SUPERIOR
+            // ==============================
+            if (data.CoverImageBytes != null)
+            {
+                coverBytes = await DescargarImagenAsync(data.CoverImageBytes);
+                var coverImg = Image.GetInstance(coverBytes);
+                coverImg.ScaleToFit(400, 200);
+                coverImg.Alignment = Element.ALIGN_CENTER;
+                cardCell.AddElement(coverImg);
+                cardCell.AddElement(new Paragraph(" "));
+            }
+
+            // ==============================
+            // 📝 TEXTOS CENTRADOS
+            // ==============================
+            void AddCentered(string text, Font font, int spacing = 5)
+            {
+                var p = new Paragraph(text, font)
+                {
+                    Alignment = Element.ALIGN_CENTER,
+                    SpacingAfter = spacing
+                };
+                cardCell.AddElement(p);
+            }
+
+            AddCentered("GRACIAS POR CONFIRMAR TU ASISTENCIA AL EVENTO DE:", fontMuted, 10);
+            AddCentered(data.SubNombre?.ToUpper() ?? "", fontTitle, 0);
+            AddCentered(data.NombreEvento?.ToUpper() ?? "", fontTitle, 0);
+            AddCentered(data.Fecha.FormatearFechaLargaEspanol(), fontNormal, 15);
+
+            // ==============================
+            // 🔳 QR CENTRADO
+            // ==============================
+            var qrImage = Image.GetInstance(qrBytes);
+            qrImage.ScaleAbsolute(120, 120);
+            qrImage.Alignment = Element.ALIGN_CENTER;
+            cardCell.AddElement(qrImage);
+
+            AddCentered(" ", fontNormal, 5);
+
+            // ==============================
+            // 👥 LISTA DE INVITADOS
+            // ==============================
+            AddCentered("LISTA DE INVITADOS", fontMuted, 0);
+            AddCentered(data.NombreInvitado, fontTitle, 0);
+
+            foreach (var item in data.Guests)
+            {
+                AddCentered(item, fontTitle,0);
+            }
+
+            // ==============================
+            // 📄 TEXTO INFORMATIVO
+            // ==============================
+            var infoText = new Paragraph(
+                "Este código QR es tu acceso al evento.\nDescárgalo y preséntalo en la entrada.\nEste QR solo se escanea con nuestra App.",
+                fontSmall)
+            {
+                Alignment = Element.ALIGN_CENTER,
+                SpacingBefore = 10
+            };
+
+            cardCell.AddElement(infoText);
+
+            cardTable.AddCell(cardCell);
+            document.Add(cardTable);
+
+            document.Close();
+            return ms.ToArray();
+        }
+
+        private async Task<byte[]?> DescargarImagenAsync(string url)
+        {
+            try
+            {
+                using var httpClient = new HttpClient();
+                return await httpClient.GetByteArrayAsync(url);
+            }
+            catch
+            {
+                return null; // si falla, no rompe el PDF
+            }
+        }
+
         public byte[] GenerarPdfQrs(string evento, List<string> codigosQr)
         {
             using var ms = new MemoryStream();
@@ -186,6 +311,11 @@ namespace SIC.Backend.Services
             using var qr = new PngByteQRCode(data);
 
             return qr.GetGraphic(20);
+        }
+
+        internal object GenerarBoletaEstiloCard(BoletaInvitacionDto dto, string v)
+        {
+            throw new NotImplementedException();
         }
     }
 }

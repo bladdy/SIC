@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SIC.Shared.DTOs
+﻿namespace SIC.Shared.DTOs
 {
     public class BoletaInvitacionDto
     {
@@ -20,5 +14,7 @@ namespace SIC.Shared.DTOs
         public int Niños { get; set; }
         public string MesaAsignada { get; set; } = string.Empty;
         public string CodigoQr { get; set; } = string.Empty;
+        public string CoverImageBytes { get; set; } = string.Empty;
+        public List<string> Guests { get; set; } = [];
     }
 }

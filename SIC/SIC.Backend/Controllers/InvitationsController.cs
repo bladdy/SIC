@@ -2,6 +2,7 @@
 using QRCoder;
 using SIC.Backend.Services;
 using SIC.Backend.UnitOfWork.Interfaces;
+using SIC.Frontend.Helpers;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 
@@ -137,10 +138,12 @@ public class InvitationsController : GenericController<Invitation>
                 NombreInvitado = invitacion.Name,
                 NombreEvento = invitacion.Event!.Name,
                 SubNombre = invitacion.Event!.SubTitle,
+                CoverImageBytes = invitacion.Event!.CoverImageUrl!,
                 Fecha = invitacion.Event!.Date,
                 Hora = DateTime.Today.Add(invitacion.Event!.Time).ToString("hh:mm tt"),
                 Lugar = invitacion.Event!.Url!,
                 CantidadPersonas = invitacion.NumberAdults + invitacion.NumberChildren,
+                Guests = [.. invitacion.Guests.Select(c => $"{c.GuestName} ({c.GuestType.GetDescription()})")],
                 Niños = invitacion.NumberConfirmedChildren,
                 Jovenes = invitacion.NumberConfirmedYouths,
                 Adultos = invitacion.NumberConfirmedAdults,
@@ -150,10 +153,12 @@ public class InvitationsController : GenericController<Invitation>
 
             // 🔹 QR Base64
             string qrBase64 = GenerateQRCodeBase64(dto.CodigoQr, evento);
-
+            byte[] qrBytes = Convert.FromBase64String(qrBase64);
             // 🔹 PDF Base64
             var (pdfBytes, _) = _boletaService.GenerarBoleta(dto);
-            string pdfBase64 = Convert.ToBase64String(pdfBytes);
+            var pdfQRByte = _boletaService.GenerarBoletaEstiloCard(dto, qrBytes);
+            //string pdfBase64 = Convert.ToBase64String(pdfBytes);
+            string pdfBase64 = Convert.ToBase64String(await pdfQRByte);
 
             return Ok(new
             {

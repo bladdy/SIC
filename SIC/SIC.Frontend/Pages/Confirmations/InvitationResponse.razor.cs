@@ -9,6 +9,9 @@ using System.Net.Http.Json;
 
 namespace SIC.Frontend.Pages.Confirmations
 {
+    //ToDo: Agregar validaciones para que no se pueda enviar la respuesta sin seleccionar una opción (asistirá o no asistirá)
+    //ToDo: Agregar validaciones para que no se pueda enviar la respuesta sin seleccionar el número de invitados (adultos, jóvenes, niños)
+    //ToDo: Agregar que se que se vaya el estatus desde el formulario
     public partial class InvitationResponse : ComponentBase
     {
         [Parameter] public string? Code { get; set; }
@@ -48,7 +51,6 @@ namespace SIC.Frontend.Pages.Confirmations
                 MostrarBotonConfirmar = true;
             }
         }
-
 
         protected string? CodigoNoEncontrado;
         protected string? QrBase64;
@@ -146,6 +148,7 @@ namespace SIC.Frontend.Pages.Confirmations
                 MostrarGracias = true;
 
                 if (Invitacion.Status == Status.Attend)
+                    await CargarInvitacion(Code);
                     await CargarQr();
             }
             else
