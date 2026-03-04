@@ -143,7 +143,7 @@ public class InvitationsController : GenericController<Invitation>
                 Hora = DateTime.Today.Add(invitacion.Event!.Time).ToString("hh:mm tt"),
                 Lugar = invitacion.Event!.Url!,
                 CantidadPersonas = invitacion.NumberAdults + invitacion.NumberChildren,
-                Guests = [.. invitacion.Guests.Select(c => $"{c.GuestName} ({c.GuestType.GetDescription()})")],
+                Guests = invitacion.Guests.Select(c => $"{c.GuestName} ({c.GuestType.GetDescription()})").ToList(),
                 Niños = invitacion.NumberConfirmedChildren,
                 Jovenes = invitacion.NumberConfirmedYouths,
                 Adultos = invitacion.NumberConfirmedAdults,
@@ -155,7 +155,7 @@ public class InvitationsController : GenericController<Invitation>
             string qrBase64 = GenerateQRCodeBase64(dto.CodigoQr, evento);
             byte[] qrBytes = Convert.FromBase64String(qrBase64);
             // 🔹 PDF Base64
-            var (pdfBytes, _) = _boletaService.GenerarBoleta(dto);
+            //var (pdfBytes, _) = _boletaService.GenerarBoleta(dto);
             var pdfQRByte = _boletaService.GenerarBoletaEstiloCard(dto, qrBytes);
             //string pdfBase64 = Convert.ToBase64String(pdfBytes);
             string pdfBase64 = Convert.ToBase64String(await pdfQRByte);
