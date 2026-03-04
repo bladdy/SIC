@@ -103,7 +103,7 @@ namespace SIC.Backend.Services
                 "Event.SubTitle" => ev.SubTitle,
                 "Event.CoverImageUrl" => ev.CoverImageUrl ?? "",
                 "Event.DateFormatted" => FechaHelper.FormatearFechaLargaEspanol(ev.Date),
-                "Event.UrlWithCode" => $"{ev.Url}?codigo={code}",
+                "Event.UrlWithCode" => code,
                 "Event.UrlConfirmation" => code,
                 "Event.DateLimitFormatted" => FechaHelper.FormatearFechaLargaEspanol((DateTime)ev.DeadLine!),
                 "Invitation.ReservedSeats" => (invitation.NumberAdults + invitation.NumberYouths + invitation.NumberChildren).ToString(),
