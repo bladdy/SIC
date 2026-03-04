@@ -193,11 +193,11 @@ namespace SIC.Backend.Services
             // 👥 LISTA DE INVITADOS
             // ==============================
             AddCentered("LISTA DE INVITADOS", fontMuted, 0);
-            AddCentered(data.NombreInvitado, fontTitle, 0);
+            AddCentered(data.NombreInvitado, fontTitle, 5);
 
             foreach (var item in data.Guests)
             {
-                AddCentered(item, fontTitle, 0);
+                AddCentered(item, fontMuted, 0);
             }
 
             // ==============================
