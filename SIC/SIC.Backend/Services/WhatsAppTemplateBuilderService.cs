@@ -16,8 +16,6 @@ namespace SIC.Backend.Services
         {
             try
             {
-
-
                 var components = new List<TemplateComponentRequest>();
 
                 var structure = JsonSerializer.Deserialize<TemplateStructure>(
@@ -88,7 +86,6 @@ namespace SIC.Backend.Services
                 }
 
                 return components;
-
             }
             catch (Exception ex)
             {
@@ -109,6 +106,7 @@ namespace SIC.Backend.Services
                 "Event.UrlWithCode" => $"{ev.Url}?codigo={code}",
                 "Event.UrlConfirmation" => code,
                 "Event.DateLimitFormatted" => FechaHelper.FormatearFechaLargaEspanol((DateTime)ev.DeadLine!),
+                "Invitation.ReservedSeats" => (invitation.NumberAdults + invitation.NumberYouths + invitation.NumberChildren).ToString(),
                 "Event.Table" => string.IsNullOrWhiteSpace(invitation.Table)
                         ? "Sin asignar"
                         : invitation.Table,
