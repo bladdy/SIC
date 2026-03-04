@@ -13,6 +13,8 @@ using SIC.Shared.Response;
 using System.Net;
 
 namespace SIC.Frontend.Pages.MyEvents;
+//ToDo: separar en componentes más pequeños, especialmente el modal de creación/edición de invitaciones
+//ToDo: Revisar el reload después de cada acción, a veces es necesario y a veces no, optimizar eso
 
 [Authorize(Roles = "Admin,WeddingPlanner,User")]
 public partial class MyEventsDetails

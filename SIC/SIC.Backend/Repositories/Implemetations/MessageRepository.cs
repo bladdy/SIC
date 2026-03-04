@@ -188,6 +188,7 @@ namespace SIC.Backend.Repositories.Implemetations
                         Message = "La invitación no existe."
                     };
                 }
+                //ToDo: Revisar esto
                 var mesage = new HistoryMessages
                 {
                     Invitation = invitations,
