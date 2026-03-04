@@ -9,7 +9,7 @@ namespace SIC.Shared.Helpers
 {
     public static class FechaHelper
     {
-        public static string FormatearFechaLargaEspanol(DateTime fecha)
+        public static string FormatearFechaLargaEspanol(this DateTime fecha)
         {
             var cultura = new CultureInfo("es-ES");
 

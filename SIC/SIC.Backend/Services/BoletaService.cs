@@ -1,8 +1,8 @@
 ﻿using iTextSharp.text;
 using iTextSharp.text.pdf;
 using QRCoder;
-using SIC.Frontend.Helpers;
 using SIC.Shared.DTOs;
+using SIC.Shared.Helpers;
 
 namespace SIC.Backend.Services
 {
@@ -197,7 +197,7 @@ namespace SIC.Backend.Services
 
             foreach (var item in data.Guests)
             {
-                AddCentered(item, fontTitle,0);
+                AddCentered(item, fontTitle, 0);
             }
 
             // ==============================
