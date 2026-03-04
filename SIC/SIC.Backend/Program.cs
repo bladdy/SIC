@@ -14,7 +14,6 @@ using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.Entities;
 using System.Security.Claims;
 using System.Text;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
 //ToDo: Agregar la deshabilitacion de los botones Editar y Crear para los Clientes y los Wedding Planner
@@ -64,7 +63,7 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddDbContext<DataContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection")));
 builder.Services.AddTransient<SeedDb>();
 
 // Registrar el servicio de WhatsAppService

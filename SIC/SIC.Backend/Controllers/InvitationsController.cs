@@ -2,9 +2,9 @@
 using QRCoder;
 using SIC.Backend.Services;
 using SIC.Backend.UnitOfWork.Interfaces;
-using SIC.Frontend.Helpers;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
+using SIC.Shared.Helpers;
 
 namespace SIC.Backend.Controllers;
 
