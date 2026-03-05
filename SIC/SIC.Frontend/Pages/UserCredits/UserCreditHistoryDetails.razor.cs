@@ -1,7 +1,6 @@
 using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using SIC.Frontend.Pages.Events;
 using SIC.Frontend.Repositories;
 using SIC.Shared.Entities;
 using System.Net;
@@ -16,7 +15,7 @@ namespace SIC.Frontend.Pages.UserCredits
         public List<UserCreditHistory>? userCreditHistories { get; set; }
         [Inject] private IRepository Repository { get; set; } = default!;
         [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
-        [Inject] private NavigationManager NavigationManager { get; set; } = default!; 
+        [Inject] private NavigationManager NavigationManager { get; set; } = default!;
         [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
 
         [Parameter, SupplyParameterFromQuery] public string Page { get; set; } = string.Empty;
@@ -32,9 +31,7 @@ namespace SIC.Frontend.Pages.UserCredits
                 if (user.Identity is not null && user.Identity.IsAuthenticated)
                 {
                     Id = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
                 }
-                
             }
             RecordsNumber ??= 15;
             await LoadCreditHistoriy();

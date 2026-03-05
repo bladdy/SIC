@@ -28,7 +28,9 @@ namespace SIC.Backend.UnitOfWork.Implemetations
 
         public async Task<ActionResponse<bool>> AddHistoryMessages(string code, bool Success, string? Message) => await _messageRepository.AddHistoryMessages(code, Success, Message);
 
-        public async Task<ActionResponse<IEnumerable<HistoryMessages>>> GetHistoryMessagesAsync() => await _messageRepository.GetHistoryMessagesAsync();
+        public async Task<ActionResponse<IEnumerable<HistoryMessages>>> GetHistoryMessagesAsync(PaginationDTO pagination) => await _messageRepository.GetHistoryMessagesAsync(pagination);
+
+        public async Task<ActionResponse<int>> GetHistoryMessagesTotalRecordAsync(PaginationDTO pagination) => await _messageRepository.GetHistoryMessagesTotalRecordAsync(pagination);
 
         public async Task<ActionResponse<bool>> AddReceiveMessages(WhatsappIncomingMessageDto whatsappIncoming) => await _messageRepository.AddReceiveMessages(whatsappIncoming);
 

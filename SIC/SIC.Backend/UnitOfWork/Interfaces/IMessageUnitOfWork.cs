@@ -19,7 +19,9 @@ namespace SIC.Backend.UnitOfWork.Interfaces
 
         Task<ActionResponse<bool>> AddHistoryMessages(string code, bool Success, string? Message);
 
-        Task<ActionResponse<IEnumerable<HistoryMessages>>> GetHistoryMessagesAsync();
+        Task<ActionResponse<IEnumerable<HistoryMessages>>> GetHistoryMessagesAsync(PaginationDTO pagination);
+
+        Task<ActionResponse<int>> GetHistoryMessagesTotalRecordAsync(PaginationDTO pagination);
 
         Task<ActionResponse<bool>> AddReceiveMessages(WhatsappIncomingMessageDto whatsappIncoming);
 

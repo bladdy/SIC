@@ -2,6 +2,7 @@
 using SIC.Backend.Helpers;
 using SIC.Backend.UnitOfWork.Implemetations;
 using SIC.Backend.UnitOfWork.Interfaces;
+using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 
 namespace SIC.Backend.Controllers
@@ -80,15 +81,26 @@ namespace SIC.Backend.Controllers
             return NotFound(action.Message);
         }
 
-        [HttpGet("HistoryMessages")]
-        public async Task<IActionResult> GetHistoryMessages()
+        [HttpGet("HistoryMessages/paginated")]
+        public async Task<IActionResult> GetHistoryMessages([FromQuery] PaginationDTO pagination)
         {
-            var action = await _messageUnitOfWork.GetHistoryMessagesAsync();
+            var action = await _messageUnitOfWork.GetHistoryMessagesAsync(pagination);
             if (action.Success)
             {
                 return Ok(action.Result);
             }
             return NotFound(action.Message);
+        }
+
+        [HttpGet("totalRecordAsync")]
+        public override async Task<IActionResult> GetTotalRecordsAsync([FromQuery] PaginationDTO pagination)
+        {
+            var action = await _messageUnitOfWork.GetHistoryMessagesTotalRecordAsync(pagination);
+            if (action.Success)
+            {
+                return Ok(action.Result);
+            }
+            return BadRequest();
         }
 
         [HttpGet("GetAllMessagesRecive")]

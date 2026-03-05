@@ -217,16 +217,52 @@ namespace SIC.Backend.Repositories.Implemetations
             }
         }
 
-        public async Task<ActionResponse<IEnumerable<HistoryMessages>>> GetHistoryMessagesAsync()
+
+        public async Task<ActionResponse<IEnumerable<HistoryMessages>>> GetHistoryMessagesAsync(PaginationDTO pagination)
         {
-            var message = await _context.HistoryMessages
-               .Include(e => e.Event)
-               .Include(e => e.Invitation).ToListAsync();
+            var queryable = _context.HistoryMessages
+                .Include(e => e.Event)
+                .Include(e => e.Invitation)
+                .AsNoTracking();
+
+            if (!string.IsNullOrWhiteSpace(pagination.Filter))
+            {
+                queryable = queryable.Where(x =>
+                    x.Event.Name.Contains(pagination.Filter));
+            }
 
             return new ActionResponse<IEnumerable<HistoryMessages>>
             {
                 Success = true,
-                Result = message
+                Result = await queryable
+                    .OrderByDescending(e => e.SendDate)
+                    .Paginate(pagination)
+                    .ToListAsync()
+            };
+        }
+        public async Task<ActionResponse<int>> GetHistoryMessagesTotalRecordAsync(PaginationDTO pagination)
+        {
+            var queryable = _context.HistoryMessages
+                .AsNoTracking()
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(pagination.Filter))
+            {
+                queryable = queryable.Where(x =>
+                    x.Event != null &&
+                    x.Event.Name.Contains(pagination.Filter));
+            }
+
+            queryable = queryable.Where(e => e.Invitation != null && e.Event != null);
+
+            var count = await queryable.CountAsync();
+
+            int totalPages = (int)Math.Ceiling((double)count / pagination.PageSize);
+
+            return new ActionResponse<int>
+            {
+                Success = true,
+                Result = totalPages
             };
         }
 
