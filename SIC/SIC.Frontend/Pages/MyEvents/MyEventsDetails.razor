@@ -250,7 +250,7 @@ else
                                 <li>
                                     <button type="button"
                                     class="dropdown-item"
-                                    @onclick="() => EnviarInvitacionesMasivas(template.Name)">
+                                    @onclick="() => EnviarInvitacionesMasivas(template)">
                                         @template.DisplayName
                                     </button>
                                 </li>
@@ -421,7 +421,7 @@ else
                                                                         <li>
                                                                             <button type="button"
                                                                             class="dropdown-item"
-                                                                            @onclick="() => EnviarInvitacion(invitation.Code!, template.Name, invitation.Id)">
+                                                                                    @onclick="() => EnviarInvitacion(invitation.Code!, template.Name, invitation.Id, template.DisplayName)">
                                                                                 @template.DisplayName
                                                                             </button>
                                                                         </li>
@@ -646,7 +646,7 @@ else
                                                     <li>
                                                         <button type="button"
                                                         class="dropdown-item"
-                                                        @onclick="() => EnviarInvitacion(invitation.Code!, template.Name, invitation.Id)">
+                                                                @onclick="() => EnviarInvitacion(invitation.Code!, template.Name, invitation.Id, template.DisplayName)">
                                                             @template.DisplayName
                                                         </button>
                                                     </li>

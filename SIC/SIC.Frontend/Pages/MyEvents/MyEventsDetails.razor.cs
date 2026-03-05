@@ -271,7 +271,7 @@ public partial class MyEventsDetails
         );
 
         await LoadEvent();
-        await LoadInvitations();
+        await LoadInvitations(currentPage);
     }
 
     private async Task SaveInvitation()
@@ -315,7 +315,7 @@ public partial class MyEventsDetails
         );
         isSavingInvitation = false;
         await LoadEvent();
-        await LoadInvitations();
+        await LoadInvitations(currentPage);
     }
 
     private async Task DescargarExcel()
@@ -643,12 +643,30 @@ public partial class MyEventsDetails
         return true;
     }
 
-    private async Task EnviarInvitacion(string code, string template, int invitationId)
+    private async Task EnviarInvitacion(string code, string template, int invitationId, string displayedName)
     {
         try
         {
             loadingWhatsappId1 = invitationId;
+            var confirmResult = await SweetAlertService.FireAsync(new SweetAlertOptions
+            {
+                Html = $@"
+                        <div style='text-align:center'>
+                            <p>Estas seguro de enviar la plantilla:</p>
+                            <h2 style='color:#3C6A79'><strong>{displayedName}</strong></h2>
+                            <p>¿Deseas continuar?</p>
+                        </div>
+                    ",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Sí, Continuar",
+                CancelButtonText = "Cancelar",
+                ConfirmButtonColor = "#3C6A79",
+                CancelButtonColor = "#d33"
+            });
 
+            if (confirmResult.IsDismissed)
+                return;
             var codes = new List<string> { code };
 
             var dto = new MasiveSendTemplateDTO
@@ -697,51 +715,87 @@ public partial class MyEventsDetails
         }
     }
 
-    private async Task EnviarInvitacionesMasivas(string templateName)
+    private async Task EnviarInvitacionesMasivas(WhatsAppTemplate templateName)
     {
-        var seleccionados = Invitations!
-            .Where(i => SelectedInvitations.TryGetValue(i.Id, out var selected) && selected)
-            .Select(i => i.Code!)
-            .ToList();
-
-        if (!seleccionados.Any())
-            return;
-
-        IsSendingMassive = true;
-
-        var dto = new MasiveSendTemplateDTO
+        try
         {
-            TemplateName = templateName, // 👈 ahora dinámico
-            Codes = seleccionados
-        };
+            var confirmResult = await SweetAlertService.FireAsync(new SweetAlertOptions
+            {
+                Html = $@"
+                        <div style='text-align:center'>
+                            <p>Estas seguro de enviar la plantilla:</p>
+                            <h2 style='color:#3C6A79'><strong>{templateName.DisplayName}</strong></h2>
+                            <p>¿Deseas continuar?</p>
+                        </div>
+                    ",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Sí, Continuar",
+                CancelButtonText = "Cancelar",
+                ConfirmButtonColor = "#3C6A79",
+                CancelButtonColor = "#d33"
+            });
 
-        var response = await Repository.PostAsync<object>(
-            "api/whatsapp/enviar-invitacion-dina",
-            dto
-        );
+            if (confirmResult.IsDismissed)
+                return;
 
-        IsSendingMassive = false;
+            var seleccionados = Invitations!
+                .Where(i => SelectedInvitations.TryGetValue(i.Id, out var selected) && selected)
+                .Select(i => i.Code!)
+                .ToList();
 
-        if (response.Error)
+            if (!seleccionados.Any())
+                return;
+
+            IsSendingMassive = true;
+
+            var dto = new MasiveSendTemplateDTO
+            {
+                TemplateName = templateName.Name, // 👈 ahora dinámico
+                Codes = seleccionados
+            };
+
+            var response = await Repository.PostAsync<object>(
+                "api/whatsapp/enviar-invitacion-dina",
+                dto
+            );
+
+            if (response.Error)
+            {
+                var msg = await response.GetErrorMessageAsync();
+                await SweetAlertService.FireAsync(
+                    "Error",
+                    msg,
+                    SweetAlertIcon.Error
+                );
+                return;
+            }
+
+            await SweetAlertService.FireAsync(
+                "Envío masivo finalizado",
+                $"Invitaciones enviadas: {seleccionados.Count}",
+                SweetAlertIcon.Success
+            );
+        }
+        catch
         {
-            var msg = await response.GetErrorMessageAsync();
             await SweetAlertService.FireAsync(
                 "Error",
-                msg,
+                "Algo ocurrió, inténtalo más tarde",
                 SweetAlertIcon.Error
             );
-            return;
         }
+        finally
+        {
+            HasSelectedInvitations = false;
+            SelectAll = false;
+            foreach (var key in SelectedInvitations.Keys.ToList())
+                SelectedInvitations[key] = false;
 
-        await SweetAlertService.FireAsync(
-            "Envío masivo finalizado",
-            $"Invitaciones enviadas: {seleccionados.Count}",
-            SweetAlertIcon.Success
-        );
-        HasSelectedInvitations = false;
-        SelectAll = false;
-        foreach (var key in SelectedInvitations.Keys.ToList())
-            SelectedInvitations[key] = false;
+            IsSendingMassive = false;
+            await LoadInvitations(currentPage);
+            StateHasChanged();
+        }
     }
 
     //ToDo: que sea acumulativos
