@@ -29,5 +29,17 @@ namespace SIC.Frontend.Helpers
             using var streamRef = new DotNetStreamReference(new MemoryStream(content));
             await jsRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
         }
+        public static async Task DownloadFileAsync(
+            this IJSRuntime jsRuntime,
+            string fileName,
+            byte[] content,
+            string contentType)
+        {
+            await jsRuntime.InvokeVoidAsync(
+                "downloadFile",
+                fileName,
+                contentType,
+                content);
+        }
     }
 }

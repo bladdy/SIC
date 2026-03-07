@@ -6,6 +6,7 @@ using SIC.Frontend.Repositories;
 using SIC.Frontend.Services;
 using SIC.Shared.DTOs;
 using SIC.Shared.Response;
+using System.Text.RegularExpressions;
 
 //Ya actualiza el chat, falta que actualice laa conversación del inbox y el evevto cuando se marca como visto, y que desde el evento se vea el cambio en el chat, y que se actualice el estado del mensaje a visto porque no se actualiza el estado del mensaje a visto, y que se actualice el estado del mensaje a enviado, porque no se actualiza el estado del mensaje a enviado, y que se actualice el estado del mensaje a error, porque no se actualiza el estado del mensaje a error
 namespace SIC.Frontend.Pages.Whatsapp.Components;
@@ -89,7 +90,34 @@ public partial class WhatsappChat : ComponentBase, IAsyncDisposable
 
         await InvokeAsync(StateHasChanged);
     }
+    private MarkupString FormatWhatsAppText(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+            return new MarkupString("");
 
+        // Saltos de línea
+        text = text.Replace("\\n", "<br>")
+                   .Replace("\r\n", "<br>")
+                   .Replace("\n", "<br>");
+
+        // Links (http / https)
+        text = Regex.Replace(
+            text,
+            @"(https?:\/\/[^\s<]+)",
+            "<a href=\"$1\" target=\"_blank\" class=\"chat-link\">$1</a>"
+        );
+
+        // *negrita*
+        text = Regex.Replace(text, @"\*(.*?)\*", "<strong>$1</strong>");
+
+        // _cursiva_
+        text = Regex.Replace(text, @"_(.*?)_", "<em>$1</em>");
+
+        // ~tachado~
+        text = Regex.Replace(text, @"~(.*?)~", "<del>$1</del>");
+
+        return new MarkupString(text);
+    }
     private void MarkMessagesAsync(List<string> messageIds)
     {
         Repository.PutAsync(

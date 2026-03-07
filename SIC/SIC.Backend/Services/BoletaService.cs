@@ -2,6 +2,7 @@
 using iTextSharp.text.pdf;
 using QRCoder;
 using SIC.Shared.DTOs;
+using SIC.Shared.Entities;
 using SIC.Shared.Helpers;
 
 namespace SIC.Backend.Services
@@ -210,7 +211,7 @@ namespace SIC.Backend.Services
                 Alignment = Element.ALIGN_CENTER,
                 SpacingBefore = 10
             };
-
+            AddCentered($"MESA: {data.MesaAsignada}", fontTitle, 5);
             cardCell.AddElement(infoText);
 
             cardTable.AddCell(cardCell);
@@ -316,6 +317,90 @@ namespace SIC.Backend.Services
         internal object GenerarBoletaEstiloCard(BoletaInvitacionDto dto, string v)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<byte[]> GenerarListaPdf(List<Invitation> invitaciones)
+        {
+            using var ms = new MemoryStream();
+
+            var document = new Document(PageSize.A4, 40, 40, 40, 40);
+            PdfWriter.GetInstance(document, ms);
+            document.Open();
+
+            // ==============================
+            // 🎨 COLORES
+            // ==============================
+            var borderColor = new BaseColor(222, 226, 230);
+            var headerColor = new BaseColor(33, 37, 41);
+
+            // ==============================
+            // 🔠 FUENTES
+            // ==============================
+            var fontTitle = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16);
+            var fontHeader = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 11, BaseColor.White);
+            var fontCell = FontFactory.GetFont(FontFactory.HELVETICA, 11);
+
+            // ==============================
+            // 📝 TÍTULO
+            // ==============================
+            var title = new Paragraph($"LISTA DE INVITADOS: {invitaciones.FirstOrDefault()!.Event!.Name}", fontTitle)
+            {
+                Alignment = Element.ALIGN_CENTER,
+                SpacingAfter = 10
+            };
+            document.Add(title);
+            document.Add(new Paragraph($"Fecha generación: {DateTime.Now:dd/MM/yyyy HH:mm}")
+            {
+                Alignment = Element.ALIGN_RIGHT,
+                SpacingAfter = 15
+            });
+
+            // ==============================
+            // 📋 TABLA
+            // ==============================
+            var table = new PdfPTable(5)
+            {
+                WidthPercentage = 100
+            };
+
+            table.SetWidths(new float[] { 4, 2, 2, 2, 2 });
+
+            void AddHeader(string text)
+            {
+                var cell = new PdfPCell(new Phrase(text, fontHeader))
+                {
+                    BackgroundColor = headerColor,
+                    HorizontalAlignment = Element.ALIGN_CENTER,
+                    Padding = 6,
+                    BorderColor = borderColor
+                };
+
+                table.AddCell(cell);
+            }
+
+            AddHeader("Nombre");
+            AddHeader("Adultos Confirmados");
+            AddHeader("Jovenes Confirmados");
+            AddHeader("Niños Confirmados");
+            AddHeader("Control de Asistencia");
+
+            // ==============================
+            // 👥 FILAS
+            // ==============================
+            foreach (var item in invitaciones)
+            {
+                table.AddCell(new PdfPCell(new Phrase(item.Name ?? "", fontCell)) { Padding = 5 });
+                table.AddCell(new PdfPCell(new Phrase(item.NumberConfirmedAdults.ToString() ?? "", fontCell)) { Padding = 5 });
+                table.AddCell(new PdfPCell(new Phrase(item.NumberConfirmedYouths.ToString() ?? "", fontCell)) { Padding = 5 });
+                table.AddCell(new PdfPCell(new Phrase(item.NumberConfirmedChildren.ToString() ?? "", fontCell)) { Padding = 5 });
+                table.AddCell(new PdfPCell(new Phrase("", fontCell)) { Padding = 5 });
+            }
+
+            document.Add(table);
+
+            document.Close();
+
+            return await Task.FromResult(ms.ToArray());
         }
     }
 }

@@ -123,6 +123,31 @@ public class InvitationsController : GenericController<Invitation>
         return NotFound(action.Message);
     }
 
+    [HttpGet("generatedpdf")]
+    public async Task<IActionResult> GetLitPdf(string evento)
+    {
+        try
+        {
+            var response = await _invitationUnitOfWork.GetAllAsync(evento);
+            var invitaciones = response.Result?.ToList();
+
+            if (invitaciones == null || !invitaciones.Any())
+                return NotFound("No hay invitados.");
+
+            var pdfBytes = await _boletaService.GenerarListaPdf(invitaciones);
+
+            return File(
+                pdfBytes,
+                "application/pdf",
+                $"lista-invitados-{evento}.pdf"
+            );
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
     [HttpGet("qr")]
     public async Task<IActionResult> GetQRCodeAsync(string codigo, string evento)
     {

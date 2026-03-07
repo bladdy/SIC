@@ -133,10 +133,13 @@
                             <div class="mb-3">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
                                     <div>
-                                        <strong>@e.EventName</strong><br />
+                                        <a href="/events/details/@e.Code" style="text-decoration:none;">
+                                            <strong>@e.EventName</strong><br />
+
+                                        </a>
                                         <small class="text-muted">@e.Date.ToString("dd/MM/yyyy")</small>
                                     </div>
-                                    <small>@e.ConfirmedGuests confirmados / @e.TotalGuests invitados</small>
+                                    <small>@e.ConfirmedGuests Asistirán / @e.TotalGuests invitados</small>
                                 </div>
 
                                 <div class="progress" style="height: 22px;">

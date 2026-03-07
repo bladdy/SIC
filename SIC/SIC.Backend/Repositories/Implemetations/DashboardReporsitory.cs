@@ -85,6 +85,7 @@ public class DashboardReporsitory : IDashboardReporsitory
             .Take(20)
             .Select(e => new EventDashboardItemDto
             {
+                Code = e.Code,
                 EventName = e.Name,
                 Date = e.Date,
                 TotalGuests = e.Invitations.Sum(i => i.NumberAdults + i.NumberChildren),
@@ -202,9 +203,9 @@ public class DashboardReporsitory : IDashboardReporsitory
 
         // 🔹 Top eventos por invitados
         var topEventsRaw = await _context.Events
-            .Where(e => eventIds.Contains(e.Id))
+            .Where(e => eventIds.Contains(e.Id) && e.Status == Status.Active)//Eventos
             .OrderByDescending(e => e.Invitations
-                .Where(i => i.Status == Status.Attend)
+                .Where(i => i.Status == Status.Attend)//Invitaciones
                 .Sum(i => i.NumberConfirmedAdults + i.NumberConfirmedChildren))
             .Take(20)
             .Select(e => new
@@ -218,7 +219,7 @@ public class DashboardReporsitory : IDashboardReporsitory
                 NotAttending = e.Invitations.Count(i => i.Status == Status.NotAttend),
                 Date = e.Date,
                 // 🔹 Invitados (adultos + niños)
-                TotalGuests = e.Invitations.Sum(i => i.NumberAdults + i.NumberChildren+ i.NumberYouths),
+                TotalGuests = e.Invitations.Sum(i => i.NumberAdults + i.NumberChildren + i.NumberYouths),
                 ConfirmedGuests = e.Invitations
                     .Where(i => i.Status == Status.Attend)
                     .Sum(i => i.NumberConfirmedAdults + i.NumberConfirmedChildren + i.NumberConfirmedYouths),

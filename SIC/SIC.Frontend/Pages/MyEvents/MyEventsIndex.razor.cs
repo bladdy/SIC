@@ -33,6 +33,8 @@ public partial class MyEventsIndex
     private Event NewEvent = new();
     private bool IsModalVisible = false;
     private bool IsEditMode = false;
+
+    private bool IsDateReadOnly => IsEditMode && NewEvent.Date.Date <= DateTime.Today.Date;
     private DateTime MinAllowedDate { get; set; } = new DateTime(2023, 1, 1); // Sets January 1, 2023 as the minimum
 
     protected override async Task OnInitializedAsync()
@@ -214,6 +216,7 @@ public partial class MyEventsIndex
             EventType = evnt.EventType,
             Status = evnt.Status
         };
+
         IsEditMode = true;
         IsModalVisible = true;
     }
@@ -266,7 +269,7 @@ public partial class MyEventsIndex
         }
         if (responseHttp.Error)
         {
-            var message = await responseHttp.GetErrorMessageAsync() ?? "No se pudo guardar el plan.";
+            var message = await responseHttp.GetErrorMessageAsync() ?? "No se pudo guardar el Evento.";
             await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
             return;
         }

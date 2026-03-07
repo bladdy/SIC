@@ -9,7 +9,7 @@ using SIC.Shared.Helpers;
 
 //ToDO: Validar que las invitaciones importadas pertenezcan al eventId
 //ToDO: Manejar mejor los errores (ej. código duplicado)
-
+//ToDo: Refactorizar el codigo
 namespace SIC.Backend.Controllers
 {
     [ApiController]
@@ -30,6 +30,12 @@ namespace SIC.Backend.Controllers
             IFormFile file,
             bool DeleteRegister)
         {
+            //try catch general para capturar cualquier error inesperado durante el proceso de importación
+
+            try
+            {
+
+            
             if (file == null || file.Length == 0)
                 return BadRequest("El archivo no es válido.");
 
@@ -38,6 +44,8 @@ namespace SIC.Backend.Controllers
             using var stream = new MemoryStream();
             await file.CopyToAsync(stream);
             using var workbook = new XLWorkbook(stream);
+
+            //Validacion del nombre de la hoja
             var worksheet = workbook.Worksheets.FirstOrDefault();
 
             if (worksheet == null)
@@ -122,7 +130,6 @@ namespace SIC.Backend.Controllers
             {
                 try
                 {
-
                     //ToDo: revisar el cargado del excel con los guest
                     var response = await _invitationUnitOfWork.GetByCodeAsync(inv.Code!);
                     var existing = response.Result;
@@ -138,7 +145,7 @@ namespace SIC.Backend.Controllers
                         {
                             inv.Guests.Add(new InvitationGuest
                             {
-                                GuestName = "Adulto",
+                                GuestName = $"Adulto {i + 1}",
                                 GuestType = GuestType.Adult,
                                 Status = Status.Pending
                             });
@@ -149,7 +156,7 @@ namespace SIC.Backend.Controllers
                         {
                             inv.Guests.Add(new InvitationGuest
                             {
-                                GuestName = "Joven",
+                                GuestName = $"Joven {i + 1}",
                                 GuestType = GuestType.Youth,
                                 Status = Status.Pending
                             });
@@ -160,7 +167,7 @@ namespace SIC.Backend.Controllers
                         {
                             inv.Guests.Add(new InvitationGuest
                             {
-                                GuestName = "Niño",
+                                GuestName = $"Niño {i + 1}",
                                 GuestType = GuestType.Children,
                                 Status = Status.Pending
                             });
@@ -193,23 +200,28 @@ namespace SIC.Backend.Controllers
                 catch
                 {
                     errors++;
+                    }
                 }
-            }
 
-            return Ok(new ImportExcelResultDTO
+                return Ok(new ImportExcelResultDTO
+                {
+                    Total = invitations.Count,
+                    Agregadas = added,
+                    Modificadas = updated,
+                    Eliminadas = deleted,
+                    Errores = errors,
+                    Message =
+                        $"Procesadas {invitations.Count} invitaciones. " +
+                        $"Agregadas: {added}, " +
+                        $"Modificadas: {updated}, " +
+                        $"Eliminadas: {deleted}, " +
+                        $"Errores: {errors}"
+                });
+            }
+            catch (Exception ex)
             {
-                Total = invitations.Count,
-                Agregadas = added,
-                Modificadas = updated,
-                Eliminadas = deleted,
-                Errores = errors,
-                Message =
-                    $"Procesadas {invitations.Count} invitaciones. " +
-                    $"Agregadas: {added}, " +
-                    $"Modificadas: {updated}, " +
-                    $"Eliminadas: {deleted}, " +
-                    $"Errores: {errors}"
-            });
+                return StatusCode(500, new {error = ex.Message, detalle = ex.StackTrace });
+            }
         }
 
         [HttpGet("GenerarExcel/{EventId}")]

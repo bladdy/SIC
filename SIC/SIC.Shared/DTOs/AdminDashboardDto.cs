@@ -47,6 +47,7 @@ namespace SIC.Shared.DTOs
     // 🔸 DTO reutilizado de PlannerDashboardDto
     public class EventDashboardItemDto
     {
+        public string Code { get; set; } = string.Empty;
         public string EventName { get; set; } = string.Empty;
         public int TotalGuests { get; set; }
         public int ConfirmedGuests { get; set; }

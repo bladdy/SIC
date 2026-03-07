@@ -29,6 +29,7 @@ public partial class MyEventsDetails
     private bool SelectAll = false;
     private bool IsSendingMassive = false;
     private bool IsCopyURl = false;
+    private bool IsProcessList = false;
 
     private bool HasSelectedInvitations = false;
 
@@ -336,6 +337,28 @@ public partial class MyEventsDetails
         }
     }
 
+private async Task GeneratedPDF()
+{
+    try
+    {
+        IsProcessList = true;
+
+        var content = await Repository.GetFileAsync($"api/Invitations/generatedpdf?evento={EventDetail!.Code}");
+
+        if (content != null && content.Length > 0)
+        {
+            await JsRuntime.DownloadFileAsync(
+                $"{EventDetail.Name}.pdf",
+                content,
+                "application/pdf");
+        }
+    }
+    finally
+    {
+        IsProcessList = false;
+    }
+}
+
     private async Task CopiarEventUrl()
     {
         IsCopyURl = true;
@@ -579,6 +602,7 @@ public partial class MyEventsDetails
                 {
                     var error = responseHttp.Error;
                     importResult = $"❌ Error: {error}";
+                    await SweetAlertService.FireAsync("Error", "Ha ocurrido un error mientras se subia la lista de invitados, favor de revisar el excel, y no le cambie o elimine ninguna columna.", SweetAlertIcon.Error);
                 }
             }
         }
@@ -719,6 +743,7 @@ public partial class MyEventsDetails
     {
         try
         {
+            IsSendingMassive = true;
             var confirmResult = await SweetAlertService.FireAsync(new SweetAlertOptions
             {
                 Html = $@"
@@ -747,7 +772,6 @@ public partial class MyEventsDetails
             if (!seleccionados.Any())
                 return;
 
-            IsSendingMassive = true;
 
             var dto = new MasiveSendTemplateDTO
             {

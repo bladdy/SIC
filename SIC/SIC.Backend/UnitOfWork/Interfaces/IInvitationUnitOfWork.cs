@@ -9,6 +9,7 @@ namespace SIC.Backend.UnitOfWork.Interfaces
         Task<ActionResponse<Invitation>> GetByCodeAsync(string code);
 
         Task<ActionResponse<IEnumerable<Invitation>>> GetAsync();
+        Task<ActionResponse<IEnumerable<Invitation>>> GetAllAsync(string code);
 
         Task<ActionResponse<IEnumerable<Invitation>>> GetInivtationsByyEventIdAsync(int EventId);
 

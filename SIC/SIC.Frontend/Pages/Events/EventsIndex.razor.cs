@@ -280,7 +280,7 @@ namespace SIC.Frontend.Pages.Events
                 await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
                 return;
             }
-            if ((HostUser.UserType.ToString() == "WeddingPlanner") && !response.Error)
+            if ((HostUser.UserType.ToString() == "WeddingPlanner") && !response.Error && IsEditMode == false)
             {
                 HttpResponseWrapper<object>? responseHttps;
                 responseHttps = await repository.PostAsync<object>($"api/UserCredits/consume/{NewEvent.UserId}/{NewEvent.Name}");

@@ -6,6 +6,7 @@ using SIC.Backend.Helpers;
 using SIC.Backend.Repositories.Interfaces;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
+using SIC.Shared.Enums;
 using SIC.Shared.Response;
 using System;
 using System.Linq;
@@ -211,7 +212,24 @@ namespace SIC.Backend.Repositories.Implemetations
                 };
             }
         }
+        public async Task<ActionResponse<IEnumerable<Invitation>>> GetAllAsync(string code)
+        {
+            var invitations = await _context.Invitations.Include(e => e.Event).ThenInclude(e => e!.EventType).Where(x => x.Event!.Code == code && x.Status == Status.Attend).ToListAsync();
+            if (invitations == null)
+            {
+                return new ActionResponse<IEnumerable<Invitation>>
+                {
+                    Success = true,
+                    Message = "Evento no existe."
+                };
+            }
 
+            return new ActionResponse<IEnumerable<Invitation>>
+            {
+                Success = true,
+                Result = invitations
+            };
+        }
         public async Task<ActionResponse<IEnumerable<Invitation>>> GetInivtationsByyEventIdAsync(int EventId)
         {
             var invitations = await _context.Invitations.Include(e => e.Event).ThenInclude(e => e!.EventType).Where(x => x.EventId == EventId).ToListAsync();
@@ -364,5 +382,7 @@ namespace SIC.Backend.Repositories.Implemetations
                 };
             }
         }
+
+        
     }
 }
