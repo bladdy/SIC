@@ -4,6 +4,7 @@ using SIC.Backend.Services;
 using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
+using SIC.Shared.Enums;
 using SIC.Shared.Helpers;
 
 namespace SIC.Backend.Controllers;
@@ -168,7 +169,7 @@ public class InvitationsController : GenericController<Invitation>
                 Hora = DateTime.Today.Add(invitacion.Event!.Time).ToString("hh:mm tt"),
                 Lugar = invitacion.Event!.Url!,
                 CantidadPersonas = invitacion.NumberAdults + invitacion.NumberChildren,
-                Guests = invitacion.Guests.Select(c => $"{c.GuestName} ({c.GuestType.GetDescription()})").ToList(),
+                Guests = invitacion.Guests.Where(s => s.Status == Status.Attend).Select(c => $"{c.GuestName} ({c.GuestType.GetDescription()})").ToList(),
                 Niños = invitacion.NumberConfirmedChildren,
                 Jovenes = invitacion.NumberConfirmedYouths,
                 Adultos = invitacion.NumberConfirmedAdults,
