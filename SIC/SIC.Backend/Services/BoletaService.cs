@@ -332,14 +332,14 @@ namespace SIC.Backend.Services
             // ==============================
             var borderColor = new BaseColor(222, 226, 230);
             var headerColor = new BaseColor(33, 37, 41);
-
+            var footerColor = new BaseColor(211, 211, 211);
             // ==============================
             // 🔠 FUENTES
             // ==============================
             var fontTitle = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16);
             var fontHeader = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 11, BaseColor.White);
             var fontCell = FontFactory.GetFont(FontFactory.HELVETICA, 11);
-
+            var fontFotter = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 11);
             // ==============================
             // 📝 TÍTULO
             // ==============================
@@ -395,6 +395,17 @@ namespace SIC.Backend.Services
                 table.AddCell(new PdfPCell(new Phrase(item.NumberConfirmedChildren.ToString() ?? "", fontCell)) { Padding = 5 });
                 table.AddCell(new PdfPCell(new Phrase("", fontCell)) { Padding = 5 });
             }
+
+            int totalAdultos = invitaciones.Sum(x => x.NumberConfirmedAdults);
+            int totalJovenes = invitaciones.Sum(x => x.NumberConfirmedYouths);
+            int totalNiños = invitaciones.Sum(x => x.NumberConfirmedChildren);
+            int totales = totalAdultos + totalJovenes + totalNiños;
+
+            table.AddCell(new PdfPCell(new Phrase("Total" ?? "", fontFotter)) { Padding = 5, BackgroundColor = footerColor });
+            table.AddCell(new PdfPCell(new Phrase(totalAdultos.ToString() ?? "", fontFotter)) { Padding = 5, BackgroundColor = footerColor });
+            table.AddCell(new PdfPCell(new Phrase(totalJovenes.ToString() ?? "", fontFotter)) { Padding = 5, BackgroundColor = footerColor });
+            table.AddCell(new PdfPCell(new Phrase(totalNiños.ToString() ?? "", fontFotter)) { Padding = 5, BackgroundColor = footerColor });
+            table.AddCell(new PdfPCell(new Phrase(totales.ToString(), fontFotter)) { Padding = 5, BackgroundColor = footerColor });
 
             document.Add(table);
 
