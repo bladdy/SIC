@@ -73,6 +73,7 @@
                                             <input class="form-check-input"
                                             type="radio"
                                             name="guest_@guest.Id"
+                                            disabled="@(Asistira == false)"
                                             checked="@(guest.Status == Status.Attend)"
                                             @onclick="() => guest.Status = Status.Attend" /> Sí
 

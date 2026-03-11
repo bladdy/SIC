@@ -120,6 +120,16 @@ namespace SIC.Frontend.Pages.Confirmations
         {
             if (Invitacion == null)
                 return;
+            int totalConfirmados = Invitacion.Guests.Count(g => g.Status == Status.Attend);
+            if (totalConfirmados == 0 &&
+                Invitacion.Status == Status.Attend)
+            {
+                await sweetAlertService.FireAsync(
+                    "Enviar Respuesta",
+                    "Por favor, selecciona al menos un invitado Sí, para poder enviar tu respuesta.",
+                    SweetAlertIcon.Warning);
+                return;
+            }
 
             var dto = new ResponseInvitationDTO
             {
@@ -149,7 +159,7 @@ namespace SIC.Frontend.Pages.Confirmations
 
                 if (Invitacion.Status == Status.Attend)
                     await CargarInvitacion(Code);
-                    await CargarQr();
+                await CargarQr();
             }
             else
             {
@@ -157,7 +167,6 @@ namespace SIC.Frontend.Pages.Confirmations
                 await sweetAlertService.FireAsync("Error", error, SweetAlertIcon.Error);
             }
         }
-
         private async Task CargarQr()
         {
             try
