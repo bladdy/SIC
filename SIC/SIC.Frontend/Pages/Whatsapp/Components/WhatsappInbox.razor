@@ -1,49 +1,30 @@
-﻿
-<div class="wa-container @(SelectedPhone != null ? "chat-open" : "")">
-    <!-- INBOX -->
+﻿<div class="wa-container @(SelectedPhone != null ? "chat-open" : "")">
+
+    <!-- LISTA DE CONTACTOS -->
     <div class="wa-inbox">
         <div class="wa-inbox-header">
+            <!-- Este botón solo aparece en mobile, vuelve a la lista de eventos -->
+            <button class="wa-back-btn" @onclick="Back">←</button>
             WhatsApp Inbox
         </div>
-
         <div class="wa-inbox-list">
-            @if (Inbox == null || !Inbox.Any())
+            @foreach (var chat in Inbox)
             {
-                <div class="wa-empty">No hay conversaciones</div>
-            }
-            else
-            {
-                @foreach (var chat in Inbox)
-                {
-                    <div @onclick="() => SelectChat(chat.PhoneNumber)"
-                         class="wa-inbox-item @(SelectedPhone == chat.PhoneNumber ? "active" : "")">
-
-                        <div class="wa-avatar">
-                            @chat.PhoneNumber[^2..]
+                <div class="wa-inbox-item @(SelectedPhone == chat.PhoneNumber ? "active" : "")"
+                     @onclick="() => SelectChat(chat.PhoneNumber)">
+                    <div class="wa-avatar">@chat.PhoneNumber[^2..]</div>
+                    <div class="wa-text">
+                        <div class="wa-header-row">
+                            <span class="wa-title">@chat.NameConversation</span>
+                            <span class="wa-date">@chat.LastMessageAt.ToWhatsappDate()</span>
                         </div>
-
-                        <div class="wa-text">
-                            <div class="wa-header-row">
-                                <span class="wa-title">@chat.NameConversation</span>
-
-                                <div class="d-flex align-items-center gap-2">
-                                    @if (chat.UnreadCount > 0)
-                                    {
-                                        <span class="wa-unread-badge">@chat.UnreadCount</span>
-                                    }
-
-                                    <span class="wa-date">
-                                        @chat.LastMessageAt.ToWhatsappDate()
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="wa-preview">
-                                @chat.LastMessage
-                            </div>
-                        </div>
+                        <div class="wa-preview">@chat.LastMessage</div>
                     </div>
-                }
+                    @if (chat.UnreadCount > 0)
+                    {
+                        <span class="wa-unread-badge">@chat.UnreadCount</span>
+                    }
+                </div>
             }
         </div>
     </div>
@@ -57,12 +38,13 @@
         else
         {
             <div class="wa-chat-header">
-                <button class="wa-back-btn" @onclick="BackToInbox">←</button>
+                <!-- Este botón vuelve a la lista de contactos -->
+                <button class="wa-back-btn" @onclick="Back">←</button>
                 <span>@SelectedPhone</span>
             </div>
-
             <div class="wa-chat-body">
-                <WhatsappChat PhoneNumber="@SelectedPhone" OwnerPhone="OwnerPhone" />
+                <WhatsappChat PhoneNumber="@SelectedPhone"
+                              OwnerPhone="@OwnerPhone" />
             </div>
         }
     </div>

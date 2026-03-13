@@ -1,58 +1,42 @@
-﻿﻿
-@page "/whatsapp/inbox"
+﻿@page "/whatsapp/inbox"
 @using SIC.Frontend.Pages.Whatsapp.Components
 
-<div class="wa-container @(SelectedEventCode != null ? "chat-open" : "")">
+<div class="wap-container @(SelectedEventCode != null ? "inbox-open" : "")">
 
     <!-- EVENTOS -->
-    <div class="wa-inbox">
-        <div class="wa-inbox-header">
-            Eventos
-        </div>
-
+    <div class="wap-events">
+        <div class="wap-events-header">Eventos</div>
         <div class="wa-inbox-list">
             @foreach (var ev in Inbox)
             {
-                <div @onclick="() => SelectEvent(ev.EventCode!)"
-                     class="wa-inbox-item @(SelectedEventCode == ev.EventCode ? "active" : "")">
-
-                    <div class="wa-avatar">
-                        @ev.EventCode?[^2..]
-                    </div>
-
+                <div class="wa-inbox-item @(SelectedEventCode == ev.EventCode ? "active" : "")"
+                     @onclick="() => SelectEvent(ev.EventCode!)">
+                    <div class="wa-avatar">@ev.EventCode?[^2..]</div>
                     <div class="wa-text">
-                        <span class="wa-title">
-                        @ev.EventName
-                            </span>
-                        <div class="wa-preview">
-                            @ev.EventCode
-                        </div>
+                        <span class="wa-title">@ev.EventName</span>
+                        <div class="wa-preview">@ev.EventCode</div>
                     </div>
-
-                    <div class="d-flex align-items-center gap-2">
-                        @if (ev.UnreadCount > 0)
-                        {
-                            <span class="wa-unread-badge">@ev.UnreadCount</span>
-                        }
-                    </div>
+                    @if (ev.UnreadCount > 0)
+                    {
+                        <span class="wa-unread-badge">@ev.UnreadCount</span>
+                    }
                 </div>
             }
         </div>
     </div>
 
-    <!-- INBOX -->
-    <div class="wa-chat">
-        @if (SelectedEventCode == null)
+    <!-- PANEL DERECHO: solo existe en DOM si hay evento seleccionado (mobile) o siempre (desktop) -->
+    <div class="wap-inbox-panel">
+        @if (SelectedEventCode != null)
         {
-            <div class="wa-empty">
-                Selecciona un evento
-            </div>
+            <WhatsappInbox EventCode="@SelectedEventCode"
+                           OwnerPhone="@OwnerPhone"
+                           OnBack="BackToEvents" />
         }
         else
         {
-            <WhatsappInbox EventCode="@SelectedEventCode" OwnerPhone="OwnerPhone" />
+            <div class="wap-empty-desktop">Selecciona un evento</div>
         }
     </div>
 
 </div>
-

@@ -10,10 +10,9 @@ public partial class WhatsappInbox : IAsyncDisposable
     [Inject] private IRepository Repository { get; set; } = default!;
     [Inject] private SignalRService SignalR { get; set; } = default!;
 
-    [Parameter] public string? EventCode { get; set; } // 🔑 CLAVE
-
-    [Parameter, EditorRequired]
-    public string OwnerPhone { get; set; } = null!;
+    [Parameter] public string? EventCode { get; set; }
+    [Parameter] public string OwnerPhone { get; set; } = null!;
+    [Parameter] public EventCallback OnBack { get; set; }
 
     private List<InboxConversationDto> Inbox = new();
     private string? SelectedPhone;
@@ -21,7 +20,6 @@ public partial class WhatsappInbox : IAsyncDisposable
     protected override async Task OnInitializedAsync()
     {
         SignalR.OnInboxUpdated += UpdateInbox;
-        await SignalR.StartAsync("https://invboxv-app.com/hubs/whatsapp-chat");
     }
 
     protected override async Task OnParametersSetAsync()
@@ -29,40 +27,33 @@ public partial class WhatsappInbox : IAsyncDisposable
         if (string.IsNullOrWhiteSpace(EventCode))
             return;
 
-        Inbox.Clear();
-        SelectedPhone = null;
-
-        // 🔥 UNIRSE AL GRUPO DEL EVENTO
-        await SignalR.JoinEventInbox(OwnerPhone, EventCode);
-
         var response = await Repository.GetAsync<List<InboxConversationDto>>(
             $"/api/whatsapp/webhook/whatsapp/inbox/{EventCode}"
         );
 
         Inbox = response.Response ?? new();
-
-        StateHasChanged();
     }
 
     private void SelectChat(string phone)
     {
         SelectedPhone = phone;
-
-        var chat = Inbox.FirstOrDefault(x => x.PhoneNumber == phone);
-        if (chat != null)
-            chat.UnreadCount = 0;
     }
 
-    private void BackToInbox()
+    private async Task Back()
     {
-        SelectedPhone = null;
+        if (SelectedPhone != null)
+        {
+            SelectedPhone = null;
+        }
+        else
+        {
+            await OnBack.InvokeAsync();
+        }
     }
 
     private void UpdateInbox(InboxConversationDto item)
     {
-        // 🔐 Si viene EventCode, ignorar otros eventos
-        if (!string.IsNullOrWhiteSpace(EventCode) &&
-            item.EventCode != EventCode)
+        if (item.EventCode != EventCode)
             return;
 
         var chat = Inbox.FirstOrDefault(x => x.PhoneNumber == item.PhoneNumber);
@@ -87,8 +78,5 @@ public partial class WhatsappInbox : IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         SignalR.OnInboxUpdated -= UpdateInbox;
-
-        if (!string.IsNullOrWhiteSpace(EventCode))
-            await SignalR.LeaveEventInbox(OwnerPhone, EventCode);
     }
 }
