@@ -95,7 +95,7 @@ public class WhatsappWebhookController : ControllerBase
                 // 💾 Guardar mensaje
                 await _iMessageUnitOfWork.AddReceiveMessages(dto);
                 var conversation = await _iMessageUnitOfWork.GetConversationAsync(dto.From);
-                var eventCode = conversation.Result!.LastOrDefault()!.EventCode;
+                var eventCode = conversation?.Result?.LastOrDefault()?.EventCode ?? "default";
                 // 📥 Inbox
                 await _hub.Clients
                     .Group($"event-inbox-{owner.PhoneNumber}-{eventCode}")
