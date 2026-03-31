@@ -65,39 +65,39 @@ public class WhatsAppOnboardingController : ControllerBase
 
             // ── PASO 2: Suscribir la app al WABA ─────────────────────────────
             // Esto es CRÍTICO: sin este paso el phone_number_id no acepta mensajes
-            await _metaAuth.SubscribeAppAsync(request.WabaId);
-            Console.WriteLine("✅ Paso 2: App suscrita al WABA");
+            /* await _metaAuth.SubscribeAppAsync(request.WabaId);
+             Console.WriteLine("✅ Paso 2: App suscrita al WABA");
 
-            // ── PASO 3: Crear System User ─────────────────────────────────────
-            // Usamos el User Token temporal (el usuario debe ser admin del Business)
-            var systemUserId = await _metaAuth.CreateSystemUserAsync(
-                request.BusinessId, tempToken.AccessToken);
-            Console.WriteLine($"✅ Paso 3: System User creado: {systemUserId}");
+             // ── PASO 3: Crear System User ─────────────────────────────────────
+             // Usamos el User Token temporal (el usuario debe ser admin del Business)
+             var systemUserId = await _metaAuth.CreateSystemUserAsync(
+                 request.BusinessId, tempToken.AccessToken);
+             Console.WriteLine($"✅ Paso 3: System User creado: {systemUserId}");
 
-            // ── PASO 4: Asignar WABA al System User ──────────────────────────
-            // Usamos el App Token (AppID|AppSecret) que tiene permisos globales
-            var appToken = _metaAuth.GetAppToken();
-            await _metaAuth.AssignWabaToSystemUserAsync(request.WabaId, systemUserId, appToken);
-            Console.WriteLine("✅ Paso 4: WABA asignado al System User");
+             // ── PASO 4: Asignar WABA al System User ──────────────────────────
+             // Usamos el App Token (AppID|AppSecret) que tiene permisos globales
+             var appToken = _metaAuth.GetAppToken();
+             await _metaAuth.AssignWabaToSystemUserAsync(request.WabaId, systemUserId, appToken);
+             Console.WriteLine("✅ Paso 4: WABA asignado al System User");
 
-            // ── PASO 5: Generar Token Permanente ──────────────────────────────
-            var permanentToken = await _metaAuth.GeneratePermanentTokenAsync(systemUserId, appToken);
-            Console.WriteLine("✅ Paso 5: Token permanente generado");
+             // ── PASO 5: Generar Token Permanente ──────────────────────────────
+             var permanentToken = await _metaAuth.GeneratePermanentTokenAsync(systemUserId, appToken);
+             Console.WriteLine("✅ Paso 5: Token permanente generado");
 
-            // ── PASO 6: Obtener datos reales del phone number ─────────────────
-            var phoneInfo = await _metaAuth.GetPhoneNumberAsync(
-                request.PhoneNumberId, permanentToken);
-            Console.WriteLine($"✅ Paso 6: Phone number obtenido: {phoneInfo.DisplayPhoneNumber}");
+             // ── PASO 6: Obtener datos reales del phone number ─────────────────
+             var phoneInfo = await _metaAuth.GetPhoneNumberAsync(
+                 request.PhoneNumberId, permanentToken);
+             Console.WriteLine($"✅ Paso 6: Phone number obtenido: {phoneInfo.DisplayPhoneNumber}");*/
 
             // ── PASO 7: Guardar en DB ─────────────────────────────────────────
             var config = new UsuarioWhatsAppConfig
             {
-                AccessToken = permanentToken,           // ✅ Token permanente del System User
+                AccessToken = tempToken.AccessToken,           // ✅ Token permanente del System User
                 PhoneNumberId = request.PhoneNumberId,
                 WabaId = request.WabaId,
                 BusinessId = request.BusinessId,
-                PhoneNumber = phoneInfo.DisplayPhoneNumber ?? "no-disponible",
-                SystemUserId = systemUserId,
+                PhoneNumber = "", //phoneInfo.DisplayPhoneNumber ?? "no-disponible",
+                SystemUserId = "system_user_id",//systemUserId,
                 UsuarioId = usuarioId,
                 CreatedAt = DateTime.UtcNow,
                 IsActive = true,
