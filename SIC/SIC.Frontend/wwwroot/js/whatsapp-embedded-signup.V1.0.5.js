@@ -1,4 +1,4 @@
-﻿/* whatsapp-embedded-signup.V1.0.2.js */
+﻿/* whatsapp-embedded-signup.V1.0.4.js */
 
 /* ============================
    CONFIG
@@ -6,7 +6,8 @@
 window.fbSdkReady = false;
 let AUTH_CODE = null;
 
-const API_BASE_URL = "https://localhost:7141";
+//const API_BASE_URL = "https://localhost:7141";
+const API_BASE_URL = "https://invboxv-app.com;
 
 /* ============================
    SDK INIT
@@ -19,7 +20,7 @@ window.initFacebookSdk = function (appId) {
             appId: appId,
             autoLogAppEvents: true,
             xfbml: true,
-            version: 'v22.0' // ✅ versión estable recomendada
+            version: 'v25.0' // ✅ versión estable recomendada
         });
 
         window.fbSdkReady = true;
@@ -65,7 +66,6 @@ window.whatsappEmbeddedSignup = function (configId) {
             scope: 'whatsapp_business_management,whatsapp_business_messaging', // ✅ IMPORTANTE
             // 🔥 AGREGA ESTO
             extras: {
-                setup: {},
                 featureType: 'whatsapp_business_app_onboarding',
                 sessionInfoVersion: '3'
             }
