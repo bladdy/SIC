@@ -102,7 +102,8 @@ public class SeedDb
             new() { Key = "{evento_hora}", Description = "Hora de la recepción", PropertyName = "Event.Time" },
             new() { Key = "{Email}", Description = "Correo electrónico del invitado", PropertyName = "Email" },
             new() { Key = "{PhoneNumber}", Description = "Número de teléfono del invitado", PropertyName = "PhoneNumber" },
-            new() { Key = "{Comments}", Description = "Comentarios del invitado", PropertyName = "Comments" }
+            new() { Key = "{linkconfirmacion}", Description ="Link de formulario de confirmacion para el invitado", PropertyName ="N/A" },
+            new() { Key = "{Comments}", Description = "Comentarios del invitado", PropertyName = "Comments" },
         };
 
         foreach (var key in keys_message)

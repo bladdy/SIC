@@ -217,7 +217,6 @@ namespace SIC.Backend.Repositories.Implemetations
             }
         }
 
-
         public async Task<ActionResponse<IEnumerable<HistoryMessages>>> GetHistoryMessagesAsync(PaginationDTO pagination)
         {
             var queryable = _context.HistoryMessages
@@ -240,6 +239,7 @@ namespace SIC.Backend.Repositories.Implemetations
                     .ToListAsync()
             };
         }
+
         public async Task<ActionResponse<int>> GetHistoryMessagesTotalRecordAsync(PaginationDTO pagination)
         {
             var queryable = _context.HistoryMessages
@@ -276,14 +276,18 @@ namespace SIC.Backend.Repositories.Implemetations
             var last10 = fromDigits.Length > 10
                 ? fromDigits.Substring(fromDigits.Length - 10)
                 : fromDigits;
-
+            // Buscar la invitación que coincida con el número de teléfono (últimos 10 dígitos)
             var guest = await _context.Invitations
                 .Include(e => e.Event)
-                .FirstOrDefaultAsync(x =>
+                .Where(x =>
                     x.PhoneNumber != null &&
                     x.PhoneNumber.Length >= 10 &&
                     x.PhoneNumber.Substring(x.PhoneNumber.Length - 10) == last10
-                );
+                )
+                .OrderByDescending(x => x.Event!.Date) // 👈 el más reciente primero
+                .FirstOrDefaultAsync();
+            //Validar si Direction = "IN" busque el ultimo mensaje que se le envio a ese numero y evento para obtener el EventCode, EventName y NameConversation
+            //En ResponseFromWhatsApp se guardara el EventCode, EventName y NameConversation para luego mostrarlo en el inbox
             var response = new ResponseFromWhatsApp
             {
                 EventCode = guest?.Event?.Code,

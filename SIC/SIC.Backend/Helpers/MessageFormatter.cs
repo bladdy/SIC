@@ -57,6 +57,15 @@ namespace SIC.Backend.Helpers
                             // Construcción final
                             return $"{baseUrl}/?codigo={invitationCode}";
                         }
+                    case "linkconfirmacion":
+                        {
+                            // Construye la URL dinámica: https://invboxv-app.com/invitacion/L20DY5
+                            var baseUrl = "https://invboxv-app.com/";
+                            var invitationCode = invitation.Code ?? string.Empty;
+
+                            // Construcción final
+                            return $"{baseUrl}invitacion/{invitationCode}";
+                        }
                     default:
                         return string.Empty;
                 }
@@ -76,6 +85,10 @@ namespace SIC.Backend.Helpers
                     if (key.PropertyName.Equals("LinkInvitation", StringComparison.OrdinalIgnoreCase))
                     {
                         replacement = GetCustomValue("LinkInvitation");
+                    }
+                    else if (key.PropertyName.Equals("LinkConfirmacion", StringComparison.OrdinalIgnoreCase))
+                    {
+                        replacement = GetCustomValue("LinkConfirmacion");
                     }
                     else
                     {

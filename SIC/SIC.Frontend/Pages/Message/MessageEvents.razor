@@ -1,9 +1,9 @@
 ﻿@page "/events/message-events/{Code}"
 <PageTitle>Mensajes del evento</PageTitle>
-<div class="d-flex justify-content-center align-items-start my-4">
+<div class="d-flex justify-content-center my-4 px-3">
     @if (NewMessage != null)
     {
-        <EditForm Model="@NewMessage" OnValidSubmit="HandleValidSubmit" class="w-100" style="max-width: 900px;">
+        <EditForm Model="@NewMessage" OnValidSubmit="HandleValidSubmit" class="w-100">
             <h3>Datos del Evento</h3>
             <DataAnnotationsValidator />
             <ValidationSummary />
@@ -29,24 +29,27 @@
 
             <h3>Mensajes para WhatsApp</h3>
             <div class="mb-3 row">
-                <div class="form-group col-12 col-md-6 mb-3 mb-md-0">
+                <div class="form-group col-12 col-md-4 mb-3 mb-md-0">
                     <label for="textoInvitacion" class="form-label">Texto de invitación:</label>
                     <InputTextArea id="textoInvitacion" class="form-control" @bind-Value="NewMessage.MessageInvitation" style="height: 25em;" />
                 </div>
 
-                <div class="form-group col-12 col-md-6">
+                <div class="form-group col-12 col-md-4">
                     <label for="mensajeConfirmacion" class="form-label">Mensaje de confirmación:</label>
                     <InputTextArea id="mensajeConfirmacion" class="form-control" @bind-Value="NewMessage.MessageConfirmation" style="height: 25em;" />
                 </div>
+                <div class="form-group col-12 col-md-4">
+                    <h3>Tokens que puede usar en mensajes:</h3>
+                    <ul>
+                        @foreach (var token in Tokens!)
+                        {
+                            <li>@token.Key - @token.Description</li>
+                        }
+                    </ul>
+
+                </div>
             </div>
 
-            <h3>Tokens que puede usar en mensajes:</h3>
-            <ul>
-                @foreach (var token in Tokens!)
-                {
-                    <li>@token.Key - @token.Description</li>
-                }
-            </ul>
 
             <div class="form-group mt-3 d-flex justify-content-end gap-2 flex-wrap">
                 <button type="submit" class="btn btn-custom" disabled="@(isLoading)">
