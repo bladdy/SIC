@@ -13,7 +13,7 @@ namespace SIC.Shared.Entities
         public Event Event { get; set; } = null!;
         public int InvitationId { get; set; }
         public Invitation Invitation { get; set; } = null!;
-        public DateTime SendDate { get; set; }
+        public DateTime SendDate { get; set; } = DateTime.UtcNow;
         public bool Send { get; set; }
         public bool Delivered { get; set; }
         public bool Error { get; set; }

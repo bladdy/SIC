@@ -194,7 +194,7 @@ namespace SIC.Backend.Repositories.Implemetations
                     Invitation = invitations,
                     Event = invitations.Event!,
                     Delivered = Success,
-                    SendDate = DateTime.Now,
+                    SendDate = DateTime.UtcNow,
                     Send = Success,
                     Error = !Success,
                     Message = mensajeMostrar,

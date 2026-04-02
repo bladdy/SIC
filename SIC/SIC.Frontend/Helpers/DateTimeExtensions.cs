@@ -13,10 +13,12 @@ public static class DateTimeExtensions
             .ToLocalTime()
             .ToString("hh:mm tt");
     }
+
     public static string ToDateLocal12h(this DateTime date)
     {
         return date.ToString("dd/MM/yyyy hh:mm tt");
     }
+
     public static string FormatearFechaLargaEspanol(this DateTime fecha)
     {
         var cultura = new CultureInfo("es-ES");
@@ -30,6 +32,7 @@ public static class DateTimeExtensions
 
         return $"{diaSemana} {dia} de {mes} del {anio}";
     }
+
     public static string ToWhatsappDate(this DateTime date)
     {
         var culture = new CultureInfo("es-ES");
