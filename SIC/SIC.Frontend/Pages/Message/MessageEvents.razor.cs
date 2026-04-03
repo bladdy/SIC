@@ -36,7 +36,7 @@ namespace SIC.Frontend.Pages.Message
             {
                 if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
                 {
-                    NavigationManager.NavigateTo("/events");
+                    NavigationManager.NavigateTo("/");
                     return;
                 }
                 var message = await responseHttp.GetErrorMessageAsync();
@@ -53,7 +53,7 @@ namespace SIC.Frontend.Pages.Message
             {
                 if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
                 {
-                    NavigationManager.NavigateTo("/events");
+                    NavigationManager.NavigateTo("/");
                     return;
                 }
                 var message = await responseHttp.GetErrorMessageAsync();
@@ -70,7 +70,7 @@ namespace SIC.Frontend.Pages.Message
             {
                 if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
                 {
-                    NavigationManager.NavigateTo("/events");
+                    NavigationManager.NavigateTo("/");
                     return;
                 }
                 var message = await responseHttp.GetErrorMessageAsync();
@@ -131,7 +131,6 @@ namespace SIC.Frontend.Pages.Message
                 isEditOrCreate ? "Los mensajes han sido creados con éxito." : "Los mensajes han sido actualizados con éxito.",
                 SweetAlertIcon.Success
             );
-            NavigationManager.NavigateTo($"/events/details/{Code}");
             isLoading = false;
         }
 

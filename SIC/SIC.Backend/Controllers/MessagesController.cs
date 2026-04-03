@@ -81,6 +81,7 @@ namespace SIC.Backend.Controllers
             return NotFound(action.Message);
         }
 
+        //Poner lo de la autenticacion para obtener los datos del usuario y filtrar el historial
         [HttpGet("HistoryMessages/paginated")]
         public async Task<IActionResult> GetHistoryMessages([FromQuery] PaginationDTO pagination)
         {
@@ -92,6 +93,7 @@ namespace SIC.Backend.Controllers
             return NotFound(action.Message);
         }
 
+        //Poner lo de la autenticacion para obtener los datos del usuario y filtrar el historial
         [HttpGet("totalRecordAsync")]
         public override async Task<IActionResult> GetTotalRecordsAsync([FromQuery] PaginationDTO pagination)
         {
