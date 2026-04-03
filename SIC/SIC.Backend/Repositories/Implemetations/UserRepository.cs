@@ -45,7 +45,6 @@ namespace SIC.Backend.Repositories.Implemetations
 
         public async Task<ActionResponse<IEnumerable<User>>> GetAsync(PaginationDTO pagination)
         {
-            pagination.PageNumber = 1000;
             var queryable = _context.Users.Include(c => c.UserCredit)
                 .AsQueryable();
 

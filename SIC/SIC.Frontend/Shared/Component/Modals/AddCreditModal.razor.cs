@@ -47,7 +47,7 @@ namespace SIC.Frontend.Shared.Component.Modals
         {
             try
             {
-                var result = await Http.GetFromJsonAsync<List<User>>("api/Accounts/all");
+                var result = await Http.GetFromJsonAsync<List<User>>($"api/Accounts/all?PageSize={200}");
                 if (result != null)
                     Planners = result.Where(u => u.UserType == UserType.WeddingPlanner).ToList();
             }
