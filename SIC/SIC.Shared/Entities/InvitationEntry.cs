@@ -18,6 +18,10 @@ public class InvitationEntry
     [Range(0, int.MaxValue)]
     public int AdultsEntered { get; set; }
 
+    [Display(Name = "Cantidad de Jovenes")]
+    [Range(0, int.MaxValue)]
+    public int YouthsEntered { get; set; }
+
     [Display(Name = "Cantidad de Niños")]
     [Range(0, int.MaxValue)]
     public int ChildrenEntered { get; set; }

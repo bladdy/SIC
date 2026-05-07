@@ -228,6 +228,7 @@ public partial class InvitationsEntriesIndex
             InvitationId = EditedInvitationEntry.InvitationId,
             EventId = EditedInvitationEntry.EventId,
             AdultsEntered = EditedInvitationEntry.AdultsEntered,
+            YouthsEntered = EditedInvitationEntry.YouthsEntered,
             ChildrenEntered = EditedInvitationEntry.ChildrenEntered,
             EntryDateTime = EditedInvitationEntry.EntryDateTime,
             QrCode = EditedInvitationEntry.QrCode

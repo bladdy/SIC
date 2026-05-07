@@ -54,6 +54,7 @@ public class Invitation
     [Display(Name = "Comentarios")]
     public string? Comments { get; set; }
 
+    public int TotalInvitados => (NumberAdults + NumberYouths + NumberChildren);
     public DateTime SentDate { get; set; }
     public DateTime? ConfirmationDate { get; set; }
     public int EventId { get; set; }

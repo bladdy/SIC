@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using QRCoder;
 using SIC.Backend.Services;
-using SIC.Backend.UnitOfWork.Implemetations;
 using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using SIC.Shared.Response;
-using SkiaSharp;
 using System.Text.Json;
 
 namespace SIC.Backend.Controllers;
@@ -168,6 +166,18 @@ public class EventsController : GenericController<Event>
             return BadRequest(ex.Message);
         }
     }
+
+    /*
+    CREARLO nuevo
+
+    [HttpDelete("{id}")]
+    public override async Task<IActionResult> DeleteAsync(int id)
+    {
+        var response = await _eventsUnitOfWork.DeleteAsync(id);
+        if (response.Success)
+            return Ok(response.Result);
+        return BadRequest(response.Message);
+    }*/
 
     private static byte[] GenerateQRCodePng(string content)
     {

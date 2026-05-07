@@ -239,7 +239,7 @@ else
                 {
                     <button type="button" class="btn btn-custom mt-2 mt-lg-0" style="display: flex; align-items: center; gap: 4px;" @onclick="NavegateToMessage"> <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-mail"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" /><path d="M3 7l9 6l9 -6" /></svg>Mensajes</button>
                 }
-                
+
             }
 
         </div>
@@ -366,18 +366,18 @@ else
 
                                         <!-- ===== COLUMNA 3 ===== -->
                                         <div class="col-12 col-md-7 d-flex flex-wrap align-items-center justify-content-center gap-2">
-                                        
+
                                             <div class="d-flex align-items-center">
                                                 @if (EventDetail.User.UserWhatsAppConfigs != null)
                                                 {
 
 
                                                     <div class="steps-wrapper">
-                                                    @{
-                                                        var sentTemplates = invitation.TemplateSents
-                                                        .Select(t => t.TemplateNumber)
-                                                        .ToList();
-                                                    }
+                                                        @{
+                                                            var sentTemplates = invitation.TemplateSents
+                                                            .Select(t => t.TemplateNumber)
+                                                            .ToList();
+                                                        }
                                                         <div class="steps-container">
 
                                                             <div class="step-circle @(sentTemplates.Contains(1) ? "active-step" : "inactive-step")">
@@ -455,7 +455,7 @@ else
                                                                             <li>
                                                                                 <button type="button"
                                                                                 class="dropdown-item"
-                                                                                        @onclick="() => EnviarInvitacion(invitation.Code!, template.Name, invitation.Id, template.DisplayName)">
+                                                                                @onclick="() => EnviarInvitacion(invitation.Code!, template.Name, invitation.Id, template.DisplayName)">
                                                                                     @template.DisplayName
                                                                                 </button>
                                                                             </li>
@@ -654,7 +654,7 @@ else
                         {
                             @if (EventDetail.User.UserWhatsAppConfigs != null)
                             {
-                                
+
                                 @if (Templates != null && Templates.Any() )
                                 {
                                     <div class="dropdown">
@@ -681,7 +681,7 @@ else
                                                     <li>
                                                         <button type="button"
                                                         class="dropdown-item"
-                                                                @onclick="() => EnviarInvitacion(invitation.Code!, template.Name, invitation.Id, template.DisplayName)">
+                                                        @onclick="() => EnviarInvitacion(invitation.Code!, template.Name, invitation.Id, template.DisplayName)">
                                                             @template.DisplayName
                                                         </button>
                                                     </li>
@@ -694,11 +694,11 @@ else
                             else
                             {
                                 <button class="btn d-flex align-items-center gap-1 flex-fill" style="background-color:#25d366; color:white;"
-                                        @onclick="() => AbrirWhatsapp(invitation.CountryCode+invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)">
+                                @onclick="() => AbrirWhatsapp(invitation.CountryCode+invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)">
                                     <i class="bi bi-whatsapp"></i> Invitar
                                 </button>
                                 <button class="btn d-flex align-items-center gap-1 flex-fill" style="background-color:#25d366; color:white;"
-                                        @onclick="() => AbrirWhatsapp(invitation.CountryCode+invitation.PhoneNumber, invitation.Code!, invitation.Id, 2)">
+                                @onclick="() => AbrirWhatsapp(invitation.CountryCode+invitation.PhoneNumber, invitation.Code!, invitation.Id, 2)">
                                     <i class="bi bi-whatsapp"></i> Aviso
                                 </button>
                             }
@@ -752,41 +752,44 @@ else
                             <i class="bi bi-pencil-fill"></i>Editar
                         </button>
                     </div>
+                    @if (EventDetail.User.UserWhatsAppConfigs != null)
+                    {
+                        
+                        <div class="row m-2">
 
-                    <div class="row m-2">
+                            @{
+                                var sentTemplates = invitation.TemplateSents
+                                .Select(t => t.TemplateNumber)
+                                .ToList();
+                            }
 
-                        @{
-                            var sentTemplates = invitation.TemplateSents
-                            .Select(t => t.TemplateNumber)
-                            .ToList();
-                        }
+                            <div class="steps-wrapper">
+                                <div class="steps-container">
 
-                        <div class="steps-wrapper">
-                            <div class="steps-container">
+                                    <div class="step-circle @(sentTemplates.Contains(1) ? "active-step" : "inactive-step")">
+                                        <!-- SVG 1 -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circle-number-1"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 10l2 -2v8" /></svg>
+                                    </div>
 
-                                <div class="step-circle @(sentTemplates.Contains(1) ? "active-step" : "inactive-step")">
-                                    <!-- SVG 1 -->
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circle-number-1"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 10l2 -2v8" /></svg>
+                                    <div class="step-circle @(sentTemplates.Contains(2) ? "active-step" : "inactive-step")">
+                                        <!-- SVG 2 -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circle-number-2"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 8h3a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 0 -1 1v2a1 1 0 0 0 1 1h3" /></svg>
+                                    </div>
+
+                                    <div class="step-circle @(sentTemplates.Contains(3) ? "active-step" : "inactive-step")">
+                                        <!-- SVG 3 -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circle-number-3"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 9a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1" /></svg>
+                                    </div>
+
+                                    <div class="step-circle @(sentTemplates.Contains(4) ? "active-step" : "inactive-step")">
+                                        <!-- SVG 4 -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circle-number-4"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 8v3a1 1 0 0 0 1 1h3" /><path d="M14 8v8" /></svg>
+                                    </div>
+
                                 </div>
-
-                                <div class="step-circle @(sentTemplates.Contains(2) ? "active-step" : "inactive-step")">
-                                    <!-- SVG 2 -->
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circle-number-2"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 8h3a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 0 -1 1v2a1 1 0 0 0 1 1h3" /></svg>
-                                </div>
-
-                                <div class="step-circle @(sentTemplates.Contains(3) ? "active-step" : "inactive-step")">
-                                    <!-- SVG 3 -->
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circle-number-3"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 9a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1" /></svg>
-                                </div>
-
-                                <div class="step-circle @(sentTemplates.Contains(4) ? "active-step" : "inactive-step")">
-                                    <!-- SVG 4 -->
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circle-number-4"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 8v3a1 1 0 0 0 1 1h3" /><path d="M14 8v8" /></svg>
-                                </div>
-
                             </div>
                         </div>
-                    </div>
+                    }
                 </div>
             </div>
         }

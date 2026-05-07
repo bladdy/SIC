@@ -17,9 +17,6 @@ namespace SIC.Frontend.Pages.Message
         [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
         [Inject] private NavigationManager NavigationManager { get; set; } = default!;
 
-        private string Title = "No";
-        private string SubTitle = "No";
-
         public List<MessageKey>? Tokens { get; set; }
 
         protected override async Task OnInitializedAsync()
