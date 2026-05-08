@@ -44,24 +44,22 @@ public class FtpStorageService
     }
 
     public async Task<string> UploadImageAsync(
-    Stream fileStream,
-    string folder,
-    string fileName)
+        Stream fileStream,
+        string folder,
+        string fileName)
     {
         const int maxWidth = 1280;
+
         using var client = CreateClient();
 
         var directory = $"/{folder}";
-        if (!client.DirectoryExists(directory))
-        {
-            client.CreateDirectory(directory);
-        }
 
-        // 🔹 Forzar extensión .webp
+        EnsureDirectory(client, directory);
+
         var webpFileName = Path.ChangeExtension(fileName, ".webp");
+
         var remotePath = $"{directory}/{webpFileName}";
 
-        // 🔹 Convertir a WEBP
         using var image = await Image.LoadAsync(fileStream);
 
         if (image.Width > maxWidth)
@@ -74,26 +72,106 @@ public class FtpStorageService
                 }));
         }
 
-        // 🔹 Guardar en WEBP optimizado
         using var webpStream = new MemoryStream();
-        await image.SaveAsync(webpStream, new WebpEncoder
-        {
-            Quality = 65,          // 👈 punto dulce
-            Method = WebpEncodingMethod.BestQuality
-        });
+
+        await image.SaveAsync(
+            webpStream,
+            new WebpEncoder
+            {
+                Quality = 65,
+                Method = WebpEncodingMethod.BestQuality
+            });
 
         webpStream.Position = 0;
 
-        // 🔹 Subir al FTP
         client.UploadStream(
             webpStream,
             remotePath,
             FtpRemoteExists.Overwrite,
+            true);
+
+        return BuildFileUrl(folder, webpFileName);
+    }
+
+    public async Task<string> UploadVideoAsync(
+        Stream fileStream,
+        string folder,
+        string fileName)
+    {
+        using var client = CreateClient();
+
+        var directory = $"/{folder}/videos";
+
+        EnsureDirectory(client, directory);
+
+        var remotePath = $"{directory}/{fileName}";
+
+        await UploadFileStreamAsync(
+            client,
+            fileStream,
+            remotePath);
+
+        return BuildFileUrl(
+            $"{folder}/videos",
+            fileName);
+    }
+
+    public async Task<string> UploadAudioAsync(
+        Stream fileStream,
+        string folder,
+        string fileName)
+    {
+        using var client = CreateClient();
+
+        var directory = $"/{folder}/audios";
+
+        EnsureDirectory(client, directory);
+
+        var remotePath = $"{directory}/{fileName}";
+
+        await UploadFileStreamAsync(
+            client,
+            fileStream,
+            remotePath);
+
+        return BuildFileUrl(
+            $"{folder}/audios",
+            fileName);
+    }
+
+    private Task UploadFileStreamAsync(
+        FtpClient client,
+        Stream stream,
+        string remotePath)
+    {
+        stream.Position = 0;
+
+        client.UploadStream(
+            stream,
+            remotePath,
+            FtpRemoteExists.Overwrite,
             true
         );
+        return Task.CompletedTask;
+    }
 
+    private void EnsureDirectory(
+        FtpClient client,
+        string directory)
+    {
+        if (!client.DirectoryExists(directory))
+        {
+            client.CreateDirectory(directory);
+        }
+    }
+
+    private string BuildFileUrl(
+        string folder,
+        string fileName)
+    {
         var baseUrl = _configuration["Ftp:UrlBase"];
-        return $"{baseUrl}/{folder}/{webpFileName}";
+
+        return $"{baseUrl}/{folder}/{fileName}";
     }
 
     //ToDo: Crear un metodo que diga si o no se borro el archivo
