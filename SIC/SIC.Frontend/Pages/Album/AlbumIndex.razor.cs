@@ -24,7 +24,7 @@ namespace SIC.Frontend.Pages.Album
         protected override async Task OnInitializedAsync()
         {
             await LoadEvent();
-            if (Event is not null && Event.AlbumPublic)
+            if (Event is not null && Event.HasAlbum)
             {
                 await LoadEventImage();
             }

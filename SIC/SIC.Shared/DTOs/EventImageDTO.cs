@@ -11,5 +11,6 @@ namespace SIC.Shared.DTOs
         public string? CodeEvent { get; set; }
         public string ImageUrl { get; set; } = null!;
         public string? FileName { get; set; }
+        public string? ImageType { get; set; } = null!;
     }
 }

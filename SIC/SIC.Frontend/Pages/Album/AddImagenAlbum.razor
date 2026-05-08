@@ -16,21 +16,21 @@
                 max-height: 440px;
                 overflow: hidden;
                 margin-bottom: 1.5rem;
-            ">
+        ">
 
             @if (Event is not null && Event.CoverAlbumImageUrl is not null)
             {
 
                 <!-- Imagen -->
                 <img src="@Event.CoverAlbumImageUrl"
-                     alt="Portada del evento"
-                     style="
+                alt="Portada del evento"
+                style="
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
                 object-position: @($"{Event.CoverPositionX}% {Event.CoverPositionY}%");
                 display: block;
-                 " />
+                " />
 
                 <!-- Overlay degradado (mejora legibilidad en mobile) -->
                 <div style="
@@ -41,7 +41,7 @@
                 rgba(0,0,0,0.6),
                 rgba(0,0,0,0)
             );
-            "></div>
+                "></div>
 
                 <!-- Texto -->
                 <div style="
@@ -53,14 +53,14 @@
             text-align: left;
             text-shadow: 0 0 10px rgba(0,0,0,0.7);
             max-width: 100%;
-            ">
+                ">
 
                     <p style="
                 font-size: clamp(0.85rem, 2.5vw, 1rem);
                 margin: 0 0 4px 0;
                 line-height: 1.3;
                 opacity: 0.9;
-                ">
+                    ">
                         @Event.SubTitle
                     </p>
 
@@ -69,7 +69,7 @@
                 margin: 0;
                 line-height: 1.15;
                 word-break: break-word;
-                ">
+                    ">
                         @Event.Name
                     </h1>
 
@@ -78,34 +78,39 @@
 
         </div>
         <div class="d-flex justify-content-center align-items-center" style="height: 200px;">
-            <div class="d-flex flex-column gap-3" style="width: 300px;">
+            <div class="d-flex flex-column gap-3" style="width: 340px;">
 
                 <!-- InputFile cámara -->
                 <InputFile class="d-none"
-                           id="cameraInput"
-                           OnChange="HandleFileSelected"
-                           accept="image/*"
-                           capture="environment" />
+                id="cameraInput"
+                OnChange="HandleFileSelected"
+                accept="image/*,video/*"
+                capture="environment" />
+
 
                 <button class="btn btn-sm btn-outline-secondary w-100"
-                        type="button"
-                        onclick="document.getElementById('cameraInput').click()">
-                    📷 Tomar foto
+                type="button"
+                onclick="document.getElementById('cameraInput').click()">
+                    📷 Tomar foto o video
                 </button>
                 <!-- InputFile normal -->
                 <InputFile class="d-none"
-                           id="fileInput"
-                           OnChange="HandleFileSelected"
-                           multiple
-                           accept="image/*" />
+                id="fileInput"
+                OnChange="HandleFileSelected"
+                multiple
+                accept="image/*,video/mp4,audio/mpeg" />
 
                 <label for="fileInput"
-                       class="form-control form-control-sm text-center"
-                       style="cursor:pointer;">
-                    Elegir imagen
+                class="form-control form-control-sm text-center"
+                style="cursor:pointer;">
                     @if (selectedFiles != null && selectedFiles.Count > 0)
                     {
-                        <strong>(@selectedFiles.Count archivo(s))</strong>
+                        <strong>@selectedFiles.Count Archivo(s) seleccionado(s)</strong>
+                    }
+                    else
+                    {
+
+                        <strong>Seleccionar Archivos (imagenes, audio y video)</strong>
                     }
                 </label>
 
@@ -122,7 +127,7 @@
                     }
                     else
                     {
-                        <span>Subir Imagen</span>
+                        <span>Subir Archivo</span>
                     }
                 </button>
 
@@ -131,13 +136,19 @@
                             data-bs-toggle="popover"
                             data-bs-placement="bottom"
                             data-bs-html="true"
-                            title="¿Cómo subir tu imagen?"
+                            title="¿Cómo subir un archivo?"
                             data-bs-content="<ol style='padding-left:1rem; margin:0;'>
-                                            <li>Toma una Foto o Selecciona imágen(es)</li>
-                                            <li>Solo formatos JPG o PNG</li>
-                                            <li>Tamaño máximo recomendado: 5MB</li>
-                                            <li>Evita imágenes borrosas</li>
-                                        </ol>">
+                                                <li>Toma una foto, video o selecciona archivos desde tu galería.</li>
+                                                <li>Formatos permitidos:
+                                                    <strong>JPG, PNG, WEBP, MP4, MOV y MP3</strong>.
+                                                </li>
+                                                <li>Tamaño máximo recomendado:
+                                                    <strong>10 MB por archivo</strong>.
+                                                </li>
+                                                <li>Evita imágenes borrosas o videos con poca iluminación.</li>
+                                                <li>Puedes seleccionar múltiples archivos al mismo tiempo.</li>
+                                                <li>Espera a que finalice la carga antes de cerrar la página.</li>
+                                            </ol>">
                                         Instrucciones
                     </button>
                 </div>

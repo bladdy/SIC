@@ -23,7 +23,7 @@ public class ImagesController : ControllerBase
         _eventsUnitOfWork = eventsUnitOfWork;
     }
 
-    [HttpPost("upload/{folder}")]
+    /*[HttpPost("upload/{folder}")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> Upload(
         [FromForm] List<IFormFile> files,
@@ -34,6 +34,11 @@ public class ImagesController : ControllerBase
 
         if (string.IsNullOrWhiteSpace(folder))
             return BadRequest("La carpeta es obligatoria");
+        //Verificar que tipo de archivo,imagen seguir el proceso video crear el proceso de video y si es audio crear el proceso de audio
+
+        //refactorizar, sacar este proceso a un metodo  privado para subir imagen
+        //Crear el metodo privado para subir video y audio, y verificar el tipo de archivo para llamar al metodo correspondiente
+        //Los metodos van a retornar imagesSaved para que se pueda retornar la respuesta al cliente, y en caso de error se pueda manejar el error de forma correcta
 
         var imagesSaved = new List<EventImage>();
 
@@ -74,6 +79,64 @@ public class ImagesController : ControllerBase
         }).ToList();
 
         return Ok(result);
+    }*/
+
+    [HttpPost("upload/{folder}")]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> Upload(
+    [FromForm] List<IFormFile> files,
+    [FromRoute] string folder)
+    {
+        if (files == null || !files.Any())
+            return BadRequest("No se enviaron archivos");
+
+        if (string.IsNullOrWhiteSpace(folder))
+            return BadRequest("La carpeta es obligatoria");
+
+        var imagesSaved = new List<EventImage>();
+
+        foreach (var file in files)
+        {
+            if (file.Length == 0)
+                continue;
+
+            try
+            {
+                EventImage? result = null;
+
+                if (file.ContentType.StartsWith("image/"))
+                {
+                    result = await UploadImageAsync(file, folder);
+                }
+                else if (file.ContentType.StartsWith("video/"))
+                {
+                    result = await UploadVideoAsync(file, folder);
+                }
+                else if (file.ContentType.StartsWith("audio/"))
+                {
+                    result = await UploadAudioAsync(file, folder);
+                }
+
+                if (result != null)
+                    imagesSaved.Add(result);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        if (!imagesSaved.Any())
+            return BadRequest("No se pudo subir ningún archivo");
+
+        var resultResponse = imagesSaved.Select(img => new EventImageDTO
+        {
+            CodeEvent = img.Event.Code,
+            ImageUrl = img.Url,
+            FileName = img.FileName
+        }).ToList();
+
+        return Ok(resultResponse);
     }
 
     [HttpGet("byEvent/{code}")]
@@ -169,5 +232,82 @@ public class ImagesController : ControllerBase
             "application/zip",
             $"Album_{folder}.zip"
         );
+    }
+
+    private async Task<EventImage?> UploadImageAsync(
+    IFormFile file,
+    string folder)
+    {
+        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+
+        using var stream = file.OpenReadStream();
+
+        var url = await _ftp.UploadImageAsync(
+            stream,
+            folder,
+            fileName);
+
+        if (string.IsNullOrWhiteSpace(url))
+            return null;
+
+        return await SaveFileRecordAsync(folder, url, "imagen");
+    }
+
+    private async Task<EventImage?> UploadVideoAsync(
+        IFormFile file,
+        string folder)
+    {
+        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+
+        using var stream = file.OpenReadStream();
+
+        var url = await _ftp.UploadVideoAsync(
+            stream,
+            folder,
+            fileName);
+
+        if (string.IsNullOrWhiteSpace(url))
+            return null;
+
+        return await SaveFileRecordAsync(folder, url, "video");
+    }
+
+    private async Task<EventImage?> UploadAudioAsync(
+        IFormFile file,
+        string folder)
+    {
+        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+
+        using var stream = file.OpenReadStream();
+
+        var url = await _ftp.UploadAudioAsync(
+            stream,
+            folder,
+            fileName);
+
+        if (string.IsNullOrWhiteSpace(url))
+            return null;
+
+        return await SaveFileRecordAsync(folder, url, "audio");
+    }
+
+    private async Task<EventImage?> SaveFileRecordAsync(
+        string folder,
+        string url, string ImageType)
+    {
+        var dto = new EventImageDTO
+        {
+            CodeEvent = folder,
+            ImageUrl = url,
+            FileName = Path.GetFileName(new Uri(url).LocalPath),
+            ImageType = ImageType
+        };
+
+        var response = await _imageUnitOfWork.AddFullAsyn(dto);
+
+        if (!response.Success)
+            return null;
+
+        return response.Result;
     }
 }

@@ -7,6 +7,7 @@ using SIC.Frontend.Repositories;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using System.Net;
+using System.Net.Http;
 
 namespace SIC.Frontend.Pages.Album;
 
@@ -131,9 +132,15 @@ public partial class AddImagenAlbum
                 }
 
                 var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+                // 🔹 IMPORTANTE
+
+                var streamContent = new StreamContent(stream);
+                streamContent.Headers.ContentType =
+                    new System.Net.Http.Headers.MediaTypeHeaderValue(
+                        file.ContentType);
 
                 content.Add(
-                    new StreamContent(stream),
+                    streamContent,
                     "files",
                     file.Name
                 );

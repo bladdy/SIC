@@ -41,7 +41,8 @@ namespace SIC.Backend.Repositories.Implemetations
                 {
                     EventId = eventEntity.Id,
                     Url = eventImage.ImageUrl,
-                    FileName = eventImage.FileName
+                    FileName = eventImage.FileName,
+                    ImageType = eventImage.ImageType
                 };
                 _context.EventImages.Add(newEventImage);
                 await _context.SaveChangesAsync();

@@ -53,37 +53,103 @@
     </div>
 
     <!-- CONTENIDO -->
+    <!-- CONTENIDO -->
     @if (EventImages == null)
     {
-        <p style="color: #6c757d;">Cargando imágenes...</p>
+        <p style="color: #6c757d;">Cargando archivos...</p>
     }
     else if (!EventImages.Any())
     {
         <div style="padding: 2rem; text-align: center; color: #6c757d; border: 1px dashed #dee2e6; border-radius: 6px;">
-            <p>No hay imágenes en este álbum aún.</p>
+            <p>No hay archivos en este álbum aún.</p>
         </div>
     }
     else
     {
         <div style="
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
             ">
+
             @foreach (var image in EventImages)
             {
-                <div style="overflow: hidden; border-radius: 6px; cursor: pointer;">
-                    <img src="@image.Url"
-                         alt="Imagen del evento"
-                         loading="lazy"
-                         @onclick="() => OpenPreview(image)"
-                         style="
+                <div style="
+                overflow: hidden;
+                border-radius: 10px;
+                background: #f5f5f5;
+                cursor: pointer;
+                position: relative;
+                        ">
+
+                    @if (image.ImageType == "imagen")
+                    {
+                        <img src="@image.Url"
+                             alt="Imagen"
+                             loading="lazy"
+                             @onclick="() => OpenPreview(image)"
+                             style="
                             width: 100%;
                             height: 250px;
-                            display: block;
                             object-fit: cover;
-                            border-radius: 6px;
-                                 " />
+                            display: block;" />
+                    }
+                    else if (image.ImageType == "video")
+                    {
+                        <div @onclick="() => OpenPreview(image)"
+                             style="position: relative;">
+
+                            <video style="
+                                width: 100%;
+                                height: 250px;
+                                object-fit: cover;
+                                display: block;
+                                            ">
+                                <source src="@image.Url" />
+                            </video>
+
+                            <div style="
+                                position: absolute;
+                                inset: 0;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                background: rgba(0,0,0,0.2);
+                                            ">
+                                <i class="bi bi-play-circle-fill"
+                                   style="
+                                    font-size: 60px;
+                                    color: white;
+                                                "></i>
+                            </div>
+                        </div>
+                    }
+                    else if (image.ImageType == "audio")
+                    {
+                        <div style="
+                            height: 250px;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            justify-content: center;
+                            padding: 1rem;
+                            background: #f8f9fa;
+                                        ">
+
+                            <i class="bi bi-music-note-beamed"
+                               style="
+                                font-size: 60px;
+                                color: #3C6A79;
+                                margin-bottom: 1rem;
+                                            ">
+                            </i>
+
+                            <audio controls
+                                   style="width: 100%;">
+                                <source src="@image.Url" type="audio/mpeg" />
+                            </audio>
+                        </div>
+                    }
                 </div>
             }
         </div>
@@ -97,12 +163,13 @@
          style="
             position: fixed;
             inset: 0;
-            background-color: rgba(0,0,0,0.8);
+            background-color: rgba(0,0,0,0.85);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 9999;
-             ">
+            padding: 1rem;
+                 ">
 
         <div style="position: relative;" @onclick:stopPropagation>
 
@@ -116,14 +183,11 @@
                         color: white;
                         border: none;
                         border-radius: 50%;
-                        width: 36px;
-                        height: 36px;
+                        width: 40px;
+                        height: 40px;
                         cursor: pointer;
-                        font-size: 18px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        ">
+                        z-index: 10;
+                            ">
                 <i class="bi bi-download"></i>
             </button>
 
@@ -133,37 +197,64 @@
                         position: absolute;
                         top: 20px;
                         right: 20px;
-                        background-color: #3C6A79;
+                        background-color: #dc3545;
                         color: white;
                         border: none;
                         border-radius: 50%;
-                        width: 36px;
-                        height: 36px;
+                        width: 40px;
+                        height: 40px;
                         cursor: pointer;
-                        font-size: 18px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        ">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M4 7l16 0" />
-                    <path d="M10 11l0 6" />
-                    <path d="M14 11l0 6" />
-                    <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
-                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
-                </svg>
+                        z-index: 10;
+                            ">
+                <i class="bi bi-trash"></i>
             </button>
 
-            <!-- Imagen -->
-            <img src="@PreviewImage.Url"
-                 style="
-                    max-width: 90vw;
-                    max-height: 90vh;
-                    border-radius: 6px;
-                     " />
+            @if (PreviewImage.ImageType == "imagen")
+            {
+                <img src="@PreviewImage.Url"
+                     style="
+                        max-width: 90vw;
+                        max-height: 90vh;
+                        border-radius: 10px;
+                                " />
+            }
+            else if (PreviewImage.ImageType == "video")
+            {
+                <video controls autoplay
+                       style="
+                            max-width: 90vw;
+                            max-height: 90vh;
+                            border-radius: 10px;
+                                    ">
+                    <source src="@PreviewImage.Url" />
+                </video>
+            }
+            else if (PreviewImage.ImageType == "audio")
+            {
+                <div style="
+                        width: 400px;
+                        max-width: 90vw;
+                        background: white;
+                        padding: 2rem;
+                        border-radius: 12px;
+                        text-align: center;
+                                ">
+
+                    <i class="bi bi-music-note-beamed"
+                       style="
+                            font-size: 80px;
+                            color: #3C6A79;
+                            margin-bottom: 1rem;
+                            display: block;
+                                    ">
+                    </i>
+
+                    <audio controls autoplay
+                           style="width: 100%;">
+                        <source src="@PreviewImage.Url" type="audio/mpeg" />
+                    </audio>
+                </div>
+            }
         </div>
     </div>
 }
