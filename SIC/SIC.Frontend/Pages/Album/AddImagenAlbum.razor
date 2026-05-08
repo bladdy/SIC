@@ -93,6 +93,20 @@
                 onclick="document.getElementById('cameraInput').click()">
                     📷 Tomar foto o video
                 </button>
+
+                <!-- AUDIO -->
+                <InputFile class="d-none"
+                           id="audioInput"
+                           OnChange="HandleFileSelected"
+                           accept="audio/*"
+                           capture />
+
+                <button class="btn btn-sm btn-outline-secondary w-100"
+                        type="button"
+                        onclick="document.getElementById('audioInput').click()">
+                    🎤 Grabar audio
+                </button>
+
                 <!-- InputFile normal -->
                 <InputFile class="d-none"
                 id="fileInput"

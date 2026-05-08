@@ -2,12 +2,10 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
-using SIC.Frontend.Helpers;
 using SIC.Frontend.Repositories;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using System.Net;
-using System.Net.Http;
 
 namespace SIC.Frontend.Pages.Album;
 
@@ -106,7 +104,7 @@ public partial class AddImagenAlbum
         {
             await SweetAlertService.FireAsync(
                 "Error",
-                "Debes seleccionar al menos una imagen.",
+                "Debes seleccionar al menos un archivo.",
                 SweetAlertIcon.Error
             );
             return;
@@ -125,7 +123,7 @@ public partial class AddImagenAlbum
                 {
                     await SweetAlertService.FireAsync(
                         "Archivo muy grande",
-                        $"La imagen \"{file.Name}\" supera el límite de 10 MB.",
+                        $"El archivo \"{file.Name}\" supera el límite de 10 MB.",
                         SweetAlertIcon.Warning
                     );
                     return;
@@ -165,7 +163,7 @@ public partial class AddImagenAlbum
 
                 await toast.FireAsync(
                     "Subir fotos",
-                    "Las imágenes fueron subidas correctamente.",
+                    "Los archivos fueron subidas correctamente.",
                     SweetAlertIcon.Success
                 );
 
@@ -177,7 +175,7 @@ public partial class AddImagenAlbum
                 var message = await responseHttp.GetErrorMessageAsync();
                 await SweetAlertService.FireAsync(
                     "Error",
-                    message ?? "Error al subir las imágenes.",
+                    message ?? "Error al subir los archivos.",
                     SweetAlertIcon.Error
                 );
             }
@@ -187,7 +185,7 @@ public partial class AddImagenAlbum
             // 🔴 Excede maxAllowedSize
             await SweetAlertService.FireAsync(
                 "Archivo demasiado grande",
-                "Una o más imágenes superan el límite permitido de 10 MB.",
+                "Un o más archivos superan el límite permitido de 10 MB.",
                 SweetAlertIcon.Warning
             );
         }
