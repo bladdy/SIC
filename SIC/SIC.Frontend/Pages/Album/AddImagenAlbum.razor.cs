@@ -19,6 +19,16 @@ public partial class AddImagenAlbum
 
     private IReadOnlyList<IBrowserFile>? selectedFiles;
 
+    private bool isRecording;
+
+    private RecordedAudioDTO? recordedAudio;
+
+    private string? recordedAudioUrl;
+
+    private PeriodicTimer? timer;
+
+    private TimeSpan recordingTime = TimeSpan.Zero;
+
     private string? importResult;
 
     private bool hasFileSelected = false;
@@ -202,6 +212,121 @@ public partial class AddImagenAlbum
         {
             isLoadingImport = false;
         }
+    }
+
+    private async Task UploadRecordedAudio()
+    {
+        if (recordedAudio is null)
+            return;
+
+        try
+        {
+            isLoadingImport = true;
+
+            using var content =
+                new MultipartFormDataContent();
+
+            var bytes =
+                Convert.FromBase64String(
+                    recordedAudio.Base64Data);
+
+            var byteContent =
+                new ByteArrayContent(bytes);
+
+            byteContent.Headers.ContentType =
+                new System.Net.Http.Headers.MediaTypeHeaderValue(
+                    recordedAudio.ContentType);
+
+            content.Add(
+                byteContent,
+                "files",
+                recordedAudio.FileName);
+
+            var response =
+                await Repository.PostMultipartAsync<List<EventImageDTO>>(
+                    $"api/images/upload/{Code}",
+                    content);
+
+            if (!response.Error)
+            {
+                await SweetAlertService.FireAsync(
+                    "Éxito",
+                    "Audio subido correctamente",
+                    SweetAlertIcon.Success);
+
+                await LoadEventImage();
+
+                // 🔹 Limpiar
+                recordedAudio = null;
+                recordedAudioUrl = null;
+                recordingTime = TimeSpan.Zero;
+            }
+            else
+            {
+                await SweetAlertService.FireAsync(
+                    "Error",
+                    "No se pudo subir el audio",
+                    SweetAlertIcon.Error);
+            }
+        }
+        finally
+        {
+            isLoadingImport = false;
+        }
+    }
+
+    private async Task StartRecording()
+    {
+        recordingTime = TimeSpan.Zero;
+
+        await JsRuntime.InvokeVoidAsync(
+            "audioRecorder.start");
+
+        isRecording = true;
+
+        timer = new PeriodicTimer(
+            TimeSpan.FromSeconds(1));
+
+        _ = Task.Run(async () =>
+        {
+            while (await timer.WaitForNextTickAsync())
+            {
+                recordingTime =
+                    recordingTime.Add(
+                        TimeSpan.FromSeconds(1));
+
+                await InvokeAsync(StateHasChanged);
+            }
+        });
+    }
+
+    private async Task StopRecording()
+    {
+        timer?.Dispose();
+
+        recordedAudio =
+            await JsRuntime.InvokeAsync<RecordedAudioDTO>(
+                "audioRecorder.stop");
+
+        isRecording = false;
+
+        if (recordedAudio is null)
+            return;
+
+        // 🔹 Crear preview para reproducir
+        recordedAudioUrl =
+            $"data:{recordedAudio.ContentType};base64,{recordedAudio.Base64Data}";
+
+        StateHasChanged();
+    }
+
+    private void DiscardRecording()
+    {
+        recordedAudio = null;
+
+        recordedAudioUrl = null;
+
+        recordingTime = TimeSpan.Zero;
     }
 
     private void OpenPreview(EventImage eventImage)

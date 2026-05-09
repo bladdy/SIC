@@ -80,60 +80,124 @@
         <div class="d-flex justify-content-center align-items-center" style="height: 200px;">
             <div class="d-flex flex-column gap-3" style="width: 340px;">
 
-                <!-- InputFile cámara -->
+                <!-- FOTO / VIDEO -->
                 <InputFile class="d-none"
-                id="cameraInput"
-                OnChange="HandleFileSelected"
-                accept="image/*,video/*"
-                capture="environment" />
-
+                           id="cameraInput"
+                           OnChange="HandleFileSelected"
+                           accept="image/*,video/*"
+                           capture="environment" />
 
                 <button class="btn btn-sm btn-outline-secondary w-100"
-                type="button"
-                onclick="document.getElementById('cameraInput').click()">
+                        type="button"
+                        onclick="document.getElementById('cameraInput').click()">
                     📷 Tomar foto o video
                 </button>
 
                 <!-- AUDIO -->
+                <div class="d-flex flex-column gap-3" style="width: 340px;">
+
+                    <!-- CONTROLES -->
+                    <div class="d-flex gap-2">
+
+                        <!-- INICIAR -->
+                        <button class="btn btn-sm btn-danger w-100"
+                                @onclick="StartRecording"
+                                disabled="@isRecording">
+
+                            🎤 Grabar Audio
+                        </button>
+
+                        <!-- DETENER -->
+                        <button class="btn btn-sm btn-custom w-100"
+                                @onclick="StopRecording"
+                                disabled="@(!isRecording)">
+
+                            ⏹ Detener
+                        </button>
+
+                    </div>
+
+                    <!-- TIEMPO -->
+                    @if (isRecording)
+                    {
+                        <div class="text-center">
+
+                            <span class="badge bg-danger">
+                                🔴 Grabando:
+                                @recordingTime.ToString(@"mm\:ss")
+                            </span>
+
+                        </div>
+                    }
+
+                    <!-- PREVIEW -->
+                    @if (!string.IsNullOrWhiteSpace(recordedAudioUrl))
+                    {
+                        <div class="border rounded p-3 d-flex flex-column gap-3">
+
+                            <strong>
+                                🎧 Vista previa del audio
+                            </strong>
+
+                            <audio controls
+                                   src="@recordedAudioUrl"
+                                   style="width:100%;">
+                            </audio>
+
+                            <div class="d-flex gap-2">
+
+                                <!-- VOLVER A GRABAR -->
+                                <button class="btn btn-outline-secondary w-100"
+                                        @onclick="DiscardRecording">
+
+                                    🔄 Regrabar
+                                </button>
+
+                                <!-- SUBIR -->
+                                <button class="btn btn-custom w-100"
+                                        @onclick="UploadRecordedAudio">
+
+                                    ⬆️ Subir Audio
+                                </button>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+                <!-- SELECCIONAR ARCHIVOS -->
                 <InputFile class="d-none"
-                           id="audioInput"
+                           id="fileInput"
                            OnChange="HandleFileSelected"
-                           accept="audio/*"
-                           capture />
-
-                <button class="btn btn-sm btn-outline-secondary w-100"
-                        type="button"
-                        onclick="document.getElementById('audioInput').click()">
-                    🎤 Grabar audio
-                </button>
-
-                <!-- InputFile normal -->
-                <InputFile class="d-none"
-                id="fileInput"
-                OnChange="HandleFileSelected"
-                multiple
-                accept="image/*,video/mp4,audio/mpeg" />
+                           multiple
+                           accept="image/*,video/*,audio/*" />
 
                 <label for="fileInput"
-                class="form-control form-control-sm text-center"
-                style="cursor:pointer;">
+                       class="form-control form-control-sm text-center"
+                       style="cursor:pointer;">
+
                     @if (selectedFiles != null && selectedFiles.Count > 0)
                     {
-                        <strong>@selectedFiles.Count Archivo(s) seleccionado(s)</strong>
+                        <strong>
+                            @selectedFiles.Count Archivo(s) seleccionado(s)
+                        </strong>
                     }
                     else
                     {
-
-                        <strong>Seleccionar Archivos (imagenes, audio y video)</strong>
+                        <strong>
+                            Seleccionar Archivos
+                            (imágenes, audio y video)
+                        </strong>
                     }
                 </label>
 
-                
-
-                <!-- Botón subir -->
+                <!-- BOTÓN SUBIR -->
                 <button class="btn btn-sm btn-custom w-100"
                         @onclick="UploadPhoto"
                         disabled="@(!hasFileSelected || isLoadingImport)">
+
                     @if (isLoadingImport)
                     {
                         <span class="spinner-border spinner-border-sm me-2"></span>
@@ -145,6 +209,7 @@
                     }
                 </button>
 
+                <!-- INSTRUCCIONES -->
                 <div class="d-flex mb-2">
                     <button class="btn btn-sm btn-custom w-100"
                             data-bs-toggle="popover"
@@ -152,22 +217,25 @@
                             data-bs-html="true"
                             title="¿Cómo subir un archivo?"
                             data-bs-content="<ol style='padding-left:1rem; margin:0;'>
-                                                <li>Toma una foto, video o selecciona archivos desde tu galería.</li>
-                                                <li>Formatos permitidos:
-                                                    <strong>JPG, PNG, WEBP, MP4, MOV y MP3</strong>.
-                                                </li>
-                                                <li>Tamaño máximo recomendado:
-                                                    <strong>10 MB por archivo</strong>.
-                                                </li>
-                                                <li>Evita imágenes borrosas o videos con poca iluminación.</li>
-                                                <li>Puedes seleccionar múltiples archivos al mismo tiempo.</li>
-                                                <li>Espera a que finalice la carga antes de cerrar la página.</li>
-                                            </ol>">
-                                        Instrucciones
+                                    <li>Toma una foto, video o graba un audio.</li>
+                                    <li>También puedes seleccionar archivos desde tu galería.</li>
+                                    <li>Formatos permitidos:
+                                        <strong>
+                                            JPG, PNG, WEBP,
+                                            MP4, MOV,
+                                            MP3, WAV y OGG
+                                        </strong>.
+                                    </li>
+                                    <li>Tamaño máximo recomendado:
+                                        <strong>10 MB por archivo</strong>.
+                                    </li>
+                                    <li>Evita imágenes borrosas o audios con mucho ruido.</li>
+                                    <li>Puedes seleccionar múltiples archivos al mismo tiempo.</li>
+                                    <li>Espera a que finalice la carga antes de cerrar la página.</li>
+                                </ol>">
+                        Instrucciones
                     </button>
                 </div>
-
-
 
             </div>
         </div>
