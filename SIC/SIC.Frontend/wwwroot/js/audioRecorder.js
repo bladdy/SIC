@@ -1,6 +1,8 @@
 ﻿window.audioRecorder = {
+
     mediaRecorder: null,
     audioChunks: [],
+    mimeType: null,
 
     start: async function () {
 
@@ -11,12 +13,31 @@
 
         this.audioChunks = [];
 
+        // 🔹 Detectar formato compatible
+        if (MediaRecorder.isTypeSupported('audio/mp4')) {
+
+            this.mimeType = 'audio/mp4';
+
+        } else if (
+            MediaRecorder.isTypeSupported('audio/webm')
+        ) {
+
+            this.mimeType = 'audio/webm';
+
+        } else {
+
+            this.mimeType = '';
+        }
+
         this.mediaRecorder =
-            new MediaRecorder(stream);
+            new MediaRecorder(stream, {
+                mimeType: this.mimeType
+            });
 
         this.mediaRecorder.ondataavailable = (event) => {
 
             if (event.data.size > 0) {
+
                 this.audioChunks.push(event.data);
             }
         };
@@ -32,13 +53,20 @@
 
                 const audioBlob = new Blob(
                     this.audioChunks,
-                    { type: 'audio/webm' }
-                );
+                    {
+                        type: this.mimeType
+                    });
+
+                // 🔹 Extensión dinámica
+                let extension = "webm";
+
+                if (this.mimeType.includes("mp4")) {
+                    extension = "m4a";
+                }
 
                 const fileName =
-                    `audio_${Date.now()}.webm`;
+                    `audio_${Date.now()}.${extension}`;
 
-                // 🔹 Convertir a Base64
                 const reader = new FileReader();
 
                 reader.onloadend = () => {
@@ -48,7 +76,7 @@
 
                     resolve({
                         fileName: fileName,
-                        contentType: 'audio/webm',
+                        contentType: this.mimeType,
                         base64Data: base64
                     });
                 };
