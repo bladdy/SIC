@@ -206,6 +206,7 @@ namespace SIC.Frontend.Pages.Events
                 Planner = evnt.Planner,
                 AlbumPublic = evnt.AlbumPublic,
                 HasAlbum = evnt.HasAlbum,
+                OnlyAlbum = evnt.OnlyAlbum,
                 PlannerPhone = evnt.PlannerPhone,
                 EventType = evnt.EventType,
                 Status = evnt.Status

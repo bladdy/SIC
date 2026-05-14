@@ -18,6 +18,7 @@ public partial class AddImagenAlbum
     [Inject] private IJSRuntime JsRuntime { get; set; } = default!;
 
     private IReadOnlyList<IBrowserFile>? selectedFiles;
+    private string ActiveTab = "foto";
 
     private bool isRecording;
 
@@ -333,7 +334,19 @@ public partial class AddImagenAlbum
     {
         PreviewImage = eventImage;
     }
+    private void ChangeTab(string tab)
+    {
+        ActiveTab = tab;
+    }
 
+    private string GetTabStyle(string tab)
+    {
+        bool isActive = ActiveTab == tab;
+
+        return isActive
+            ? "height:68px;border-radius:14px;border:1px solid #3C6A79;background:#3C6A79;color:#ffffff;padding:6px 4px;box-shadow:0 2px 8px rgba(0,0,0,.12);"
+            : "height:68px;border-radius:14px;border:1px solid #ebe7e2;background:#f8f6f3;color:#9b7b45;padding:6px 4px;";
+    }
     private void ClosePreview()
     {
         PreviewImage = null;

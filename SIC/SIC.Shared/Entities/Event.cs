@@ -49,6 +49,7 @@ public class Event : IEntityWithName
     public string? Planner { get; set; }
     public string? PlannerPhone { get; set; }
     public bool HasAlbum { get; set; } = false;
+    public bool OnlyAlbum { get; set; } = false;
     public bool AlbumPublic { get; set; } = true;
 
     // 🔹 Álbum de imágenes del evento

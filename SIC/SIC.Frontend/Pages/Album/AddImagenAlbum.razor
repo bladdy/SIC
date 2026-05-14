@@ -3,7 +3,7 @@
 @using Microsoft.AspNetCore.Components.Forms
 
 <PageTitle>Subir fotos</PageTitle>
-<div class="container-fluid min-vh-100 position-relative text-light" style=" margin: auto; padding: 0;">
+<div class="container-fluid min-vh-100 position-relative text-light" style=" margin: auto; padding: 0; background-color:#3C6A79;">
     <!-- Contenedor principal sin margen superior -->
     <div style="width: 100%; font-family: Arial, sans-serif;">
 
@@ -15,7 +15,7 @@
                 min-height: 280px;
                 max-height: 440px;
                 overflow: hidden;
-                margin-bottom: 1.5rem;
+                padding:10px;
         ">
 
             @if (Event is not null && Event.CoverAlbumImageUrl is not null)
@@ -30,24 +30,21 @@
                 object-fit: cover;
                 object-position: @($"{Event.CoverPositionX}% {Event.CoverPositionY}%");
                 display: block;
+
+                border-radius:12px;
                 " />
 
                 <!-- Overlay degradado (mejora legibilidad en mobile) -->
                 <div style="
             position: absolute;
             inset: 0;
-            background: linear-gradient(
-                to top,
-                rgba(0,0,0,0.6),
-                rgba(0,0,0,0)
-            );
                 "></div>
 
                 <!-- Texto -->
                 <div style="
             position: absolute;
-            bottom: clamp(12px, 4vw, 24px);
-            left: clamp(12px, 4vw, 24px);
+            bottom: clamp(22px, 4vw, 24px);
+            left: clamp(22px, 4vw, 24px);
             right: clamp(12px, 4vw, 24px);
             color: white;
             text-align: left;
@@ -77,207 +74,529 @@
             }
 
         </div>
-        <div class="d-flex justify-content-center align-items-center" style="height: 200px;">
-            <div class="d-flex flex-column gap-3" style="width: 340px;">
+        <div style="width: 100%;">
 
-                <!-- FOTO / VIDEO -->
-                <InputFile class="d-none"
-                           id="cameraInput"
-                           OnChange="HandleFileSelected"
-                           accept="image/*,video/*"
-                           capture="environment" />
+            <div class="card" style="border-top-left-radius:12px;border-top-right-radius:12px;">
+                <div class="card-body">
 
-                <button class="btn btn-sm btn-outline-secondary w-100"
-                        type="button"
-                        onclick="document.getElementById('cameraInput').click()">
-                    📷 Tomar foto o video
-                </button>
+                    <!-- Label centrado -->
+                    <label class="card-title d-block text-center fw-bold mb-2"
+                    style="color: #3C6A79;">
+                        ¿Qué deseas agregar al álbum?
+                    </label>
 
-                <!-- AUDIO -->
-                <div class="d-flex flex-column gap-3" style="width: 340px;">
+                    <div class="container-fluid px-1">
+                        <div class="row g-2">
 
-                    <!-- CONTROLES -->
-                    <div class="d-flex gap-2">
+                            <!-- FOTO -->
+                            <div class="col-3 d-flex">
+                                <button class="btn w-100 d-flex flex-column align-items-center justify-content-center"
+                                @onclick='() => ChangeTab("foto")'
+                                style="@GetTabStyle("foto")">
 
-                        <!-- INICIAR -->
-                        <button class="btn btn-sm btn-danger w-100"
-                                @onclick="StartRecording"
-                                disabled="@isRecording">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.5">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <path d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2" />
+                                        <path d="M9 13a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                    </svg>
 
-                            🎤 Grabar Audio
-                        </button>
-
-                        <!-- DETENER -->
-                        <button class="btn btn-sm btn-custom w-100"
-                                @onclick="StopRecording"
-                                disabled="@(!isRecording)">
-
-                            ⏹ Detener
-                        </button>
-
-                    </div>
-
-                    <!-- TIEMPO -->
-                    @if (isRecording)
-                    {
-                        <div class="text-center">
-
-                            <span class="badge bg-danger">
-                                🔴 Grabando:
-                                @recordingTime.ToString(@"mm\:ss")
-                            </span>
-
-                        </div>
-                    }
-
-                    <!-- PREVIEW -->
-                    @if (!string.IsNullOrWhiteSpace(recordedAudioUrl))
-                    {
-                        <div class="border rounded p-3 d-flex flex-column gap-3">
-
-                            <strong>
-                                🎧 Vista previa del audio
-                            </strong>
-
-                            <audio controls
-                                   src="@recordedAudioUrl"
-                                   style="width:100%;">
-                            </audio>
-
-                            <div class="d-flex gap-2">
-
-                                <!-- VOLVER A GRABAR -->
-                                <button class="btn btn-outline-secondary w-100"
-                                        @onclick="DiscardRecording">
-
-                                    🔄 Regrabar
+                                    <div style="font-size:13px;font-weight:500;">
+                                        Foto
+                                    </div>
                                 </button>
-
-                                <!-- SUBIR -->
-                                <button class="btn btn-custom w-100"
-                                        @onclick="UploadRecordedAudio">
-
-                                    ⬆️ Subir Audio
-                                </button>
-
                             </div>
 
+                            <!-- VIDEO -->
+                            <div class="col-3 d-flex">
+                                <button class="btn w-100 d-flex flex-column align-items-center justify-content-center"
+                                @onclick='() => ChangeTab("video")'
+                                style="@GetTabStyle("video")">
+
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.5">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <path d="M4 6a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2l0 -12" />
+                                        <path d="M8 4l0 16" />
+                                        <path d="M16 4l0 16" />
+                                    </svg>
+
+                                    <div style="font-size:13px;font-weight:500;">
+                                        Reels
+                                    </div>
+                                </button>
+                            </div>
+
+                            <!-- AUDIO -->
+                            <div class="col-3 d-flex">
+                                <button class="btn w-100 d-flex flex-column align-items-center justify-content-center"
+                                @onclick='() => ChangeTab("audio")'
+                                style="@GetTabStyle("audio")">
+
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.5">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <path d="M9 5a3 3 0 0 1 3 -3a3 3 0 0 1 3 3v5a3 3 0 0 1 -3 3a3 3 0 0 1 -3 -3l0 -5" />
+                                        <path d="M5 10a7 7 0 0 0 14 0" />
+                                        <path d="M12 17l0 4" />
+                                    </svg>
+
+                                    <div style="font-size:13px;font-weight:500;">
+                                        Audio
+                                    </div>
+                                </button>
+                            </div>
+
+                            <!-- TEXTO -->
+                            <div class="col-3 d-flex">
+                                <button class="btn w-100 d-flex flex-column align-items-center justify-content-center"
+                                @onclick='() => ChangeTab("texto")'
+                                style="@GetTabStyle("texto")">
+
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.5">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+                                        <path d="M13.5 6.5l4 4" />
+                                    </svg>
+
+                                    <div style="font-size:13px;font-weight:500;">
+                                        Texto
+                                    </div>
+                                </button>
+                            </div>
                         </div>
+                    </div>
+
+                    <!-- OPCIONES SEGUN TAB -->
+                    <div class="card mt-2"
+                    style="border-radius:16px;
+                        border:1px solid #ebe7e2;
+                        overflow:hidden;">
+
+                        <!-- HEADER -->
+                        <div style="background:#3C6A79;
+                            color:white;
+                            padding:8px 16px; font-size:12px;
+                            font-weight:400; align-items:start; 
+                            display:flex; justify-items:start; gap:12px;">
+
+                            @if (ActiveTab == "foto")
+                            {
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.5">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                    <path d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2" />
+                                    <path d="M9 13a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                </svg>
+                                <span>Foto</span>
+                            }
+                            else if (ActiveTab == "video")
+                            {
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.5">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                    <path d="M4 6a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2l0 -12" />
+                                    <path d="M8 4l0 16" />
+                                    <path d="M16 4l0 16" />
+                                </svg>
+                                <span>Reels</span>
+                            }
+                            else if (ActiveTab == "audio")
+                            {
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.5">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                    <path d="M9 5a3 3 0 0 1 3 -3a3 3 0 0 1 3 3v5a3 3 0 0 1 -3 3a3 3 0 0 1 -3 -3l0 -5" />
+                                    <path d="M5 10a7 7 0 0 0 14 0" />
+                                    <path d="M12 17l0 4" />
+                                </svg>
+                                <span>Audio</span>
+                            }
+                            else if (ActiveTab == "texto")
+                            {
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.5">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                    <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+                                    <path d="M13.5 6.5l4 4" />
+                                </svg>
+                                <span>Texto</span>
+                            }
+
+                        </div>
+
+                        <!-- BODY -->
+                        <div class="card-body p-2">
+
+                            <div class="row g-2" >
+
+                                @if (ActiveTab == "foto")
+                                {
+                                    <div class="col-5 d-flex">
+                                        <InputFile class="d-none"
+                                        id="cameraInput"
+                                        OnChange="HandleFileSelected"
+                                        accept="image/*"
+                                        capture="environment" />
+                                        <button class="btn w-100"
+                                        onclick="document.getElementById('cameraInput').click()"
+
+                                        style="background:#f8f6f3;border:1px solid #ebe7e2;border-radius:12px;padding:16px; font-size:12px; gap:16px; display:flex; justify-items:center; align-items:center;">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="1.5">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2" />
+                                                <path d="M9 13a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                            </svg>
+                                            Tomar foto
+                                        </button>
+                                    </div>
+
+                                    <div class="col-7 d-flex">
+                                        <button class="btn w-100"
+                                        style="background:#f8f6f3;border:1px solid #ebe7e2;border-radius:12px;padding:16px; font-size:12px; gap:16px; display:flex; justify-items:center; align-items:center;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" 
+                                            width="24" 
+                                            height="24" 
+                                            viewBox="0 0 24 24" 
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="1.5">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path d="M15 8h.01" />
+                                                <path d="M3 6a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v12a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3v-12" />
+                                                <path d="M3 16l5 -5c.928 -.893 2.072 -.893 3 0l5 5" />
+                                                <path d="M14 14l1 -1c.928 -.893 2.072 -.893 3 0l3 3" />
+                                            </svg>
+                                            Seleccionar de galería
+                                        </button>
+                                    </div>
+                                }
+
+                                @if (ActiveTab == "video")
+                                {
+                                    <div class="col-5 d-flex">
+                                        <InputFile class="d-none"
+                                        id="videoCameraInput"
+                                        OnChange="HandleFileSelected"
+                                        accept="video/*"
+                                        capture="environment" />
+                                        <button class="btn w-100"
+                                        onclick="document.getElementById('videoCameraInput').click()"
+                                        style="background:#f8f6f3;border:1px solid #ebe7e2;border-radius:12px;padding:16px; font-size:12px; gap:10px; display:flex; justify-items:center; align-items:center;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" 
+                                            width="24" 
+                                            height="24" 
+                                            viewBox="0 0 24 24" 
+                                            fill="none" stroke="currentColor"
+                                            stroke-width="1.5">
+                                                >
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path d="M15 10l4.553 -2.276a1 1 0 0 1 1.447 .894v6.764a1 1 0 0 1 -1.447 .894l-4.553 -2.276v-4" />
+                                                <path d="M3 8a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2l0 -8" />
+                                            </svg>
+                                            Grabar reels
+                                        </button>
+                                    </div>
+
+                                    <div class="col-7 d-flex">
+                                        <button class="btn w-100"
+                                        style="background:#f8f6f3;border:1px solid #ebe7e2;border-radius:12px;padding:16px; font-size:12px; gap:10px; display:flex; justify-items:center; align-items:center;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" 
+                                            width="24" height="24" 
+                                            viewBox="0 0 24 24" 
+                                            fill="none" stroke="currentColor" 
+                                            stroke-width="1.5"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M9 15h-3a3 3 0 0 1 -3 -3v-6a3 3 0 0 1 3 -3h6a3 3 0 0 1 3 3v3" /><path d="M9 12a3 3 0 0 1 3 -3h6a3 3 0 0 1 3 3v6a3 3 0 0 1 -3 3h-6a3 3 0 0 1 -3 -3l0 -6" /><path d="M3 12l2.296 -2.296a2.41 2.41 0 0 1 3.408 0l.296 .296" /><path d="M14 13.5v3l2.5 -1.5l-2.5 -1.5" /><path d="M7 6v.01" /></svg>
+                                            Seleccionar de galería
+                                        </button>
+                                    </div>
+                                }
+
+                                @if (ActiveTab == "audio")
+                                {
+                                    
+                                    <div class="col-6 d-flex">
+                                        @if (!string.IsNullOrWhiteSpace(recordedAudioUrl))
+                                        {
+                                            <button class="btn w-100"
+                                                    @onclick="DiscardRecording"
+                                                    style="background:#f8f6f3;border:1px solid #ebe7e2;border-radius:12px;padding:16px; font-size:12px; gap:10px; display:flex; justify-items:center; align-items:center;">
+
+                                                 <div>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M19.933 13.041a8 8 0 1 1 -9.925 -8.788c3.899 -1 7.935 1.007 9.425 4.747" /><path d="M20 4v5h-5" /></svg>
+                                                        Re-grabar
+
+                                                </div>
+
+
+                                            </button>
+
+                                        }
+                                        else
+                                        {
+                                            <button class="btn w-100"
+                                            @onclick="StartRecording"
+                                            disabled="@isRecording"
+                                            style="background:#f8f6f3;border:1px solid #ebe7e2;border-radius:12px;padding:16px; font-size:12px; gap:10px; display:flex; justify-items:center; align-items:center;">
+
+                                                <!-- TIEMPO -->
+                                                @if (isRecording)
+                                                {
+                                                    <div class="text-center">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#ab2c2c"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M8 5.072a8 8 0 1 1 -3.995 7.213l-.005 -.285l.005 -.285a8 8 0 0 1 3.995 -6.643z" /></svg>
+                                                        Grabando: @recordingTime.ToString(@"mm\:ss")
+
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#3C6A79"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M8 5.072a8 8 0 1 1 -3.995 7.213l-.005 -.285l.005 -.285a8 8 0 0 1 3.995 -6.643z" /></svg>
+                                                        Grabar audio
+
+                                                    </div>
+
+                                                }
+
+                                            </button>
+
+                                        }
+                                    </div>
+
+                                    <div class="col-6 d-flex">
+                                        @if (!string.IsNullOrWhiteSpace(recordedAudioUrl))
+                                        {
+                                            <button class="btn w-100" @onclick="UploadRecordedAudio"
+                                                    style="background:#f8f6f3;border:1px solid #ebe7e2;border-radius:12px;padding:16px; font-size:12px; gap:10px; display:flex; justify-items:center; align-items:center;">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 9l5 -5l5 5" /><path d="M12 4l0 12" /></svg>
+                                                Subir audio
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button class="btn w-100"
+                                                    @onclick="StopRecording"
+                                                    disabled="@(!isRecording)"
+                                                    style="background:#f8f6f3;border:1px solid #ebe7e2;border-radius:12px;padding:16px; font-size:12px; gap:10px; display:flex; justify-items:center; align-items:center;">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#3C6A79"> <path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M17 4h-10a3 3 0 0 0 -3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3 -3v-10a3 3 0 0 0 -3 -3z" /></svg>
+                                                Detener audio
+                                            </button>
+                                            
+                                        }
+                                    </div>
+                                    <!-- PREVIEW -->
+                                    @if (!string.IsNullOrWhiteSpace(recordedAudioUrl))
+                                    {
+                                        <div class="p-3 d-flex flex-column gap-3">
+
+                                            <audio controls
+                                                   src="@recordedAudioUrl"
+                                                   style="width:100%;">
+                                            </audio>
+                                        </div>
+                                    }
+                                }
+
+                                @if (ActiveTab == "texto")
+                                {
+                                    <div class="col-7 d-flex">
+                                        <button class="btn w-100"
+                                                style="background:#f8f6f3;border:1px solid #ebe7e2;border-radius:12px;padding:16px; font-size:12px; gap:10px; display:flex; justify-items:center; align-items:center;">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                 width="20"
+                                                 height="20"
+                                                 viewBox="0 0 24 24"
+                                                 fill="none"
+                                                 stroke="currentColor"
+                                                 stroke-width="1.5">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+                                                <path d="M13.5 6.5l4 4" />
+                                            </svg>
+                                            Escribir dedicatoria
+                                        </button>
+                                    </div>
+
+                                    <div class="col-5 d-flex">
+                                        <button class="btn w-100"
+                                                style="background:#f8f6f3;border:1px solid #ebe7e2;border-radius:12px;padding:16px; font-size:12px; gap:10px; display:flex; justify-items:center; align-items:center;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M10 14l11 -11" /><path d="M21 3l-6.5 18a.55 .55 0 0 1 -1 0l-3.5 -7l-7 -3.5a.55 .55 0 0 1 0 -1l18 -6.5" /></svg>
+                                            Publicar
+                                        </button>
+                                    </div>
+                                }
+
+                            </div>
+                           
+
+
+                        </div>
+                </div>
+                <div style="min-height:80vw">
+                @if (Event is not null && Event.AlbumPublic)
+                    {
+                        <div style="padding: 1rem; font-family: Arial, sans-serif;">
+                            <!-- Header -->
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+                                <h2 style="margin: 0; color: #3C6A79;">Galería (@EventImages!.Count)</h2>
+                            </div>
+
+                            <!-- Cargando / vacío / imágenes -->
+                            @if (EventImages == null)
+                            {
+                                <p style="color: #6c757d;">Cargando imágenes...</p>
+                            }
+                            else if (!EventImages.Any())
+                            {
+                                <div style="padding: 2rem; text-align: center; color: #6c757d; border: 1px dashed #dee2e6; border-radius: 0.25rem;">
+                                    <p>No hay imágenes en este álbum aún.</p>
+                                </div>
+                            }
+                            else
+                            {
+                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem;">
+                                    @foreach (var image in EventImages)
+                                    {
+                                        <div style="
+                overflow: hidden;
+                border-radius: 10px;
+                background: #f5f5f5;
+                cursor: pointer;
+                position: relative;
+                                                ">
+
+                                            @if (image.ImageType == "imagen")
+                                            {
+                                                <img src="@image.Url"
+                                                     alt="Imagen"
+                                                     loading="lazy"
+                                                     @onclick="() => OpenPreview(image)"
+                                                     style="
+                            width: 100%;
+                            height: 250px;
+                            object-fit: cover;
+                            display: block;" />
+                                            }
+                                            else if (image.ImageType == "video")
+                                            {
+                                                <div @onclick="() => OpenPreview(image)"
+                                                     style="position: relative;">
+
+                                                    <video style="
+                                width: 100%;
+                                height: 250px;
+                                object-fit: cover;
+                                display: block;
+                                                                            ">
+                                                        <source src="@image.Url" />
+                                                    </video>
+
+                                                    <div style="
+                                position: absolute;
+                                inset: 0;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                background: rgba(0,0,0,0.2);
+                                                                            ">
+                                                        <i class="bi bi-play-circle-fill"
+                                                           style="
+                                    font-size: 60px;
+                                    color: white;
+                                                                                "></i>
+                                                    </div>
+                                                </div>
+                                            }
+                                            else if (image.ImageType == "audio")
+                                            {
+                                                <div style="
+                            height: 250px;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            justify-content: center;
+                            padding: 1rem;
+                            background: #f8f9fa;
+                                                                        ">
+
+                                                    <i class="bi bi-music-note-beamed"
+                                                       style="
+                                font-size: 60px;
+                                color: #3C6A79;
+                                margin-bottom: 1rem;
+                                                                            ">
+                                                    </i>
+
+                                                    <audio controls
+                                                           style="width: 100%;">
+                                                        <source src="@image.Url" type="audio/mpeg" />
+                                                    </audio>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+
+                                </div>
+                            }
+                        </div>
+
                     }
+
 
                 </div>
-
-                <!-- SELECCIONAR ARCHIVOS -->
-                <InputFile class="d-none"
-                           id="fileInput"
-                           OnChange="HandleFileSelected"
-                           multiple
-                           accept="image/*,video/*,audio/*" />
-
-                <label for="fileInput"
-                       class="form-control form-control-sm text-center"
-                       style="cursor:pointer;">
-
-                    @if (selectedFiles != null && selectedFiles.Count > 0)
-                    {
-                        <strong>
-                            @selectedFiles.Count Archivo(s) seleccionado(s)
-                        </strong>
-                    }
-                    else
-                    {
-                        <strong>
-                            Seleccionar Archivos
-                            (imágenes, audio y video)
-                        </strong>
-                    }
-                </label>
-
-                <!-- BOTÓN SUBIR -->
-                <button class="btn btn-sm btn-custom w-100"
-                        @onclick="UploadPhoto"
-                        disabled="@(!hasFileSelected || isLoadingImport)">
-
-                    @if (isLoadingImport)
-                    {
-                        <span class="spinner-border spinner-border-sm me-2"></span>
-                        <span>Cargando...</span>
-                    }
-                    else
-                    {
-                        <span>Subir Archivo</span>
-                    }
-                </button>
-
-                <!-- INSTRUCCIONES -->
-                <div class="d-flex mb-2">
-                    <button class="btn btn-sm btn-custom w-100"
-                            data-bs-toggle="popover"
-                            data-bs-placement="bottom"
-                            data-bs-html="true"
-                            title="¿Cómo subir un archivo?"
-                            data-bs-content="<ol style='padding-left:1rem; margin:0;'>
-                                    <li>Toma una foto, video o graba un audio.</li>
-                                    <li>También puedes seleccionar archivos desde tu galería.</li>
-                                    <li>Formatos permitidos:
-                                        <strong>
-                                            JPG, PNG, WEBP,
-                                            MP4, MOV,
-                                            MP3, WAV y OGG
-                                        </strong>.
-                                    </li>
-                                    <li>Tamaño máximo recomendado:
-                                        <strong>10 MB por archivo</strong>.
-                                    </li>
-                                    <li>Evita imágenes borrosas o audios con mucho ruido.</li>
-                                    <li>Puedes seleccionar múltiples archivos al mismo tiempo.</li>
-                                    <li>Espera a que finalice la carga antes de cerrar la página.</li>
-                                </ol>">
-                        Instrucciones
-                    </button>
                 </div>
-
             </div>
+            
         </div>
 
+
         <!--Album Publico, si es publico carga todas las imagenes del album para que cualquiera la pueda descargar-->
-        @if (Event is not null && Event.AlbumPublic)
-        {
-            <div style="padding: 1rem; font-family: Arial, sans-serif;">
-                <!-- Header -->
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
-                    <h2 style="margin: 0; color: #3C6A79;">Galería (@EventImages!.Count)</h2>
-                </div>
-
-                <!-- Cargando / vacío / imágenes -->
-                @if (EventImages == null)
-                {
-                    <p style="color: #6c757d;">Cargando imágenes...</p>
-                }
-                else if (!EventImages.Any())
-                {
-                    <div style="padding: 2rem; text-align: center; color: #6c757d; border: 1px dashed #dee2e6; border-radius: 0.25rem;">
-                        <p>No hay imágenes en este álbum aún.</p>
-                    </div>
-                }
-                else
-                {
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem;">
-                        @foreach (var image in EventImages)
-                        {
-                            <div style="overflow: hidden; border-radius: 0.25rem; cursor: pointer;">
-                                <img src="@image.Url"
-                                     alt="Imagen del evento"
-                                     loading="lazy"
-                                     @onclick="() => OpenPreview(image)"
-                                     style="width: 100%; height: 250px; display: block; object-fit: cover; border-radius: 0.25rem;" />
-                            </div>
-                        }
-                    </div>
-                }
-            </div>
-
-        }
     </div>
 </div>
 
