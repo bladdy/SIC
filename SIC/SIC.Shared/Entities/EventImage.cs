@@ -15,6 +15,12 @@ public class EventImage
     // Tipo de Archivo audio, video, imagen, etc. para poder diferenciarlo en el album y mostrarlo de forma correcta
     public string? ImageType { get; set; }
 
+    // Opcional: mensaje o descripción de la imagen
+    public string? Message { get; set; } = null!;
+
+    // Opcional: autor o fuente de la imagen
+    public string? Author { get; set; } = null!;
+
     // Para ordenarlas en el álbum
     public DateTime PostingDate { get; set; } = DateTime.UtcNow;
 

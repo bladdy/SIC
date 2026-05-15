@@ -23,64 +23,19 @@ public class ImagesController : ControllerBase
         _eventsUnitOfWork = eventsUnitOfWork;
     }
 
-    /*[HttpPost("upload/{folder}")]
-    [Consumes("multipart/form-data")]
-    public async Task<IActionResult> Upload(
-        [FromForm] List<IFormFile> files,
-        [FromRoute] string folder)
+    [HttpPost("full/{Code}")]
+    public async Task<IActionResult> PostFullAsync(string Code, EventImageDTO eventImage)
     {
-        if (files == null || !files.Any())
-            return BadRequest("No se enviaron archivos");
-
-        if (string.IsNullOrWhiteSpace(folder))
-            return BadRequest("La carpeta es obligatoria");
-        //Verificar que tipo de archivo,imagen seguir el proceso video crear el proceso de video y si es audio crear el proceso de audio
-
-        //refactorizar, sacar este proceso a un metodo  privado para subir imagen
-        //Crear el metodo privado para subir video y audio, y verificar el tipo de archivo para llamar al metodo correspondiente
-        //Los metodos van a retornar imagesSaved para que se pueda retornar la respuesta al cliente, y en caso de error se pueda manejar el error de forma correcta
-
-        var imagesSaved = new List<EventImage>();
-
-        foreach (var file in files)
+        eventImage.CodeEvent = Code;
+        eventImage.ImageType = "text";
+        eventImage.ImageUrl = "ESTO NO ES UNA IMAGEN";
+        var action = await _imageUnitOfWork.AddFullAsyn(eventImage);
+        if (action.Success)
         {
-            if (file.Length == 0)
-                continue;
-
-            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
-
-            using var stream = file.OpenReadStream();
-            var url = await _ftp.UploadImageAsync(stream, folder, fileName);
-
-            if (string.IsNullOrWhiteSpace(url))
-                continue;
-
-            var image = new EventImageDTO
-            {
-                CodeEvent = folder,
-                ImageUrl = url,
-                FileName = Path.GetFileName(new Uri(url).LocalPath)
-            };
-
-            var response = await _imageUnitOfWork.AddFullAsyn(image);
-
-            if (response.Success)
-                imagesSaved.Add(response.Result);
+            return Ok(action.Result);
         }
-
-        if (!imagesSaved.Any())
-            return BadRequest("No se pudo subir ninguna imagen");
-
-        var result = imagesSaved.Select(img => new EventImageDTO
-        {
-            CodeEvent = img.Event.Code,
-            ImageUrl = img.Url,
-            FileName = img.FileName
-        }).ToList();
-
-        return Ok(result);
-    }*/
-
+        return NotFound(action.Message);
+    }
     [HttpPost("upload/{folder}")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> Upload(

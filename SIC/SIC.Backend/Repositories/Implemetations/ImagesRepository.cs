@@ -42,7 +42,9 @@ namespace SIC.Backend.Repositories.Implemetations
                     EventId = eventEntity.Id,
                     Url = eventImage.ImageUrl,
                     FileName = eventImage.FileName,
-                    ImageType = eventImage.ImageType
+                    ImageType = eventImage.ImageType,
+                    Message = eventImage.Message,
+                    Author = eventImage.Author
                 };
                 _context.EventImages.Add(newEventImage);
                 await _context.SaveChangesAsync();

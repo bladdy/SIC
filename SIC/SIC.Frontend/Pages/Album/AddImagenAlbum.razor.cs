@@ -21,6 +21,7 @@ public partial class AddImagenAlbum
     private string ActiveTab = "foto";
 
     private bool isRecording;
+    private bool isWriting;
 
     private RecordedAudioDTO? recordedAudio;
 
@@ -34,7 +35,9 @@ public partial class AddImagenAlbum
 
     private bool hasFileSelected = false;
 
+    private bool isLoadingMessage = false;
     private bool isLoadingImport = false;
+    private EventImageDTO eventImageDTO = new();
     public Event? Event { get; set; }
     public List<EventImage>? EventImages { get; set; } = [];
     private EventImage? PreviewImage;
@@ -212,6 +215,7 @@ public partial class AddImagenAlbum
         finally
         {
             isLoadingImport = false;
+            hasFileSelected = false;
         }
     }
 
@@ -334,6 +338,7 @@ public partial class AddImagenAlbum
     {
         PreviewImage = eventImage;
     }
+
     private void ChangeTab(string tab)
     {
         ActiveTab = tab;
@@ -347,8 +352,72 @@ public partial class AddImagenAlbum
             ? "height:68px;border-radius:14px;border:1px solid #3C6A79;background:#3C6A79;color:#ffffff;padding:6px 4px;box-shadow:0 2px 8px rgba(0,0,0,.12);"
             : "height:68px;border-radius:14px;border:1px solid #ebe7e2;background:#f8f6f3;color:#9b7b45;padding:6px 4px;";
     }
+
     private void ClosePreview()
     {
         PreviewImage = null;
+    }
+
+    private async Task PublishMessage()
+    {
+
+        try
+        {
+            isLoadingMessage = true;
+            var responseHttp =
+                await Repository.PostAsync<EventImageDTO>(
+                    $"api/images/full/{Code}", eventImageDTO
+                );
+
+            if (!responseHttp.Error)
+            {
+                var toast = SweetAlertService.Mixin(new SweetAlertOptions
+                {
+                    Toast = true,
+                    Position = SweetAlertPosition.TopEnd,
+                    ShowConfirmButton = false,
+                    Timer = 3000,
+                    TimerProgressBar = true
+                });
+
+                await toast.FireAsync(
+                    "Enviar dedicatoria",
+                    "Tu dedicatoria fue enviada correctamente.",
+                    SweetAlertIcon.Success
+                );
+
+                await LoadEventImage();
+                selectedFiles = null;
+            }
+            else
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                await SweetAlertService.FireAsync(
+                    "Error",
+                    message ?? "Error al enviar tu dedicatoria.",
+                    SweetAlertIcon.Error
+                );
+            }
+        }
+        catch (Exception)
+        {
+            // 🔴 Cualquier otro error
+            await SweetAlertService.FireAsync(
+                "Error",
+                "Ha ocurrido un error inesperado.",
+                SweetAlertIcon.Error
+            );
+        }
+        finally
+        {
+            isLoadingMessage = false;
+            WriteMessage();
+        }
+    }
+
+    private void WriteMessage()
+    {
+        isWriting = !isWriting;
+        eventImageDTO = new();
     }
 }
