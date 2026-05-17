@@ -1,8 +1,10 @@
 ﻿using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.Extensions.Localization;
 using Microsoft.JSInterop;
 using SIC.Frontend.Repositories;
+using SIC.Frontend.Resources;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using System.Net;
@@ -12,6 +14,7 @@ namespace SIC.Frontend.Pages.Album;
 public partial class AddImagenAlbum
 {
     [Parameter] public string? Code { get; set; }
+    [Inject] private IStringLocalizer<SharedResource> Localizer { get; set; } = default!;
     [Inject] private IRepository Repository { get; set; } = default!;
     [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
@@ -360,7 +363,6 @@ public partial class AddImagenAlbum
 
     private async Task PublishMessage()
     {
-
         try
         {
             isLoadingMessage = true;

@@ -1,8 +1,10 @@
 using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Localization;
 using Microsoft.JSInterop;
 using SIC.Frontend.Helpers;
 using SIC.Frontend.Repositories;
+using SIC.Frontend.Resources;
 using SIC.Shared.Entities;
 using System.Net;
 
@@ -13,6 +15,7 @@ namespace SIC.Frontend.Pages.Album
         //ToDo: boton GenerarQR para cada evento
         [Parameter] public string? Code { get; set; }
 
+        [Inject] private IStringLocalizer<SharedResource> Localizer { get; set; } = default!;
         [Inject] private IRepository Repository { get; set; } = default!;
         [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
         [Inject] private NavigationManager NavigationManager { get; set; } = default!;
@@ -20,6 +23,7 @@ namespace SIC.Frontend.Pages.Album
         public List<EventImage>? EventImages { get; set; } = [];
         public Event? Event { get; set; }
         private EventImage? PreviewImage;
+        private string ActiveTab = "foto";
 
         protected override async Task OnInitializedAsync()
         {
@@ -207,6 +211,20 @@ namespace SIC.Frontend.Pages.Album
                     SweetAlertIcon.Error
                 );
             }
+        }
+
+        private void ChangeTab(string tab)
+        {
+            ActiveTab = tab;
+        }
+
+        private string GetTabStyle(string tab)
+        {
+            bool isActive = ActiveTab == tab;
+
+            return isActive
+                ? "height:68px;border-radius:14px;border:1px solid #3C6A79;background:#3C6A79;color:#ffffff;padding:6px 4px;box-shadow:0 2px 8px rgba(0,0,0,.12);"
+                : "height:68px;border-radius:14px;border:1px solid #ebe7e2;background:#f8f6f3;color:#9b7b45;padding:6px 4px;";
         }
 
         private void ClosePreview()

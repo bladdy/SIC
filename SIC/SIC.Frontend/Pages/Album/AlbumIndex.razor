@@ -35,7 +35,7 @@
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                 <button @onclick="() => DownloadAllImages(Code!)"
                         style="padding: 0.5rem 1rem; background-color: #3C6A79; color: white; border: none; border-radius: 6px; cursor: pointer;">
-                    <i class="bi bi-download"></i> Descargar Imágenes
+                    <i class="bi bi-download"></i> Descargar Álbum
                 </button>
 
                 <button @onclick="() => GenerateQR(Code!)"
@@ -46,13 +46,112 @@
         </div>
 
         <!-- Fila inferior -->
-        <h4 style="margin: 0.25rem 0 0; color: #3C6A79;">
-            Galería (@EventImages?.Count)
-        </h4>
+        
+        <div class="container px-1 pt-4">
+            <div class="row g-2">
+
+                <!-- FOTO -->
+                <div class="col-3 d-flex">
+                    <button class="btn w-100 d-flex flex-column align-items-center justify-content-center"
+                            @onclick='() => ChangeTab("foto")'
+                            style="@GetTabStyle("foto")">
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             width="20"
+                             height="20"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="1.5">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2" />
+                            <path d="M9 13a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                        </svg>
+
+                        <div style="font-size:13px;font-weight:500;">
+                            @Localizer["Photo"] (@EventImages?.Where(x => x.ImageType == "imagen").Count())
+                        </div>
+                    </button>
+                </div>
+
+                <!-- VIDEO -->
+                <div class="col-3 d-flex">
+                    <button class="btn w-100 d-flex flex-column align-items-center justify-content-center"
+                            @onclick='() => ChangeTab("video")'
+                            style="@GetTabStyle("video")">
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             width="20"
+                             height="20"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="1.5">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M4 6a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2l0 -12" />
+                            <path d="M8 4l0 16" />
+                            <path d="M16 4l0 16" />
+                        </svg>
+
+                        <div style="font-size:13px;font-weight:500;">
+                            @Localizer["Reels"] (@EventImages?.Where(x => x.ImageType == "video").Count())
+                        </div>
+                    </button>
+                </div>
+
+                <!-- AUDIO -->
+                <div class="col-3 d-flex">
+                    <button class="btn w-100 d-flex flex-column align-items-center justify-content-center"
+                            @onclick='() => ChangeTab("audio")'
+                            style="@GetTabStyle("audio")">
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             width="20"
+                             height="20"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="1.5">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M9 5a3 3 0 0 1 3 -3a3 3 0 0 1 3 3v5a3 3 0 0 1 -3 3a3 3 0 0 1 -3 -3l0 -5" />
+                            <path d="M5 10a7 7 0 0 0 14 0" />
+                            <path d="M12 17l0 4" />
+                        </svg>
+
+                        <div style="font-size:13px;font-weight:500;">
+                            @Localizer["Audio"] (@EventImages?.Where(x => x.ImageType == "audio").Count())
+                        </div>
+                    </button>
+                </div>
+
+                <!-- TEXTO -->
+                <div class="col-3 d-flex">
+                    <button class="btn w-100 d-flex flex-column align-items-center justify-content-center"
+                            @onclick='() => ChangeTab("texto")'
+                            style="@GetTabStyle("texto")">
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             width="20"
+                             height="20"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="1.5">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+                            <path d="M13.5 6.5l4 4" />
+                        </svg>
+
+                        <div style="font-size:13px;font-weight:500;">
+                            @Localizer["Texts"] (@EventImages?.Where(x => x.ImageType == "text").Count())
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
 
     </div>
 
-    <!-- CONTENIDO -->
     <!-- CONTENIDO -->
     @if (EventImages == null)
     {
@@ -74,83 +173,137 @@
 
             @foreach (var image in EventImages)
             {
-                <div style="
-                overflow: hidden;
-                border-radius: 10px;
-                background: #f5f5f5;
-                cursor: pointer;
-                position: relative;
-                        ">
+                bool showItem =
+                (image.ImageType == "imagen" && ActiveTab == "foto") ||
+                (image.ImageType == "video" && ActiveTab == "video") ||
+                (image.ImageType == "audio" && ActiveTab == "audio") ||
+                (image.ImageType == "text" && ActiveTab == "texto");
 
-                    @if (image.ImageType == "imagen")
-                    {
-                        <img src="@image.Url"
-                             alt="Imagen"
-                             loading="lazy"
-                             @onclick="() => OpenPreview(image)"
-                             style="
-                            width: 100%;
-                            height: 250px;
-                            object-fit: cover;
-                            display: block;" />
-                    }
-                    else if (image.ImageType == "video")
-                    {
-                        <div @onclick="() => OpenPreview(image)"
-                             style="position: relative;">
+                @if (showItem)
+                {
+                    <div style="
+            overflow: hidden;
+            border-radius: 10px;
+            background: #f5f5f5;
+            cursor: pointer;
+            position: relative;">
 
-                            <video style="
-                                width: 100%;
-                                height: 250px;
-                                object-fit: cover;
-                                display: block;
-                                            ">
-                                <source src="@image.Url" />
-                            </video>
+                        @if (image.ImageType == "imagen")
+                        {
+                            <img src="@image.Url"
+                                 alt="Imagen"
+                                 loading="lazy"
+                                 @onclick="() => OpenPreview(image)"
+                                 style="
+                        width: 100%;
+                        height: 250px;
+                        object-fit: cover;
+                        display: block;" />
+                        }
+                        else if (image.ImageType == "video")
+                        {
+                            <div @onclick="() => OpenPreview(image)"
+                                 style="position: relative;">
 
-                            <div style="
-                                position: absolute;
-                                inset: 0;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                background: rgba(0,0,0,0.2);
-                                            ">
-                                <i class="bi bi-play-circle-fill"
-                                   style="
-                                    font-size: 60px;
-                                    color: white;
-                                                "></i>
+                                <video style="
+                        width: 100%;
+                        height: 250px;
+                        object-fit: cover;
+                        display: block;">
+                                    <source src="@image.Url" />
+                                </video>
+
+                                <div style="
+                        position: absolute;
+                        inset: 0;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        background: rgba(0,0,0,0.2);">
+
+                                    <i class="bi bi-play-circle-fill"
+                                       style="
+                            font-size: 60px;
+                            color: white;">
+                                    </i>
+                                </div>
                             </div>
-                        </div>
-                    }
-                    else if (image.ImageType == "audio")
-                    {
-                        <div style="
-                            height: 250px;
-                            display: flex;
-                            flex-direction: column;
-                            align-items: center;
-                            justify-content: center;
-                            padding: 1rem;
-                            background: #f8f9fa;
-                                        ">
+                        }
+                        else if (image.ImageType == "audio")
+                        {
+                            <div style="
+                    height: 250px;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 1rem;
+                    background: #f8f9fa;">
 
-                            <i class="bi bi-music-note-beamed"
-                               style="
-                                font-size: 60px;
-                                color: #3C6A79;
-                                margin-bottom: 1rem;
-                                            ">
-                            </i>
+                                <i class="bi bi-music-note-beamed"
+                                   style="
+                        font-size: 60px;
+                        color: #3C6A79;
+                        margin-bottom: 1rem;">
+                                </i>
 
-                            <audio controls
-                                   style="width: 100%;">
-                                <source src="@image.Url" type="audio/mpeg" />
-                            </audio>
-                        </div>
-                    }
-                </div>
+                                <audio controls style="width: 100%;">
+                                    <source src="@image.Url" type="audio/mpeg" />
+                                </audio>
+                            </div>
+                        }
+                        else if (image.ImageType == "text")
+                        {
+                            <div style="
+                    background:#fcfaf8;
+                    border:1px solid #f0ebe5;
+                    border-radius:22px;
+                    padding:24px;
+                    position:relative;
+                    box-shadow:0 2px 10px rgba(0,0,0,.03);
+                    max-width:420px;
+                    width:100%;
+                    height:100%;
+                    display:flex;
+                    flex-direction:column;
+                    justify-content:space-between;">
+
+                                <div style="
+                        color:#d6b07a;
+                        font-size:42px;
+                        line-height:1;
+                        font-weight:bold;
+                        margin-bottom:10px;">
+                                    “
+                                </div>
+
+                                <div style="
+                        color:#5c5c5c;
+                        font-size:22px;
+                        line-height:1.6;
+                        font-weight:500;
+                        margin-top:-10px;">
+                                    @image.Message
+                                </div>
+
+                                <div style="
+                        margin-top:24px;
+                        display:flex;
+                        justify-content:space-between;
+                        align-items:center;">
+
+                                    <div style="
+                            color:#b5b5b5;
+                            font-size:20px;
+                            font-weight:600;">
+                                        — @image.Author
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+                }
             }
         </div>
     }

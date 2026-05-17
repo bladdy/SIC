@@ -6,8 +6,10 @@ using SIC.Frontend;
 using SIC.Frontend.AuthenticationProviders;
 using SIC.Frontend.Repositories;
 using SIC.Frontend.Services;
+using System.Globalization;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
+
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
@@ -34,14 +36,24 @@ builder.Services.AddSingleton(sp => new HttpClient
 ///builder.Services.AddSingleton(sp => new HttpClient { BaseAddress = new Uri(backendUrl) });
 
 // Servicios y autenticación
-builder.Services.AddScoped<IRepository, Repository>();
 builder.Services.AddSweetAlert2();
-
 builder.Services.AddAuthorizationCore();
 builder.Services.AddSingleton<SignalRService>();
+builder.Services.AddScoped<IRepository, Repository>();
+
+builder.Services.AddLocalization();
+
 builder.Services.AddScoped<AuthenticationProviderJWT>();
-builder.Services.AddScoped<AuthenticationStateProvider, AuthenticationProviderJWT>(x => x.GetRequiredService<AuthenticationProviderJWT>());
-builder.Services.AddScoped<ILoginService, AuthenticationProviderJWT>(x => x.GetRequiredService<AuthenticationProviderJWT>());
+
+builder.Services.AddScoped<
+    AuthenticationStateProvider,
+    AuthenticationProviderJWT>(x =>
+        x.GetRequiredService<AuthenticationProviderJWT>());
+
+builder.Services.AddScoped<
+    ILoginService,
+    AuthenticationProviderJWT>(x =>
+        x.GetRequiredService<AuthenticationProviderJWT>());
 
 // 👇 habilita appsettings.json
 builder.Services.AddScoped(sp =>
