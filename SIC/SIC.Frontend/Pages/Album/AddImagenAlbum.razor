@@ -649,35 +649,28 @@
                 <div style="min-height:80vw">
                 @if (Event is not null && Event.AlbumPublic)
                     {
-                        <div style="padding: 1rem; font-family: Arial, sans-serif;">
-                            <!-- Header -->
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
-                                <h2 style="margin: 0; color: #3C6A79;">Galería (@EventImages!.Count)</h2>
-                            </div>
+                       <div style="
+                            display: grid;
+                            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                            gap: 1rem;
+                                ">
 
-                            <!-- Cargando / vacío / imágenes -->
-                            @if (EventImages == null)
-                            {
-                                <p style="color: #6c757d;">Cargando imágenes...</p>
-                            }
-                            else if (!EventImages.Any())
-                            {
-                                <div style="padding: 2rem; text-align: center; color: #6c757d; border: 1px dashed #dee2e6; border-radius: 0.25rem;">
-                                    <p>No hay imágenes en este álbum aún.</p>
-                                </div>
-                            }
-                            else
-                            {
-                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem;">
-                                    @foreach (var image in EventImages)
+                                @foreach (var image in EventImages)
+                                {
+                                    bool showItem =
+                                    (image.ImageType == "imagen" && ActiveTab == "foto") ||
+                                    (image.ImageType == "video" && ActiveTab == "video") ||
+                                    (image.ImageType == "audio" && ActiveTab == "audio") ||
+                                    (image.ImageType == "text" && ActiveTab == "texto");
+
+                                    @if (showItem)
                                     {
                                         <div style="
-                                                overflow: hidden;
-                                                border-radius: 10px;
-                                                background: #f5f5f5;
-                                                cursor: pointer;
-                                                position: relative;
-                                                ">
+                                            overflow: hidden;
+                                            border-radius: 10px;
+                                            background: #f5f5f5;
+                                            cursor: pointer;
+                                            position: relative; margin-top:20px;">
 
                                             @if (image.ImageType == "imagen")
                                             {
@@ -686,10 +679,10 @@
                                                      loading="lazy"
                                                      @onclick="() => OpenPreview(image)"
                                                      style="
-                                                            width: 100%;
-                                                            height: 250px;
-                                                            object-fit: cover;
-                                                            display: block;" />
+                                            width: 100%;
+                                            height: 250px;
+                                            object-fit: cover;
+                                            display: block;" />
                                             }
                                             else if (image.ImageType == "video")
                                             {
@@ -697,135 +690,106 @@
                                                      style="position: relative;">
 
                                                     <video style="
-                                                        width: 100%;
-                                                        height: 250px;
-                                                        object-fit: cover;
-                                                        display: block;
-                                                                            ">
+                                            width: 100%;
+                                            height: 250px;
+                                            object-fit: cover;
+                                            display: block;">
                                                         <source src="@image.Url" />
                                                     </video>
 
                                                     <div style="
-                                                        position: absolute;
-                                                        inset: 0;
-                                                        display: flex;
-                                                        align-items: center;
-                                                        justify-content: center;
-                                                        background: rgba(0,0,0,0.2);
-                                                                            ">
+                                            position: absolute;
+                                            inset: 0;
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: center;
+                                            background: rgba(0,0,0,0.2);">
+
                                                         <i class="bi bi-play-circle-fill"
                                                            style="
-                                                                    font-size: 60px;
-                                                                    color: white;
-                                                                                "></i>
+                                                font-size: 60px;
+                                                color: white;">
+                                                        </i>
                                                     </div>
                                                 </div>
                                             }
                                             else if (image.ImageType == "audio")
                                             {
                                                 <div style="
-                                                    height: 250px;
-                                                    display: flex;
-                                                    flex-direction: column;
-                                                    align-items: center;
-                                                    justify-content: center;
-                                                    padding: 1rem;
-                                                    background: #f8f9fa;
-                                                                        ">
+                                        height: 250px;
+                                        display: flex;
+                                        flex-direction: column;
+                                        align-items: center;
+                                        justify-content: center;
+                                        padding: 1rem;
+                                        background: #f8f9fa;">
 
                                                     <i class="bi bi-music-note-beamed"
                                                        style="
-                                                                font-size: 60px;
-                                                                color: #3C6A79;
-                                                                margin-bottom: 1rem;
-                                                                            ">
+                                            font-size: 60px;
+                                            color: #3C6A79;
+                                            margin-bottom: 1rem;">
                                                     </i>
 
-                                                    <audio controls
-                                                           style="width: 100%;">
+                                                    <audio controls style="width: 100%;">
                                                         <source src="@image.Url" type="audio/mpeg" />
                                                     </audio>
                                                 </div>
                                             }
-                                                else if (image.ImageType == "text")
-                                                {
+                                            else if (image.ImageType == "text")
+                                            {
+                                                <div style="
+                                        background:#fcfaf8;
+                                        border:1px solid #f0ebe5;
+                                        border-radius:22px;
+                                        padding:24px;
+                                        position:relative;
+                                        box-shadow:0 2px 10px rgba(0,0,0,.03);
+                                        max-width:420px;
+                                        width:100%;
+                                        height:100%;
+                                        display:flex;
+                                        flex-direction:column;
+                                        justify-content:space-between;">
+
                                                     <div style="
-                                                        background:#fcfaf8;
-                                                        border:1px solid #f0ebe5;
-                                                        border-radius:22px;
-                                                        padding:24px;
-                                                        position:relative;
-                                                        box-shadow:0 2px 10px rgba(0,0,0,.03);
-                                                        max-width:420px;
-                                                        width:100%;
-                                                        height:100%;
-                                                        display:flex;
-                                                        flex-direction:column;
-                                                        justify-content:space-between;">
+                                            color:#d6b07a;
+                                            font-size:42px;
+                                            line-height:1;
+                                            font-weight:bold;
+                                            margin-bottom:10px;">
+                                                        “
+                                                    </div>
 
-                                                        <!-- Icono -->
+                                                    <div style="
+                                            color:#5c5c5c;
+                                            font-size:22px;
+                                            line-height:1.6;
+                                            font-weight:500;
+                                            margin-top:-10px;">
+                                                        @image.Message
+                                                    </div>
+
+                                                    <div style="
+                                            margin-top:24px;
+                                            display:flex;
+                                            justify-content:space-between;
+                                            align-items:center;">
+
                                                         <div style="
-                                                            color:#d6b07a;
-                                                            font-size:42px;
-                                                            line-height:1;
-                                                            font-weight:bold;
-                                                            margin-bottom:10px;">
-                                                            “
-                                                        </div>
-
-                                                        <!-- Mensaje -->
-                                                        <div style="
-                                                            color:#5c5c5c;
-                                                            font-size:22px;
-                                                            line-height:1.6;
-                                                            font-weight:500;
-                                                            margin-top:-10px;">
-                                                            @image.Message
-                                                        </div>
-
-                                                        <!-- Autor -->
-                                                        <div style="
-                                                                margin-top:24px;
-                                                                display:flex;
-                                                                justify-content:space-between;
-                                                                align-items:center;">
-
-                                                            <div style="
-                                                                color:#b5b5b5;
-                                                                font-size:20px;
-                                                                font-weight:600;">
-                                                                — @image.Author
-                                                            </div>
-
-                                                            <!-- Corazón -->
-                                                            <div style="
-                                                                        color:#d6b07a;
-                                                                        display:flex;
-                                                                        align-items:center;
-                                                                        justify-content:center;">
-
-                                                                <svg xmlns="http://www.w3.org/2000/svg"
-                                                                     width="26"
-                                                                     height="26"
-                                                                     viewBox="0 0 24 24"
-                                                                     fill="none"
-                                                                     stroke="currentColor"
-                                                                     stroke-width="1.8">
-
-                                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                                    <path d="M12 20l-7 -7a4 4 0 1 1 5.5 -5.5l1.5 1.5l1.5 -1.5a4 4 0 1 1 5.5 5.5l-7 7" />
-                                                                </svg>
-
-                                                            </div>
+                                                color:#b5b5b5;
+                                                font-size:20px;
+                                                font-weight:600;">
+                                                            — @image.Author
                                                         </div>
                                                     </div>
-                                                }
+                                                </div>
+                                            }
+
                                         </div>
                                     }
-
-                                </div>
-                            }
-                        </div>
+                                }
+                            </div>
 
                     }
 
