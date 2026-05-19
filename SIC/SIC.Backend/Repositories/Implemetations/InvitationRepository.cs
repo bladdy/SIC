@@ -212,6 +212,7 @@ namespace SIC.Backend.Repositories.Implemetations
                 };
             }
         }
+
         public async Task<ActionResponse<IEnumerable<Invitation>>> GetAllAsync(string code)
         {
             var invitations = await _context.Invitations.Include(e => e.Event).ThenInclude(e => e!.EventType).Where(x => x.Event!.Code == code && x.Status == Status.Attend).ToListAsync();
@@ -230,6 +231,7 @@ namespace SIC.Backend.Repositories.Implemetations
                 Result = invitations
             };
         }
+
         public async Task<ActionResponse<IEnumerable<Invitation>>> GetInivtationsByyEventIdAsync(int EventId)
         {
             var invitations = await _context.Invitations.Include(e => e.Event).ThenInclude(e => e!.EventType).Where(x => x.EventId == EventId).ToListAsync();
@@ -296,8 +298,33 @@ namespace SIC.Backend.Repositories.Implemetations
 
         public async Task<ActionResponse<bool>> DeleteAsync(Invitation invitation)
         {
-            _context.Remove(invitation);
-            await _context.SaveChangesAsync(); // Ensure changes are saved to the database
+            // Cargar relaciones
+            await _context.Entry(invitation)
+                .Collection(i => i.Guests)
+                .LoadAsync();
+
+            await _context.Entry(invitation)
+                .Collection(i => i.HistoryMessages)
+                .LoadAsync();
+
+            await _context.Entry(invitation)
+                .Collection(i => i.TemplateSents)
+                .LoadAsync();
+
+            // Eliminar relaciones
+            if (invitation.Guests.Any())
+                _context.InvitationGuest.RemoveRange(invitation.Guests);
+
+            if (invitation.HistoryMessages.Any())
+                _context.HistoryMessages.RemoveRange(invitation.HistoryMessages);
+
+            if (invitation.TemplateSents.Any())
+                _context.TemplateSents.RemoveRange(invitation.TemplateSents);
+
+            // Eliminar invitación
+            _context.Invitations.Remove(invitation);
+
+            await _context.SaveChangesAsync();
 
             return new ActionResponse<bool>
             {
@@ -382,7 +409,5 @@ namespace SIC.Backend.Repositories.Implemetations
                 };
             }
         }
-
-        
     }
 }
