@@ -10,7 +10,8 @@ namespace SIC.Backend.Services;
 
 public class QRBannerService
 {
-    private const string BASE_URL = "https://localhost:7174/";
+    //private const string BASE_URL = "https://localhost:7174/";
+    private const string BASE_URL = "https://invboxv-app.com/";
 
     public async Task<byte[]> QRBanner(Event data)
     {
