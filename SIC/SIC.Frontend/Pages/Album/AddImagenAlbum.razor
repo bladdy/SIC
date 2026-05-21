@@ -107,7 +107,20 @@
                                     </svg>
 
                                     <div style="font-size:13px;font-weight:500;">
-                                        @Localizer["Photo"]
+                                        @if (Event is not null && Event.AlbumPublic)
+                                        {
+                                            <span>
+                                                @Localizer["Photo"]
+                                                (@EventImages?.Where(x => x.ImageType == "imagen").Count())
+                                            </span>
+
+                                        }
+                                        else
+                                        {
+                                            <span>
+                                                @Localizer["Photo"]
+                                            </span>
+                                        }
                                     </div>
                                 </button>
                             </div>
@@ -132,7 +145,19 @@
                                     </svg>
 
                                     <div style="font-size:13px;font-weight:500;">
-                                        @Localizer["Reels"]
+                                        @if (Event is not null && Event.AlbumPublic)
+                                        {
+                                            <span>
+                                                @Localizer["Reels"]
+                                                (@EventImages?.Where(x => x.ImageType == "video").Count())
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span>
+                                                @Localizer["Reels"]
+                                            </span>
+                                        }
                                     </div>
                                 </button>
                             </div>
@@ -157,7 +182,19 @@
                                     </svg>
 
                                     <div style="font-size:13px;font-weight:500;">
-                                        @Localizer["Audio"]
+                                        @if (Event is not null && Event.AlbumPublic)
+                                        {
+                                            <span>
+                                                @Localizer["Audio"]
+                                                (@EventImages?.Where(x => x.ImageType == "audio").Count())
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span>
+                                                @Localizer["Audio"]
+                                            </span>
+                                        }
                                     </div>
                                 </button>
                             </div>
@@ -181,7 +218,19 @@
                                     </svg>
 
                                     <div style="font-size:13px;font-weight:500;">
-                                        @Localizer["Texts"]
+                                        @if (Event is not null && Event.AlbumPublic)
+                                        {
+                                            <span>
+                                                @Localizer["Texts"]
+                                                (@EventImages?.Where(x => x.ImageType == "text").Count())
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span>
+                                                @Localizer["Texts"]
+                                            </span>
+                                        }
                                     </div>
                                 </button>
                             </div>
@@ -214,7 +263,10 @@
                                     <path d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2" />
                                     <path d="M9 13a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
                                 </svg>
-                                <span> @Localizer["Photo"]</span>
+                                   
+                                <span>
+                                    @Localizer["Photo"]
+                                </span>
                             }
                             else if (ActiveTab == "video")
                             {
@@ -230,7 +282,10 @@
                                     <path d="M8 4l0 16" />
                                     <path d="M16 4l0 16" />
                                 </svg>
-                                <span>@Localizer["Reels"]</span>
+                                
+                                <span>
+                                    @Localizer["Reels"]
+                                </span>
                             }
                             else if (ActiveTab == "audio")
                             {
@@ -246,7 +301,10 @@
                                     <path d="M5 10a7 7 0 0 0 14 0" />
                                     <path d="M12 17l0 4" />
                                 </svg>
-                                <span>@Localizer["Audio"]</span>
+
+                                <span>
+                                    @Localizer["Audio"]
+                                </span>
                             }
                             else if (ActiveTab == "texto")
                             {
@@ -261,7 +319,10 @@
                                     <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
                                     <path d="M13.5 6.5l4 4" />
                                 </svg>
-                                <span>@Localizer["Texts"]</span>
+                                
+                                <span>
+                                    @Localizer["Texts"]
+                                </span>
                             }
 
                         </div>

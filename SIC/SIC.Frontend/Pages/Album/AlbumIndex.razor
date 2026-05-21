@@ -40,7 +40,45 @@
 
                 <button @onclick="() => GenerateQR(Code!)"
                         style="padding: 0.5rem 1rem; background-color: #3C6A79; color: white; border: none; border-radius: 6px; cursor: pointer;">
-                    <i class="bi bi-qr-code"></i> Descargar QR
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                    stroke-width="1.5"
+                    ><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4" /><path d="M20 15h-1a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h1v-3" /><path d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6" /><path d="M11 21v-6l3 6v-6" /></svg>
+                    Descargar QR en .png
+                </button>
+                <button @onclick="() => GenerateBanner(Code!)"
+                        disabled="@IsLoadingBanner"
+                        style="padding: 0.5rem 1rem; background-color: #3C6A79; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                    @if (IsLoadingBanner)
+                    {
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        <span> Generando lista... </span>
+                    }
+                    else
+                    {
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
+                        \viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4" /><path d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6" /><path d="M17 18h2" /><path d="M20 15h-3v6" /><path d="M11 15v6h1a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2h-1" /></svg>
+                    
+
+                        <span>Descargar QR en .pdf</span>
+                    }
+                </button>
+                <button @onclick="CopiarEventUrl" disabled="@IsCopyURl"
+                        style="padding: 0.5rem 1rem; background-color: #3C6A79; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                    @if (IsCopyURl)
+                    {
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        <span> Copiando... </span>
+                    }
+                    else
+                    {
+
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                        stroke-width="1.5">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M15 6a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M15 18a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M8.7 10.7l6.6 -3.4" /><path d="M8.7 13.3l6.6 3.4" /></svg> 
+                        <span>Compartir enlace del album</span>
+                    }
                 </button>
             </div>
         </div>
@@ -92,7 +130,6 @@
                             <path d="M8 4l0 16" />
                             <path d="M16 4l0 16" />
                         </svg>
-
                         <div style="font-size:13px;font-weight:500;">
                             @Localizer["Reels"] (@EventImages?.Where(x => x.ImageType == "video").Count())
                         </div>

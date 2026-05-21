@@ -12,14 +12,16 @@ namespace SIC.Backend.Controllers;
 public class ImagesController : ControllerBase
 {
     private readonly FtpStorageService _ftp;
+    private readonly QRBannerService _qRBannerService;
     private readonly IImageUnitOfWork _imageUnitOfWork;
     private readonly IEventsUnitOfWork _eventsUnitOfWork;
 
     //IImagesRepository
-    public ImagesController(FtpStorageService ftp, IImageUnitOfWork imageUnitOf, IEventsUnitOfWork eventsUnitOfWork)
+    public ImagesController(FtpStorageService ftp, IImageUnitOfWork imageUnitOf, IEventsUnitOfWork eventsUnitOfWork, QRBannerService qRBannerService)
     {
         _ftp = ftp;
         _imageUnitOfWork = imageUnitOf;
+        _qRBannerService = qRBannerService;
         _eventsUnitOfWork = eventsUnitOfWork;
     }
 
@@ -36,6 +38,7 @@ public class ImagesController : ControllerBase
         }
         return NotFound(action.Message);
     }
+
     [HttpPost("upload/{folder}")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> Upload(
@@ -187,6 +190,30 @@ public class ImagesController : ControllerBase
             "application/zip",
             $"Album_{folder}.zip"
         );
+    }
+
+    [HttpGet("bannerpdf/{evento}")]
+    public async Task<IActionResult> GetLitPdf(string evento)
+    {
+        try
+        {
+            var response = await _eventsUnitOfWork.GetByCodeAsync(evento);
+
+            if (response.Result == null)
+                return NotFound("Este evento no Existe.");
+
+            var pdfBytes = await _qRBannerService.QRBanner(response.Result);
+
+            return File(
+                pdfBytes,
+                "application/pdf",
+                $"BannerQR-{response.Result.Name}.pdf"
+            );
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     private async Task<EventImage?> UploadImageAsync(

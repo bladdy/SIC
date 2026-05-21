@@ -204,8 +204,12 @@ else
                                 }
                             </button>
                         </div>
+
+                    }
+                    @if (EventDetail.User.UserType == UserType.WeddingPlanner || EventDetail.User.UserType == UserType.User)
+                    {
                         <div class="d-flex justify-content-center gap-2 mb-2 mb-lg-0">
-                            <button class="btn btn-sm btn-custom" @onclick="GeneratedPDF" disabled="@IsCopyURl">
+                            <button class="btn btn-sm btn-custom" @onclick="GeneratedPDF" disabled="@IsProcessList">
                                 @if (IsProcessList)
                                 {
                                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -217,7 +221,7 @@ else
                                 }
                             </button>
                         </div>
-
+                        
                     }
                 </div>
             </div>

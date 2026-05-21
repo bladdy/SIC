@@ -337,27 +337,31 @@ public partial class MyEventsDetails
         }
     }
 
-private async Task GeneratedPDF()
-{
-    try
+    private async Task GeneratedPDF()
     {
-        IsProcessList = true;
-
-        var content = await Repository.GetFileAsync($"api/Invitations/generatedpdf?evento={EventDetail!.Code}");
-
-        if (content != null && content.Length > 0)
+        try
         {
-            await JsRuntime.DownloadFileAsync(
-                $"{EventDetail.Name}.pdf",
-                content,
-                "application/pdf");
+            IsProcessList = true;
+
+            var content = await Repository.GetFileAsync($"api/Invitations/generatedpdf?evento={EventDetail!.Code}");
+
+            if (content != null && content.Length > 0)
+            {
+                await JsRuntime.DownloadFileAsync(
+                    $"{EventDetail.Name}.pdf",
+                    content,
+                    "application/pdf");
+            }
+            else
+            {
+                await SweetAlertService.FireAsync("Generar .PDF", "No tienes ningun invitado confirmado aun, espere a que los invitados confirmen para generar la lista de invitados", SweetAlertIcon.Info);
+            }
+        }
+        finally
+        {
+            IsProcessList = false;
         }
     }
-    finally
-    {
-        IsProcessList = false;
-    }
-}
 
     private async Task CopiarEventUrl()
     {
@@ -771,7 +775,6 @@ private async Task GeneratedPDF()
 
             if (!seleccionados.Any())
                 return;
-
 
             var dto = new MasiveSendTemplateDTO
             {

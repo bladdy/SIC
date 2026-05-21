@@ -24,6 +24,8 @@ namespace SIC.Frontend.Pages.Album
         public Event? Event { get; set; }
         private EventImage? PreviewImage;
         private string ActiveTab = "foto";
+        private bool IsLoadingBanner = false;
+        private bool IsCopyURl = false;
 
         protected override async Task OnInitializedAsync()
         {
@@ -180,6 +182,16 @@ namespace SIC.Frontend.Pages.Album
             }
         }
 
+        private async Task CopiarEventUrl()
+        {
+            IsCopyURl = true;
+            var url = $"{NavigationManager.BaseUri}upload-photo/{Code}";
+
+            await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", url);
+            await Task.Delay(1500);
+            IsCopyURl = false;
+        }
+
         private async Task GenerateQR(string code)
         {
             try
@@ -210,6 +222,41 @@ namespace SIC.Frontend.Pages.Album
                     ex.Message,
                     SweetAlertIcon.Error
                 );
+            }
+        }
+
+        private async Task GenerateBanner(string code)
+        {
+            try
+            {
+                IsLoadingBanner = true;
+                var url = $"api/images/bannerpdf/{code}";
+                var bytes = await Repository.GetFileAsync(url);
+                if (bytes == null || bytes.Length == 0)
+                {
+                    await SweetAlertService.FireAsync(
+                        "Error",
+                        "No se pudo generar el banner.",
+                        SweetAlertIcon.Error
+                    );
+                    return;
+                }
+                await JsRuntime.DownloadFileAsync(
+                    $"Banner-Event-{Event?.Name}.pdf",
+                    bytes
+                );
+            }
+            catch (Exception ex)
+            {
+                await SweetAlertService.FireAsync(
+                    "Error",
+                    ex.Message,
+                    SweetAlertIcon.Error
+                );
+            }
+            finally
+            {
+                IsLoadingBanner = false;
             }
         }
 
