@@ -86,36 +86,18 @@ public class QRBannerService
         // FONDO
         // =====================================================
 
-        string backgroundPath = Path.Combine(
-            Directory.GetCurrentDirectory(),
-            "Background",
-            "logo_SIC.jpeg");
+        canvas.SaveState();
 
-        if (File.Exists(backgroundPath))
-        {
-            Image background = Image.GetInstance(backgroundPath);
+        BaseColor bgColor = new BaseColor(
+            System.Drawing.ColorTranslator.FromHtml("#3C6A79"));
 
-            background.ScaleAbsolute(width, height);
+        canvas.SetColorFill(bgColor);
 
-            background.SetAbsolutePosition(x, y);
+        canvas.Rectangle(x, y, width, height);
 
-            canvas.AddImage(background);
-        }
-        else
-        {
-            canvas.SaveState();
+        canvas.Fill();
 
-            BaseColor bgColor = new BaseColor(
-                System.Drawing.ColorTranslator.FromHtml("#3C6A79"));
-
-            canvas.SetColorFill(bgColor);
-
-            canvas.Rectangle(x, y, width, height);
-
-            canvas.Fill();
-
-            canvas.RestoreState();
-        }
+        canvas.RestoreState();
 
         // =====================================================
         // OVERLAY OSCURO
