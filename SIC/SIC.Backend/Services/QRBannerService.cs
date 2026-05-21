@@ -56,7 +56,7 @@ public class QRBannerService
 
         foreach (var position in positions)
         {
-            DrawBanner(
+            await DrawBannerAsync(
                 document,
                 writer,
                 canvas,
@@ -72,7 +72,7 @@ public class QRBannerService
         return stream.ToArray();
     }
 
-    private void DrawBanner(
+    private async Task DrawBannerAsync(
         Document document,
         PdfWriter writer,
         PdfContentByte canvas,
@@ -88,17 +88,42 @@ public class QRBannerService
 
         string backgroundUrl = $"{BASE_URL}logo_SIC.jpeg";
 
+        bool imageLoaded = false;
+
         try
         {
-            Image background = Image.GetInstance(new Uri(backgroundUrl));
+            using HttpClient httpClient = new();
 
-            background.ScaleAbsolute(width, height);
+            HttpResponseMessage response = await httpClient.GetAsync(backgroundUrl);
 
-            background.SetAbsolutePosition(x, y);
+            if (response.IsSuccessStatusCode)
+            {
+                byte[] imageBytes = await response.Content.ReadAsByteArrayAsync();
 
-            canvas.AddImage(background);
+                if (imageBytes.Length > 0)
+                {
+                    Image background = Image.GetInstance(imageBytes);
+
+                    background.ScaleAbsolute(width, height);
+
+                    background.SetAbsolutePosition(x, y);
+
+                    canvas.AddImage(background);
+
+                    imageLoaded = true;
+                }
+            }
         }
         catch
+        {
+            imageLoaded = false;
+        }
+
+        // =====================================================
+        // FONDO DEFAULT
+        // =====================================================
+
+        if (!imageLoaded)
         {
             canvas.SaveState();
 
@@ -113,7 +138,6 @@ public class QRBannerService
 
             canvas.RestoreState();
         }
-
         // =====================================================
         // OVERLAY OSCURO
         // =====================================================
