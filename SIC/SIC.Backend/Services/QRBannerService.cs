@@ -56,7 +56,7 @@ public class QRBannerService
 
         foreach (var position in positions)
         {
-            await DrawBannerAsync(
+            DrawBanner(
                 document,
                 writer,
                 canvas,
@@ -72,7 +72,7 @@ public class QRBannerService
         return stream.ToArray();
     }
 
-    private async Task DrawBannerAsync(
+    private void DrawBanner(
         Document document,
         PdfWriter writer,
         PdfContentByte canvas,
@@ -86,44 +86,22 @@ public class QRBannerService
         // FONDO
         // =====================================================
 
-        string backgroundUrl = $"{BASE_URL}logo_SIC.jpeg";
+        string backgroundPath = Path.Combine(
+            Directory.GetCurrentDirectory(),
+            "Background",
+            "logo_SIC.jpeg");
 
-        bool imageLoaded = false;
-
-        try
+        if (File.Exists(backgroundPath))
         {
-            using HttpClient httpClient = new();
+            Image background = Image.GetInstance(backgroundPath);
 
-            HttpResponseMessage response = await httpClient.GetAsync(backgroundUrl);
+            background.ScaleAbsolute(width, height);
 
-            if (response.IsSuccessStatusCode)
-            {
-                byte[] imageBytes = await response.Content.ReadAsByteArrayAsync();
+            background.SetAbsolutePosition(x, y);
 
-                if (imageBytes.Length > 0)
-                {
-                    Image background = Image.GetInstance(imageBytes);
-
-                    background.ScaleAbsolute(width, height);
-
-                    background.SetAbsolutePosition(x, y);
-
-                    canvas.AddImage(background);
-
-                    imageLoaded = true;
-                }
-            }
+            canvas.AddImage(background);
         }
-        catch
-        {
-            imageLoaded = false;
-        }
-
-        // =====================================================
-        // FONDO DEFAULT
-        // =====================================================
-
-        if (!imageLoaded)
+        else
         {
             canvas.SaveState();
 
@@ -138,6 +116,7 @@ public class QRBannerService
 
             canvas.RestoreState();
         }
+
         // =====================================================
         // OVERLAY OSCURO
         // =====================================================
