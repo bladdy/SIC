@@ -67,6 +67,8 @@ builder.Services.AddDbContext<DataContext>(options =>
 builder.Services.AddTransient<SeedDb>();
 
 // Registrar el servicio de WhatsAppService
+
+builder.Services.AddScoped<QRBannerService>();
 builder.Services.AddScoped<WhatsAppService>();
 builder.Services.AddScoped<BoletaService>();
 builder.Services.AddScoped<FtpStorageService>();
