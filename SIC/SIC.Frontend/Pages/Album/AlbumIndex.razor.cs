@@ -243,7 +243,8 @@ namespace SIC.Frontend.Pages.Album
                 }
                 await JsRuntime.DownloadFileAsync(
                     $"Banner-Event-{Event?.Name}.pdf",
-                    bytes
+                    bytes,
+                    "application/pdf"
                 );
             }
             catch (Exception ex)

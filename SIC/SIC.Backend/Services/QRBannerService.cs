@@ -45,13 +45,13 @@ public class QRBannerService
         float bannerWidth = pageWidth / 2;
         float bannerHeight = pageHeight / 2;
 
-        // Posiciones
-        List<(float x, float y)> positions =
+        // Posiciones + si va rotado
+        List<(float x, float y, bool rotate)> positions =
         [
-            (0, bannerHeight),                 // Arriba izquierda
-            (bannerWidth, bannerHeight),       // Arriba derecha
-            (0, 0),                            // Abajo izquierda
-            (bannerWidth, 0)                   // Abajo derecha
+            (0, bannerHeight, true),            // 1 Arriba izquierda ROTADO
+            (bannerWidth, bannerHeight, true),  // 2 Arriba derecha ROTADO
+            (0, 0, false),                      // 3 Abajo izquierda NORMAL
+            (bannerWidth, 0, false)             // 4 Abajo derecha NORMAL
         ];
 
         foreach (var position in positions)
@@ -64,7 +64,8 @@ public class QRBannerService
                 position.x,
                 position.y,
                 bannerWidth,
-                bannerHeight);
+                bannerHeight,
+                position.rotate);
         }
 
         document.Close();
@@ -80,8 +81,17 @@ public class QRBannerService
         float x,
         float y,
         float width,
-        float height)
+        float height,
+        bool rotate)
     {
+        if (rotate)
+        {
+            canvas.SaveState();
+
+            // Rotar 180°
+            canvas.ConcatCtm(-1, 0, 0, -1, x * 2 + width, y * 2 + height);
+        }
+
         // =====================================================
         // FONDO
         // =====================================================
@@ -141,18 +151,16 @@ public class QRBannerService
         byte[] qrBytes = qrCode.GetGraphic(20);
 
         Image qrImage = Image.GetInstance(qrBytes);
-        //Tamaño
+
         float qrSize = width * 0.55f;
 
         qrImage.ScaleAbsolute(qrSize, qrSize);
 
-        // CENTRADO PERFECTO
         float qrX = x + ((width - qrSize) / 2);
         float qrY = y + ((height - qrSize) / 2);
 
         qrImage.SetAbsolutePosition(qrX, qrY);
 
-        // IMPORTANTE
         canvas.AddImage(qrImage);
 
         // =====================================================
@@ -187,15 +195,26 @@ public class QRBannerService
         // TEXTO SUPERIOR
         // =====================================================
 
-        ColumnText.ShowTextAligned(
-            canvas,
-            Element.ALIGN_CENTER,
-            new Phrase(
-                "ESCANEA, TOMA Y COMPARTE\n¡ASÍ DE FÁCIL!",
-                topTextFont),
-            x + width / 2,
-            y + height - 60,
-            0);
+        ColumnText ct = new ColumnText(canvas);
+
+        Paragraph p = new Paragraph
+        {
+            Alignment = Element.ALIGN_CENTER
+        };
+
+        p.Add(new Chunk("ESCANEA, TOMA Y COMPARTE\n", topTextFont));
+        p.Add(new Chunk("¡ASÍ DE FÁCIL!", topTextFont));
+
+        ct.SetSimpleColumn(
+            p,
+            x,
+            y + height - 90,
+            x + width,
+            y + height - 20,
+            20,
+            Element.ALIGN_CENTER);
+
+        ct.Go();
 
         // =====================================================
         // TITULO
@@ -245,18 +264,23 @@ public class QRBannerService
 
         canvas.SaveState();
 
-        canvas.SetColorStroke(BaseColor.White);
+        //canvas.SetColorStroke(BaseColor.White);
 
-        canvas.SetLineWidth(2);
+        //canvas.SetLineWidth(2);
 
-        canvas.Rectangle(
+        /*canvas.Rectangle(
             x + 5,
             y + 5,
             width - 10,
             height - 10);
 
-        canvas.Stroke();
+        canvas.Stroke();*/
 
         canvas.RestoreState();
+
+        if (rotate)
+        {
+            canvas.RestoreState();
+        }
     }
 }
