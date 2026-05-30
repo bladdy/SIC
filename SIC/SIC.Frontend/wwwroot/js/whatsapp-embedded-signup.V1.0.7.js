@@ -6,8 +6,8 @@
 window.fbSdkReady = false;
 let AUTH_CODE = null;
 
-/*const API_BASE_URL = "https://localhost:7141";*/
-const API_BASE_URL = "https://invboxv-app.com";
+const API_BASE_URL = "https://localhost:7141";
+/*const API_BASE_URL = "https://invboxv-app.com";*/
 /* ============================
    SDK INIT
 ============================ */
@@ -160,7 +160,7 @@ window.addEventListener("message", async (event) => {
             }
 
             try {
-                const response = await fetch(`${API_BASE_URL}/api/WhatsAppOnboarding/exchange-code`, {
+                const response = await fetch(`${API_BASE_URL}/api/WhatsAppOnboarding/exchange-code-60days`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

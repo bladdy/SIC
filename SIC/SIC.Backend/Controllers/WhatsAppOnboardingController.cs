@@ -180,9 +180,9 @@ public class WhatsAppOnboardingController : ControllerBase
             // IMPORTANTE para webhooks y mensajería
             // ============================================================
 
-            await _metaAuth.SubscribeAppAsync(
+            /*await _metaAuth.SubscribeAppAsync(
                 request.WabaId,
-                longLivedToken.AccessToken);
+                longLivedToken.AccessToken);*/
 
             Console.WriteLine("✅ App suscrita al WABA");
 
@@ -219,7 +219,7 @@ public class WhatsAppOnboardingController : ControllerBase
                 PhoneNumber =
                     phoneInfo.DisplayPhoneNumber ?? "no-disponible",
 
-                SystemUserId = null,
+                SystemUserId = "",
 
                 CreatedAt = DateTime.UtcNow,
 

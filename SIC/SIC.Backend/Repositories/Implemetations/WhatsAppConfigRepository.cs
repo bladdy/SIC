@@ -33,6 +33,7 @@ namespace SIC.Backend.Repositories.Implemetations
                 Result = events
             };
         }
+
         public async Task<ActionResponse<UsuarioWhatsAppConfig>> AddFullAsync(UsuarioWhatsAppConfig whatsAppConfig)
         {
             try
@@ -62,6 +63,7 @@ namespace SIC.Backend.Repositories.Implemetations
                     existingConfig.AccessToken = whatsAppConfig.AccessToken;
                     existingConfig.PhoneNumber = whatsAppConfig.PhoneNumber;
                     existingConfig.IsActive = true;
+                    existingConfig.TokenExpiresAt = whatsAppConfig.TokenExpiresAt;
                     existingConfig.RevokedAt = null;
 
                     _context.Update(existingConfig);
@@ -93,7 +95,6 @@ namespace SIC.Backend.Repositories.Implemetations
                 };
             }
         }
-
 
         public async Task<ActionResponse<UsuarioWhatsAppConfig>> UpdateFullAsync(UsuarioWhatsAppConfig whatsAppConfig)
         {
