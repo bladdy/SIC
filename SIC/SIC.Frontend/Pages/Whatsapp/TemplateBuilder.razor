@@ -1,5 +1,17 @@
-﻿@page "/whatsapp_templates/template-builder"
+﻿
+@page "/whatsapp_templates/template-builder"
+@using CurrieTechnologies.Razor.SweetAlert2
 @using SIC.Shared.Request
+@using Microsoft.AspNetCore.Components.Web
+
+@using System.Text
+@using System.Text.Json
+@using System.Text.RegularExpressions
+@using System.Net.Http.Json
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+@inject SweetAlertService SweetAlertService
 
 <div class="row">
 
@@ -12,15 +24,19 @@
 
             <div class="mb-3">
                 <label>Nombre de la plantilla</label>
+
                 <input class="form-control"
-                       @bind="Model.Name"
-                       @bind:event="oninput" />
+                @bind="TemplateName"
+                @bind:event="oninput" />
             </div>
 
             <div class="mb-3">
                 <label>Idioma</label>
-                <select class="form-select" @bind="Model.Language">
-                    <option value="es_ES">Spanish (SPA)</option>
+
+                <select class="form-select"
+                @bind="Model.Language">
+                    <option value="es_MX">Español (MX) </option>
+                    <option value="es_ES">Español (SPA)</option>
                     <option value="en_US">English (US)</option>
                 </select>
             </div>
@@ -31,7 +47,8 @@
 
             <h5>Encabezado</h5>
 
-            <select class="form-select mb-2" @bind="HeaderType">
+            <select class="form-select mb-2"
+            @bind="HeaderType">
                 <option value="">Sin encabezado</option>
                 <option value="TEXT">Texto</option>
             </select>
@@ -39,9 +56,9 @@
             @if (HeaderType == "TEXT")
             {
                 <input class="form-control"
-                       placeholder="Texto del encabezado"
-                       @bind="HeaderText"
-                       @bind:event="oninput" />
+                placeholder="Texto del encabezado"
+                @bind="HeaderText"
+                @bind:event="oninput" />
             }
 
             <hr />
@@ -51,7 +68,7 @@
             <h5>Muestra de contenido multimedia</h5>
 
             <select class="form-select mb-2"
-                    @bind="Model.MediaType">
+            @bind="Model.MediaType">
                 <option value="">Sin multimedia</option>
                 <option value="IMAGE">Imagen</option>
                 <option value="VIDEO">Video</option>
@@ -61,14 +78,14 @@
             @if (!string.IsNullOrEmpty(Model.MediaType))
             {
                 <input class="form-control mb-2"
-                       placeholder="URL del archivo"
-                       @bind="Model.MediaUrl"
-                       @bind:event="oninput" />
+                placeholder="URL del archivo"
+                @bind="Model.MediaUrl"
+                @bind:event="oninput" />
 
                 <input class="form-control"
-                       placeholder="Texto alternativo / nombre archivo"
-                       @bind="Model.MediaCaption"
-                       @bind:event="oninput" />
+                placeholder="Texto alternativo / nombre archivo"
+                @bind="Model.MediaCaption"
+                @bind:event="oninput" />
             }
 
             <hr />
@@ -78,16 +95,19 @@
             <h5>Contenido</h5>
 
             <textarea class="form-control"
-                      rows="5"
-                      placeholder="Ej: Hola {{1}}, tu pedido {{2}} está listo"
-                      value="@Model.Components"
-                      @oninput="OnBodyChanged">
+            rows="5"
+            placeholder="Ej: Hola {{1}}, tu pedido {{2}} está listo"
+            @ref="BodyTextarea"
+            @bind="BodyText"
+            @bind:event="oninput"
+            @onclick="CaptureCursorPosition"
+            @onkeyup="CaptureCursorPosition">
             </textarea>
 
             <div class="mt-2">
                 <button type="button"
-                        class="btn btn-sm btn-custom"
-                        @onclick="AddVariable">
+                class="btn btn-sm btn-custom"
+                @onclick="AddVariable">
                     + Agregar variable
                 </button>
             </div>
@@ -95,6 +115,7 @@
             @if (Model.BodyExamples.Any())
             {
                 <div class="mt-3">
+
                     <h6>Muestras de variables</h6>
 
                     @for (int i = 0; i < Model.BodyExamples.Count; i++)
@@ -102,27 +123,62 @@
                         var index = i;
 
                         <div class="input-group mb-2">
-                            <span class="input-group-text">@((index + 1))</span>
+
+                            <span class="input-group-text">
+                                @((index + 1))
+                            </span>
 
                             <input class="form-control"
-                                   value="@Model.BodyExamples[index]"
-                                   @oninput="(e => OnExampleChanged(e, index))" />
+                            value="@Model.BodyExamples[index]"
+                            @oninput="(e => OnExampleChanged(e, index))" />
 
                             <select class="form-select form-select-sm"
-                                    style="max-width: 200px;"
-                                    value="@Model.BodyExampleTypes[index]"
-                                    @onchange="(e => OnExampleTypeChanged(e, index))">
-                                <option value="">Selecciona una variable</option>
-                                <option value="Date">Nombre Invitado</option>
-                                <option value="Date">Codigo de Invitacion</option>
-                                <option value="Date">Fecha del Evento</option>
-                                <option value="">Nombre del Evento</option>
-                                <option value="Text">Titulo Evento</option>
-                                <option value="Number">Url de la Invitacion</option>
-                                <option value="Currency">Mesa</option>
-                            </select>
-                        </div>
+                            style="max-width: 200px;"
+                            value="@Model.BodyExampleTypes[index]"
+                            @onchange="(e => OnExampleTypeChanged(e, index))">
 
+                                <option value="">
+                                    Selecciona una variable
+                                </option>
+
+                                <option value="GuestName">
+                                    Nombre Invitado
+                                </option>
+
+                                <option value="InvitationCode">
+                                    Codigo de Invitacion
+                                </option>
+
+                                <option value="EventDate">
+                                    Fecha del Evento
+                                </option>
+
+                                <option value="EventName">
+                                    Nombre del Evento
+                                </option>
+
+                                <option value="EventTitle">
+                                    Titulo Evento
+                                </option>
+
+                                <option value="InvitationUrl">
+                                    Url de la Invitacion
+                                </option>
+
+                                <option value="Table">
+                                    Mesa
+                                </option>
+
+                            </select>
+
+                            <button type="button"
+                            class="btn btn-danger"
+                            title="Eliminar variable"
+                            @onclick="() => RemoveVariable(index)">
+                                ✕
+                            </button>
+
+                        </div>
                     }
                 </div>
             }
@@ -132,9 +188,10 @@
             <!-- ================= FOOTER ================= -->
 
             <h5>Pie de página</h5>
+
             <input class="form-control"
-                   @bind="Model.Footer"
-                   @bind:event="oninput" />
+            @bind="Model.Footer"
+            @bind:event="oninput" />
 
             <hr />
 
@@ -143,7 +200,7 @@
             <h5>Botones</h5>
 
             <button class="btn btn-custom mb-3"
-                    @onclick="AddButton">
+            @onclick="AddButton">
                 + Agregar botón
             </button>
 
@@ -152,47 +209,87 @@
                 <div class="card p-3 mb-2">
 
                     <select class="form-select mb-2"
-                            @bind="button.Type">
-                        <option value="URL">Ir al sitio web</option>
-                        <option value="QUICK_REPLY">Respuesta rápida</option>
+                    @bind="button.Type">
+
+                        <option value="URL">
+                            Ir al sitio web
+                        </option>
+
+                        <option value="QUICK_REPLY">
+                            Respuesta rápida
+                        </option>
+
                     </select>
 
                     <input class="form-control mb-2"
-                           placeholder="Texto del botón"
-                           @bind="button.Text"
-                           @bind:event="oninput" />
+                    placeholder="Texto del botón"
+                    @bind="button.Text"
+                    @bind:event="oninput" />
 
                     @if (button.Type == "URL")
                     {
                         <select class="form-select mb-2"
-                                @bind="button.UrlType">
-                            <option value="STATIC">Estática</option>
-                            <option value="DYNAMIC">Dinámica</option>
+                        @bind="button.UrlType">
+
+                            <option value="STATIC">
+                                Estática
+                            </option>
+
+                            <option value="DYNAMIC">
+                                Dinámica
+                            </option>
+
                         </select>
 
                         @if (button.UrlType == "STATIC")
                         {
                             <input class="form-control"
-                                   placeholder="https://midominio.com"
-                                   @bind="button.Url"
-                                   @bind:event="oninput" />
+                            placeholder="https://midominio.com"
+                            @bind="button.Url"
+                            @bind:event="oninput" />
                         }
                         else
                         {
                             <input class="form-control mb-2"
-                                   placeholder="https://midominio.com/"
-                                   @bind="button.UrlBase"
-                                   @bind:event="oninput" />
+                            placeholder="https://midominio.com/"
+                            @bind="button.UrlBase"
+                            @bind:event="oninput" />
 
                             <input class="form-control"
-                                   placeholder="Ejemplo dinámico"
-                                   @bind="button.DynamicExample"
-                                   @bind:event="oninput" />
+                            placeholder="Ejemplo dinámico"
+                            @bind="button.DynamicExample"
+                            @bind:event="oninput" />
                         }
                     }
 
                 </div>
             }
+
+        </div>
+        <div class="d-flex justify-content-end w-100 gap-2">
+
+            <!-- Poner un mensaje de confirmacion para que el usuraio sepa que si va a salir se perdera todo el progreso-->
+            <button class="btn btn-danger mt-3"
+            @onclick="DiscardTemplate">
+                Descartar
+            </button>
+
+            <!--LLama la api interna para preparar la plantilla y enviarla a meta-->
+            <button class="btn btn-custom mt-3"
+            disabled="@IsSubmitting"
+            @onclick="SubmitTemplate">
+
+                @if (IsSubmitting)
+                {
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                    <span>Enviando...</span>
+                }
+                else
+                {
+                    <span>Enviar para revisión</span>
+                }
+
+            </button>
 
         </div>
     </div>
@@ -202,6 +299,7 @@
     <div class="col-md-3">
 
         <div class="phone-frame">
+
             <div class="whatsapp-header">
                 Vista previa
             </div>
@@ -217,7 +315,7 @@
                             @if (Model.MediaType == "IMAGE")
                             {
                                 <img src="@Model.MediaUrl"
-                                     style="max-width:100%; border-radius:8px;" />
+                                style="max-width:100%; border-radius:8px;" />
                             }
                             else if (Model.MediaType == "VIDEO")
                             {
@@ -256,18 +354,21 @@
                     @if (Model.Buttons.Any())
                     {
                         <div class="mt-3">
+
                             @foreach (var btn in Model.Buttons)
                             {
                                 <div class="preview-button">
                                     @btn.Text
                                 </div>
                             }
+
                         </div>
                     }
 
                 </div>
 
             </div>
+
         </div>
 
     </div>
@@ -276,128 +377,462 @@
 
 <style>
     .phone-frame {
-        border: 10px solid #111;
-        border-radius: 30px;
-        height: 100vh;
-        background: #e5ddd5;
-        display: flex;
-        flex-direction: column;
+    border: 10px solid #111;
+    border-radius: 30px;
+    height: 100vh;
+    background: #e5ddd5;
+    display: flex;
+    flex-direction: column;
     }
 
     .whatsapp-header {
-        background: #075E54;
-        color: white;
-        padding: 15px;
-        font-weight: bold;
-        text-align: center;
+    background: #075E54;
+    color: white;
+    padding: 15px;
+    font-weight: bold;
+    text-align: center;
     }
 
     .chat-area {
-        padding: 20px;
-        flex-grow: 1;
+    padding: 20px;
+    flex-grow: 1;
     }
 
     .message-bubble {
-        background: white;
-        padding: 15px;
-        border-radius: 10px;
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
     }
 
     .footer-text {
-        font-size: 12px;
-        color: gray;
+    font-size: 12px;
+    color: gray;
     }
 
     .preview-button {
-        border: 1px solid #25D366;
-        color: #25D366;
-        padding: 8px;
-        text-align: center;
-        border-radius: 8px;
-        margin-top: 5px;
+    border: 1px solid #25D366;
+    color: #25D366;
+    padding: 8px;
+    text-align: center;
+    border-radius: 8px;
+    margin-top: 5px;
     }
 </style>
 
 @code {
 
     private CreateTemplateModel Model = new();
+    private bool IsSubmitting;
     private string HeaderType = "";
+
     private string? HeaderText;
 
-    private void OnBodyChanged(ChangeEventArgs e)
-    {
-        var text = e.Value?.ToString() ?? "";
+    private ElementReference BodyTextarea;
 
-        // Siempre mantenemos una sola componente BODY
-        if (!Model.Components.Any(c => c.Type == "BODY"))
+    private int CursorPosition;
+
+
+    private async Task SubmitTemplate()
+    {
+        try
         {
+            IsSubmitting = true;
+
+            BuildTemplatePayload();
+
+            if (string.IsNullOrEmpty(Model.Name))
+            {
+                await SweetAlertService.FireAsync(
+                    "Error", 
+                    "La plantilla no se puede crear sin nombre.", 
+                    SweetAlertIcon.Error);
+                return;
+            }
+
+
+            var response = await Http.PostAsJsonAsync(
+                "api/whatsapp/create-templates",
+                Model);
+
+
+            if (response.IsSuccessStatusCode)
+            {
+                await SweetAlertService.FireAsync(
+                    "Exito",
+                    "Plantilla enviada correctamente para revisión.",
+                    SweetAlertIcon.Success);
+            }
+            else
+            {
+                var error =
+                    await response.Content.ReadAsStringAsync();
+
+
+                await SweetAlertService.FireAsync(
+                    "Error",
+                    $"Error al enviar plantilla: {error}",
+                    SweetAlertIcon.Error);
+                
+            }
+        }
+        catch (Exception ex)
+        {
+
+            await SweetAlertService.FireAsync(
+                "Error",
+                $"Error al enviar plantilla: {ex.Message}",
+                SweetAlertIcon.Error);
+        }
+        finally
+        {
+            IsSubmitting = false;
+        }
+    }
+
+    private void BuildTemplatePayload()
+    {
+        // =========================================
+        // LIMPIAR COMPONENTES
+        // =========================================
+
+        Model.Components.Clear();
+
+        // =========================================
+        // HEADER
+        // =========================================
+
+        if (!string.IsNullOrWhiteSpace(HeaderType))
+        {
+            Model.Header = new HeaderModel
+                {
+                    Type = HeaderType,
+                    Text = HeaderText
+                };
+
             Model.Components.Add(new ComponentRequest
                 {
-                    Type = "BODY",
-                    Text = text
+                    Type = "HEADER",
+                    Format = HeaderType,
+                    Text = HeaderText
                 });
         }
         else
         {
-            var bodyComp = Model.Components.First(c => c.Type == "BODY");
-            bodyComp.Text = text;
+            Model.Header = null;
+        }
+
+        // =========================================
+        // BODY
+        // =========================================
+
+        var bodyComponent = new ComponentRequest
+            {
+                Type = "BODY",
+                Text = BodyText,
+                BodyExampleParams = new List<BodyExampleParam>()
+            };
+
+        for (int i = 0; i < Model.BodyExamples.Count; i++)
+        {
+            bodyComponent.BodyExampleParams.Add(
+                new BodyExampleParam
+                    {
+                        ParamName =
+                            string.IsNullOrWhiteSpace(Model.BodyExampleTypes[i])
+                                ? $"param_{i + 1}"
+                                : Model.BodyExampleTypes[i],
+
+                        ExampleValue = Model.BodyExamples[i]
+                    });
+        }
+
+        Model.Components.Add(bodyComponent);
+
+        // =========================================
+        // FOOTER
+        // =========================================
+
+        if (!string.IsNullOrWhiteSpace(Model.Footer))
+        {
+            Model.Components.Add(new ComponentRequest
+                {
+                    Type = "FOOTER",
+                    Text = Model.Footer
+                });
+        }
+
+        // =========================================
+        // BUTTONS
+        // =========================================
+
+        if (Model.Buttons.Any())
+        {
+            var buttonComponent = new ComponentRequest
+                {
+                    Type = "BUTTONS",
+                    Buttons = new List<ButtonRequest>()
+                };
+
+            foreach (var btn in Model.Buttons)
+            {
+                var buttonRequest = new ButtonRequest
+                    {
+                        Type = btn.Type,
+                        Text = btn.Text
+                    };
+
+                // ===============================
+                // URL BUTTON
+                // ===============================
+
+                if (btn.Type == "URL")
+                {
+                    buttonRequest.UrlType = btn.UrlType;
+
+                    if (btn.UrlType == "STATIC")
+                    {
+                        buttonRequest.Url = btn.Url;
+                    }
+                    else
+                    {
+                        buttonRequest.UrlBase = btn.UrlBase;
+                        buttonRequest.DynamicExample = btn.DynamicExample;
+
+                        buttonRequest.Url =
+                            $"{btn.UrlBase}{{{{1}}}}";
+
+                        buttonRequest.Example =
+                            [
+                            btn.DynamicExample ?? "example"
+                        ];
+                    }
+                }
+
+                buttonComponent.Buttons.Add(buttonRequest);
+            }
+
+            Model.Components.Add(buttonComponent);
+        }
+
+        // =========================================
+        // MEDIA
+        // =========================================
+
+        if (!string.IsNullOrWhiteSpace(Model.MediaType))
+        {
+            var headerMedia = Model.Components
+                .FirstOrDefault(x => x.Type == "HEADER");
+
+            if (headerMedia != null)
+            {
+                headerMedia.Format = Model.MediaType;
+            }
+            else
+            {
+                Model.Components.Add(new ComponentRequest
+                    {
+                        Type = "HEADER",
+                        Format = Model.MediaType
+                    });
+            }
         }
     }
+
+    private async Task DiscardTemplate()
+    {
+
+        // 🔹 Confirmación antes de eliminar
+        var confirmResult = await SweetAlertService.FireAsync(new SweetAlertOptions
+        {
+            Title = "Salir",
+            Text = "Si sales ahora perderás todo el progreso de la plantilla. ¿Deseas continuar?",
+            Icon = SweetAlertIcon.Warning,
+            ShowCancelButton = true,
+            ConfirmButtonText = "Salir",
+            CancelButtonText = "Cancelar",
+            ConfirmButtonColor = "#d33",
+            CancelButtonColor = "#3085d6"
+        });
+
+        // Si el usuario cancela, no hacer nada
+        if (confirmResult.IsDismissed)
+            return;
+
+        Navigation.NavigateTo("/whatsapp_templates");
+    }
+
+
+
+    // ============================================
+    // BODY TEXT
+    // ============================================
+
+    private string BodyText { get; set; } = "";
+    // ============================================
+    // CURSOR POSITION
+    // ============================================
+
+    private void CaptureCursorPosition()
+    {
+        // Blazor no tiene acceso directo al cursor sin JS,
+        // así que usamos la longitud actual como fallback.
+        CursorPosition = BodyText.Length;
+    }
+
+    // ============================================
+    // VARIABLES
+    // ============================================
 
     private void AddVariable()
     {
         var nextIndex = Model.BodyExamples.Count + 1;
 
-        // Asegurarse que exista la componente BODY
-        if (!Model.Components.Any(c => c.Type == "BODY"))
+        var variable = $"{{{{{nextIndex}}}}}";
+
+        var currentText = BodyText ?? "";
+
+        // Insertar en la posición del cursor
+        if (CursorPosition < 0 || CursorPosition > currentText.Length)
         {
-            Model.Components.Add(new ComponentRequest
-                {
-                    Type = "BODY",
-                    Text = $"{{{{{nextIndex}}}}}"
-                });
+            CursorPosition = currentText.Length;
         }
-        else
-        {
-            var bodyComp = Model.Components.First(c => c.Type == "BODY");
-            bodyComp.Text += $" {{{{{nextIndex}}}}}";
-        }
+
+        var newText =
+            currentText[..CursorPosition]
+            + variable
+            + currentText[CursorPosition..];
+
+        BodyText = newText;
+
+        // Mover cursor al final de la variable insertada
+        CursorPosition += variable.Length;
 
         Model.BodyExamples.Add("");
         Model.BodyExampleTypes.Add("");
     }
 
+    // ============================================
+    // EXAMPLES
+    // ============================================
+
     private void OnExampleChanged(ChangeEventArgs e, int index)
     {
         if (index >= 0 && index < Model.BodyExamples.Count)
-            Model.BodyExamples[index] = e.Value?.ToString() ?? "";
+        {
+            Model.BodyExamples[index] =
+                e.Value?.ToString() ?? "";
+        }
     }
+
     private void OnExampleTypeChanged(ChangeEventArgs e, int index)
     {
-        Model.BodyExampleTypes[index] = e.Value?.ToString() ?? "";
+        if (index >= 0 && index < Model.BodyExampleTypes.Count)
+        {
+            Model.BodyExampleTypes[index] =
+                e.Value?.ToString() ?? "";
+        }
     }
+
+    // ============================================
+    // BUTTONS
+    // ============================================
+
     private void AddButton()
     {
         Model.Buttons.Add(new ButtonModel());
     }
 
+    // ============================================
+    // PREVIEW
+    // ============================================
+
     private string RenderPreviewBody()
     {
-        if (!Model.Components.Any(c => c.Type == "BODY"))
-            return "";
-
-        var result = Model.Components.First(c => c.Type == "BODY").Text ?? "";
+        var result = BodyText ?? "";
 
         for (int i = 0; i < Model.BodyExamples.Count; i++)
         {
             var variable = $"{{{{{i + 1}}}}}";
-            var value = string.IsNullOrEmpty(Model.BodyExamples[i])
-                ? $"[Var{i + 1}]"
-                : Model.BodyExamples[i];
 
-            result = result.Replace(variable, $"<b>{value}</b>");
+            var value =
+                string.IsNullOrWhiteSpace(Model.BodyExamples[i])
+                    ? $"[Var{i + 1}]"
+                    : Model.BodyExamples[i];
+
+            result = result.Replace(
+                variable,
+                $"<b>{value}</b>");
         }
 
         return result.Replace("\n", "<br>");
+    }
+    private void RemoveVariable(int index)
+    {
+        var variableToRemove = $"{{{{{index + 1}}}}}";
+
+        // Eliminar variable del texto
+        BodyText = (BodyText ?? "")
+            .Replace(variableToRemove, "");
+
+        // Eliminar ejemplo y tipo
+        if (index >= 0 && index < Model.BodyExamples.Count)
+        {
+            Model.BodyExamples.RemoveAt(index);
+        }
+
+        if (index >= 0 && index < Model.BodyExampleTypes.Count)
+        {
+            Model.BodyExampleTypes.RemoveAt(index);
+        }
+
+        // Reordenar variables restantes
+        var updatedText = BodyText ?? "";
+
+        for (int i = index + 1; i <= Model.BodyExamples.Count + 1; i++)
+        {
+            var oldVariable = $"{{{{{i + 1}}}}}";
+            var newVariable = $"{{{{{i}}}}}";
+
+            updatedText = updatedText.Replace(oldVariable, newVariable);
+        }
+
+        BodyText = updatedText;
+    }
+    private string TemplateName
+    {
+        get => Model.Name ?? "";
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                Model.Name = "";
+                return;
+            }
+
+            // =====================================
+            // FORMATEAR NOMBRE PARA META
+            // =====================================
+
+            var formatted = value
+                .Trim()
+                .ToLowerInvariant();
+
+            // reemplazar espacios por _
+            formatted = Regex.Replace(
+                formatted,
+                @"\s+",
+                "_");
+
+            // dejar solo:
+            // letras
+            // numeros
+            // underscore
+            formatted = Regex.Replace(
+                formatted,
+                @"[^a-z0-9_]",
+                "");
+
+            Model.Name = formatted;
+        }
     }
 }

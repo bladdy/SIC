@@ -168,9 +168,11 @@ namespace SIC.Backend.Controllers
             var accessToken = "EAAUu8FHu8ZAwBQsU6ZAoXcUw8GZClIsc7h1JGvgz0ZBQdWO7XxIMkafA1TzRls0Jn1ZCMeQRkg95Cj4PeUkuCAR3YvpzpWCuEr3HmdL3D5w0meDRVqwZC5vE9O4fK1MVnrHT64UsfQQb25BWATpEm2nEa822WdceVjoFe9lHYlcxlb4BkGpyYK3uEIoZCzkfggiMgZDZD";//userWhatsAppConfig.Result!.AccessToken;
             var wabaId = "1265194188987559";//userWhatsAppConfig.Result.WabaId;
             var request = BuildWhatsappTemplateJson(model);
+            //Este tiene que recibir el model para que la funcion itere sobre los componentes y arme el json dinamicamente, detectando variables {{param}} en el texto del body para crear el example necesario para que WhatsApp acepte la plantilla, y tambien detectando si el header es de tipo texto o media (imagen/video/documento) para armar el json correctamente, y lo mismo con los botones, detectando si son de tipo URL o QUICK_REPLY, y si son URL detectar si la URL es dinámica (tiene {{param}}) para agregar el example necesario, etc.
+            var result = await _whatsAppService.CreateWhatsAppTemplateAsync(accessToken, wabaId, request, model);
+            //Despues que se envie la plantilla a Meta, si la respuesta es exitosa, guardar en la base de datos la plantilla creada con su nombre, categoría, idioma, contenido, etc. para tener un registro de las plantillas creadas y poder usarlas posteriormente para enviar mensajes dinámicos. Si la respuesta no es exitosa, devolver un mensaje de error con el motivo del error que devuelva WhatsApp.
 
-            var result = await _whatsAppService.CreateWhatsAppTemplateAsync(accessToken, wabaId, request, model.MediaUrl);
-
+            //Arreglar el resultado para que devuelva un mensaje de éxito o error dependiendo de la respuesta de WhatsApp, y también guardar en la base de datos la plantilla creada con su nombre, categoría, idioma, contenido, etc. para tener un registro de las plantillas creadas y poder usarlas posteriormente para enviar mensajes dinámicos.
             return result ? Ok() : StatusCode(500, new { error = "Error al crear plantilla en WhatsApp" });
         }
 
@@ -556,7 +558,6 @@ namespace SIC.Backend.Controllers
 
                         var response = await _iMessageUnitOfWork
                         .AddReceiveMessages(messageDto);
-                        
                     }
                     if (!result.Success)
                     {

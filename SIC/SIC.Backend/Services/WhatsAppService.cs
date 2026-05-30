@@ -8,6 +8,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 using static QRCoder.PayloadGenerator;
 
 namespace SIC.Backend.Services
@@ -515,66 +516,443 @@ namespace SIC.Backend.Services
             return true;
         }
 
-        public async Task<bool> CreateWhatsAppTemplateAsync(
-            string accessToken,
-            string wabaId,
-            string requestJson,
-            string imageUrl)
+    public async Task<bool> CreateWhatsAppTemplateAsync(
+        string accessToken,
+        string wabaId,
+        string requestJson,
+        CreateTemplateModel model)
         {
-            if (string.IsNullOrEmpty(accessToken))
+            if (string.IsNullOrWhiteSpace(accessToken))
                 throw new ArgumentException("Access token is required");
 
-            if (string.IsNullOrEmpty(wabaId))
+            if (string.IsNullOrWhiteSpace(wabaId))
                 throw new ArgumentException("wabaId is required");
 
-            // 1️⃣ Subir imagen y obtener handle válido
-            var mediaHandle = await UploadTemplateImageAsync(accessToken, imageUrl);
+            // ============================================
+            // PARSE JSON
+            // ============================================
 
-            // 2️⃣ Reemplazar en JSON
             var requestObj = JsonNode.Parse(requestJson);
 
-            var components = requestObj["components"].AsArray();
+            if (requestObj == null)
+                throw new Exception("No se pudo parsear requestJson");
+
+            var components = requestObj["components"]?.AsArray();
+
+            if (components == null)
+                throw new Exception("El JSON no contiene components");
+
+            // ============================================
+            // HEADER
+            // ============================================
 
             var header = components
                 .FirstOrDefault(c =>
-                    c["type"]?.ToString()
-                    .Equals("HEADER", StringComparison.OrdinalIgnoreCase) == true);
+                    c?["type"]?.ToString()
+                        .Equals("HEADER", StringComparison.OrdinalIgnoreCase) == true);
 
-            if (header == null)
-                throw new Exception("El template no contiene componente HEADER.");
+            if (header != null)
+            {
+                // ========================================
+                // HEADER TEXTO
+                // ========================================
 
-            // Asegurar estructura example.header_handle
-            if (header["example"] == null)
-                header["example"] = new JsonObject();
+                if (model.Header?.Type == "TEXT")
+                {
+                    header["format"] = "TEXT";
+                    header["text"] = model.Header.Text;
+                }
 
-            header["example"]["header_handle"] = new JsonArray(mediaHandle);
+                // ========================================
+                // HEADER MEDIA
+                // ========================================
 
-            var finalJson = requestObj.ToJsonString();
+                else if (
+                    model.MediaType == "IMAGE"
+                    || model.MediaType == "VIDEO"
+                    || model.MediaType == "DOCUMENT")
+                {
+                    if (string.IsNullOrWhiteSpace(model.MediaUrl))
+                        throw new Exception("MediaUrl es requerido.");
+
+                    // ====================================
+                    // SUBIR MEDIA A META
+                    // ====================================
+
+                    var uploadedHandle =
+                        await UploadTemplateImageAsync(
+                            accessToken,
+                            model.MediaUrl);
+
+                    if (string.IsNullOrWhiteSpace(uploadedHandle))
+                        throw new Exception("No se pudo obtener el media handle.");
+
+                    header["format"] = model.MediaType;
+
+                    JsonObject exampleObject;
+
+                    if (header["example"] == null)
+                    {
+                        exampleObject = new JsonObject();
+
+                        header["example"] = exampleObject;
+                    }
+                    else
+                    {
+                        exampleObject = header["example"]!.AsObject();
+                    }
+
+                    exampleObject["header_handle"] = new JsonArray
+            {
+                uploadedHandle
+            };
+                }
+            }
+
+            // ============================================
+            // BODY
+            // ============================================
+
+            var body = components
+                .FirstOrDefault(c =>
+                    c?["type"]?.ToString()
+                        .Equals("BODY", StringComparison.OrdinalIgnoreCase) == true);
+
+            if (body != null)
+            {
+                var bodyText = body["text"]?.ToString() ?? "";
+
+                body["text"] = bodyText;
+
+                // ========================================
+                // BODY EXAMPLES POSITIONAL
+                // ========================================
+
+                var bodyExamples = new JsonArray();
+
+                var bodyParams =
+                    model.Components
+                        .FirstOrDefault(x => x.Type == "BODY")
+                        ?.BodyExampleParams;
+
+                if (bodyParams != null)
+                {
+                    foreach (var param in bodyParams)
+                    {
+                        if (string.IsNullOrWhiteSpace(param.ExampleValue))
+                            continue;
+
+                        bodyExamples.Add(param.ExampleValue);
+                    }
+                }
+
+                if (bodyExamples.Count > 0)
+                {
+                    body["example"] = new JsonObject
+                    {
+                        ["body_text"] = new JsonArray
+                {
+                    bodyExamples
+                }
+                    };
+                }
+            }
+
+            // ============================================
+            // FOOTER
+            // ============================================
+
+            var footer = components
+                .FirstOrDefault(c =>
+                    c?["type"]?.ToString()
+                        .Equals("FOOTER", StringComparison.OrdinalIgnoreCase) == true);
+
+            if (footer != null)
+            {
+                footer["text"] = model.Footer ?? "";
+            }
+
+            // ============================================
+            // BUTTONS
+            // ============================================
+
+            var buttons = components
+                .FirstOrDefault(c =>
+                    c?["type"]?.ToString()
+                        .Equals("BUTTONS", StringComparison.OrdinalIgnoreCase) == true);
+
+            if (buttons?["buttons"] is JsonArray buttonsArray)
+            {
+                var validButtons = new JsonArray();
+
+                for (int i = 0; i < buttonsArray.Count; i++)
+                {
+                    var originalBtn = buttonsArray[i];
+
+                    var modelButton =
+                        model.Buttons.ElementAtOrDefault(i);
+
+                    if (originalBtn == null || modelButton == null)
+                        continue;
+
+                    // ====================================
+                    // VALIDAR TEXTO
+                    // ====================================
+
+                    if (string.IsNullOrWhiteSpace(modelButton.Text))
+                        continue;
+
+                    // ====================================
+                    // CLONAR BOTON
+                    // ====================================
+
+                    var btn = JsonNode.Parse(
+                        originalBtn.ToJsonString())!.AsObject();
+
+                    // ====================================
+                    // QUICK_REPLY
+                    // ====================================
+
+                    if (modelButton.Type == "QUICK_REPLY")
+                    {
+                        btn["type"] = "QUICK_REPLY";
+                        btn["text"] = modelButton.Text;
+
+                        btn.Remove("url");
+                        btn.Remove("example");
+
+                        validButtons.Add(btn);
+
+                        continue;
+                    }
+
+                    // ====================================
+                    // URL
+                    // ====================================
+
+                    if (modelButton.Type == "URL")
+                    {
+                        btn["type"] = "URL";
+                        btn["text"] = modelButton.Text;
+
+                        // ================================
+                        // STATIC
+                        // ================================
+
+                        if (modelButton.UrlType == "STATIC")
+                        {
+                            if (string.IsNullOrWhiteSpace(modelButton.Url))
+                                continue;
+
+                            btn["url"] = modelButton.Url;
+
+                            btn.Remove("example");
+
+                            validButtons.Add(btn);
+
+                            continue;
+                        }
+
+                        // ================================
+                        // DYNAMIC
+                        // ================================
+
+                        if (modelButton.UrlType == "DYNAMIC")
+                        {
+                            if (string.IsNullOrWhiteSpace(modelButton.UrlBase))
+                                continue;
+
+                            // ====================================
+                            // POSITIONAL PARAM
+                            // ====================================
+
+                            btn["url"] =
+                                $"{modelButton.UrlBase}{{{{1}}}}";
+
+                            btn["example"] = new JsonArray
+                    {
+                        modelButton.DynamicExample ?? "123456"
+                    };
+
+                            validButtons.Add(btn);
+
+                            continue;
+                        }
+                    }
+                }
+
+                // ========================================
+                // REEMPLAZAR BOTONES
+                // ========================================
+
+                buttons["buttons"] = validButtons;
+            }
+
+            // ============================================
+            // PARAMETER FORMAT
+            // ============================================
+
+            requestObj["parameter_format"] = "POSITIONAL";
+
+            // ============================================
+            // JSON FINAL
+            // ============================================
+
+            var finalJson = requestObj.ToJsonString(
+                new JsonSerializerOptions
+                {
+                    WriteIndented = true
+                });
+
+            Console.WriteLine("============== JSON FINAL ==============");
+            Console.WriteLine(finalJson);
+
+            // ============================================
+            // HTTP
+            // ============================================
 
             using var httpClient = new HttpClient();
+
             httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", accessToken);
+                new AuthenticationHeaderValue(
+                    "Bearer",
+                    accessToken);
 
-            var url = $"https://graph.facebook.com/v22.0/{wabaId}/message_templates";
+            var url =
+                $"https://graph.facebook.com/v22.0/{wabaId}/message_templates";
 
-            var content = new StringContent(finalJson, Encoding.UTF8, "application/json");
-            var response = await httpClient.PostAsync(url, content);
+            var content = new StringContent(
+                finalJson,
+                Encoding.UTF8,
+                "application/json");
 
-            var responseBody = await response.Content.ReadAsStringAsync();
+            var response = await httpClient.PostAsync(
+                url,
+                content);
+
+            var responseBody =
+                await response.Content.ReadAsStringAsync();
+
+            Console.WriteLine("============== RESPONSE META ==============");
+            Console.WriteLine(responseBody);
 
             if (!response.IsSuccessStatusCode)
             {
-                Console.WriteLine("Error Meta:");
+                Console.WriteLine("============== ERROR META ==============");
                 Console.WriteLine(responseBody);
+
                 return false;
             }
 
-            Console.WriteLine("Template creado correctamente:");
+            Console.WriteLine("============== TEMPLATE CREADO ==============");
             Console.WriteLine(responseBody);
+
             return true;
         }
 
-        public async Task<string> UploadTemplateImageAsync(string accessToken, string imageUrl)
+        private async Task<string> UploadTemplateImageAsync(
+            string accessToken,
+            string imageUrl)
+        {
+            using var httpClient = new HttpClient();
+
+            httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue(
+                    "Bearer",
+                    accessToken);
+
+            // ============================================
+            // DESCARGAR IMAGEN
+            // ============================================
+
+            var imageBytes =
+                await httpClient.GetByteArrayAsync(imageUrl);
+
+            // ============================================
+            // PASO 1:
+            // CREAR UPLOAD SESSION
+            // ============================================
+
+            var fileLength = imageBytes.Length;
+
+            var createSessionUrl =
+                $"https://graph.facebook.com/v22.0/app/uploads" +
+                $"?file_name=header.jpg" +
+                $"&file_length={fileLength}" +
+                $"&file_type=image/jpeg";
+
+            var createResponse =
+                await httpClient.PostAsync(
+                    createSessionUrl,
+                    null);
+
+            var createBody =
+                await createResponse.Content.ReadAsStringAsync();
+
+            Console.WriteLine("======= CREATE SESSION =======");
+            Console.WriteLine(createBody);
+
+            if (!createResponse.IsSuccessStatusCode)
+                throw new Exception(createBody);
+
+            var createJson = JsonNode.Parse(createBody);
+
+            var uploadId = createJson?["id"]?.ToString();
+
+            if (string.IsNullOrWhiteSpace(uploadId))
+                throw new Exception("Meta no devolvió upload session id");
+
+            // ============================================
+            // PASO 2:
+            // SUBIR BINARIO
+            // ============================================
+
+            using var uploadContent =
+                new ByteArrayContent(imageBytes);
+
+            uploadContent.Headers.ContentType =
+                new MediaTypeHeaderValue("image/jpeg");
+
+            var uploadRequest =
+                new HttpRequestMessage(
+                    HttpMethod.Post,
+                    $"https://graph.facebook.com/v22.0/{uploadId}");
+
+            uploadRequest.Content = uploadContent;
+
+            uploadRequest.Headers.Add(
+                "file_offset",
+                "0");
+
+            var uploadResponse =
+                await httpClient.SendAsync(uploadRequest);
+
+            var uploadBody =
+                await uploadResponse.Content.ReadAsStringAsync();
+
+            Console.WriteLine("======= UPLOAD RESPONSE =======");
+            Console.WriteLine(uploadBody);
+
+            if (!uploadResponse.IsSuccessStatusCode)
+                throw new Exception(uploadBody);
+
+            // ============================================
+            // META DEVUELVE EL HANDLE FINAL EN "h"
+            // ============================================
+
+            var uploadJson = JsonNode.Parse(uploadBody);
+
+            var handle =
+                uploadJson?["h"]?.ToString();
+
+            if (string.IsNullOrWhiteSpace(handle))
+                throw new Exception(
+                    "Meta no devolvió header handle.");
+
+            return handle;
+        }
+
+        public async Task<string> UploadTemplateImageAsyncsWSD(string accessToken, string imageUrl)
         {
             using var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Authorization =

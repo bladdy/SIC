@@ -40,5 +40,6 @@ namespace SIC.Shared.Entities
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public DateTime? RevokedAt { get; set; }
+        public DateTime TokenExpiresAt { get; set; }
     }
 }

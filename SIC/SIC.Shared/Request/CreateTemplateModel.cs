@@ -3,9 +3,9 @@
     // Modelo principal de la plantilla
     public class CreateTemplateModel
     {
-        public string Name { get; set; } = "";
-        public string Language { get; set; } = "es_ES";
-        public string Category { get; set; } = "MARKETING"; // MARKETING / UTILITY / AUTHENTICATION / SERVICE
+        public string Name { get; set; } = string.Empty;
+        public string Language { get; set; } = "es_MX";
+        public string Category { get; set; } = "UTILITY"; // MARKETING / UTILITY / AUTHENTICATION / SERVICE
         public HeaderModel? Header { get; set; }
         public List<ComponentRequest> Components { get; set; } = new(); // Lista de componentes
         public string? Footer { get; set; }
@@ -13,7 +13,7 @@
         public List<string> BodyExampleTypes { get; set; } = new();
         public List<ButtonModel> Buttons { get; set; } = new();
         public string MediaType { get; set; } = ""; // IMAGE / VIDEO / DOCUMENT
-        public string? MediaUrl { get; set; }
+        public string? MediaUrl { get; set; } = "https://invboxv.com/wp-content/uploads/2026/05/WhatsApp-Image-2026-05-28-at-7.22.03-PM.jpeg";
         public string? MediaCaption { get; set; }
     }
 
