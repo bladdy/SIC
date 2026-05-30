@@ -461,12 +461,14 @@
                     "Exito",
                     "Plantilla enviada correctamente para revisión.",
                     SweetAlertIcon.Success);
+
+                IsSubmitting = false;
+                Navigation.NavigateTo("/whatsapp_templates");
             }
             else
             {
                 var error =
                     await response.Content.ReadAsStringAsync();
-
 
                 await SweetAlertService.FireAsync(
                     "Error",
