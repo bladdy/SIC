@@ -1,0 +1,189 @@
+﻿@page "/buy-product"
+@inject NavigationManager NavigationManager
+<div class="container py-5">
+
+    <div class="text-center mb-4">
+        <h3 style="text-transform: uppercase; font-weight: bold; color: #3f6d78;">
+            PAQUETES DE ACUERDO A TUS NECESIDADES
+        </h3>
+    </div>
+    <div class="row justify-content-center mt-5">
+
+        <!-- Card 1 -->
+        <div class="col-lg-4 col-md-6 mb-4">
+
+            <div style="
+                border:4px solid #3f6d78;
+                border-radius:20px;
+                padding:35px 25px;
+                text-align:center;
+                height:600px;
+                width:400px;
+                background:white;">
+
+                <div style="font-size:60px; margin-bottom:20px;">
+                    <img src="credit1.png" alt="Logo" class="mb-3" style="width: 200px; height: auto; border-radius: 50%;" />
+                </div>
+
+                <h4 style="
+                    color:#3f6d78;
+                    font-weight:bold;
+                    text-transform:uppercase;
+                    margin-bottom:30px;">
+                    Planner Esencial
+                </h4>
+
+                <div style="border-bottom:2px solid #3C6A79; padding:10px;">
+                    Crear 1 evento
+                </div>
+
+                <div style="border-bottom:2px solid #3C6A79; padding:10px;">
+                    Subir lista de invitados en la app
+                </div>
+
+                <div style="border-bottom:2px solid #3C6A79; padding:10px;">
+                    Crear plantillas para mensaje de envío
+                </div>
+                <div style="border-bottom:2px solid #3C6A79; padding:10px;">
+                    Enviar invitaciones masivas
+                </div>
+
+                <div style="padding:10px;">
+                   Lista de asistentes en PDF
+                </div>
+
+
+                <div style="margin-top:35px;">
+                    <button class="btn btn-custom btn-lg">
+                        $997 / 1 CREDITO
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Card 2 -->
+        <div class="col-lg-4 col-md-6 mb-4">
+
+            <div style="
+                border:4px solid #3f6d78;
+                border-radius:20px;
+                padding:35px 25px;
+                text-align:center;
+                height:600px;
+                background:white;">
+
+                <div style="font-size:60px; margin-bottom:20px;">
+                    <img src="credit2.png" alt="Logo" class="mb-3" style="width: 200px; height: auto;"/>
+                </div>
+                <h4 style="
+                    color:#3f6d78;
+                    font-weight:bold;
+                    text-transform:uppercase;
+                    margin-bottom:30px;">
+                    Planner Elite
+                </h4>
+                <div style="border-bottom:2px solid #3C6A79; padding:10px;">
+                    Crear 3 eventos
+                </div>
+
+                <div style="border-bottom:2px solid #3C6A79; padding:10px;">
+                    Subir lista de invitados en la app
+                </div>
+
+                <div style="border-bottom:2px solid #3C6A79; padding:10px;">
+                    Crear plantillas para mensaje de envío
+                </div>
+                <div style="border-bottom:2px solid #3C6A79; padding:10px;">
+                    Enviar invitaciones masivas
+                </div>
+
+                <div style="padding:10px;">
+                    Lista de asistentes en PDF
+                </div>
+
+                <div style="margin-top:35px;">
+                    <button class="btn btn-custom btn-lg" @onclick="Pay">
+                        >
+                        $2,697 / 3 CREDITOS
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Card 3 -->
+        <div class="col-lg-4 col-md-6 mb-4">
+
+            <div style="
+                border:4px solid #3f6d78;
+                border-radius:20px;
+                padding:35px 25px;
+                text-align:center;
+                height:600px;
+                background:white;">
+
+                <div style="font-size:60px; margin-bottom:20px;">
+                    <img src="credit3.png" alt="Logo" class="mb-3" style="width: 200px; height: auto;" />
+                </div>
+                <h4 style="
+                    color:#3f6d78;
+                    font-weight:bold;
+                    text-transform:uppercase;
+                    margin-bottom:30px;">
+                    Planner Premium
+                </h4>
+
+                <div style="border-bottom:2px solid #3C6A79; padding:10px;">
+                    Crear 5 eventos
+                </div>
+
+                <div style="border-bottom:2px solid #3C6A79; padding:10px;">
+                    Subir lista de invitados en la app
+                </div>
+
+                <div style="border-bottom:2px solid #3C6A79; padding:10px;">
+                    Crear plantillas para mensaje de envío
+                </div>
+                <div style="border-bottom:2px solid #3C6A79; padding:10px;">
+                    Enviar invitaciones masivas
+                </div>
+
+                <div style="padding:10px;">
+                    Lista de asistentes en PDF
+                </div>
+
+                <div style="margin-top:35px;">
+                    <button class="btn btn-custom btn-lg">
+                        $2,997 / 5 CREDITOS
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="text-center mb-4">
+
+        <p style="max-width:800px; margin:auto; color:#3C6A79;">
+            Antes de comprar te recomendamos dar clic en el botón y leer todo el contenido para que estés informado como funcionan los créditos y los eventos.
+        </p>
+
+        <div style="margin-top:20px;">
+            <button class="btn btn-custom me-2" @onclick="goToPurchasingPolicy">
+                POLITICAS DE COMPRA
+            </button>
+
+            <button class="btn btn-custom" @onclick="goToTermsConditions">
+                TERMINOS Y CONDICIONES
+            </button>
+        </div>
+
+    </div>
+</div>
+
+

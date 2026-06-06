@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SIC.Shared.Entities
+﻿namespace SIC.Shared.Entities
 {
     public class HistoryMessages
     {
@@ -16,7 +10,13 @@ namespace SIC.Shared.Entities
         public DateTime SendDate { get; set; } = DateTime.UtcNow;
         public bool Send { get; set; }
         public bool Delivered { get; set; }
+        public bool Read { get; set; }
         public bool Error { get; set; }
+
+        public string? MessageId { get; set; }      // wamid...
+        public string? ErrorCode { get; set; }
+        public string? ErrorMessage { get; set; }
+
         public string? Message { get; set; }
     }
 }

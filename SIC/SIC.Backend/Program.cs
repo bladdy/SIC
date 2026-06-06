@@ -11,7 +11,9 @@ using SIC.Backend.Repositories.Interfaces;
 using SIC.Backend.Services;
 using SIC.Backend.UnitOfWork.Implemetations;
 using SIC.Backend.UnitOfWork.Interfaces;
+using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
+using Stripe;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -65,7 +67,9 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddTransient<SeedDb>();
-
+//Servicio Stipe
+builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("StripeSettings"));
+builder.Services.AddScoped<ProductService>();
 // Registrar el servicio de WhatsAppService
 
 builder.Services.AddScoped<QRBannerService>();

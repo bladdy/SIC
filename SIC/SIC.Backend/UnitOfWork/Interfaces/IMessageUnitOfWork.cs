@@ -17,7 +17,7 @@ namespace SIC.Backend.UnitOfWork.Interfaces
 
         Task<ActionResponse<IEnumerable<MessageKey>>> GetKeysAsync();
 
-        Task<ActionResponse<bool>> AddHistoryMessages(string code, bool Success, string? Message);
+        Task<ActionResponse<bool>> AddHistoryMessages(string code, bool Success, string? Message, WhatsAppMessageResponse messageResponse);
 
         Task<ActionResponse<IEnumerable<HistoryMessages>>> GetHistoryMessagesAsync(PaginationDTO pagination);
 
@@ -34,5 +34,7 @@ namespace SIC.Backend.UnitOfWork.Interfaces
         Task<List<InboxConversationDto>> GetInboxAsync(string usuarioId);
 
         Task<List<InboxConversationDto>> GetInboxAsync(string phoneNumber, string eventC);
+
+        Task UpdateStatusAsync(string id, string status);
     }
 }

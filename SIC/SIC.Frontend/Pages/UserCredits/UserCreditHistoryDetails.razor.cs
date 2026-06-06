@@ -1,7 +1,9 @@
 using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using SIC.Frontend.Repositories;
+using SIC.Frontend.Services;
 using SIC.Shared.Entities;
 using System.Net;
 using System.Security.Claims;
@@ -11,8 +13,10 @@ namespace SIC.Frontend.Pages.UserCredits
     public partial class UserCreditHistoryDetails
     {
         private int totalPages;
-        private int currentPage = 1;
         public List<UserCreditHistory>? userCreditHistories { get; set; }
+        private int currentPage = 1;
+        private int Credits = 1;
+        [Inject] private PaymentService PaymentService { get; set; } = default!;
         [Inject] private IRepository Repository { get; set; } = default!;
         [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
         [Inject] private NavigationManager NavigationManager { get; set; } = default!;
@@ -90,6 +94,16 @@ namespace SIC.Frontend.Pages.UserCredits
 
             userCreditHistories = responseHttp?.Response ?? new List<UserCreditHistory>();
             return true;
+        }
+
+        private async Task Pay()
+        {
+            NavigationManager.NavigateTo("/buy-product");
+            /*var url =
+            await PaymentService.CreatePayment(Credits);
+
+            if(!string.IsNullOrEmpty(url))
+                NavigationManager.NavigateTo(url, true);*/
         }
     }
 }

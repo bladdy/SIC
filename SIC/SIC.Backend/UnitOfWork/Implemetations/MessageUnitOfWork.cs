@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR.Protocol;
 using SIC.Backend.Repositories.Interfaces;
 using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.DTOs;
@@ -26,7 +27,7 @@ namespace SIC.Backend.UnitOfWork.Implemetations
 
         public async Task<ActionResponse<IEnumerable<MessageWhatsappInvitationDTO>>> GetMessageWhatsappInvitation(string code) => await _messageRepository.GetMessageWhatsappInvitation(code);
 
-        public async Task<ActionResponse<bool>> AddHistoryMessages(string code, bool Success, string? Message) => await _messageRepository.AddHistoryMessages(code, Success, Message);
+        public async Task<ActionResponse<bool>> AddHistoryMessages(string code, bool Success, string? Message, WhatsAppMessageResponse messageResponse) => await _messageRepository.AddHistoryMessages(code, Success, Message, messageResponse);
 
         public async Task<ActionResponse<IEnumerable<HistoryMessages>>> GetHistoryMessagesAsync(PaginationDTO pagination) => await _messageRepository.GetHistoryMessagesAsync(pagination);
 
@@ -43,5 +44,7 @@ namespace SIC.Backend.UnitOfWork.Implemetations
         public async Task<List<InboxConversationDto>> GetInboxAsync(string usuarioId) => await _messageRepository.GetInboxAsync(usuarioId);
 
         public async Task<List<InboxConversationDto>> GetInboxAsync(string phoneNumber, string eventC) => await _messageRepository.GetInboxAsync(phoneNumber, eventC);
+
+        public async Task UpdateStatusAsync(string id, string status) => await _messageRepository.UpdateStatusAsync(id, status);
     }
 }

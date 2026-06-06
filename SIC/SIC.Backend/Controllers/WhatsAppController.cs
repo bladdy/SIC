@@ -641,7 +641,7 @@ namespace SIC.Backend.Controllers
                 Type = "template",
                 ReplyToMessageId = result.Result!.Wamid,
                 Direction = "OUT",
-                Status = "sent"
+                Status = "sent",
             };
 
             var response = await _iMessageUnitOfWork
@@ -742,7 +742,8 @@ namespace SIC.Backend.Controllers
             return await _iMessageUnitOfWork.AddHistoryMessages(
                 code,
                 result.Success,
-                result.Success ? "Mensaje enviado correctamente." : result.Message
+                result.Success ? "Mensaje enviado correctamente." : result.Message,
+                result.Result!
             );
         }
     }

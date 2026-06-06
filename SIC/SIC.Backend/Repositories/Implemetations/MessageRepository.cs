@@ -148,39 +148,19 @@ namespace SIC.Backend.Repositories.Implemetations
             };
         }
 
-        public async Task<ActionResponse<bool>> AddHistoryMessages(string code, bool Success, string? Message)
+        public async Task<ActionResponse<bool>> AddHistoryMessages(
+            string code,
+            bool Success,
+            string? Message,
+            WhatsAppMessageResponse messageResponse)
         {
             try
             {
-                string mensajeMostrar;
-
-                if (!string.IsNullOrWhiteSpace(Message) && Message.Trim().StartsWith("{"))
-                {
-                    try
-                    {
-                        dynamic? errorObject = JsonConvert.DeserializeObject<dynamic>(Message);
-
-                        string? mensajePrincipal = errorObject?.error?.message?.ToString();
-                        string? detalle = errorObject?.error?.error_data?.details?.ToString();
-
-                        mensajeMostrar = detalle ?? mensajePrincipal ?? "Error desconocido";
-                    }
-                    catch
-                    {
-                        mensajeMostrar = Message; // Si falla el parseo, devuelve el texto original
-                    }
-                }
-                else
-                {
-                    mensajeMostrar = Message ?? "Error desconocido";
-                }
-
-                Console.WriteLine(mensajeMostrar);
-
-                var invitations = await _context.Invitations
+                var invitation = await _context.Invitations
                     .Include(i => i.Event)
                     .FirstOrDefaultAsync(i => i.Code == code);
-                if (invitations == null)
+
+                if (invitation == null)
                 {
                     return new ActionResponse<bool>
                     {
@@ -188,31 +168,85 @@ namespace SIC.Backend.Repositories.Implemetations
                         Message = "La invitación no existe."
                     };
                 }
-                //ToDo: Revisar esto
-                var mesage = new HistoryMessages
+
+                string mensajeMostrar = Message ?? string.Empty;
+
+                if (!Success)
                 {
-                    Invitation = invitations,
-                    Event = invitations.Event!,
-                    Delivered = Success,
+                    if (!string.IsNullOrWhiteSpace(Message) &&
+                        Message.Trim().StartsWith("{"))
+                    {
+                        try
+                        {
+                            dynamic? errorObject =
+                                JsonConvert.DeserializeObject<dynamic>(Message);
+
+                            string? mensajePrincipal =
+                                errorObject?.error?.message?.ToString();
+
+                            string? detalle =
+                                errorObject?.error?.error_data?.details?.ToString();
+
+                            mensajeMostrar =
+                                detalle ??
+                                mensajePrincipal ??
+                                "Error desconocido";
+                        }
+                        catch
+                        {
+                            mensajeMostrar = Message;
+                        }
+                    }
+                    else
+                    {
+                        mensajeMostrar = Message ?? "Error desconocido";
+                    }
+                }
+
+                var history = new HistoryMessages
+                {
+                    InvitationId = invitation.Id,
+                    EventId = invitation.EventId,
+
                     SendDate = DateTime.UtcNow,
+
+                    // Estado inicial al enviar
                     Send = Success,
+
+                    // Estos estados se actualizarán desde el webhook
+                    Delivered = false,
+                    Read = false,
+
                     Error = !Success,
-                    Message = mensajeMostrar,
+
+                    // wamid retornado por WhatsApp
+                    MessageId = messageResponse?.Wamid,
+
+                    ErrorMessage = !Success
+                        ? mensajeMostrar
+                        : null,
+
+                    Message = Success
+                        ? "Plantilla enviada correctamente"
+                        : mensajeMostrar
                 };
-                _context.Add(mesage);
+
+                _context.HistoryMessages.Add(history);
+
                 await _context.SaveChangesAsync();
+
                 return new ActionResponse<bool>
                 {
                     Success = true,
-                    Message = "La History Messages."
+                    Message = "Historial guardado correctamente."
                 };
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return new ActionResponse<bool>
                 {
                     Success = false,
-                    Message = "Algo paso."
+                    Message = ex.Message
                 };
             }
         }
@@ -500,6 +534,37 @@ namespace SIC.Backend.Repositories.Implemetations
                 Console.WriteLine($"Error al obtener el inbox: {ex.Message}");
                 return new List<InboxConversationDto>();
             }
+        }
+
+        public async Task UpdateStatusAsync(string messageId, string status)
+        {
+            var history = await _context.HistoryMessages
+                .FirstOrDefaultAsync(x => x.MessageId == messageId);
+
+            if (history == null)
+                return;
+
+            switch (status?.ToLower())
+            {
+                case "accepted":
+                case "sent":
+                    history.Send = true;
+                    break;
+
+                case "delivered":
+                    history.Delivered = true;
+                    break;
+
+                case "read":
+                    history.Read = true;
+                    break;
+
+                case "failed":
+                    history.Error = true;
+                    break;
+            }
+
+            await _context.SaveChangesAsync();
         }
     }
 }
