@@ -32,23 +32,24 @@
                         <div class="mb-3">
                             <p class="mb-2">Elija su respuesta:</p>
 
-                            <InputRadioGroup @bind-Value="Asistira"
-                            class="d-flex justify-content-center align-items-center gap-4">
+                            <InputRadioGroup @bind-Value="Asistira">
 
-                                <div class="form-check form-check-inline custom-radio">
-                                    <InputRadio class="form-check-input custom-radio"
-                                    Value="true" />
-                                    <label class="form-check-label">
-                                        Sí Asistiré
-                                    </label>
-                                </div>
+                                <div class="d-flex justify-content-center align-items-center gap-4">
 
-                                <div class="form-check form-check-inline">
-                                    <InputRadio class="form-check-input custom-radio"
-                                    Value="false" />
-                                    <label class="form-check-label">
-                                        No Asistiré
+                                    <label class="d-flex align-items-center gap-2 mb-0"
+                                           style="cursor:pointer; white-space:nowrap;">
+                                        <InputRadio class="form-check-input m-0"
+                                                    Value="true" />
+                                        <span>Sí Asistiré</span>
                                     </label>
+
+                                    <label class="d-flex align-items-center gap-2 mb-0"
+                                           style="cursor:pointer; white-space:nowrap;">
+                                        <InputRadio class="form-check-input m-0"
+                                                    Value="false" />
+                                        <span>No Asistiré</span>
+                                    </label>
+
                                 </div>
 
                             </InputRadioGroup>
@@ -69,19 +70,33 @@
                                         </div>
 
                                         <div class="col-6 d-flex gap-4 justify-content-center">
+                                            <div class="form-check">
+                                                <input class="form-check-input"
+                                                       id="@($"invitado_{contador}_si")"
+                                                       type="radio"
+                                                       name="guest_@guest.Id"
+                                                       checked="@(guest.Status == Status.Attend)"
+                                                       @onclick="() => guest.Status = Status.Attend" />
 
-                                            <input class="form-check-input"
-                                            type="radio"
-                                            name="guest_@guest.Id"
-                                            disabled="@(Asistira == false)"
-                                            checked="@(guest.Status == Status.Attend)"
-                                            @onclick="() => guest.Status = Status.Attend" /> Sí
+                                                <label class="form-check-label"
+                                                       for="@($"invitado_{contador}_si")">
+                                                    Sí
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input"
+                                                       id="@($"invitado_{contador}_no")"
+                                                       type="radio"
+                                                       name="guest_@guest.Id"
+                                                       checked="@(guest.Status == Status.NotAttend)"
+                                                       @onclick="() => guest.Status = Status.NotAttend" />
 
-                                            <input class="form-check-input"
-                                            type="radio"
-                                            name="guest_@guest.Id"
-                                            checked="@(guest.Status == Status.NotAttend)"
-                                            @onclick="() => guest.Status = Status.NotAttend" /> No
+                                                <label class="form-check-label"
+                                                       for="@($"invitado_{contador}_no")">
+                                                    No
+                                                </label>
+                                            </div>
+                                            
                                         </div>
                                     </div>
 
