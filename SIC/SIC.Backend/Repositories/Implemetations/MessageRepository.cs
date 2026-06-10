@@ -536,7 +536,10 @@ namespace SIC.Backend.Repositories.Implemetations
             }
         }
 
-        public async Task UpdateStatusAsync(string messageId, string status)
+        public async Task UpdateStatusAsync(
+            string messageId,
+            string status,
+            string? errorCode = null)
         {
             var history = await _context.HistoryMessages
                 .FirstOrDefaultAsync(x => x.MessageId == messageId);
@@ -549,22 +552,68 @@ namespace SIC.Backend.Repositories.Implemetations
                 case "accepted":
                 case "sent":
                     history.Send = true;
+                    history.Message = "Mensaje enviado correctamente.";
                     break;
 
                 case "delivered":
                     history.Delivered = true;
+                    history.Message = "Mensaje entregado al destinatario.";
                     break;
 
                 case "read":
                     history.Read = true;
+                    history.Message = "Mensaje leído por el destinatario.";
                     break;
 
                 case "failed":
                     history.Error = true;
+                    history.ErrorCode = errorCode;
+                    history.ErrorMessage = GetMetaErrorMessage(errorCode);
+                    history.Message = history.ErrorMessage;
                     break;
             }
 
             await _context.SaveChangesAsync();
+        }
+
+        private static string GetMetaErrorMessage(string? errorCode)
+        {
+            return errorCode switch
+            {
+                "131026" => "No fue posible entregar el mensaje. El número puede no tener WhatsApp o no estar disponible.",
+
+                "131031" => "La cuenta de WhatsApp Business está restringida o bloqueada.",
+
+                "131042" => "Existe un problema relacionado con la facturación o pagos de la cuenta.",
+
+                "131047" => "No se puede enviar el mensaje porque la conversación ha expirado (ventana de 24 horas cerrada).",
+
+                "131049" => "Meta decidió no entregar el mensaje para proteger la experiencia del usuario.",
+
+                "131050" => "El usuario ha dejado de recibir mensajes de marketing.",
+
+                "131051" => "El tipo de mensaje enviado no es compatible.",
+
+                "131052" => "No fue posible descargar el archivo multimedia.",
+
+                "131053" => "No fue posible cargar el archivo multimedia.",
+
+                "131056" => "Se alcanzó el límite de mensajes permitidos para este destinatario.",
+
+                "131060" => "El mensaje solicitado ya no está disponible.",
+
+                "131064" => "Se alcanzó un límite relacionado con la calidad o clasificación de plantillas.",
+
+                "130429" => "Se excedió el límite de velocidad permitido por WhatsApp.",
+
+                "130497" => "No es posible enviar mensajes al país de destino debido a restricciones.",
+
+                "131021" => "El remitente y destinatario no pueden ser el mismo número.",
+
+                null => "Error desconocido reportado por WhatsApp.",
+
+                _ => $"Error de WhatsApp ({errorCode}). Consulte la documentación de Meta para más detalles."
+            };
         }
     }
 }

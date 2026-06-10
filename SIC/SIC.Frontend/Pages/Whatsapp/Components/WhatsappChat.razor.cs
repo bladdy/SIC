@@ -6,6 +6,7 @@ using SIC.Frontend.Repositories;
 using SIC.Frontend.Services;
 using SIC.Shared.DTOs;
 using SIC.Shared.Response;
+using System.Net;
 using System.Text.RegularExpressions;
 
 namespace SIC.Frontend.Pages.Whatsapp.Components;
@@ -89,34 +90,52 @@ public partial class WhatsappChat : ComponentBase, IAsyncDisposable
 
         await InvokeAsync(StateHasChanged);
     }
+
     private MarkupString FormatWhatsAppText(string text)
     {
-        if (string.IsNullOrEmpty(text))
+        if (string.IsNullOrWhiteSpace(text))
             return new MarkupString("");
+
+        // Seguridad
+        text = WebUtility.HtmlEncode(text);
 
         // Saltos de línea
         text = text.Replace("\\n", "<br>")
                    .Replace("\r\n", "<br>")
                    .Replace("\n", "<br>");
 
-        // Links (http / https)
+        // Negrita
+        text = Regex.Replace(
+            text,
+            @"\*([^\*]+)\*",
+            "<strong>$1</strong>");
+
+        // Cursiva
+        text = Regex.Replace(
+            text,
+            @"_([^_]+)_",
+            "<em>$1</em>");
+
+        // Tachado
+        text = Regex.Replace(
+            text,
+            @"~([^~]+)~",
+            "<del>$1</del>");
+
+        // URLs al final
         text = Regex.Replace(
             text,
             @"(https?:\/\/[^\s<]+)",
-            "<a href=\"$1\" target=\"_blank\" class=\"chat-link\">$1</a>"
-        );
+            m =>
+            {
+                var url = m.Value;
 
-        // *negrita*
-        text = Regex.Replace(text, @"\*(.*?)\*", "<strong>$1</strong>");
-
-        // _cursiva_
-        text = Regex.Replace(text, @"_(.*?)_", "<em>$1</em>");
-
-        // ~tachado~
-        text = Regex.Replace(text, @"~(.*?)~", "<del>$1</del>");
+                return $"<a href=\"{url}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"chat-link\">{url}</a>";
+            });
 
         return new MarkupString(text);
     }
+
     private void MarkMessagesAsync(List<string> messageIds)
     {
         Repository.PutAsync(

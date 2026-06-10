@@ -45,6 +45,6 @@ namespace SIC.Backend.UnitOfWork.Implemetations
 
         public async Task<List<InboxConversationDto>> GetInboxAsync(string phoneNumber, string eventC) => await _messageRepository.GetInboxAsync(phoneNumber, eventC);
 
-        public async Task UpdateStatusAsync(string id, string status) => await _messageRepository.UpdateStatusAsync(id, status);
+        public async Task UpdateStatusAsync(string id, string status, string errorCode) => await _messageRepository.UpdateStatusAsync(id, status, errorCode);
     }
 }

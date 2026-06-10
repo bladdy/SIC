@@ -527,7 +527,7 @@ namespace SIC.Backend.Controllers
                     );
                     if (components == null)
                         continue;
-                    var fullnumber = string.Concat(invitacion.Result.CountryCode, invitacion.Result.PhoneNumber);
+                    var fullnumber = string.Concat(invitacion.Result.CountryCode, invitacion.Result.PhoneNumber);// +1 
 
                     var result = await _whatsAppService.EnviarTemplateDinamicoAsync(
                         accessToken,

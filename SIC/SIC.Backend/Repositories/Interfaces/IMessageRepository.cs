@@ -34,6 +34,7 @@ namespace SIC.Backend.Repositories.Interfaces
         Task<ActionResponse<bool>> MarkMessagesAsSeenAsync(string psid);
 
         Task<List<InboxConversationDto>> GetInboxAsync(string phoneNumber, string eventC);
-        Task UpdateStatusAsync(string id, string status);
+
+        Task UpdateStatusAsync(string id, string status, string errorCode);
     }
 }

@@ -16,7 +16,8 @@ public static class DateTimeExtensions
 
     public static string ToDateLocal12h(this DateTime date)
     {
-        return date.ToString("dd/MM/yyyy hh:mm tt");
+        return date.ToLocalTime()
+               .ToString("dd/MM/yyyy hh:mm tt");
     }
 
     public static string FormatearFechaLargaEspanol(this DateTime fecha)

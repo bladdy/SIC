@@ -20,8 +20,8 @@ public class PaymentsController : ControllerBase
         _product = product;
     }
 
-    [HttpPost("pay")]
-    public async Task<IActionResult> Pay([FromBody] string priceId)
+    [HttpPost("pay/{priceId}")]
+    public async Task<IActionResult> Pay(string priceId)
     {
         StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
         var options = new SessionCreateOptions
@@ -40,7 +40,10 @@ public class PaymentsController : ControllerBase
         };
         var service = new SessionService();
         Session session = await service.CreateAsync(options);
-        return Ok(session.Url);
+        return Ok(new
+        {
+            Url = session.Url
+        });
     }
 
     [HttpGet("GetAllProducts")]
@@ -49,7 +52,7 @@ public class PaymentsController : ControllerBase
         StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
         var options = new ProductListOptions { Expand = new List<string> { "data.default_price" } };
         var products = _product.List(options);
-        return Ok(products);
+        return Ok(products.Data);
     }
 
     [HttpPost("create-checkout-session")]

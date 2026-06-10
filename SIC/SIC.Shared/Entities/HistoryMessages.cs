@@ -12,11 +12,9 @@
         public bool Delivered { get; set; }
         public bool Read { get; set; }
         public bool Error { get; set; }
-
         public string? MessageId { get; set; }      // wamid...
         public string? ErrorCode { get; set; }
         public string? ErrorMessage { get; set; }
-
         public string? Message { get; set; }
     }
 }

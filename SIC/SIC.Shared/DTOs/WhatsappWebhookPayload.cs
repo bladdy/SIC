@@ -99,6 +99,18 @@ namespace SIC.Shared.DTOs
 
         [JsonPropertyName("recipient_id")]
         public string RecipientId { get; set; }
+
+        // NUEVO
+        [JsonPropertyName("errors")]
+        public List<StatusError>? Errors { get; set; }
+
+        // OPCIONAL
+        [JsonPropertyName("conversation")]
+        public ConversationInfo? Conversation { get; set; }
+
+        // OPCIONAL
+        [JsonPropertyName("pricing")]
+        public PricingInfo? Pricing { get; set; }
     }
 
     // =========================
@@ -111,5 +123,56 @@ namespace SIC.Shared.DTOs
 
         [JsonPropertyName("display_phone_number")]
         public string DisplayPhoneNumber { get; set; }
+    }
+
+    public class StatusError
+    {
+        [JsonPropertyName("code")]
+        public int Code { get; set; }
+
+        [JsonPropertyName("title")]
+        public string? Title { get; set; }
+
+        [JsonPropertyName("message")]
+        public string? Message { get; set; }
+
+        [JsonPropertyName("error_data")]
+        public ErrorData? ErrorData { get; set; }
+    }
+
+    public class ErrorData
+    {
+        [JsonPropertyName("details")]
+        public string? Details { get; set; }
+    }
+
+    public class ConversationInfo
+    {
+        [JsonPropertyName("id")]
+        public string? Id { get; set; }
+
+        [JsonPropertyName("expiration_timestamp")]
+        public string? ExpirationTimestamp { get; set; }
+
+        [JsonPropertyName("origin")]
+        public ConversationOrigin? Origin { get; set; }
+    }
+
+    public class ConversationOrigin
+    {
+        [JsonPropertyName("type")]
+        public string? Type { get; set; }
+    }
+
+    public class PricingInfo
+    {
+        [JsonPropertyName("billable")]
+        public bool Billable { get; set; }
+
+        [JsonPropertyName("pricing_model")]
+        public string? PricingModel { get; set; }
+
+        [JsonPropertyName("category")]
+        public string? Category { get; set; }
     }
 }

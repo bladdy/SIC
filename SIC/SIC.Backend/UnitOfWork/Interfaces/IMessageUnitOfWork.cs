@@ -35,6 +35,6 @@ namespace SIC.Backend.UnitOfWork.Interfaces
 
         Task<List<InboxConversationDto>> GetInboxAsync(string phoneNumber, string eventC);
 
-        Task UpdateStatusAsync(string id, string status);
+        Task UpdateStatusAsync(string id, string status, string errorCode);
     }
 }

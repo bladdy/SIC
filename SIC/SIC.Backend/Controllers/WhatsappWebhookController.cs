@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.SignalR;
 using SIC.Backend.Hubs;
 using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.DTOs;
+using SIC.Shared.Enums;
 using System.Security.Claims;
 
 namespace SIC.Backend.Controllers;
@@ -83,13 +84,18 @@ public class WhatsappWebhookController : ControllerBase
                 {
                     try
                     {
+                        var error = status.Errors?.FirstOrDefault();
+
+                        var errorCode = error?.Code.ToString();
+                        var errorTitle = error?.Title;
+
                         Console.WriteLine(
-                            $"MessageId: {status.Id} - Status: {status.Status}");
+                            $"Status: {status.Status} - Error: {errorCode} - {errorTitle}");
 
                         // Actualiza HistoryMessages
                         await _iMessageUnitOfWork.UpdateStatusAsync(
                             status.Id,
-                            status.Status);
+                            status.Status, errorCode);
 
                         // Actualiza tabla de mensajes/chat
                         /*await _iMessageUnitOfWork.UpdateMessageStatusAsync(
