@@ -107,9 +107,12 @@ namespace SIC.Backend.Services
                 "Event.UrlConfirmation" => code,
                 "Event.DateLimitFormatted" => FechaHelper.FormatearFechaLargaEspanol((DateTime)ev.DeadLine!),
                 "Invitation.ReservedSeats" => (invitation.NumberAdults + invitation.NumberYouths + invitation.NumberChildren).ToString(),
-                "Event.Table" => string.IsNullOrWhiteSpace(invitation.Table)
-                        ? "Sin asignar"
-                        : invitation.Table,
+                "Event.Table" =>
+                    !string.IsNullOrWhiteSpace(invitation.TablesEvents?.Name)
+                        ? invitation.TablesEvents.Name
+                        : !string.IsNullOrWhiteSpace(invitation.Table)
+                            ? invitation.Table
+                            : "Sin asignar",
                 "Event.AnotherSupplier" => ev.Url ?? "N/A",
                 _ => ""
             };

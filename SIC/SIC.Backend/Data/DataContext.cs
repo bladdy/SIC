@@ -19,6 +19,7 @@ public class DataContext : IdentityDbContext<User>
     public DbSet<PlanItem> PlanItems { get; set; }
     public DbSet<Event> Events { get; set; }
     public DbSet<Message> Messages { get; set; }
+    public DbSet<TablesEvents> TablesEvents { get; set; }
     public DbSet<InvitationSendLog> InvitationSendLogs { get; set; }
     public DbSet<UsuarioWhatsAppConfig> UsuarioWhatsAppConfigs { get; set; }
     public DbSet<MassiveShippingProgress> MassiveShippingProgresses { get; set; }

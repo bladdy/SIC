@@ -1,0 +1,400 @@
+﻿@page "/events/tables/{Code}"
+@using SIC.Frontend.Shared
+<PageTitle>Mesas del Evento</PageTitle>
+
+<div class="container-fluid p-4">
+
+    <!-- Encabezado -->
+    <div class="row align-items-center mb-4">
+
+        <div class="col-md-4">
+            <div class="input-group">
+                <span class="input-group-text bg-white">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text"
+                class="form-control"
+                placeholder="Buscar por mesa o nombre de invitado..." />
+            </div>
+        </div>
+
+        <div class="col-md-2 text-center">
+            <h5 class="mb-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3C6A79" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-tools-kitchen-2"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M19 3v12h-5c-.023 -3.681 .184 -7.406 5 -12m0 12v6h-1v-3m-10 -14v17m-3 -17v3a3 3 0 1 0 6 0v-3" /></svg>
+                Mis mesas
+            </h5>
+        </div>
+
+        <div class="col-md-4">
+            <div class="row text-center">
+
+                <div class="col">
+                    <h4 class="fw-bold mb-0">@Tables.Count()</h4>
+                    <small>Total</small>
+                </div>
+
+                <div class="col">
+                    <h4 class="fw-bold mb-0">@Tables.Sum(s =>s.Seats)</h4>
+                    <small>Lugares</small>
+                </div>
+
+                <div class="col">
+                    <h4 class="fw-bold mb-0">@(@Tables.Sum(s => s.Seats) - @Tables.Sum(s => s.OccupiedSeats))</h4>
+                    <small>Disponibles</small>
+                </div>
+
+                <div class="col">
+                    <h4 class="fw-bold mb-0">@Tables.Sum(s => s.OccupiedSeats)</h4>
+                    <small>Ocupados</small>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-md-2 text-end">
+            <button class="btn btn-custom" @onclick="() => ShowModaCrearMesa()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-square-plus">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M9 12h6" />
+                    <path d="M12 9v6" />
+                    <path d="M3 5a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-14" />
+                </svg>
+                Mesa
+            </button>
+            <button class="btn btn-custom" @onclick="() => ModaGenerarMesa()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-library-plus">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M7 5.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667l0 -8.666" />
+                    <path d="M4.012 7.26a2.005 2.005 0 0 0 -1.012 1.737v10c0 1.1 .9 2 2 2h10c.75 0 1.158 -.385 1.5 -1" />
+                    <path d="M11 10h6" />
+                    <path d="M14 7v6" />
+                </svg>
+                Mesas
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Tarjetas -->
+    <div class="row g-4">
+
+        @foreach (var mesa in Tables)
+        {
+            <div class="col-xl-3 col-lg-4 col-md-6">
+
+                <div class="card mesa-card h-100">
+
+                    <div class="card-body">
+
+                        <div class="d-flex justify-content-between align-items-start">
+
+                            <small class="text-muted">
+                                @mesa.Description
+                            </small>
+
+                            <div class="d-flex">
+                                <button class="btn btn-sm btn-custom rounded-circle me-1 btn-circle"
+                                        @onclick="() => ShowModaEditaMesa(mesa)">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </button>
+
+                                <button class="btn btn-sm btn-custom rounded-circle btn-circle" @onclick="() => ConfirmDelete(mesa)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <path d="M4 7l16 0" />
+                                        <path d="M10 11l0 6" />
+                                        <path d="M14 11l0 6" />
+                                        <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+                                        <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h3 class="fw-bold mt-2">
+                                Mesa: @mesa.Name
+                            </h3>
+                            <button class="btn btn-sm btn-custom rounded-circle me-1 btn-circle" @onclick="() => ModaAsignarMes(2)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" 
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                                stroke-width="1.5" stroke-linecap="round" 
+                                stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-square-plus">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                    <path d="M9 12h6" />
+                                    <path d="M12 9v6" />
+                                    <path d="M3 5a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-14" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="mt-1">
+
+                            @foreach (var invitacion in mesa.Invitation)
+                            {
+                                <div class="card mb-1">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <h6 class="fw-bold mb-0">
+                                                @invitacion.Name
+                                            </h6>
+
+                                            <button class="btn btn-sm btn-custom rounded-circle btn-circle" @onclick="() => ConfirmDeleteAssign(invitacion)">
+                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                     width="16"
+                                                     height="16"
+                                                     viewBox="0 0 24 24"
+                                                     fill="none"
+                                                     stroke="currentColor"
+                                                     stroke-width="1.5"
+                                                     stroke-linecap="round"
+                                                     stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                    <path d="M4 7l16 0" />
+                                                    <path d="M10 11l0 6" />
+                                                    <path d="M14 11l0 6" />
+                                                    <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                                                </svg>
+                                            </button>
+                                        </div>
+
+                                        @if (invitacion.Guests?.Any() == true)
+                                        {
+                                            <ul class="mb-0">
+                                                @foreach (var guest in invitacion.Guests.Where(g => g.Status == Status.Attend))
+                                                {
+                                                    <li>@guest.GuestName</li>
+                                                }
+                                            </ul>
+                                        }
+                                        else
+                                        {
+                                            <small class="text-muted">
+                                                Sin invitados confirmados
+                                            </small>
+                                        }
+
+                                    </div>
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+
+                    <div class="card-footer border-0">
+
+                        <div class="d-flex justify-content-between">
+
+                            <span>
+                                Lugares:
+                                <strong>@mesa.Seats</strong>
+                            </span>
+
+                            <span>
+                                Ocupados:
+                                <strong>@mesa.OccupiedSeats</strong>
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+    <!-- Paginación -->
+    <div class="d-flex justify-content-center my-3 d-none">
+        <Pagination CurrentPage="currentPage"
+        TotalPages="totalPages"
+        SelectedPage="SelectedPageAsync" />
+
+    </div>
+
+</div>
+
+@if (modaCrearOrEditaMesa)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <EditForm Model="@createOrEditTablesDto" OnValidSubmit="@SaveMesa">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Crear Mesa
+                    </h5>
+                        <button type="button" class="btn-close" @onclick="CloseModaCrearOrEditaMesa"></button>
+                </div>
+                <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Mesa</label>
+                            <InputText class="form-control" @bind-Value="createOrEditTablesDto.Name" />
+                            <ValidationMessage For="@(() => createOrEditTablesDto.Name)" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descripcion</label>
+                            <InputText class="form-control" @bind-Value="createOrEditTablesDto.Description" />
+                            <ValidationMessage For="@(() => createOrEditTablesDto.Description)" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Lugares</label>
+                            <InputNumber class="form-control" @bind-Value="createOrEditTablesDto.Seats" />
+                            <ValidationMessage For="@(() => createOrEditTablesDto.Seats)" />
+                        </div>
+                </div>
+                <div class="modal-footer">
+
+                        <button type="submit" class="btn btn-custom">Asignar</button>
+                        <button type="button" class="btn btn-secondary" @onclick="CloseModaCrearOrEditaMesa">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+                    </EditForm>
+        </div>
+    </div>
+    
+}
+@if (modaAsignarMesa)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <EditForm Model="@AssignTablesDto" OnValidSubmit="@AssignTable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            Asignar Mesa
+                        </h5>
+                        <button type="button" class="btn-close" @onclick="CloseModaAsignarMesa"></button>
+                    </div>
+                    <div class="modal-body">
+                            <!-- Asignar Invitacion Error: REVISAR-->
+                        <div class="mb-3">
+                            <label class="form-label">Asignar a Mesa</label>
+                            <input type="text" class="form-control mb-2"
+                                    placeholder="Filtrar Invitacion..."
+                                    @bind="filterText"
+                                    @bind:event="oninput" />
+                            <select class="form-select" @bind="AssignTablesDto.InvitationId">
+                                <option value="">-- Selecciona una Invitacion --</option>
+                                @foreach (var inv in FilteredInvitation)
+                                {
+                                    <option value="@inv.Id">
+                                        @($"{inv.Name} - Confirmados: {inv.Guests?.Count(g => g.Status == Status.Attend) ?? 0}")
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>Mesa</label>
+                            <InputSelect class="form-select" @bind-Value="AssignTablesDto.TableId">
+                                <option value="0">-- Selecciona la Mesa --</option>
+                                @foreach (var table in Tables)
+                                {
+                                    <option value="@table.Id">@table.Name</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => AssignTablesDto.TableId)" />
+                        </div>
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-custom">Asignar</button>
+                        <button type="button" class="btn btn-secondary" @onclick="CloseModaAsignarMesa">
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+
+}
+@if (modaGenerarMesa)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <EditForm Model="@GenerateTablesDto" OnValidSubmit="@GenerarMesa">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            Generar Mesas
+                        </h5>
+                        <button type="button" class="btn-close" @onclick="CloseModaGenerarMesa"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Cantidad de Mesas</label>
+                            <InputNumber class="form-control" @bind-Value="GenerateTablesDto.NumbersTables" />
+                            <ValidationMessage For="@(() => GenerateTablesDto.NumbersTables)" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Lugares en cada mesa</label>
+                            <InputNumber class="form-control" @bind-Value="GenerateTablesDto.NumberOfSeats" />
+                            <ValidationMessage For="@(() => GenerateTablesDto.NumberOfSeats)" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+
+                        <button type="submit" class="btn btn-custom">Generar</button>
+                        <button type="button" class="btn btn-secondary" @onclick="CloseModaGenerarMesa">
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+
+}
+
+
+
+
+<style>
+    .mesa-card {
+        border: 2px solid #3C6A79;
+        border-radius: 15px;
+        transition: .2s;
+    }
+
+        .mesa-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,.10);
+        }
+
+        .mesa-card h3 {
+            font-size: 1.8rem;
+        }
+
+    .card-footer {
+        font-size: 1rem;
+    }
+
+    .btn-success {
+        background-color: #3C6A79;
+        border-color: #3C6A79;
+    }
+
+    .btn-outline-success {
+        color: #3C6A79;
+        border-color: #3C6A79;
+    }
+
+    .btn-circle {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>

@@ -255,13 +255,17 @@ namespace SIC.Backend.Repositories.Implemetations
         {
             var queryable = _context.HistoryMessages
                 .Include(e => e.Event)
+                .ThenInclude(e => e.User)
                 .Include(e => e.Invitation)
                 .AsNoTracking();
-
+            queryable
+                = queryable.Where(u => u.Event.UserId == pagination.UserId &&
+                    u.Invitation != null &&
+                    u.Event != null);
             if (!string.IsNullOrWhiteSpace(pagination.Filter))
             {
                 queryable = queryable.Where(x =>
-                    x.Event.Name.Contains(pagination.Filter));
+                    x.Event.Name.Contains(pagination.Filter) || x.Invitation.Name.Contains(pagination.Filter));
             }
 
             return new ActionResponse<IEnumerable<HistoryMessages>>
@@ -277,14 +281,20 @@ namespace SIC.Backend.Repositories.Implemetations
         public async Task<ActionResponse<int>> GetHistoryMessagesTotalRecordAsync(PaginationDTO pagination)
         {
             var queryable = _context.HistoryMessages
+                .Include(e => e.Event)
+                .ThenInclude(e => e.User)
+                .Include(e => e.Invitation)
                 .AsNoTracking()
                 .AsQueryable();
-
+            queryable
+                = queryable.Where(u => u.Event.UserId == pagination.UserId &&
+                    u.Invitation != null &&
+                    u.Event != null);
             if (!string.IsNullOrWhiteSpace(pagination.Filter))
             {
                 queryable = queryable.Where(x =>
                     x.Event != null &&
-                    x.Event.Name.Contains(pagination.Filter));
+                    x.Event.Name.Contains(pagination.Filter) || x.Invitation.Name.Contains(pagination.Filter));
             }
 
             queryable = queryable.Where(e => e.Invitation != null && e.Event != null);

@@ -1,16 +1,20 @@
 using CurrieTechnologies.Razor.SweetAlert2;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using SIC.Frontend.Repositories;
-using SIC.Frontend.Shared;
 using SIC.Shared.Entities;
 using System.Net;
+using System.Security.Claims;
 
 namespace SIC.Frontend.Pages.HistoryMessage
 {
+    [Authorize(Roles = "Admin,WeddingPlanner,User")]
     public partial class HistoryMessagesIndex
     {
         private int totalPages;
         private int currentPage = 1;
+        private string? userId;
 
         [Parameter, SupplyParameterFromQuery]
         public string? Page { get; set; }
@@ -35,10 +39,14 @@ namespace SIC.Frontend.Pages.HistoryMessage
         private SweetAlertService SweetAlertService { get; set; } = default!;
 
         public List<HistoryMessages> HistoryMessages { get; set; } = new();
+        [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
 
         protected override async Task OnParametersSetAsync()
         {
             // Validar RecordsNumber
+            await base.OnInitializedAsync();
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
             RecordsNumber = RecordsNumber is null or <= 0 ? 15 : RecordsNumber;
 
             // Validar Page desde Query
@@ -50,8 +58,11 @@ namespace SIC.Frontend.Pages.HistoryMessage
             {
                 currentPage = 1;
             }
-
-            await LoadHistoryMessages(currentPage);
+            if (user.Identity is not null && user.Identity.IsAuthenticated)
+            {
+                userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                await LoadHistoryMessages(currentPage);
+            }
         }
 
         private async Task SelectedPage(int page)
@@ -86,7 +97,7 @@ namespace SIC.Frontend.Pages.HistoryMessage
         {
             try
             {
-                var url = $"api/messages/totalRecordAsync?RecordsNumber={RecordsNumber}";
+                var url = $"api/messages/totalRecordAsync?RecordsNumber={RecordsNumber}&UserId={userId}";
 
                 if (SelectedPageSize != null)
                 {
@@ -118,7 +129,7 @@ namespace SIC.Frontend.Pages.HistoryMessage
         {
             try
             {
-                var url = $"api/messages/HistoryMessages/paginated?PageNumber={page}";
+                var url = $"api/messages/HistoryMessages/paginated?UserId={userId}&PageNumber={page}";
                 if (SelectedPageSize != null)
                 {
                     url += $"&PageSize={SelectedPageSize}";

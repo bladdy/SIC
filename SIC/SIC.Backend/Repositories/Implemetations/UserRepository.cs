@@ -35,11 +35,11 @@ namespace SIC.Backend.Repositories.Implemetations
             }
 
             double count = await queryable.CountAsync();
-            double totalPages = Math.Ceiling(count / pagination.PageSize);
+            int totalPages = (int)Math.Ceiling(count / pagination.PageSize);
             return new ActionResponse<int>
             {
                 Success = true,
-                Result = (int)totalPages
+                Result = totalPages
             };
         }
 

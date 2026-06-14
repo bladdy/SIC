@@ -114,6 +114,9 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserCreditUnitsOfWork, UserCreditUnitsOfWork>();
 builder.Services.AddScoped<IUserCreditRepository, UserCreditRepository>();
 
+builder.Services.AddScoped<ITablesEventsUnitOfWork, TablesEventsUnitOfWork>();
+builder.Services.AddScoped<ITablesEventsRepository, TablesEventsRepository>();
+
 builder.Services.AddScoped<IWhatsAppConfigRepository, WhatsAppConfigRepository>();
 builder.Services.AddScoped<IWhatsAppConfigUnitOfWork, WhatsAppConfigUnitOfWork>();
 

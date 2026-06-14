@@ -44,7 +44,7 @@ namespace SIC.Backend.Repositories.Implemetations
         public override async Task<ActionResponse<IEnumerable<Invitation>>> GetAsync(PaginationDTO pagination)
         {
             //ToDo: Agregar el filtro para que filte cada uno de los Guests
-            var queryable = _context.Invitations.Include(t => t.TemplateSents).Include(g => g.Guests).AsQueryable();
+            var queryable = _context.Invitations.Include(t => t.TemplateSents).Include(g => g.Guests).Include(t =>t.TablesEvents).AsQueryable();
             queryable = queryable.Where(x => x.EventId == pagination.Id);
 
             if (!string.IsNullOrWhiteSpace(pagination.Filter))
@@ -134,7 +134,7 @@ namespace SIC.Backend.Repositories.Implemetations
         {
             try
             {
-                // 1. Cargar la invitación actual con sus invitados desde la BD
+                // 1. Cargar la invitación actual con sus invitados
                 var currentInvitation = await _context.Invitations
                     .Include(i => i.Guests)
                     .FirstOrDefaultAsync(i => i.Id == invitation.Id);
@@ -148,18 +148,20 @@ namespace SIC.Backend.Repositories.Implemetations
                     };
                 }
 
-                // 2. Actualizar valores simples de Invitation
+                // Guardar estado anterior para actualizar ocupación de mesas
+                var oldTableId = currentInvitation.TablesEventsId;
+
+                var oldOccupiedSeats =
+                    1 + currentInvitation.Guests.Count(g => g.Status == Status.Attend);
+
+                // 2. Actualizar propiedades simples
                 _context.Entry(currentInvitation).CurrentValues.SetValues(invitation);
 
-                // ==== 3. Sincronizar la colección de Guests ====
-
-                // IDs existentes en la BD
+                // 3. Sincronizar invitados
                 var dbGuests = currentInvitation.Guests.ToList();
-
-                // IDs enviados desde la UI (pueden ser 0 si son nuevos)
                 var incomingGuests = invitation.Guests.ToList();
 
-                // 🔥 3.1 ELIMINAR GUESTS QUE FUERON REMOVIDOS EN LA UI
+                // Eliminar invitados removidos
                 foreach (var guestInDb in dbGuests)
                 {
                     if (!incomingGuests.Any(g => g.Id == guestInDb.Id))
@@ -168,31 +170,87 @@ namespace SIC.Backend.Repositories.Implemetations
                     }
                 }
 
-                // 🔥 3.2 ACTUALIZAR Y AGREGAR GUESTS NUEVOS
+                // Agregar o actualizar invitados
                 foreach (var incoming in incomingGuests)
                 {
                     var existing = dbGuests.FirstOrDefault(g => g.Id == incoming.Id);
 
                     if (existing == null)
                     {
-                        // 👉 ES NUEVO
                         incoming.InvitationId = invitation.Id;
                         _context.InvitationGuest.Add(incoming);
                     }
                     else
                     {
-                        // 👉 ES EXISTENTE — actualizar campos
                         _context.Entry(existing).CurrentValues.SetValues(incoming);
                     }
                 }
 
-                // 4. Guardar todos los cambios
+                // Calcular nueva ocupación
+                var newOccupiedSeats =
+                     incomingGuests.Count(g => g.Status == Status.Attend);
+
+                var newTableId = invitation.TablesEventsId;
+
+                // 4. Actualizar ocupación de mesas
+                if (oldTableId == newTableId)
+                {
+                    // Sigue en la misma mesa
+                    if (newTableId.HasValue)
+                    {
+                        var table = await _context.TablesEvents
+                            .FirstOrDefaultAsync(t => t.Id == newTableId.Value);
+
+                        if (table != null)
+                        {
+                            table.OccupiedSeats += (newOccupiedSeats - oldOccupiedSeats);
+
+                            if (table.OccupiedSeats < 0)
+                            {
+                                table.OccupiedSeats = 0;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    // Restar de la mesa anterior
+                    if (oldTableId.HasValue)
+                    {
+                        var oldTable = await _context.TablesEvents
+                            .FirstOrDefaultAsync(t => t.Id == oldTableId.Value);
+
+                        if (oldTable != null)
+                        {
+                            oldTable.OccupiedSeats -= oldOccupiedSeats;
+
+                            if (oldTable.OccupiedSeats < 0)
+                            {
+                                oldTable.OccupiedSeats = 0;
+                            }
+                        }
+                    }
+
+                    // Sumar a la nueva mesa
+                    if (newTableId.HasValue)
+                    {
+                        var newTable = await _context.TablesEvents
+                            .FirstOrDefaultAsync(t => t.Id == newTableId.Value);
+
+                        if (newTable != null)
+                        {
+                            newTable.OccupiedSeats += newOccupiedSeats;
+                        }
+                    }
+                }
+
+                // 5. Guardar cambios
                 await _context.SaveChangesAsync();
 
                 return new ActionResponse<Invitation>
                 {
                     Success = true,
-                    Result = invitation
+                    Result = currentInvitation
                 };
             }
             catch (DbUpdateException)

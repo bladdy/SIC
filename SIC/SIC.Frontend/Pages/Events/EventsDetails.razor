@@ -404,7 +404,7 @@ else
 
                                                 }
 
-                                                <button class="btn d-inline-flex align-items-center gap-2 text-white d-none"
+                                                <button class="btn d-inline-flex align-items-center gap-2 text-white"
                                                         style="background-color:#25d366;"
                                                         @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)"
                                                         disabled="@(loadingWhatsappId1 == invitation.Id)">
@@ -990,11 +990,26 @@ else
                                 </div>
 
                             </div>
-                            <div class="mb-3">
+                            <div class="mb-3 d-none">
                                 <label class="form-label">Mesa</label>
                                 <InputText class="form-control" @bind-Value="NewInvitation.Table" />
                                 <ValidationMessage For="@(() => NewInvitation.Table)" />
                             </div>
+
+
+                            <div class="mb-3">
+                                <label>Mesa</label>
+                                <InputSelect class="form-select" @bind-Value="NewInvitation.TablesEventsId">
+                                    <option value="0">-- Selecciona la Mesa --</option>
+                                    @foreach (var table in Tables)
+                                    {
+                                        <option value="@table.Id">@table.Name</option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => NewInvitation.TablesEventsId)" />
+                            </div>
+
+
                             <div class="mb-3">
                                 <label class="form-label">Dedicatoria</label>
                                 <InputTextArea class="form-control" @bind-Value="NewInvitation.Comments" />

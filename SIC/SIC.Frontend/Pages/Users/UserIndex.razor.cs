@@ -89,18 +89,21 @@ namespace SIC.Frontend.Pages.Users
         private async Task LoadPagesAsync()
         {
             var url = $"api/accounts/totalPages?PageSize={RecordsNumber}";
-            if (!string.IsNullOrEmpty(Filter))
+
+            if (!string.IsNullOrWhiteSpace(Filter))
             {
-                url += $"?filter={Filter}";
+                url += $"&filter={Uri.EscapeDataString(Filter)}";
             }
 
             var response = await Repository.GetAsync<int>(url);
+
             if (response.Error)
             {
                 var message = await response.GetErrorMessageAsync();
                 await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
                 return;
             }
+
             totalPages = response.Response;
         }
 

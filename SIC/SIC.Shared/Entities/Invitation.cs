@@ -59,6 +59,8 @@ public class Invitation
     public DateTime? ConfirmationDate { get; set; }
     public int EventId { get; set; }
     public Event? Event { get; set; } = null!;
+    public int? TablesEventsId { get; set; }
+    public TablesEvents? TablesEvents { get; set; }
 
     // 👇 Relación 1:1 con InvitationEntry
     public InvitationEntry? InvitationEntry { get; set; } = null!;
