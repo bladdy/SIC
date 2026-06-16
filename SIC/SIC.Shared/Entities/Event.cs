@@ -72,7 +72,7 @@ public class Event : IEntityWithName
     public EventType? EventType { get; set; }
     public ICollection<HistoryMessages> HistoryMessages { get; set; } = new List<HistoryMessages>();
     public ICollection<Invitation> Invitations { get; set; } = new List<Invitation>();
-    public ICollection<TablesEvents> TablesEvents { get; set; } = null!;
+    public ICollection<TablesEvents> TablesEvents { get; set; } = new List<TablesEvents>();
 
     [Display(Name = "Estado")]
     public Status Status { get; set; }
