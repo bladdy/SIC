@@ -182,6 +182,9 @@ else
                     <div>
                         <button class="btn btn-sm btn-custom" @onclick="ShowCreateModal">Agregar Invitado</button>
                     </div>
+                    <div>
+                        <button class="btn btn-sm btn-custom" @onclick="NavegateToControlTaables">Mesas</button>
+                    </div>
                 </div>
             </div>
 
@@ -1000,10 +1003,10 @@ else
                             <div class="mb-3">
                                 <label>Mesa</label>
                                 <InputSelect class="form-select" @bind-Value="NewInvitation.TablesEventsId">
-                                    <option value="0">-- Selecciona la Mesa --</option>
+                                    <option value="">-- Selecciona la Mesa --</option>
                                     @foreach (var table in Tables)
                                     {
-                                        <option value="@table.Id">@table.Name</option>
+                                        <option value="@table.Id">@table.Name - Disponibles: @(@table.Seats - @table.OccupiedSeats)</option>
                                     }
                                 </InputSelect>
                                 <ValidationMessage For="@(() => NewInvitation.TablesEventsId)" />

@@ -54,6 +54,17 @@ public class InvitationsController : GenericController<Invitation>
         }
         return BadRequest();
     }
+    [HttpGet("byEventCode/{code}")]
+    public async Task<IActionResult> GetByEventCodeAsync(string code)
+    {
+        var response = await _invitationUnitOfWork.GetAllAsync(code);
+        if (response.Success)
+        {
+            return Ok(response.Result);
+        }
+        return NotFound();
+    }
+
 
     [HttpGet("byCode/{code}")]
     public async Task<IActionResult> GetByCodeAsync(string code)

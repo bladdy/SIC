@@ -118,7 +118,7 @@
                             <h3 class="fw-bold mt-2">
                                 Mesa: @mesa.Name
                             </h3>
-                            <button class="btn btn-sm btn-custom rounded-circle me-1 btn-circle" @onclick="() => ModaAsignarMes(2)">
+                            <button class="btn btn-sm btn-custom rounded-circle me-1 btn-circle" @onclick="() => ModaAsignarMes(mesa)">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" 
                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" 
                                 stroke-width="1.5" stroke-linecap="round" 
@@ -196,8 +196,8 @@
                             </span>
 
                             <span>
-                                Ocupados:
-                                <strong>@mesa.OccupiedSeats</strong>
+                                Disponibles:
+                                <strong> @(@mesa.Seats - @mesa.OccupiedSeats)</strong>
                             </span>
 
                         </div>
@@ -293,7 +293,7 @@
                                 }
                             </select>
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-3 d-none">
                             <label>Mesa</label>
                             <InputSelect class="form-select" @bind-Value="AssignTablesDto.TableId">
                                 <option value="0">-- Selecciona la Mesa --</option>

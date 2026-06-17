@@ -60,7 +60,7 @@ public class Invitation
     public int EventId { get; set; }
     public Event? Event { get; set; } = null!;
     public int? TablesEventsId { get; set; }
-    public TablesEvents? TablesEvents { get; set; }
+    public TablesEvents? TablesEvents { get; set; } = null!;
 
     // 👇 Relación 1:1 con InvitationEntry
     public InvitationEntry? InvitationEntry { get; set; } = null!;

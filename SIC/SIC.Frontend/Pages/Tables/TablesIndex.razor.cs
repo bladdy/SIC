@@ -45,8 +45,20 @@ namespace SIC.Frontend.Pages.Tables
         {
             await LoadEventAsync();
             await LoadTablesEventsAsync();
+            await LoadInvitationsAsync();
         }
 
+        private async Task LoadInvitationsAsync()
+        {
+            var result = await Repository.GetAsync<List<Invitation>>($"api/Invitations/byEventCode/{Event.Code}");
+            if (result.Error)
+            {
+                var message = await result.GetErrorMessageAsync();
+                await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
+            }
+            Invitations = result.Response ?? new List<Invitation>();
+        }
         private async Task LoadTablesEventsAsync()
         {
             var result = await Repository.GetAsync<List<TablesEvents>>($"api/Tables/{Event.Id}");
@@ -73,8 +85,7 @@ namespace SIC.Frontend.Pages.Tables
                 await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
                 return;
             }
-            Event = result?.Response;
-            Invitations = Event.Invitations.ToList();
+            Event = result?.Response ?? new Event();
         }
 
         private async Task SelectedPageAsync(int page)
@@ -84,7 +95,7 @@ namespace SIC.Frontend.Pages.Tables
 
         private async Task ConfirmDelete(TablesEvents table)
         {
-            if (table.Invitation != null)
+            if (table.Invitation.Any())
             {
                 var message = $"No se puede eliminar la mesa:{table.Name}. Porque aun tiene registros, primero elimine los invitados de la mesa.";
                 await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
@@ -135,6 +146,7 @@ namespace SIC.Frontend.Pages.Tables
                 await SweetAlertService.FireAsync("Eliminado", "Eliminiado invitados de esta mesa correctamente.", SweetAlertIcon.Success);
 
                 await LoadTablesEventsAsync();
+                await LoadInvitationsAsync();
             }
         }
         private async Task ShowModaEditaMesa(TablesEvents updateTableEvent)
@@ -157,9 +169,10 @@ namespace SIC.Frontend.Pages.Tables
         {
             modaCrearOrEditaMesa = !modaCrearOrEditaMesa;
         }
-        private async Task ModaAsignarMes(int id)
+        private async Task ModaAsignarMes(TablesEvents tables)
         {
             modaAsignarMesa = !modaAsignarMesa;
+            AssignTablesDto.TableId = tables.Id;
         }
         private void CloseModaAsignarMesa()
         {
@@ -205,6 +218,7 @@ namespace SIC.Frontend.Pages.Tables
             GenerateTablesDto = new();
             await LoadEventAsync();
             await LoadTablesEventsAsync();
+            await LoadInvitationsAsync();
         }
         private async Task SaveMesa()
         {
@@ -248,6 +262,7 @@ namespace SIC.Frontend.Pages.Tables
             createOrEditTablesDto = new();
             await LoadEventAsync();
             await LoadTablesEventsAsync();
+            await LoadInvitationsAsync();
         }
         private async Task AssignTable()
         {
@@ -280,6 +295,7 @@ namespace SIC.Frontend.Pages.Tables
             AssignTablesDto = new();
             await LoadEventAsync();
             await LoadTablesEventsAsync();
+            await LoadInvitationsAsync();
         }
     }
 }

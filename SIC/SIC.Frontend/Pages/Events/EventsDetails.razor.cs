@@ -10,6 +10,7 @@ using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using SIC.Shared.Enums;
 using SIC.Shared.Response;
+using System.Linq;
 using System.Net;
 
 namespace SIC.Frontend.Pages.Events;
@@ -137,6 +138,11 @@ public partial class EventsDetails
     private void CloseModalExcel()
     {
         IsModalExcelVisible = false;
+    }
+
+    private void NavegateToControlTaables()
+    {
+        NavigationManager.NavigateTo($"/events/tables/{EventDetail!.Code}");
     }
 
     private void NavegateToMessage()
@@ -291,6 +297,28 @@ public partial class EventsDetails
         HttpResponseWrapper<object>? responseHttp;
         isSavingInvitation = true;
 
+        if (NewInvitation.TablesEventsId.HasValue)
+        {
+            var table = Tables.FirstOrDefault(t => t.Id == NewInvitation.TablesEventsId);
+
+            if (table != null &&
+                (table.Seats - table.OccupiedSeats) <
+                NewInvitation.Guests.Count(x => x.Status == Status.Attend))
+            {
+                await SweetAlertService.FireAsync(
+                    "Error",
+                    "No se pudo guardar la invitación. La cantidad de invitados es mayor a la cantidad de lugares disponibles en la mesa, favor de cambiar de mesa o adicionar más lugares.",
+                    SweetAlertIcon.Error);
+                isSavingInvitation = false;
+
+                return;
+            }
+        }
+        else
+        {
+            NewInvitation.TablesEvents = null;
+        }
+
         if (IsEditMode)
         {
             // PUT -> Editar
@@ -306,6 +334,7 @@ public partial class EventsDetails
         {
             var message = await responseHttp.GetErrorMessageAsync() ?? "No se pudo guardar la Inivitacion.";
             await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            isSavingInvitation = false;
             return;
         }
 
@@ -328,6 +357,7 @@ public partial class EventsDetails
         isSavingInvitation = false;
         await LoadEvent();
         await LoadInvitations();
+        await LoadTablesEventsAsync();
     }
 
     private async Task DescargarExcel()

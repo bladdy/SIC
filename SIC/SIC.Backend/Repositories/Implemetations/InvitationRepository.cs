@@ -151,8 +151,7 @@ namespace SIC.Backend.Repositories.Implemetations
                 // Guardar estado anterior para actualizar ocupación de mesas
                 var oldTableId = currentInvitation.TablesEventsId;
 
-                var oldOccupiedSeats =
-                    1 + currentInvitation.Guests.Count(g => g.Status == Status.Attend);
+                var oldOccupiedSeats = currentInvitation.Guests.Count(g => g.Status == Status.Attend);
 
                 // 2. Actualizar propiedades simples
                 _context.Entry(currentInvitation).CurrentValues.SetValues(invitation);
@@ -273,7 +272,10 @@ namespace SIC.Backend.Repositories.Implemetations
 
         public async Task<ActionResponse<IEnumerable<Invitation>>> GetAllAsync(string code)
         {
-            var invitations = await _context.Invitations.Include(e => e.Event).ThenInclude(e => e!.EventType).Where(x => x.Event!.Code == code && x.Status == Status.Attend).ToListAsync();
+            var invitations = await _context.Invitations.Include(e => e.Event)
+                .ThenInclude(e => e!.EventType).Include(g=> g.Guests).Include(t=> t.TablesEvents)
+                .Where(x => x.Event!.Code == code && x.Status == Status.Attend && x.TablesEvents == null)
+                .ToListAsync();
             if (invitations == null)
             {
                 return new ActionResponse<IEnumerable<Invitation>>
