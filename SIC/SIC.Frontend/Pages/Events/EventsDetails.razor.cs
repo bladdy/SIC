@@ -140,7 +140,7 @@ public partial class EventsDetails
         IsModalExcelVisible = false;
     }
 
-    private void NavegateToControlTaables()
+    private void NavegateToControlTables()
     {
         NavigationManager.NavigateTo($"/events/tables/{EventDetail!.Code}");
     }

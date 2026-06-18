@@ -386,12 +386,18 @@ else
                             }
                         </button>
                         <button class="btn btn-sm btn-custom" @onclick="ShowModalExcel">Importar Excel</button>
+
                     </div>
 
                     <!-- Botón que en móvil queda debajo, pero en escritorio en la misma fila -->
                     <div>
                         <button class="btn btn-sm btn-custom" @onclick="ShowCreateModal">Agregar Invitado</button>
                     </div>
+
+                    <div>
+                        <button class="btn btn-sm btn-custom" @onclick="NavegateToControlTables">Mesas</button>
+                    </div>
+
                     @if (EventDetail.User.UserType == UserType.WeddingPlanner || EventDetail.User.UserType == UserType.Admin)
                     {
                         <div class="d-flex justify-content-center gap-2 mb-2 mb-lg-0">
@@ -1331,6 +1337,22 @@ else
                                 <InputText class="form-control" @bind-Value="NewInvitation.Table" />
                                 <ValidationMessage For="@(() => NewInvitation.Table)" />
                             </div>
+                            <div class="mb-3">
+                                <label>Mesa</label>
+                                <InputSelect class="form-select"
+                                             @bind-Value="NewInvitation.TablesEventsId"
+                                             disabled="@(NewInvitation.Status != Status.Attend)">
+                                    <option value="">-- Selecciona la Mesa --</option>
+                                    @foreach (var table in Tables)
+                                    {
+                                        <option value="@table.Id">
+                                            @table.Name - Disponibles: @(table.Seats - table.OccupiedSeats)
+                                        </option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => NewInvitation.TablesEventsId)" />
+                            </div>
+
                             <div class="mb-3">
                                 <label class="form-label">Dedicatoria</label>
                                 <InputTextArea class="form-control" @bind-Value="NewInvitation.Comments" />

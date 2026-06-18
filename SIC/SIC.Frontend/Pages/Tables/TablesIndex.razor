@@ -1,8 +1,13 @@
 ﻿@page "/events/tables/{Code}"
 @using SIC.Frontend.Shared
 <PageTitle>Mesas del Evento</PageTitle>
-
-<div class="container-fluid p-4">
+@if (Tables is null)
+{
+    <div class="alert alert-info">Cargando mesas...</div>
+}
+else
+{
+    <div class="container-fluid p-4">
 
     <!-- Encabezado -->
     <div class="row align-items-center mb-4">
@@ -220,6 +225,9 @@
     </div>
 
 </div>
+    
+}
+
 
 @if (modaCrearOrEditaMesa)
 {

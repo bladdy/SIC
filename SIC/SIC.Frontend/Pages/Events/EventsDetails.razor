@@ -183,7 +183,7 @@ else
                         <button class="btn btn-sm btn-custom" @onclick="ShowCreateModal">Agregar Invitado</button>
                     </div>
                     <div>
-                        <button class="btn btn-sm btn-custom" @onclick="NavegateToControlTaables">Mesas</button>
+                        <button class="btn btn-sm btn-custom" @onclick="NavegateToControlTables">Mesas</button>
                     </div>
                 </div>
             </div>
@@ -304,7 +304,10 @@ else
                                             </div>
                                             <div><h5><strong>@invitation.Name</strong></h5></div>
                                             <div><strong>Móvil:</strong> @invitation.PhoneNumber</div>
-                                            <div><strong>Mesa:</strong> @invitation.Table</div>
+                                            <div>
+                                                <strong>Mesa:</strong>
+                                                    
+                                            </div>
                                         </div>
 
                                         <!-- ===== COLUMNA 2 ===== -->
@@ -566,7 +569,7 @@ else
 
                         }
                     </div>
-                    <p class="mb-1"><strong>Mesa:</strong> @invitation.Table</p>
+                    <p class="mb-1"><strong>Mesa:</strong>@(invitation.Table ?? invitation.TablesEvents?.Name ?? "Sin mesa")</p>
                     <p class="mb-1"><strong>Dedicatoria:</strong> @invitation.Comments</p>
 
                     <div class="d-flex flex-wrap gap-1 mt-3">
@@ -993,7 +996,7 @@ else
                                 </div>
 
                             </div>
-                            <div class="mb-3 d-none">
+                            <div class="mb-3">
                                 <label class="form-label">Mesa</label>
                                 <InputText class="form-control" @bind-Value="NewInvitation.Table" />
                                 <ValidationMessage For="@(() => NewInvitation.Table)" />
@@ -1002,11 +1005,15 @@ else
 
                             <div class="mb-3">
                                 <label>Mesa</label>
-                                <InputSelect class="form-select" @bind-Value="NewInvitation.TablesEventsId">
+                                <InputSelect class="form-select"
+                                             @bind-Value="NewInvitation.TablesEventsId"
+                                             disabled="@(NewInvitation.Status != Status.Attend)">
                                     <option value="">-- Selecciona la Mesa --</option>
                                     @foreach (var table in Tables)
                                     {
-                                        <option value="@table.Id">@table.Name - Disponibles: @(@table.Seats - @table.OccupiedSeats)</option>
+                                        <option value="@table.Id">
+                                            @table.Name - Disponibles: @(table.Seats - table.OccupiedSeats)
+                                        </option>
                                     }
                                 </InputSelect>
                                 <ValidationMessage For="@(() => NewInvitation.TablesEventsId)" />

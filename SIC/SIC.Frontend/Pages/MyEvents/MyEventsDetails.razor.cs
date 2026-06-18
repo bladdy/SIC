@@ -30,7 +30,6 @@ public partial class MyEventsDetails
     private bool IsSendingMassive = false;
     private bool IsCopyURl = false;
     private bool IsProcessList = false;
-
     private bool HasSelectedInvitations = false;
 
     private bool isLoadingWhatsapp = false;
@@ -59,6 +58,8 @@ public partial class MyEventsDetails
     public Event? EventDetail { get; set; }
     public List<Invitation>? Invitations { get; set; }
     public List<WhatsAppTemplate>? Templates { get; set; }
+
+    private List<TablesEvents> Tables = new();
     [Inject] private IRepository Repository { get; set; } = default!;
     [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
@@ -76,8 +77,19 @@ public partial class MyEventsDetails
         await LoadEvent();
         await LoadInvitations();
         await LoadTemplates();
+        await LoadTablesEventsAsync();
     }
-
+    private async Task LoadTablesEventsAsync()
+    {
+        var result = await Repository.GetAsync<List<TablesEvents>>($"api/Tables/{EventDetail.Id}");
+        if (result.Error)
+        {
+            var message = await result.GetErrorMessageAsync();
+            await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+        Tables = result.Response ?? new List<TablesEvents>();
+    }
     private async Task LoadTemplates()
     {
         var url = $"api/whatsapp/get-templates";
@@ -129,7 +141,10 @@ public partial class MyEventsDetails
     {
         IsModalExcelVisible = false;
     }
-
+    private void NavegateToControlTables()
+    {
+        NavigationManager.NavigateTo($"/events/tables/{EventDetail!.Code}");
+    }
     private void NavegateToMessage()
     {
         NavigationManager.NavigateTo($"/events/message-events/{EventDetail!.Code}");
@@ -214,6 +229,8 @@ public partial class MyEventsDetails
             SentDate = invitation.SentDate,
             ConfirmationDate = invitation.ConfirmationDate,
             Name = invitation.Name,
+            TablesEvents = invitation.TablesEvents,
+            TablesEventsId = invitation.TablesEventsId,
             Status = invitation.Status
         };
         IsEditMode = true;
@@ -317,6 +334,7 @@ public partial class MyEventsDetails
         isSavingInvitation = false;
         await LoadEvent();
         await LoadInvitations(currentPage);
+        await LoadTablesEventsAsync();
     }
 
     private async Task DescargarExcel()
