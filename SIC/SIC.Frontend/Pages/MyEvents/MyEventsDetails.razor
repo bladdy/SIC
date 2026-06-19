@@ -395,7 +395,7 @@ else
                     </div>
 
                     <div>
-                        <button class="btn btn-sm btn-custom" @onclick="NavegateToControlTables">Mesas</button>
+                        <button class="btn btn-sm btn-custom" @onclick="NavegateToControlTables">Asignar Mesas</button>
                     </div>
 
                     @if (EventDetail.User.UserType == UserType.WeddingPlanner || EventDetail.User.UserType == UserType.Admin)
@@ -1337,6 +1337,8 @@ else
                                 <InputText class="form-control" @bind-Value="NewInvitation.Table" />
                                 <ValidationMessage For="@(() => NewInvitation.Table)" />
                             </div>
+
+
                             <div class="mb-3">
                                 <label>Mesa</label>
                                 <InputSelect class="form-select"

@@ -15,7 +15,7 @@ using System.Net;
 namespace SIC.Frontend.Pages.MyEvents;
 //ToDo: separar en componentes más pequeños, especialmente el modal de creación/edición de invitaciones
 //ToDo: Revisar el reload después de cada acción, a veces es necesario y a veces no, optimizar eso
-
+// MyEventsDetails
 [Authorize(Roles = "Admin,WeddingPlanner,User")]
 public partial class MyEventsDetails
 {
@@ -297,6 +297,28 @@ public partial class MyEventsDetails
         HttpResponseWrapper<object>? responseHttp;
         isSavingInvitation = true;
 
+        if (NewInvitation.TablesEventsId.HasValue)
+        {
+            var table = Tables.FirstOrDefault(t => t.Id == NewInvitation.TablesEventsId);
+
+            if (table != null &&
+                (table.Seats - table.OccupiedSeats) <
+                NewInvitation.Guests.Count(x => x.Status == Status.Attend))
+            {
+                await SweetAlertService.FireAsync(
+                    "Error",
+                    "No se pudo guardar la invitación. La cantidad de invitados es mayor a la cantidad de lugares disponibles en la mesa, favor de cambiar de mesa o adicionar más lugares.",
+                    SweetAlertIcon.Error);
+                isSavingInvitation = false;
+
+                return;
+            }
+        }
+        else
+        {
+            NewInvitation.TablesEvents = null;
+        }
+
         if (IsEditMode)
         {
             // PUT -> Editar
@@ -312,6 +334,7 @@ public partial class MyEventsDetails
         {
             var message = await responseHttp.GetErrorMessageAsync() ?? "No se pudo guardar la Inivitacion.";
             await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            isSavingInvitation = false;
             return;
         }
 
@@ -333,7 +356,7 @@ public partial class MyEventsDetails
         );
         isSavingInvitation = false;
         await LoadEvent();
-        await LoadInvitations(currentPage);
+        await LoadInvitations();
         await LoadTablesEventsAsync();
     }
 
