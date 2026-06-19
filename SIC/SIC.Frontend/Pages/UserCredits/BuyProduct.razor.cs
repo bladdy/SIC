@@ -51,7 +51,7 @@ namespace SIC.Frontend.Pages.UserCredits
             if (!string.IsNullOrEmpty(url))
                 NavigationManager.NavigateTo(url, true);
         }*/
-
+        /*
         private async Task Pay(string priceId)
         {
             var url = await PaymentService.CreatePayment(priceId);
@@ -63,6 +63,18 @@ namespace SIC.Frontend.Pages.UserCredits
                     url,
                     "StripeCheckout",
                     "width=1200,height=800,left=100,top=100,resizable=yes,scrollbars=yes"
+                );
+            }
+        }*/
+        private async Task Pay(string priceId)
+        {
+            var url = await PaymentService.CreatePayment(priceId);
+
+            if (!string.IsNullOrEmpty(url))
+            {
+                await JsRuntime.InvokeVoidAsync(
+                    "location.assign",
+                    url
                 );
             }
         }

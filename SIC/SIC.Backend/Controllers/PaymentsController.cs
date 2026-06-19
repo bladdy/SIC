@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.DTOs;
 using SIC.Shared.Request;
 using Stripe;
@@ -11,19 +12,24 @@ namespace SIC.Backend.Controllers;
 [Route("api/[controller]")]
 public class PaymentsController : ControllerBase
 {
-    private readonly StripeSettings _stripeSettings;
     private readonly ProductService _product;
+    private readonly IWhatsAppConfigUnitOfWork _whatsAppConfigUnitOfWork;
 
-    public PaymentsController(IOptions<StripeSettings> model, ProductService product)
+    public PaymentsController( ProductService product,
+            IWhatsAppConfigUnitOfWork whatsAppConfigUnitOfWork)
     {
-        _stripeSettings = model.Value;
         _product = product;
+        _whatsAppConfigUnitOfWork = whatsAppConfigUnitOfWork;
     }
 
     [HttpPost("pay/{priceId}")]
     public async Task<IActionResult> Pay(string priceId)
     {
-        StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
+        var stripe = await _whatsAppConfigUnitOfWork.GetStripeConfig("DEV");
+        if (stripe.Result == null) 
+            return BadRequest( new { error = "No se puedo encontrar Stripe." } );
+
+        StripeConfiguration.ApiKey = stripe.Result.SecretKey;
         var options = new SessionCreateOptions
         {
             LineItems =
@@ -35,8 +41,8 @@ public class PaymentsController : ControllerBase
                 }
             ],
             Mode = "payment",
-            SuccessUrl = "https://localhost:7174/successful-Purchase",
-            CancelUrl = "https://localhost:7174/",
+            SuccessUrl = "https://invboxv-app.com/successful-Purchase",
+            CancelUrl = "https://invboxv-app.com/users-credits/details/",
         };
         var service = new SessionService();
         Session session = await service.CreateAsync(options);
@@ -47,9 +53,13 @@ public class PaymentsController : ControllerBase
     }
 
     [HttpGet("GetAllProducts")]
-    public IActionResult Get()
+    public async Task<IActionResult> Get()
     {
-        StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
+        var stripe = await _whatsAppConfigUnitOfWork.GetStripeConfig("DEV");
+        if (stripe.Result == null)
+            return BadRequest(new { error = "No se puedo encontrar Stripe." });
+
+        StripeConfiguration.ApiKey = stripe.Result.SecretKey;
         var options = new ProductListOptions { Expand = new List<string> { "data.default_price" } };
         var products = _product.List(options);
         return Ok(products.Data);

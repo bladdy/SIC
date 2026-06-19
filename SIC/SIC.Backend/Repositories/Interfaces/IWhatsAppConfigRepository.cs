@@ -13,5 +13,6 @@ namespace SIC.Backend.Repositories.Interfaces
         Task<ActionResponse<UsuarioWhatsAppConfig>> UpdateFullAsync(UsuarioWhatsAppConfig whatsAppConfig);
 
         Task<ActionResponse<MassiveShippingProgress?>> GetByEventoUserAsync(int eventoId);
+        Task<ActionResponse<StripeSettings?>> GetStripeConfig(string env);
     }
 }

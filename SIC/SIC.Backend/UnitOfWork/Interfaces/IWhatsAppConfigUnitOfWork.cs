@@ -12,5 +12,6 @@ namespace SIC.Backend.UnitOfWork.Interfaces
         Task<ActionResponse<UsuarioWhatsAppConfig>> AddFullAsync(UsuarioWhatsAppConfig whatsAppConfig);
 
         Task<ActionResponse<UsuarioWhatsAppConfig>> UpdateFullAsync(UsuarioWhatsAppConfig whatsAppConfig);
+        Task<ActionResponse<StripeSettings?>> GetStripeConfig(string Env);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SIC.Backend.Data;
 using SIC.Backend.Repositories.Interfaces;
 using SIC.Shared.Entities;
@@ -143,6 +144,24 @@ namespace SIC.Backend.Repositories.Implemetations
             {
                 Success = true,
                 Result = progress
+            };
+        }
+
+        public async Task<ActionResponse<StripeSettings?>> GetStripeConfig(string env)
+        {
+            var stripe = await _context.StripeSettings.FirstOrDefaultAsync(x => x.ENVIRONMENT ==env);
+            if (stripe == null)
+            {
+                return new ActionResponse<StripeSettings?>
+                {
+                    Success = true,
+                    Message = "No hay registros."
+                };
+            }
+            return new ActionResponse<StripeSettings?>
+            {
+                Success = true,
+                Result = stripe
             };
         }
     }

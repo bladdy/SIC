@@ -23,5 +23,7 @@ namespace SIC.Backend.UnitOfWork.Implemetations
         public async Task<ActionResponse<UsuarioWhatsAppConfig>> UpdateFullAsync(UsuarioWhatsAppConfig whatsAppConfig) => await _WhatsAppConfigUnitOfWork.UpdateFullAsync(whatsAppConfig);
 
         public async Task<ActionResponse<MassiveShippingProgress?>> GetByEventoUserAsync(int eventoId) => await _WhatsAppConfigUnitOfWork.GetByEventoUserAsync(eventoId);
+
+        public async Task<ActionResponse<StripeSettings?>> GetStripeConfig(string Env) => await _WhatsAppConfigUnitOfWork.GetStripeConfig(Env);
     }
 }

@@ -32,6 +32,7 @@ public class DataContext : IdentityDbContext<User>
     public DbSet<EventImage> EventImages { get; set; }
     public DbSet<HistoryMessages> HistoryMessages { get; set; }
     public DbSet<ResponseFromWhatsApp> ResponseFromWhatsApps { get; set; }
+    public DbSet<StripeSettings> StripeSettings { get; set; }
     public DbSet<PhotoEvent> PhotoEvents { get; set; }
     public DbSet<PhotoEventImage> PhotoEventImages { get; set; }
     public DbSet<TemplateSent> TemplateSents { get; set; }
