@@ -4,6 +4,7 @@ using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using Stripe;
 using Stripe.Checkout;
+using static System.Net.WebRequestMethods;
 
 namespace SIC.Backend.Controllers;
 
@@ -64,12 +65,11 @@ public class PaymentsController :Controller
                     }
                 }
             ],
-
             Mode = "payment",
 
-            SuccessUrl = "http://localhost:5124/successful-Purchase?session_id={CHECKOUT_SESSION_ID}",
+            SuccessUrl = "https://invboxv-app.com/successful-Purchase?session_id={CHECKOUT_SESSION_ID}",
 
-            CancelUrl = "http://localhost:5124/users-credits/details/",
+            CancelUrl = "https://invboxv-app.com/users-credits/details/",
 
             Metadata = new Dictionary<string, string>
             {
