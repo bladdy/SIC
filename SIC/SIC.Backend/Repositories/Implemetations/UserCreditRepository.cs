@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Utilities.Collections;
 using SIC.Backend.Data;
 using SIC.Backend.Helpers;
 using SIC.Backend.Repositories.Interfaces;
@@ -229,6 +231,36 @@ namespace SIC.Backend.Repositories.Implementations
             {
                 Success = true,
                 Result = result
+            };
+        }
+
+        public async Task<ActionResponse<StripeEventLog>> AddStripeEventLogAsync(StripeEventLog entity)
+        {
+            _context.StripeEventLogs.Add(entity);
+            await _context.SaveChangesAsync();
+            return new ActionResponse<StripeEventLog>
+            {
+                Success = true,
+                Result = entity
+            };
+        }
+
+        public async Task<ActionResponse<bool>> ExistStripeEventLogAsync(string id)
+        {
+            var alreadyProcessed = await _context.StripeEventLogs
+            .FirstOrDefaultAsync(x => x.EventId == id);
+
+            if (alreadyProcessed == null)
+                return new ActionResponse<bool>
+                {
+                    Success = false,
+                    Message = "No hay logs."
+                };
+
+            return new ActionResponse<bool>
+            {
+                Success = true,
+                Result = true
             };
         }
     }

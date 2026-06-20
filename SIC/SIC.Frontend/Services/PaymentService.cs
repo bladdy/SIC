@@ -33,18 +33,18 @@ public class PaymentService
         return response.Response?.Url ?? string.Empty;
     }
 
-    public async Task<string> CreatePayment(string priceId)
+    public async Task<string> CreatePayment(int priceId, string userId)
     {
         HttpResponseWrapper<CreatePaymentResponse>? responseHttp;
 
-        if (string.IsNullOrEmpty(priceId))
+        if (priceId <= 0) // Fixed the condition to check if priceId is invalid
         {
             await sweetAlertService.FireAsync("Error", "El ID del precio no puede estar vacío.", SweetAlertIcon.Error);
             return string.Empty;
         }
 
         responseHttp = await _repository.PostAsync<bool, CreatePaymentResponse>(
-           $"api/payments/pay/{priceId}", true
+           $"api/payments/pay/{priceId}/{userId}", true
        );
 
         if (responseHttp.Error)

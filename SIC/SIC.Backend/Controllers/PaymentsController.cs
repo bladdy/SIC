@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.DTOs;
-using SIC.Shared.Request;
+using SIC.Shared.Entities;
 using Stripe;
 using Stripe.Checkout;
 
@@ -10,24 +9,34 @@ namespace SIC.Backend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class PaymentsController : ControllerBase
+public class PaymentsController :Controller
 {
     private readonly ProductService _product;
+    private readonly IGenericUnitOfWork<SIC.Shared.Entities.Product> _unitOfWorkProduct;
+    private readonly IUserCreditUnitsOfWork _creditUnitsOfWork;
     private readonly IWhatsAppConfigUnitOfWork _whatsAppConfigUnitOfWork;
 
-    public PaymentsController( ProductService product,
-            IWhatsAppConfigUnitOfWork whatsAppConfigUnitOfWork)
+    public PaymentsController(ProductService product,
+            IWhatsAppConfigUnitOfWork whatsAppConfigUnitOfWork, IUserCreditUnitsOfWork creditUnitsOfWork, IGenericUnitOfWork<SIC.Shared.Entities.Product> unitOfWorkProduct) 
     {
         _product = product;
         _whatsAppConfigUnitOfWork = whatsAppConfigUnitOfWork;
+        _creditUnitsOfWork = creditUnitsOfWork;
+        _unitOfWorkProduct = unitOfWorkProduct;
+
     }
 
-    [HttpPost("pay/{priceId}")]
-    public async Task<IActionResult> Pay(string priceId)
+    [HttpPost("pay/{productid}/{userId}")]
+    public async Task<IActionResult> Pay(int productid, string userId)
     {
+
+        var products = await _unitOfWorkProduct.GetAsync(productid);
+        if (products.Result == null)
+            return BadRequest(new { error = "El producto no existe." });
+        
         var stripe = await _whatsAppConfigUnitOfWork.GetStripeConfig("DEV");
-        if (stripe.Result == null) 
-            return BadRequest( new { error = "No se puedo encontrar Stripe." } );
+        if (stripe.Result == null)
+            return BadRequest(new { error = "No se puedo encontrar Stripe." });
 
         StripeConfiguration.ApiKey = stripe.Result.SecretKey;
         var options = new SessionCreateOptions
@@ -36,13 +45,37 @@ public class PaymentsController : ControllerBase
             [
                 new SessionLineItemOptions
                 {
-                    Price = priceId,
-                    Quantity = 1
+                    Quantity = 1,
+                    PriceData = new SessionLineItemPriceDataOptions
+                    {
+                        Currency = "mxn",
+                        UnitAmount = (long)(products.Result.PriceTotal * 100), // Stripe espera centavos
+
+                        ProductData = new SessionLineItemPriceDataProductDataOptions
+                        {
+                            Name = products.Result.Name,
+                            Images =
+                            [
+                                products.Result.URLImagen
+                            ],
+                            Description = string.Join(", ", products.Result.Items)
+
+                        }
+                    }
                 }
             ],
+
             Mode = "payment",
-            SuccessUrl = "https://invboxv-app.com/successful-Purchase",
-            CancelUrl = "https://invboxv-app.com/users-credits/details/",
+
+            SuccessUrl = "http://localhost:5124/successful-Purchase?session_id={CHECKOUT_SESSION_ID}",
+
+            CancelUrl = "http://localhost:5124/users-credits/details/",
+
+            Metadata = new Dictionary<string, string>
+            {
+                { "UserId", userId },
+                { "Credits", products.Result.Amount.ToString() }
+            }
         };
         var service = new SessionService();
         Session session = await service.CreateAsync(options);
@@ -64,69 +97,78 @@ public class PaymentsController : ControllerBase
         var products = _product.List(options);
         return Ok(products.Data);
     }
-
-    [HttpPost("create-checkout-session")]
-    public async Task<IActionResult> CreateCheckoutSession(
-            BuyCreditsRequest request)
+    [HttpPost("webhook")]
+    public async Task<IActionResult> Index()
     {
-        decimal creditPrice = 150m;
-
-        decimal total =
-            request.Credits * creditPrice;
-
-        var options = new SessionCreateOptions
+        var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
+        const string endpointSecret = "whsec_P2tDvgNJUOkpz4ICIyD5IcXmxVeSifSb";
+        try
         {
-            PaymentMethodTypes =
-            [
-                "card"
-            ],
+            var signatureHeader = Request.Headers["Stripe-Signature"];
 
-            LineItems =
-            [
-                new SessionLineItemOptions
-                {
-                    PriceData =
-                        new SessionLineItemPriceDataOptions
-                        {
-                            Currency = "mxn",
+            var stripeEvent = EventUtility.ConstructEvent(
+                json,
+                signatureHeader,
+                endpointSecret,
+                throwOnApiVersionMismatch: false);
 
-                            UnitAmount =
-                                (long)(creditPrice * 100),
-
-                            ProductData =
-                                new SessionLineItemPriceDataProductDataOptions
-                                {
-                                    Name =
-                                        $"{request.Credits} Créditos"
-                                }
-                        },
-
-                    Quantity = request.Credits
-                }
-            ],
-
-            Mode = "payment",
-
-            SuccessUrl =
-                "https://tuapp.com/payment-success?session_id={CHECKOUT_SESSION_ID}",
-
-            CancelUrl =
-                "https://tuapp.com/payment-cancel",
-
-            Metadata = new Dictionary<string, string>
+            if (stripeEvent.Type == EventTypes.CheckoutSessionCompleted)
             {
-                ["credits"] = request.Credits.ToString()
+                var session = stripeEvent.Data.Object as Session;
+
+                if (session != null)
+                {
+                    var userId = Guid.Parse(session.Metadata["UserId"]);
+                    var credits = int.Parse(session.Metadata["Credits"]);
+
+                    var amountPaid = session.AmountTotal.GetValueOrDefault();
+
+                    // Evitar duplicados (recomendado)
+                    var exists = await _creditUnitsOfWork.ExistStripeEventLogAsync(stripeEvent.Id);
+                    if (exists.Result) return Ok();
+
+                    // Guardar la compra
+                     await _creditUnitsOfWork.AddStripeEventLogAsync(new StripeEventLog
+                     {
+                         EventId = stripeEvent.Id,
+                         ProcessedAt = DateTime.UtcNow
+                     });
+
+                    var userCredit = new AddCreditsRequest
+                    {
+                        CreditsToAdd = credits,
+                        UserId = userId.ToString(),
+                        UpdatedBy = "Compra hecha por Stripe",
+                        Notes = $"Usuario hizo la compra de ({credits}) Créditos."
+                    };
+                    await _creditUnitsOfWork.AddAsync(userCredit);
+                }
             }
-        };
+            else if (stripeEvent.Type == EventTypes.PaymentMethodAttached)
+            {
+                var paymentMethod = stripeEvent.Data.Object as PaymentMethod;
 
-        var service = new SessionService();
+                Console.WriteLine(
+                    $"Payment Method Attached: {paymentMethod?.Id}");
+            }
+            else
+            {
+                Console.WriteLine(
+                    $"Unhandled event type: {stripeEvent.Type}");
+            }
 
-        var session =
-            await service.CreateAsync(options);
-
-        return Ok(new
+            return Ok();
+        }
+        catch (StripeException e)
         {
-            session.Url
-        });
+            Console.WriteLine($"Stripe Error: {e.Message}");
+            return BadRequest();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+            return StatusCode(500);
+        }
     }
+
 }

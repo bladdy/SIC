@@ -28,5 +28,9 @@ namespace SIC.Backend.UnitOfWork.Implemetations
         public async Task<ActionResponse<IEnumerable<UserCreditHistory>>> GetAsync(PaginationDTO pagination) => await _repository.GetAsync(pagination);
 
         public async Task<ActionResponse<int>> GetTotalRecordAsync(PaginationDTO pagination) => await _repository.GetTotalRecordAsync(pagination);
+
+        public async Task<ActionResponse<StripeEventLog>> AddStripeEventLogAsync(StripeEventLog entity) => await _repository.AddStripeEventLogAsync(entity);
+
+        public async Task<ActionResponse<bool>> ExistStripeEventLogAsync(string id) => await _repository.ExistStripeEventLogAsync(id);
     }
 }

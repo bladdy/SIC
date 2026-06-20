@@ -125,5 +125,5 @@ public class DefaultPriceResponse
     public long UnitAmount { get; set; }
 
     [JsonPropertyName("unit_amount_decimal")]
-    public decimal UnitAmountDecimal { get; set; }
+    public string UnitAmountDecimal { get; set; } = string.Empty;
 }

@@ -9,6 +9,8 @@ namespace SIC.Backend.UnitOfWork.Interfaces
         Task<ActionResponse<UserCreditDTO>> GetByUserIdAsync(string userId);
 
         Task<ActionResponse<UserCreditDTO>> AddAsync(AddCreditsRequest entity);
+        Task<ActionResponse<StripeEventLog>> AddStripeEventLogAsync(StripeEventLog entity);
+        Task<ActionResponse<bool>> ExistStripeEventLogAsync(string id);
 
         Task<ActionResponse<bool>> ConsumeCreditAsync(string userId, string EventName);
 

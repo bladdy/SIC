@@ -1,22 +1,34 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using SIC.Frontend.Repositories;
 using SIC.Frontend.Services;
 using SIC.Shared.Entities;
 using SIC.Shared.Response;
+using System.Security.Claims;
 
 namespace SIC.Frontend.Pages.UserCredits
 {
     public partial class BuyProduct
     {
+        private string? _userId;
         [Inject] private IJSRuntime JsRuntime { get; set; } = default!;
         [Inject] private PaymentService PaymentService { get; set; } = default!;
         [Inject] private IRepository repository { get; set; } = default!;
+        [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
 
-        private List<StripeProductResponse>? StrpeProducts;
+        private List<Product>? StrpeProducts;
 
         protected override async Task OnInitializedAsync()
         {
+            await base.OnInitializedAsync();
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+            if (user.Identity is not null && user.Identity.IsAuthenticated)
+            {
+                var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                _userId = userId;
+            }
             await LoadStrpeProducts();
         }
 
@@ -32,12 +44,10 @@ namespace SIC.Frontend.Pages.UserCredits
 
         private async Task LoadStrpeProducts()
         {
-            var response = await repository.GetAsync<List<StripeProductResponse>>($"api/payments/GetAllProducts");
+            var response = await repository.GetAsync<List<Product>>($"api/Products");
             if (!response.Error && response.Response is not null)
             {
-                StrpeProducts = response.Response
-                    .OrderBy(x => x.DefaultPrice.UnitAmount)
-                    .ToList();
+                StrpeProducts = response.Response;
             }
         }
 
@@ -66,9 +76,10 @@ namespace SIC.Frontend.Pages.UserCredits
                 );
             }
         }*/
-        private async Task Pay(string priceId)
+        private async Task Pay(int productid)
         {
-            var url = await PaymentService.CreatePayment(priceId);
+            if (_userId == null) return;
+            var url = await PaymentService.CreatePayment(productid, _userId);
 
             if (!string.IsNullOrEmpty(url))
             {

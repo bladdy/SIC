@@ -23,5 +23,8 @@ namespace SIC.Backend.Repositories.Interfaces
         Task<ActionResponse<IEnumerable<UserCreditDTO>>> GetPlannersWithCreditsAsync();
 
         Task<ActionResponse<IEnumerable<UserCreditHistoryDTO>>> GetHistoryAsync(string userId);
+
+        Task<ActionResponse<StripeEventLog>> AddStripeEventLogAsync(StripeEventLog entity);
+        Task<ActionResponse<bool>> ExistStripeEventLogAsync(string id);
     }
 }

@@ -36,7 +36,8 @@ public class DataContext : IdentityDbContext<User>
     public DbSet<PhotoEvent> PhotoEvents { get; set; }
     public DbSet<PhotoEventImage> PhotoEventImages { get; set; }
     public DbSet<TemplateSent> TemplateSents { get; set; }
-
+    public DbSet<Product> Products { get; set; }
+    public DbSet<StripeEventLog> StripeEventLogs { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -46,7 +47,14 @@ public class DataContext : IdentityDbContext<User>
         modelBuilder.Entity<Plan>().HasIndex(x => x.Name).IsUnique();
         modelBuilder.Entity<PlanItem>().HasIndex(x => new { x.PlanId, x.ItemId }).IsUnique();
         modelBuilder.Entity<InvitationEntry>().HasIndex(x => x.Code).IsUnique();
+
         DisableCascadingDelete(modelBuilder);
+
+        modelBuilder.Entity<Product>()
+        .Property(p => p.Items)
+        .HasConversion(
+            v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
+            v => System.Text.Json.JsonSerializer.Deserialize<List<string>>(v, (System.Text.Json.JsonSerializerOptions?)null)!);
 
         modelBuilder.Entity<UserCredit>()
             .HasIndex(x => x.UserId)
