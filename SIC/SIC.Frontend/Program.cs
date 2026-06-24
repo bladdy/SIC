@@ -39,6 +39,7 @@ builder.Services.AddSingleton(sp => new HttpClient
 builder.Services.AddSweetAlert2();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddSingleton<SignalRService>();
+builder.Services.AddSingleton<DocumentationState>();
 builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<IRepository, Repository>();
 
