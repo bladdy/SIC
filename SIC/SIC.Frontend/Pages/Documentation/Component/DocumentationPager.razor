@@ -1,0 +1,45 @@
+﻿@using SIC.Frontend.Models
+<div class="docs-pager">
+
+    @if (PreviousPage is not null)
+    {
+        <NavLink class="btn btn-outline-secondary"
+                 href="@PreviousPage.Url">
+
+            ← @PreviousPage.Text
+
+        </NavLink>
+    }
+
+    @if (NextPage is not null)
+    {
+        <NavLink class="btn btn-primary"
+                 href="@NextPage.Url">
+
+            @NextPage.Text →
+
+        </NavLink>
+    }
+
+</div>
+
+@code {
+
+    [Parameter]
+    public DocumentationPageLink? PreviousPage { get; set; }
+
+    [Parameter]
+    public DocumentationPageLink? NextPage { get; set; }
+
+}
+<style>
+    .docs-pager {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        padding-top: 2rem;
+        margin-top: 3rem;
+        border-top: 1px solid #e5e7eb;
+    }
+</style>

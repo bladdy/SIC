@@ -1,0 +1,541 @@
+﻿@page "/documentation/whatsapp"
+@using SIC.Frontend.Models
+@using SIC.Frontend.Services
+@layout DocumentationLayout
+@inject DocumentationState DocumentationState
+
+<div class="welcome-page">
+    <div class="welcome-hero">
+
+        <h1 id="whatsapp">
+            💬 WhatsApp
+        </h1>
+
+        <p class="welcome-description">
+            Esta sección concentra todas las herramientas de comunicación y seguimiento con tus invitados.
+            Desde aquí podrás administrar conversaciones, revisar envíos realizados, crear plantillas y
+            configurar la integración con WhatsApp.
+        </p>
+
+    </div>
+    <div class="welcome-card">
+
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                Chat de WhatsApp
+            </h2>
+        </div>
+
+        <p>
+            Esta sección te permite administrar todas las conversaciones de tus eventos desde un solo lugar,
+            facilitando el seguimiento de invitados, confirmaciones y comunicación en tiempo real.
+        </p>
+        <p>
+            <strong>Lista de Eventos:</strong>
+            En la columna izquierda se muestran todos los eventos registrados en tu cuenta.
+            Al seleccionar un evento, el sistema carga automáticamente las conversaciones relacionadas
+            con los invitados de ese evento.
+        </p>
+
+
+        <p>
+            <strong>WhatsApp Inbox:</strong>
+            Muestra la lista de invitados que han recibido mensajes o que tienen conversaciones activas.
+        </p>
+
+        <h3>Información del Contacto</h3>
+
+        <p>Nombre del invitado.</p>
+        <p>Último mensaje enviado o recibido.</p>
+        <p>Fecha y hora de la conversación.</p>
+        <p>Estado de actividad.</p>
+        <p>Conversación activa.</p>
+
+        <p>
+            <strong>Conversación Activa:</strong>
+            En el panel principal se visualiza la conversación completa con el invitado seleccionado.
+        </p>
+
+        <p>Consultar mensajes enviados y recibidos.</p>
+        <p>Dar seguimiento a dudas o solicitudes.</p>
+        <p>Confirmar asistencia.</p>
+        <p>Mantener comunicación directa con los invitados.</p>
+        <p>Vista previa de la invitación.</p>
+
+
+        <p>
+            <strong>Envío de Mensajes:</strong>
+            En la parte inferior encontrarás el campo para escribir y enviar mensajes directamente al invitado sin salir de la plataforma.
+        </p>
+        <div class="hero-image-container">
+
+            <img src="documentation/whatssapchat.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+    </div>
+    <div class="welcome-card">
+
+        <div class="section-header">
+            <h2 id="whatsapp-history">
+                Historial
+            </h2>
+        </div>
+
+        <p>
+            Esta sección te permite consultar el registro completo de los mensajes enviados a tus invitados,
+            facilitando el seguimiento de la comunicación y verificando el estado de cada envío.
+        </p>
+        <p><strong>Nombre:</strong> Nombre del invitado o contacto al que se envió el mensaje.</p>
+
+        <p><strong>Invitación:</strong> Identifica la invitación o registro específico asociado al invitado.</p>
+
+        <p><strong>Teléfono:</strong> Número de WhatsApp al que fue enviado el mensaje.</p>
+
+        <p><strong>Evento:</strong> Nombre del evento relacionado con el envío realizado.</p>
+
+        <p><strong>Fecha de Envío:</strong> Fecha y hora en que el sistema procesó y envió el mensaje.</p>
+
+        <p><strong>Enviado:</strong> Indica que el mensaje fue enviado correctamente desde la plataforma.</p>
+
+        <p><strong>Entregado:</strong> Confirma que el mensaje fue recibido por WhatsApp del destinatario.</p>
+
+        <p><strong>Error:</strong> Muestra si ocurrió algún inconveniente durante el envío.</p>
+
+        <p><strong>Mensaje:</strong> Contenido del mensaje enviado al invitado para consulta y seguimiento.</p>
+        <div class="hero-image-container">
+
+            <img src="documentation/historialwhatsapp.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+    </div>
+    <div class="welcome-card">
+
+        <div class="section-header">
+            <h2 id="whatsapp-templates">
+                Plantillas
+            </h2>
+        </div>
+
+        <p>
+            Esta sección te permite administrar los mensajes prediseñados que utilizarás para comunicarte
+            con tus invitados a través de WhatsApp de forma rápida, profesional y consistente.
+        </p>
+
+
+        <p>
+            <strong>Nombre de la Plantilla:</strong>Nombre con el que identificarás la plantilla dentro de la plataforma.
+        </p>
+
+        <p>
+            <strong>
+                Ejemplos:
+            </strong>
+            Registro de Asistentes,
+            Recordatorio de Confirmación,
+            Confirmación de Acceso,
+            Asignación de Mesa.
+        </p>
+
+        <p>
+            <strong>Categoría:</strong>
+            Clasificación de la plantilla según su función o propósito.
+        </p>
+
+
+        <p>
+            <strong>Utility (Utilidad):</strong>
+            Son mensajes informativos relacionados directamente con una acción,
+            servicio o actualización solicitada por el invitado.
+        </p>
+
+        <p>
+            <strong>Marketing:</strong>
+            Son mensajes diseñados para promocionar, anunciar o incentivar una acción
+            por parte del destinatario.
+        </p>
+
+        <p>
+            <strong>Idioma:</strong>
+            Indica el idioma en el que está configurada la plantilla.
+        </p>
+
+
+        <p>
+            <strong>Estado:</strong>
+            ✅ Muestra si la plantilla se encuentra disponible y aprobada por META para su uso.
+        </p>
+
+        <p>
+            <strong>Posibles Estados:</strong>
+            Aprobada,
+            Pendiente de aprobación,
+            Rechazada,
+            Deshabilitada.
+        </p>
+        <div class="hero-image-container">
+
+            <img src="documentation/whatsapptemplate.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+    </div>
+    <div class="welcome-card">
+
+        <div class="section-header">
+            <h2>
+                Crear Plantilla
+            </h2>
+        </div>
+
+        <p><strong>Nombre de la Plantilla:</strong>Ingresa un nombre único para identificarla.</p>
+
+        <p><strong>Idioma:</strong>Selecciona el idioma de la plantilla.</p>
+
+        <p><strong>Encabezado:</strong>Permite agregar un elemento destacado en la parte superior.</p>
+
+        <p><strong>Muestra de Contenido Multimedia:</strong>Permite visualizar imágenes, videos o documentos.</p>
+
+        <p><strong>Contenido:</strong>Es el cuerpo principal del mensaje.</p>
+
+        <p><strong>Agregar Variable:</strong>Inserta variables dinámicas para personalizar mensajes.</p>
+
+        <p><strong>Pie de Página:</strong>Información complementaria al final del mensaje.</p>
+
+        <p><strong>Agregar Botón:</strong>Permite añadir acciones rápidas para los invitados.</p>
+
+        <p><strong>Vista Previa:</strong>Simulación en tiempo real de la plantilla.</p>
+
+        <p><strong>Enviar para Revisión:</strong>Envía la plantilla a WhatsApp Business para aprobación.</p>
+
+        <p><strong>Descartar:</strong>Cancela los cambios realizados.</p>
+        <div class="hero-image-container">
+
+            <img src="documentation/crearPlantillas.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+    </div>
+    <div class="welcome-card">
+
+        <div class="section-header">
+            <h2 id="whatsapp-settings">
+                Configuración
+            </h2>
+        </div>
+
+        <p>
+            Esta sección permite conectar y administrar tu cuenta de WhatsApp Business API.
+        </p>
+
+        <h3>Conectar WhatsApp</h3>
+        <p><strong>Descartar:</strong>Inicia la vinculación automática mediante Meta.</p>
+
+        <h3>Configuración Manual de WhatsApp</h3>
+
+        <p><strong>Business ID (Opcional):</strong>Identificador único dentro de Meta Business Manager.</p>
+
+        <p><strong>WABA ID:</strong>Identificador de la cuenta de WhatsApp Business.</p>
+
+        <p><strong>Phone Number ID:</strong>Identificador único del número registrado.</p>
+
+        <p><strong>Número de WhatsApp:</strong>Ejemplo: +52 866 123 4567</p>
+
+        <p><strong>Access Token Permanente:</strong>Credencial que autoriza la comunicación con Meta.</p>
+
+        <p><strong>Mostrar/Ocultar Token:</strong>Permite verificar temporalmente el token.</p>
+
+        <p><strong>Guardar Configuración:</strong>Almacena la información de conexión.</p>
+        <div class="hero-image-container">
+
+            <img src="documentation/configmeta.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+    </div>
+    <div class="alert-callout">
+
+        <div class="callout-icon">
+            💡
+        </div>
+
+        <div>
+
+            <h3>
+                Recomendación
+            </h3>
+
+            <p>
+                <strong>
+                    Configuración Manual de WhatsApp:
+                </strong>
+                
+                Solo es necesario si ya tienes accesos a los desde el panel de META. Cuando haces "Conectar WhatsApp" mediante la apliacíon no es necesario que manipules estos campos.
+            </p>
+
+        </div>
+
+    </div>
+</div>
+<style>
+    .hero-image-container {
+        display: flex;
+        justify-content: center;
+        margin: 2rem 0 2.5rem;
+    }
+
+    .hero-image {
+        width: 100%;
+        max-width: 900px;
+        height: auto;
+        border-radius: 20px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    }
+
+    .welcome-page {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding-bottom: 4rem;
+    }
+
+    .welcome-hero {
+        margin-bottom: 3rem;
+    }
+
+    .welcome-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: .4rem .9rem;
+        border-radius: 999px;
+        background: #eef2ff;
+        color: #4338ca;
+        font-size: .8rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .welcome-hero h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 1rem;
+        color: #111827;
+    }
+
+    .welcome-description {
+        font-size: 1.15rem;
+        color: #6b7280;
+        max-width: 750px;
+        line-height: 1.8;
+    }
+
+    .welcome-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .section-number {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #2563eb;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 700;
+    }
+
+    .section-header h2 {
+        margin: 0;
+        font-size: 1.8rem;
+        color: #111827;
+    }
+
+    .welcome-card p {
+        font-size: 1rem;
+        line-height: 2;
+        color: #374151;
+        margin-bottom: 1rem;
+    }
+
+    .success-callout {
+        display: flex;
+        gap: 1.5rem;
+        padding: 2rem;
+        border-radius: 20px;
+        background: linear-gradient( 135deg, #eff6ff, #dbeafe );
+        border: 1px solid #bfdbfe;
+        margin-bottom: 2rem;
+    }
+
+    .alert-callout {
+        display: flex;
+        gap: 1.5rem;
+        padding: 2rem;
+        border-radius: 20px;
+        background: linear-gradient( 135deg, #fefce8, #fef3c7 );
+        border: 1px solid #fde68a;
+        margin-bottom: 2rem;
+    }
+
+        .alert-callout h3 {
+            margin-bottom: .5rem;
+            color: #1e40af;
+        }
+
+        .alert-callout p {
+            margin: 0;
+            line-height: 1.8;
+        }
+
+    .callout-icon {
+        font-size: 2.5rem;
+    }
+
+    .success-callout h3 {
+        margin-bottom: .5rem;
+        color: #1e40af;
+    }
+
+    .success-callout p {
+        margin: 0;
+        line-height: 1.8;
+    }
+
+    .next-step {
+        border-top: 1px solid #e5e7eb;
+        padding-top: 2rem;
+    }
+
+        .next-step span {
+            font-size: .85rem;
+            text-transform: uppercase;
+            color: #9ca3af;
+            letter-spacing: .1em;
+        }
+
+        .next-step h4 {
+            margin-top: .5rem;
+            margin-bottom: .5rem;
+            font-size: 1.4rem;
+        }
+
+        .next-step p {
+            color: #6b7280;
+        }
+
+    .create-event-layout {
+        display: flex;
+        gap: 32px;
+        align-items: flex-start;
+    }
+
+    /* texto ocupa más espacio */
+    .create-event-text {
+        flex: 2;
+        min-width: 0;
+    }
+
+    /* imagen a la derecha */
+    .create-event-image-container {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+    }
+
+    /* imagen vertical: que no explote el layout */
+    .create-event-image {
+        width: 100%;
+        max-width: 320px;
+        height: auto;
+        object-fit: contain;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    }
+
+    /* responsive */
+    @@media (max-width: 900px) {
+        .create-event-layout {
+            flex-direction: column;
+        }
+
+        .create-event-image {
+            max-width: 100%;
+        }
+    }
+</style>
+
+@code{
+    protected override void OnInitialized()
+    {
+        DocumentationState.Set(new DocumentationContext
+            {
+                Breadcrumbs =
+                [
+                new ()
+                {
+                    Text = "WhatsApp",
+                    Url = "/documentation/whatsapp"
+                }
+                ],
+
+                            TocItems =
+                [
+                new ()
+                {
+                    Text = "WhatsApp",
+                    Anchor = "#whatsapp"
+                },
+                new()
+                    {
+                        Text = "Chat de WhatsApp",
+                        Anchor = "#whatsapp-chat"
+                    },
+                new()
+                    {
+                        Text = "Historial",
+                        Anchor = "#whatsapp-history"
+                    },
+                new()
+                    {
+                        Text = "Plantillas",
+                        Anchor = "#whatsapp-templates"
+                    },
+                new()
+                    {
+                        Text = "Configuración",
+                        Anchor = "#whatsapp-settings"
+                    }
+                ],
+
+                NextPage = new()
+                {
+                    Text = "Configuración General",
+                    Url = "/documentation/settings"
+                }
+            });
+    }
+
+}

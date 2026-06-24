@@ -1,0 +1,378 @@
+﻿@page "/documentation/purchases"
+@using SIC.Frontend.Models
+@using SIC.Frontend.Services
+@layout DocumentationLayout
+@inject DocumentationState DocumentationState
+
+<PageTitle>Panel de Bienvenida</PageTitle>
+<div class="welcome-page">
+
+    <div class="welcome-hero">
+
+        <h1 id="purchases">
+            💳 Mis Compras
+        </h1>
+
+        <p class="welcome-description">
+            En esta sección podrás consultar el historial de todas las compras realizadas
+            dentro de la plataforma, incluyendo créditos, paquetes y servicios adquiridos.
+        </p>
+
+    </div>
+
+    <div class="welcome-card">
+
+        <div class="section-header">
+
+            <h2 id="purchase-history">
+                Historial de Compras
+            </h2>
+
+        </div>
+
+        <p>
+            Visualiza todas las transacciones realizadas en tu cuenta de forma organizada.
+        </p>
+
+        <p>
+            La información mostrada incluye:
+        </p>
+
+        <ul>
+            <li>Tipo de Acción</li>
+            <li>Créditos</li>
+            <li>Disponibles</li>
+            <li>Fecha</li>
+            <li>Nota</li>
+        </ul>
+
+        <p>
+            Este historial te permite llevar un control detallado de todos los movimientos
+            relacionados con tus créditos y compras realizadas dentro de INVBOXV APP.
+        </p>
+        <div class="hero-image-container">
+
+            <img src="documentation/historial.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        comprarcreditos
+    </div>
+
+    <div class="welcome-card">
+
+        <div class="section-header">
+
+            <h2 id="buy-credits">
+                Comprar Créditos
+            </h2>
+
+        </div>
+
+        <p>
+            En esta sección podrás adquirir créditos para crear y administrar nuevos eventos
+            dentro de INVBOXV APP.
+        </p>
+        <div class="hero-image-container">
+
+            <img src="documentation/comprarcreditos.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+        <h3>Crédito</h3>
+
+        <p>
+            Un crédito equivale a 1 evento dentro de la plataforma. Cada vez que crees un
+            nuevo evento, se utilizará un crédito de tu saldo disponible.
+        </p>
+       
+        <h3>Paquetes Disponibles</h3>
+
+        <p>
+            <strong>Planner Esencial:</strong> Incluye 1 crédito para crear 1 evento.
+        </p>
+
+        <p>
+            <strong>Planner Elite:</strong> Incluye 3 créditos para crear hasta 3 eventos.
+        </p>
+
+        <p>
+            <strong>Planner Premium:</strong> Incluye 5 créditos para crear hasta 5 eventos.
+        </p>
+
+        <h3>Políticas de Compra</h3>
+
+        <p>
+            Te recomendamos leer las políticas de compra antes de realizar cualquier adquisición
+            para conocer el funcionamiento de los créditos, vigencias y condiciones de uso.
+        </p>
+
+        <h3>Términos y Condiciones</h3>
+
+        <p>
+            Consulta los términos y condiciones de la plataforma para conocer los derechos
+            y responsabilidades relacionadas con el uso de los servicios.
+        </p>
+
+    </div>
+
+    <div class="success-callout">
+
+        <div class="callout-icon">
+            💎
+        </div>
+
+        <div>
+
+            <h3>
+                Administra tus créditos fácilmente
+            </h3>
+
+            <p>
+                Mantén siempre créditos disponibles para crear nuevos eventos sin interrupciones
+                y aprovechar todas las funcionalidades de INVBOXV APP.
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="alert-callout">
+
+        <div class="callout-icon">
+            📋
+        </div>
+
+        <div>
+
+            <h3>
+                Recomendación
+            </h3>
+
+            <p>
+                Revisa periódicamente tu historial de compras y consulta las políticas de compra
+                antes de adquirir nuevos paquetes para conocer las condiciones vigentes.
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="next-step">
+
+        <span>Siguiente sección</span>
+
+        <h4>Configuración</h4>
+
+        <p>
+            Aprende a personalizar tu cuenta, preferencias y datos de tu perfil.
+        </p>
+
+    </div>
+
+</div>
+
+@code {
+
+    protected override void OnInitialized()
+    {
+        DocumentationState.Set(new DocumentationContext
+            {
+                Breadcrumbs =
+                [
+                    new()
+                    {
+                        Text = "Mis Compras",
+                        Url = "/documentation/purchases"
+                    }
+                ],
+
+                TocItems =
+                [
+                    new()
+                    {
+                        Text = "Mis Compras",
+                        Anchor = "#purchases"
+                    },
+                    new()
+                    {
+                        Text = "Historial de Compras",
+                        Anchor = "#purchase-history"
+                    },
+                    new()
+                    {
+                        Text = "Comprar Créditos",
+                        Anchor = "#buy-credits"
+                    }
+                ],
+
+                NextPage = new()
+                {
+                    Text = "Configuración",
+                    Url = "/documentation/settings"
+                }
+            });
+    }
+
+}
+<style>
+    .welcome-page {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding-bottom: 4rem;
+    }
+
+    .hero-image-container {
+        display: flex;
+        justify-content: center;
+        margin: 2rem 0 2.5rem;
+    }
+
+    .hero-image {
+        width: 100%;
+        max-width: 900px;
+        height: auto;
+        border-radius: 20px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    }
+    .welcome-hero {
+        margin-bottom: 3rem;
+    }
+
+    .welcome-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: .4rem .9rem;
+        border-radius: 999px;
+        background: #eef2ff;
+        color: #4338ca;
+        font-size: .8rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .welcome-hero h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 1rem;
+        color: #111827;
+    }
+
+    .welcome-description {
+        font-size: 1.15rem;
+        color: #6b7280;
+        max-width: 750px;
+        line-height: 1.8;
+    }
+
+    .welcome-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .section-number {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #2563eb;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 700;
+    }
+
+    .section-header h2 {
+        margin: 0;
+        font-size: 1.8rem;
+        color: #111827;
+    }
+
+    .welcome-card p {
+        font-size: 1rem;
+        line-height: 2;
+        color: #374151;
+        margin-bottom: 1rem;
+    }
+
+    .success-callout {
+        display: flex;
+        gap: 1.5rem;
+        padding: 2rem;
+        border-radius: 20px;
+        background: linear-gradient( 135deg, #eff6ff, #dbeafe );
+        border: 1px solid #bfdbfe;
+        margin-bottom: 2rem;
+    }
+
+    .alert-callout {
+        display: flex;
+        gap: 1.5rem;
+        padding: 2rem;
+        border-radius: 20px;
+        background: linear-gradient( 135deg, #fefce8, #fef3c7 );
+        border: 1px solid #fde68a;
+        margin-bottom: 2rem;
+    }
+
+        .alert-callout h3 {
+            margin-bottom: .5rem;
+            color: #1e40af;
+        }
+
+        .alert-callout p {
+            margin: 0;
+            line-height: 1.8;
+        }
+
+    .callout-icon {
+        font-size: 2.5rem;
+    }
+
+    .success-callout h3 {
+        margin-bottom: .5rem;
+        color: #1e40af;
+    }
+
+    .success-callout p {
+        margin: 0;
+        line-height: 1.8;
+    }
+
+    .next-step {
+        border-top: 1px solid #e5e7eb;
+        padding-top: 2rem;
+    }
+
+        .next-step span {
+            font-size: .85rem;
+            text-transform: uppercase;
+            color: #9ca3af;
+            letter-spacing: .1em;
+        }
+
+        .next-step h4 {
+            margin-top: .5rem;
+            margin-bottom: .5rem;
+            font-size: 1.4rem;
+        }
+
+        .next-step p {
+            color: #6b7280;
+        }
+</style>

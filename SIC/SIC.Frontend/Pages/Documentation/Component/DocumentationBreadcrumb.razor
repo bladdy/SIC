@@ -1,0 +1,17 @@
+﻿@using SIC.Frontend.Models
+<div class="docs-breadcrumb">
+
+    @foreach (var item in Items)
+    {
+        <NavLink href="@item.Url">
+            @item.Text
+        </NavLink>
+    }
+
+</div>
+@code {
+
+    [Parameter]
+    public List<BreadcrumbItem> Items { get; set; } = [];
+
+}

@@ -1,0 +1,92 @@
+﻿@using SIC.Frontend.Pages.Documentation.Component
+@using SIC.Frontend.Services
+
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject DocumentationState DocumentationState
+
+<div class="docs-layout">
+
+    <DocumentationHeader />
+
+    <div class="docs-body">
+
+        <aside class="docs-sidebar">
+            <DocumentationSidebar />
+        </aside>
+
+        <section class="docs-content">
+
+            <DocumentationBreadcrumb
+                Items="@DocumentationState.Context.Breadcrumbs" />
+
+            <div class="docs-page">
+                @Body
+            </div>
+
+            <DocumentationPager
+                PreviousPage="@DocumentationState.Context.PreviousPage"
+                NextPage="@DocumentationState.Context.NextPage" />
+
+        </section>
+
+        <aside class="docs-toc">
+
+            <DocumentationToc
+                Items="@DocumentationState.Context.TocItems" />
+
+        </aside>
+
+    </div>
+
+</div>
+
+@code {
+
+    protected override void OnInitialized()
+    {
+        DocumentationState.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        DocumentationState.OnChange -= StateHasChanged;
+    }
+
+}
+
+<style>
+    .docs-layout {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background: #ffffff;
+    }
+
+    .docs-body {
+        flex: 1;
+        display: flex;
+        overflow: hidden;
+    }
+
+    .docs-sidebar {
+        width: 320px;
+        border-right: 1px solid #e5e7eb;
+        overflow-y: auto;
+        background: white;
+    }
+
+    .docs-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 2rem 4rem;
+    }
+
+    .docs-toc {
+        width: 280px;
+        border-left: 1px solid #e5e7eb;
+        overflow-y: auto;
+        padding: 2rem 1rem;
+        background: #fafafa;
+    }
+</style>

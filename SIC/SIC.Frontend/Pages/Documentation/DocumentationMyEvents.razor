@@ -1,0 +1,991 @@
+﻿@page "/documentation/my-events"
+@using SIC.Frontend.Models
+@using SIC.Frontend.Services
+@layout DocumentationLayout
+@inject DocumentationState DocumentationState
+
+<PageTitle>Mis Eventos</PageTitle>
+
+<div class="welcome-page">
+
+
+    <div class="welcome-hero">
+
+        <h1 id="my-events">
+            🎉 Mis Eventos
+        </h1>
+
+        <div class="hero-image-container">
+
+            <img src="documentation/misevents.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p class="welcome-description">
+            La sección Mis Eventos te permite administrar todas las celebraciones registradas
+            en tu cuenta. Desde aquí podrás crear nuevos eventos, consultar información,
+            administrar invitados, monitorear confirmaciones de asistencia y acceder a todas
+            las herramientas necesarias para la organización de cada celebración.
+        </p>
+
+    </div>
+
+    <div class="welcome-card">
+
+        <div class="section-header">
+
+            <h2>
+                Mis Eventos
+            </h2>
+
+        </div>
+
+        <p>
+            Aquí encontrarás todos los eventos que has creado en la plataforma.
+        </p>
+
+        <p>
+            Desde esta sección podrás administrar, consultar y dar seguimiento a cada uno
+            de ellos de manera rápida y organizada.
+        </p>
+
+    </div>
+
+    <div class="welcome-card create-event-layout">
+
+        <div class="create-event-text">
+
+            <div class="section-header" id="crear-evento">
+                <h2>Crear Evento</h2>
+            </div>
+
+            <p>
+                Permite crear una nueva invitación digital utilizando uno de tus créditos disponibles.
+            </p>
+
+            <p>
+                
+                <strong> Crear Evento:</strong>
+                Esta ventana te permite registrar un nuevo evento de forma rápida para comenzar a gestionar tu invitación digital y tus invitados.
+            </p>
+
+            <p>
+                <strong>Tipo de Evento:</strong>
+                Selecciona la categoría de tu evento, como boda, quinceañera, cumpleaños, bautizo, graduación, despedida y más.
+            </p>
+
+            <p>
+                <strong>Anfitrión(es):</strong>
+                Ingresa el nombre de los festejados o anfitriones del evento.<br />
+                Ejemplo: Fernanda &amp; Raúl
+            </p>
+
+            <p>
+                <strong>Nombre del Evento:</strong>
+                Escribe el nombre con el que identificarás el evento dentro de tu panel de control.<br />
+                Ejemplo: Nuestra Boda
+            </p>
+
+            <p>
+                <strong>Fecha:</strong>
+                Selecciona la fecha en la que se llevará a cabo el evento.
+            </p>
+            <p>
+                <strong>URL Invitación:</strong>
+                Ingresa el enlace de la invitación digital que deseas asociar al evento. Esta URL será utilizada para acceder rápidamente a la invitación desde tu panel.
+            </p>
+
+            <p>
+                <strong>Miniatura (Foto de Portada):</strong>
+                Agrega la imagen principal que representará el evento dentro de la plataforma. Esta imagen se mostrará como portada o vista previa.
+            </p>
+            <p>
+                <strong>Fecha Límite para Confirmar Evento:</strong>
+                Define la fecha máxima en la que los invitados podrán confirmar o modificar su asistencia.<br />
+                Recomendación: Establece esta fecha algunos días antes del evento para facilitar la organización, asignación de lugares y logística.
+            </p>
+
+            <p>
+                <strong>Guardar:</strong>                
+                Almacena la información del evento y lo agrega automáticamente a tu lista de eventos.<br />
+                Consejo: Antes de guardar, verifica que la fecha, URL de la invitación y fotografía de portada sean correctas para brindar una mejor experiencia a tus clientes e invitados.
+            </p>
+
+            <p>
+                <strong>Cancelar:</strong>
+                Cierra la ventana sin guardar los cambios realizados.
+            </p>
+
+        </div>
+
+        <div class="create-event-image-container">
+            <img src="documentation/modalCrearEvent.jpg"
+                 alt="Crear Evento"
+                 class="create-event-image" />
+        </div>
+
+    </div>
+
+    <div class="welcome-card">
+
+        <div class="section-header" id="filtros">
+
+            <h2 id="filtros">
+                Búsqueda y Filtros
+            </h2>
+
+        </div>
+
+        <p>
+            <strong>Buscar Evento:</strong> Encuentra rápidamente un evento escribiendo el nombre
+            del festejado o alguna palabra relacionada.
+        </p>
+
+        <p>
+            <strong>Filtro por Fecha:</strong> Muestra únicamente los eventos que coincidan con
+            la fecha seleccionada.
+        </p>
+
+        <p>
+            <strong>Tipo de Evento:</strong> Filtra tus eventos por categoría, como bodas,
+            quinceañeras, cumpleaños, bautizos, graduaciones y más.
+        </p>
+
+        <p>
+            <strong>Ordenar por:</strong> Organiza la lista de eventos según diferentes criterios,
+            como fecha, nombre o estado.
+        </p>
+
+        <p>
+            <strong>Filtrar:</strong> Aplica los criterios de búsqueda seleccionados para
+            encontrar eventos específicos.
+        </p>
+
+        <p>
+            <strong>Limpiar:</strong> Restablece todos los filtros y muestra nuevamente la lista
+            completa de eventos.
+        </p>
+
+    </div>
+
+    <div class="welcome-card">
+
+        <div class="section-header">
+
+            <h2 id="herramientas-evento">
+                Herramientas del Evento
+            </h2>
+
+        </div>
+
+        <p>
+            <strong>Ver Invitación:</strong> Abre la invitación digital para visualizarla tal
+            como la verán los invitados.
+        </p>
+
+        <p>
+            <strong>Ver Álbum:</strong> Permite visualizar el álbum digital del evento y las
+            fotografías compartidas.
+        </p>
+
+        <p>
+            <strong>Editar Evento:</strong> Permite modificar la información, configuración y
+            contenido del evento.
+        </p>
+
+        <p>
+            <strong>Fecha:</strong> Muestra la fecha programada para la celebración.
+        </p>
+
+    </div>
+
+    <div class="welcome-card">
+
+        <div class="section-header" id="invitados">
+
+            <h2 id="invitados">
+                Panel de Invitados
+            </h2>
+
+        </div>
+
+        <p>
+            Accede al panel de invitados para consultar confirmaciones, enviar mensajes y
+            administrar la lista de asistentes.
+        </p>
+
+        <p>
+            <strong>Información General del Evento:</strong> Muestra el nombre del evento,
+            tipo de celebración, fecha programada y estado actual.
+        </p>
+
+        <p>
+            <strong>Invitados:</strong> Representa el total de personas registradas en el evento,
+            clasificadas en adultos, jóvenes y niños.
+        </p>
+
+        <p>
+            <strong>Total Sí Asistiré:</strong> Muestra el número de invitados que ya confirmaron
+            su asistencia, clasificados por adultos, jóvenes y niños.
+        </p>
+
+        <p>
+            <strong>Total No Asistiré:</strong> Muestra los invitados que informaron que no podrán
+            asistir al evento.
+        </p>
+
+        <p>
+            <strong>Invitados Pendientes:</strong> Muestra los invitados que aún no han respondido
+            la invitación.
+        </p>
+
+        <p>
+            <strong>Invitaciones Sin Confirmar:</strong> Corresponde a las invitaciones enviadas
+            que todavía no han recibido ninguna respuesta.
+        </p>
+        <div class="hero-image-container">
+
+            <img src="documentation/eventstatus.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+    </div>
+
+    <div class="welcome-card">
+
+        <div class="section-header" id="herramientas">
+
+            <h2 id="herramientas-invitados">
+                Herramientas para Invitados
+            </h2>
+
+        </div>
+
+        <p>
+            <strong>Exportar Excel:</strong> Descarga toda la información de los invitados para
+            realizar análisis, respaldos o reportes.
+        </p>
+
+        <p>
+            <strong>Importar Excel:</strong> Permite cargar una lista de invitados de forma masiva.
+        </p>
+
+        <div style="margin-top:10px; display:flex; justify-content:center;">
+            <img src="documentation/importarexcel.jpg"
+                 style="
+            width:100%;
+            max-width:320px;
+            height:auto;
+            border-radius:10px;
+            object-fit:contain;
+            box-shadow:0 6px 18px rgba(0,0,0,0.12);
+            border:1px solid rgba(0,0,0,0.08);
+         " />
+        </div>
+
+        <p>
+            <strong>Agregar Invitado:</strong> Añade manualmente nuevos invitados a la lista.
+        </p>
+        <div style="margin-top:10px; display:flex; justify-content:center;">
+            <img src="documentation/crearinvitacion.jpg"
+                 style="
+            width:100%;
+            max-width:320px;
+            height:auto;
+            border-radius:10px;
+            object-fit:contain;
+            box-shadow:0 6px 18px rgba(0,0,0,0.12);
+            border:1px solid rgba(0,0,0,0.08);
+         " />
+        </div>
+        <p>
+            <strong>Compartir Evento:</strong> Genera accesos rápidos para compartir la invitación.
+        </p>
+
+        <p>
+            <strong>Lista de Asistentes PDF:</strong> Genera un documento PDF con los asistentes
+            confirmados.
+        </p>
+        <div style="margin-top:10px; display:flex; justify-content:center;">
+            <img src="documentation/pdflistinv.jpg"
+                 style="
+            width:100%;
+            max-width:380px;
+            height:auto;
+            border-radius:10px;
+            object-fit:contain;
+            box-shadow:0 6px 18px rgba(0,0,0,0.12);
+            border:1px solid rgba(0,0,0,0.08);
+         " />
+        </div>
+        <p>
+            <strong>Asignación de Mesas:</strong> Permite organizar y distribuir a los invitados en mesas de manera rápida y visual. Esta herramienta facilita la planificación del acomodo durante el evento, ayudando a optimizar espacios y mejorar la experiencia de los asistentes.
+        </p>
+        <div style="
+                margin-top:10px;
+                display:grid;
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                gap:12px;
+                justify-items:center;
+                align-items:start;
+            ">
+
+            <img src="documentation/mesas.jpg"
+                 style="
+            width:100%;
+            max-width:380px;
+            height:180px;
+            border-radius:10px;
+            object-fit:contain;
+            box-shadow:0 6px 18px rgba(0,0,0,0.12);
+            border:1px solid rgba(0,0,0,0.08);
+         " />
+
+            <img src="documentation/mesas2.jpg"
+                 style="
+            width:100%;
+            max-width:380px;
+            height:180px;
+            border-radius:10px;
+            object-fit:contain;
+            box-shadow:0 6px 18px rgba(0,0,0,0.12);
+            border:1px solid rgba(0,0,0,0.08);
+         " />
+
+            <img src="documentation/mesas3.jpg"
+                 style="
+            width:100%;
+            max-width:380px;
+            height:180px;
+            border-radius:10px;
+            object-fit:contain;
+            box-shadow:0 6px 18px rgba(0,0,0,0.12);
+            border:1px solid rgba(0,0,0,0.08);
+         " />
+
+        </div>
+
+        <p>
+            <strong>Escanear QR:</strong> Permite registrar la llegada de los invitados mediante
+            el escaneo de su código QR.
+        </p>
+
+        <p>
+            <strong>Buscar Invitación:</strong> Localiza rápidamente un invitado escribiendo su
+            nombre, teléfono o información relacionada.
+        </p>
+
+        <p>
+            <strong>Modo Enviar por WhatsApp:</strong> Activa el envío de mensajes directamente
+            mediante WhatsApp.
+        </p>
+
+        <p>
+            <strong>Enviar Seleccionados:</strong> Permite enviar mensajes masivos únicamente a
+            los invitados seleccionados.
+        </p>
+
+    </div>
+
+    <div class="welcome-card">
+
+        <div class="section-header">
+
+            <h2 id="info-invitado">
+                Información del Invitado
+            </h2>
+
+        </div>
+
+        <p>
+            <strong>Nombre del Invitado:</strong> Muestra el nombre principal del invitado o familia registrada.
+        </p>
+
+        <p>
+            <strong>Teléfono Móvil:</strong> Número de contacto asociado al invitado.
+        </p>
+
+        <p>
+            <strong>Mesa:</strong> Indica la mesa asignada para el evento.
+        </p>
+
+        <p>
+            <strong>Invitados Asociados:</strong> Muestra el número de personas registradas dentro
+            de la misma invitación.
+        </p>
+
+        <p>
+            <strong>Estado de Confirmación:</strong>
+        </p>
+
+        <p>🟢 Asistiré: El invitado confirmó su asistencia al evento.</p>
+        <p>🔴 No Asistiré: El invitado informó que no podrá asistir.</p>
+        <p>⚫ Pendiente: El invitado aún no ha respondido la invitación.</p>
+
+        <div class="hero-image-container">
+
+            <img src="documentation/whatsapplis.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+    </div>
+
+    <div class="welcome-card">
+
+        <div class="section-header">
+
+            <h2 id="seguimiento-envios">
+                Seguimiento de Envíos
+            </h2>
+
+        </div>
+
+        <p>
+            Los indicadores permiten conocer el historial de seguimiento y comunicación
+            realizada con cada invitado.
+        </p>
+
+        <div style="display:flex; align-items:center; gap:10px;">
+
+            <div style="
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-shrink: 0;
+        background: #098f09;
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+        box-shadow: 0 4px 10px rgba(9, 143, 9, 0.25);
+        transition: all 0.3s ease;
+    ">
+                1
+            </div>
+
+            <p style="margin:0;">
+                Registro de Asistentes.
+            </p>
+
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+
+            <div style="
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-shrink: 0;
+        background: #098f09;
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+        box-shadow: 0 4px 10px rgba(9, 143, 9, 0.25);
+        transition: all 0.3s ease;
+    ">
+                2
+            </div>
+
+            <p style="margin:0;">
+                Recordatorio de Registro de Asistentes.
+            </p>
+
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+
+            <div style="
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-shrink: 0;
+        background: #098f09;
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+        box-shadow: 0 4px 10px rgba(9, 143, 9, 0.25);
+        transition: all 0.3s ease;
+    ">
+                3
+            </div>
+
+            <p style="margin:0;">
+                Cierre de Listas de Asistencia.
+            </p>
+
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+
+            <div style="
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-shrink: 0;
+        background: #098f09;
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+        box-shadow: 0 4px 10px rgba(9, 143, 9, 0.25);
+        transition: all 0.3s ease;
+    ">
+                4
+            </div>
+
+            <p style="margin:0;">
+                Confirmación de Acceso General.
+            </p>
+
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+
+            <div style="
+                    width: 35px;
+                    height: 35px;
+                    border-radius: 50%;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    flex-shrink: 0;
+                    background: #098f09;
+                    color: white;
+                    font-weight: 600;
+                    font-size: 14px;
+                    box-shadow: 0 4px 10px rgba(9, 143, 9, 0.25);
+                    transition: all 0.3s ease;
+                ">
+                5
+            </div>
+
+            <p style="margin:0;">
+                Confirmación de Acceso con Mesa.
+            </p>
+
+        </div>
+
+        <p>
+            <strong>Seleccionar Plantilla:</strong> Permite elegir el tipo de mensaje que se
+            enviará al invitado.
+        </p>
+
+        <p>
+            <strong>Editar:</strong> Modifica la información del invitado, número telefónico,
+            acompañantes o cualquier dato registrado.
+        </p>
+
+        <p>
+            <strong>Selección Múltiple:</strong> Permite seleccionar uno o varios invitados para
+            realizar acciones masivas.
+        </p>
+        <div class="hero-image-container">
+
+            <img src="documentation/whatsapplis.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+    </div>
+    <div class="welcome-card">
+
+        <div class="section-header">
+
+            <h2 id="paginacion">
+                Paginación
+            </h2>
+
+        </div>
+
+        <p>
+            Los botones Anterior, Siguiente y los números de página permiten navegar entre todos los eventos registrados en tu cuenta.
+        </p>
+
+        <div class="hero-image-container">
+
+            <img src="documentation/paginations.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+    </div>
+
+    <div class="welcome-card">
+
+        <div class="section-header" id="estado-evento">
+
+            <h2>
+                Estado del Evento
+            </h2>
+
+        </div>
+
+        <p>
+            Cada evento cuenta con un indicador visual que permite identificar rápidamente
+            su estado actual.
+        </p>
+
+        <p>
+            🟢 <strong>Activo:</strong> El evento se encuentra vigente y continúa recibiendo
+            visitas, confirmaciones o actividad de los invitados.
+        </p>
+
+        <p>
+            ⚫ <strong>Completado:</strong> El evento ya ha pasado y se encuentra almacenado
+            como parte del historial.
+        </p>
+
+    </div>
+
+    <div class="success-callout">
+
+        <div class="callout-icon">
+            🎉
+        </div>
+
+        <div>
+
+            <h3>
+                Administración centralizada
+            </h3>
+
+            <p>
+                Desde Mis Eventos podrás gestionar cada aspecto de tus celebraciones,
+                invitados, confirmaciones y comunicaciones desde un único lugar.
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="alert-callout">
+
+        <div class="callout-icon">
+            💡
+        </div>
+
+        <div>
+
+            <h3>
+                Recomendación
+            </h3>
+
+            <p>
+                Mantén actualizada la información de cada evento y revisa periódicamente
+                las confirmaciones para garantizar una mejor organización y experiencia
+                para tus invitados.
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="next-step">
+
+        <span>Siguiente sección</span>
+
+        <h4>Invitación Digital</h4>
+
+        <p>
+            Aprende a personalizar y administrar el contenido de tus invitaciones digitales.
+        </p>
+
+    </div>
+
+</div>
+
+<style>
+    .hero-image-container {
+        display: flex;
+        justify-content: center;
+        margin: 2rem 0 2.5rem;
+    }
+
+    .hero-image {
+        width: 100%;
+        max-width: 900px;
+        height: auto;
+        border-radius: 20px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    }
+
+    .welcome-page {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding-bottom: 4rem;
+    }
+
+    .welcome-hero {
+        margin-bottom: 3rem;
+    }
+
+    .welcome-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: .4rem .9rem;
+        border-radius: 999px;
+        background: #eef2ff;
+        color: #4338ca;
+        font-size: .8rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .welcome-hero h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 1rem;
+        color: #111827;
+    }
+
+    .welcome-description {
+        font-size: 1.15rem;
+        color: #6b7280;
+        max-width: 750px;
+        line-height: 1.8;
+    }
+
+    .welcome-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .section-number {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #2563eb;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 700;
+    }
+
+    .section-header h2 {
+        margin: 0;
+        font-size: 1.8rem;
+        color: #111827;
+    }
+
+    .welcome-card p {
+        font-size: 1rem;
+        line-height: 2;
+        color: #374151;
+        margin-bottom: 1rem;
+    }
+
+    .success-callout {
+        display: flex;
+        gap: 1.5rem;
+        padding: 2rem;
+        border-radius: 20px;
+        background: linear-gradient( 135deg, #eff6ff, #dbeafe );
+        border: 1px solid #bfdbfe;
+        margin-bottom: 2rem;
+    }
+
+    .alert-callout {
+        display: flex;
+        gap: 1.5rem;
+        padding: 2rem;
+        border-radius: 20px;
+        background: linear-gradient( 135deg, #fefce8, #fef3c7 );
+        border: 1px solid #fde68a;
+        margin-bottom: 2rem;
+    }
+
+        .alert-callout h3 {
+            margin-bottom: .5rem;
+            color: #1e40af;
+        }
+
+        .alert-callout p {
+            margin: 0;
+            line-height: 1.8;
+        }
+
+    .callout-icon {
+        font-size: 2.5rem;
+    }
+
+    .success-callout h3 {
+        margin-bottom: .5rem;
+        color: #1e40af;
+    }
+
+    .success-callout p {
+        margin: 0;
+        line-height: 1.8;
+    }
+
+    .next-step {
+        border-top: 1px solid #e5e7eb;
+        padding-top: 2rem;
+    }
+
+        .next-step span {
+            font-size: .85rem;
+            text-transform: uppercase;
+            color: #9ca3af;
+            letter-spacing: .1em;
+        }
+
+        .next-step h4 {
+            margin-top: .5rem;
+            margin-bottom: .5rem;
+            font-size: 1.4rem;
+        }
+
+        .next-step p {
+            color: #6b7280;
+        }
+
+    .create-event-layout {
+        display: flex;
+        gap: 32px;
+        align-items: flex-start;
+    }
+
+    /* texto ocupa más espacio */
+    .create-event-text {
+        flex: 2;
+        min-width: 0;
+    }
+
+    /* imagen a la derecha */
+    .create-event-image-container {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+    }
+
+    /* imagen vertical: que no explote el layout */
+    .create-event-image {
+        width: 100%;
+        max-width: 320px;
+        height: auto;
+        object-fit: contain;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    }
+
+    /* responsive */
+    @@media (max-width: 900px) {
+        .create-event-layout
+
+    {
+        flex-direction: column;
+    }
+
+    .create-event-image {
+        max-width: 100%;
+    }
+
+    }
+</style>
+@code {
+
+    protected override void OnInitialized()
+    {
+        DocumentationState.Set(new DocumentationContext
+            {
+                Breadcrumbs =
+        [
+            new()
+        {
+            Text = "Mis Eventos",
+            Url = "/documentation/my-events"
+        }
+        ],
+
+                TocItems =
+    [
+        new()
+    {
+        Text = "Mis Eventos",
+        Anchor = "#my-events"
+    },
+    new()
+    {
+        Text = "Crear Evento",
+        Anchor = "#crear-evento"
+    },
+    new()
+    {
+        Text = "Búsqueda y Filtros",
+        Anchor = "#filtros"
+    },
+    new()
+    {
+        Text = "Herramientas del Evento",
+        Anchor = "#herramientas-evento"
+    },
+    new()
+    {
+        Text = "Panel de Invitados",
+        Anchor = "#invitados"
+    },
+    new()
+    {
+        Text = "Herramientas para Invitados",
+        Anchor = "#herramientas-invitados"
+    },
+    new()
+    {
+        Text = "Información del Invitado",
+        Anchor = "#info-invitado"
+    },
+    new()
+    {
+        Text = "Seguimiento de Envíos",
+        Anchor = "#seguimiento-envios"
+    },
+    new()
+    {
+        Text = "Paginación",
+        Anchor = "#paginacion"
+    },
+    new()
+    {
+        Text = "Estado del Evento",
+        Anchor = "#estado-evento"
+    }
+    ],
+
+                NextPage = new()
+                {
+                    Text = "Invitación Digital",
+                    Url = "/documentation/digital-invitation"
+                }
+            }); ;
+    }
+
+}
+

@@ -1,0 +1,554 @@
+﻿@page "/documentation/dashboard"
+@using SIC.Frontend.Models
+@using SIC.Frontend.Services
+@layout DocumentationLayout
+@inject DocumentationState DocumentationState
+
+<PageTitle>Dashboard</PageTitle>
+
+<div class="welcome-page">
+
+    <div class="welcome-hero">
+
+        <h1 id="dashboard">
+            📊 Dashboard Principal
+        </h1>
+        <div class="hero-image-container">
+
+            <img src="documentation/Dashboard.jpg"
+                 alt="Dashboard INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+        <p class="welcome-description">
+            El Dashboard es el centro de control de INVBOXV APP. Desde esta pantalla
+            podrás visualizar un resumen general de tu actividad, consultar el estado
+            de tus eventos y monitorear las respuestas de tus invitados en tiempo real.
+        </p>
+
+    </div>
+
+    <div class="welcome-card">
+
+        <div class="section-header" id="resumen">
+
+            <h2>
+                ¿Qué información muestra el Dashboard?
+            </h2>
+
+        </div>
+
+        <p>
+            El Dashboard es el centro de control de INVBOXV APP y te permite visualizar
+            rápidamente la información más importante de tus eventos.
+        </p>
+
+        <p>
+            Desde este panel podrás monitorear en tiempo real el avance de tus eventos,
+            las confirmaciones de asistencia y el estado general de cada celebración de
+            forma rápida y organizada.
+        </p>
+
+    </div>
+
+    <div class="welcome-card">
+
+        <div class="section-header" id="creditos">
+
+            <h2>
+                Mis Créditos Disponibles
+            </h2>
+
+        </div>
+
+        <p>
+            Muestra la cantidad de créditos que tienes disponibles actualmente en tu cuenta.
+        </p>
+
+        <p>
+            Los créditos son utilizados para crear nuevos eventos dentro de la plataforma.
+            Si tus créditos llegan a cero, deberás adquirir más para continuar creando
+            invitaciones y eventos.
+        </p>
+
+    </div>
+
+    <div class="welcome-card">
+
+        <div class="section-header" id="eventos-activos">
+
+            <h2>
+                Mis Eventos Activos
+            </h2>
+
+        </div>
+
+        <p>
+            Indica la cantidad total de eventos que actualmente se encuentran en proceso.
+        </p>
+
+        <p>
+            Estos eventos continúan recibiendo confirmaciones de asistencia y pueden tener
+            actividad por parte de tus invitados.
+        </p>
+
+    </div>
+
+    <div class="welcome-card">
+
+        <div class="section-header" id="eventos-completados">
+
+            <h2>
+                Mis Eventos Completados
+            </h2>
+
+        </div>
+
+        <p>
+            Representa los eventos que ya finalizaron y permanecen almacenados en tu historial.
+        </p>
+
+        <p>
+            Esta información te permite consultar eventos anteriores y conservar un registro
+            de las celebraciones realizadas.
+        </p>
+
+    </div>
+
+    <div class="welcome-card">
+
+        <div class="section-header" id="proximos-eventos">
+
+            <h2>
+                Próximos Eventos
+            </h2>
+
+        </div>
+
+        <p>
+            Muestra una lista de los eventos más cercanos ordenados cronológicamente.
+        </p>
+
+        <p>
+            Gracias a esta sección podrás monitorear fácilmente el avance de las
+            confirmaciones y conocer cuáles celebraciones requieren mayor atención.
+        </p>
+
+    </div>
+
+    <div class="welcome-card">
+
+        <div class="section-header" id="barra-asistencia">
+
+            <h2>
+                Barra de Asistencia
+            </h2>
+
+        </div>
+
+        <p>
+            Cada evento incluye una barra visual que resume el estado de respuesta de
+            los invitados.
+        </p>
+
+        <p>
+            🟢 <strong>Confirmados:</strong> invitados que ya indicaron que asistirán al evento.
+        </p>
+
+        <p>
+            🟡 <strong>Pendientes:</strong> invitados que aún no han respondido la invitación.
+        </p>
+
+        <p>
+            🔴 <strong>No Asistirán:</strong> invitados que notificaron que no podrán asistir.
+        </p>
+
+    </div>
+
+    <div class="welcome-card">
+
+        <div class="section-header" id="asistiran">
+
+            <h2>
+                Asistirán / Invitados
+            </h2>
+
+        </div>
+
+        <p>
+            Este indicador muestra la relación entre los invitados confirmados y el total
+            de invitados registrados para el evento.
+        </p>
+
+    </div>
+
+    <div class="welcome-card">
+
+        <div class="section-header" id="ejemplo-asistencia">
+
+            <h2>
+                Ejemplo: 185 Asistirán / 252 Invitados
+            </h2>
+
+        </div>
+
+        <p>
+            Significa que 185 invitados ya confirmaron su asistencia de un total de
+            252 invitados registrados en el evento.
+        </p>
+
+        <p>
+            Esta información te permite conocer rápidamente el porcentaje de asistencia
+            esperado para tu celebración.
+        </p>
+
+    </div>
+
+    <div class="welcome-card">
+
+        <div class="section-header" id="nombre-evento">
+
+            <h2>
+                Nombre del Evento
+            </h2>
+
+        </div>
+
+        <p>
+            Corresponde al nombre del festejado, cliente o identificador principal del evento.
+        </p>
+
+        <p>
+            Este nombre facilita la identificación rápida de cada celebración dentro
+            del Dashboard.
+        </p>
+
+    </div>
+
+    <div class="welcome-card">
+
+        <div class="section-header" id="fecha-evento">
+
+            <h2>
+                Fecha del Evento
+            </h2>
+
+        </div>
+
+        <p>
+            Muestra la fecha programada para la celebración.
+        </p>
+
+        <p>
+            Los eventos se presentan ordenados para que puedas visualizar primero aquellos
+            que están más próximos a realizarse.
+        </p>
+
+    </div>
+
+    <div class="welcome-card">
+
+        <div class="section-header" id="navegacion">
+
+            <h2>
+                Flechas de Navegación
+            </h2>
+
+        </div>
+
+        <p>
+            Las flechas ubicadas en la parte inferior permiten desplazarte entre diferentes
+            grupos de eventos cuando tienes una gran cantidad de celebraciones registradas.
+        </p>
+
+        <p>
+            Utilízalas para consultar eventos adicionales sin abandonar el Dashboard.
+        </p>
+
+    </div>
+
+    <div class="success-callout">
+
+        <div class="callout-icon">
+            📈
+        </div>
+
+        <div>
+
+            <h3>
+                Información en tiempo real
+            </h3>
+
+            <p>
+                El Dashboard se actualiza constantemente para reflejar nuevas
+                confirmaciones, cancelaciones y cambios realizados por tus invitados,
+                permitiéndote mantener un control preciso de cada evento.
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="alert-callout">
+
+        <div class="callout-icon">
+            💡
+        </div>
+
+        <div>
+
+            <h3>
+                Recomendación
+            </h3>
+
+            <p>
+                Revisa periódicamente esta pantalla para monitorear el avance de tus
+                confirmaciones y detectar eventos que requieran seguimiento adicional.
+            </p>
+
+            <p>
+                Una revisión frecuente te ayudará a anticipar necesidades de logística,
+                aforo y organización antes de la fecha del evento.
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="next-step">
+
+        <span>Siguiente sección</span>
+
+        <h4>Mis Eventos</h4>
+
+        <p>
+            Aprende a crear, administrar y personalizar tus eventos dentro de la plataforma.
+        </p>
+
+    </div>
+
+</div>
+<style>
+    .hero-image-container {
+        display: flex;
+        justify-content: center;
+        margin: 2rem 0 2.5rem;
+    }
+
+    .hero-image {
+        width: 100%;
+        max-width: 900px;
+        height: auto;
+        border-radius: 20px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    }
+
+    .welcome-page {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding-bottom: 4rem;
+    }
+
+    .welcome-hero {
+        margin-bottom: 3rem;
+    }
+
+    .welcome-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: .4rem .9rem;
+        border-radius: 999px;
+        background: #eef2ff;
+        color: #4338ca;
+        font-size: .8rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .welcome-hero h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 1rem;
+        color: #111827;
+    }
+
+    .welcome-description {
+        font-size: 1.15rem;
+        color: #6b7280;
+        max-width: 750px;
+        line-height: 1.8;
+    }
+
+    .welcome-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .section-number {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #2563eb;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 700;
+    }
+
+    .section-header h2 {
+        margin: 0;
+        font-size: 1.8rem;
+        color: #111827;
+    }
+
+    .welcome-card p {
+        font-size: 1rem;
+        line-height: 2;
+        color: #374151;
+        margin-bottom: 1rem;
+    }
+
+    .success-callout {
+        display: flex;
+        gap: 1.5rem;
+        padding: 2rem;
+        border-radius: 20px;
+        background: linear-gradient( 135deg, #eff6ff, #dbeafe );
+        border: 1px solid #bfdbfe;
+        margin-bottom: 2rem;
+    }
+
+    .alert-callout {
+        display: flex;
+        gap: 1.5rem;
+        padding: 2rem;
+        border-radius: 20px;
+        background: linear-gradient( 135deg, #fefce8, #fef3c7 );
+        border: 1px solid #fde68a;
+        margin-bottom: 2rem;
+    }
+
+        .alert-callout h3 {
+            margin-bottom: .5rem;
+            color: #1e40af;
+        }
+
+        .alert-callout p {
+            margin: 0;
+            line-height: 1.8;
+        }
+
+    .callout-icon {
+        font-size: 2.5rem;
+    }
+
+    .success-callout h3 {
+        margin-bottom: .5rem;
+        color: #1e40af;
+    }
+
+    .success-callout p {
+        margin: 0;
+        line-height: 1.8;
+    }
+
+    .next-step {
+        border-top: 1px solid #e5e7eb;
+        padding-top: 2rem;
+    }
+
+        .next-step span {
+            font-size: .85rem;
+            text-transform: uppercase;
+            color: #9ca3af;
+            letter-spacing: .1em;
+        }
+
+        .next-step h4 {
+            margin-top: .5rem;
+            margin-bottom: .5rem;
+            font-size: 1.4rem;
+        }
+
+        .next-step p {
+            color: #6b7280;
+        }
+</style>
+@code {
+
+    protected override void OnInitialized()
+    {
+        DocumentationState.Set(new DocumentationContext
+        {
+            Breadcrumbs =
+            [
+                new()
+                {
+                    Text = "Dashboard",
+                    Url = "/documentation/dashboard"
+                }
+            ],
+
+            TocItems =
+            [
+                new()
+                {
+                    Text = "Dashboard Principal",
+                    Anchor = "#dashboard"
+                },
+                new()
+                {
+                    Text = "¿Qué información muestra el Dashboard?",
+                    Anchor = "#resumen"
+                },
+                new()
+                {
+                    Text = "Mis Créditos Disponibles",
+                    Anchor = "#creditos"
+                },
+                new()
+                {
+                    Text = "Mis Eventos Activos",
+                    Anchor = "#eventos-activos"
+                },
+                new()
+                {
+                    Text = "Mis Eventos Completados",
+                    Anchor = "#eventos-completados"
+                },
+                new()
+                {
+                    Text = "Próximos Eventos",
+                    Anchor = "#proximos-eventos"
+                },
+                new()
+                {
+                    Text = "Barra de Asistencia",
+                    Anchor = "#barra-asistencia"
+                }
+            ],
+
+            NextPage = new()
+            {
+                Text = "Mis Eventos",
+                Url = "/documentation/events"
+            }
+        });
+    }
+
+}
+
+             

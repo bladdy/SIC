@@ -1,0 +1,26 @@
+﻿@using SIC.Frontend.Models
+@inject NavigationManager NavigationManager
+<div class="toc">
+
+    <h6>EN ESTA PÁGINA</h6>
+
+    <ul>
+
+        @foreach (var item in Items)
+        {
+            <li class="list-group">
+                <a href="@($"{NavigationManager.Uri.Split('#')[0]}{item.Anchor}")" class="list-group-item list-group-item-action">
+                    @item.Text
+                </a>
+            </li>
+        }
+
+    </ul>
+
+</div>
+@code {
+
+    [Parameter]
+    public List<TocItem> Items { get; set; } = [];
+
+}
