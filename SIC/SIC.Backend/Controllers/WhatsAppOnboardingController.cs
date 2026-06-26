@@ -37,93 +37,222 @@ public class WhatsAppOnboardingController : ControllerBase
     /// 6. Obtener datos del phone number
     /// 7. Guardar configuración en DB
     /// </summary>
+
     [HttpPost("exchange-code")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<IActionResult> ExchangeCode([FromBody] ExchangeCodeRequest request)
+    public async Task<IActionResult> ExchangeCode(
+    [FromBody] ExchangeCodeRequest request)
     {
-        var usuarioId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var usuarioId =
+            User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
         if (usuarioId == null)
             return Unauthorized();
 
-        if (string.IsNullOrEmpty(request.Code) ||
-            string.IsNullOrEmpty(request.BusinessId) ||
-            string.IsNullOrEmpty(request.WabaId) ||
-            string.IsNullOrEmpty(request.PhoneNumberId))
+        if (string.IsNullOrWhiteSpace(request.Code) ||
+            string.IsNullOrWhiteSpace(request.BusinessId) ||
+            string.IsNullOrWhiteSpace(request.WabaId) ||
+            string.IsNullOrWhiteSpace(request.PhoneNumberId))
         {
-            return BadRequest("Datos incompletos: se requieren Code, BusinessId, WabaId y PhoneNumberId");
+            return BadRequest(new
+            {
+                error = "Datos incompletos"
+            });
         }
-
-        var existing = await _repo.GetByPhoneNumberIdAsync(request.PhoneNumberId);
-        if (existing != null)
-            return Conflict("Este número ya está configurado");
 
         try
         {
-            // ── PASO 1: Exchange code → User Token temporal ──────────────────
-            var tempToken = await _metaAuth.ExchangeCodeAsync(request.Code);
-            Console.WriteLine("✅ Paso 1: Token temporal obtenido");
+            // =========================================================
+            // VALIDAR QUE NO EXISTA
+            // =========================================================
 
-            // ── PASO 2: Suscribir la app al WABA ─────────────────────────────
-            // Esto es CRÍTICO: sin este paso el phone_number_id no acepta mensajes
-            /* await _metaAuth.SubscribeAppAsync(request.WabaId);
-             Console.WriteLine("✅ Paso 2: App suscrita al WABA");
+            var existing =
+                await _repo.GetByPhoneNumberIdAsync(
+                    request.PhoneNumberId);
 
-             // ── PASO 3: Crear System User ─────────────────────────────────────
-             // Usamos el User Token temporal (el usuario debe ser admin del Business)
-             var systemUserId = await _metaAuth.CreateSystemUserAsync(
-                 request.BusinessId, tempToken.AccessToken);
-             Console.WriteLine($"✅ Paso 3: System User creado: {systemUserId}");
-
-             // ── PASO 4: Asignar WABA al System User ──────────────────────────
-             // Usamos el App Token (AppID|AppSecret) que tiene permisos globales
-             var appToken = _metaAuth.GetAppToken();
-             await _metaAuth.AssignWabaToSystemUserAsync(request.WabaId, systemUserId, appToken);
-             Console.WriteLine("✅ Paso 4: WABA asignado al System User");
-
-             // ── PASO 5: Generar Token Permanente ──────────────────────────────
-             var permanentToken = await _metaAuth.GeneratePermanentTokenAsync(systemUserId, appToken);
-             Console.WriteLine("✅ Paso 5: Token permanente generado");
-
-             // ── PASO 6: Obtener datos reales del phone number ─────────────────
-             var phoneInfo = await _metaAuth.GetPhoneNumberAsync(
-                 request.PhoneNumberId, permanentToken);
-             Console.WriteLine($"✅ Paso 6: Phone number obtenido: {phoneInfo.DisplayPhoneNumber}");*/
-
-            // ── PASO 7: Guardar en DB ─────────────────────────────────────────
-            var config = new UsuarioWhatsAppConfig
+            if (existing != null)
             {
-                AccessToken = tempToken.AccessToken,           // ✅ Token permanente del System User
-                PhoneNumberId = request.PhoneNumberId,
-                WabaId = request.WabaId,
-                BusinessId = request.BusinessId,
-                PhoneNumber = "", //phoneInfo.DisplayPhoneNumber ?? "no-disponible",
-                SystemUserId = "system_user_id",//systemUserId,
-                UsuarioId = usuarioId,
-                CreatedAt = DateTime.UtcNow,
-                IsActive = true,
-            };
+                return Conflict(new
+                {
+                    error = "Este número ya está configurado"
+                });
+            }
 
-            var action = await _whatsAppConfigUnitOfWork.AddFullAsync(config);
+            // =========================================================
+            // PASO 1
+            // Exchange Code -> Short Lived Token
+            // =========================================================
+
+            var shortToken =
+                await _metaAuth.ExchangeCodeAsync(
+                    request.Code);
+
+            Console.WriteLine(
+                "✅ Paso 1: Short-lived token obtenido");
+
+            // =========================================================
+            // PASO 2
+            // Short -> Long Lived Token
+            // =========================================================
+
+            var longToken =
+                await _metaAuth.ExchangeForLongLivedTokenAsync(
+                    shortToken.AccessToken);
+
+            Console.WriteLine(
+                "✅ Paso 2: Long-lived token obtenido");
+
+            // =========================================================
+            // PASO 3
+            // Validar token
+            // =========================================================
+
+            var tokenInfo =
+                await _metaAuth.DebugTokenAsync(
+                    longToken.AccessToken);
+
+            if (!tokenInfo.TryGetProperty(
+                    "is_valid",
+                    out var isValidProp) ||
+                !isValidProp.GetBoolean())
+            {
+                throw new Exception(
+                    "El token obtenido no es válido");
+            }
+
+            Console.WriteLine(
+                "✅ Paso 3: Token validado");
+
+            // =========================================================
+            // PASO 4
+            // Suscribir App al WABA
+            // =========================================================
+
+            await _metaAuth.SubscribeAppAsync(
+                request.WabaId,
+                longToken.AccessToken);
+
+            Console.WriteLine(
+                "✅ Paso 4: App suscrita al WABA");
+
+            // =========================================================
+            // PASO 5
+            // Obtener información del número
+            // =========================================================
+
+            var phoneInfo =
+                await _metaAuth.GetPhoneNumberAsync(
+                    request.PhoneNumberId,
+                    longToken.AccessToken);
+
+            Console.WriteLine(
+                $"✅ Paso 5: Número obtenido: {phoneInfo.DisplayPhoneNumber}");
+
+            // =========================================================
+            // PASO 6
+            // Verificar acceso al Phone Number
+            // =========================================================
+
+            await _metaAuth.RegisterPhoneNumberAsync(request.PhoneNumberId,longToken.AccessToken, "123456");
+            /*try
+            {
+                await _metaAuth.SendTestMessageAsync(
+                    request.PhoneNumberId,
+                    "528661425258", // tu número de prueba
+                    longToken.AccessToken);
+
+                Console.WriteLine(
+                    "✅ Paso 6: Mensaje de prueba enviado");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(
+                    $"⚠️ Mensaje de prueba omitido: {ex.Message}");
+            }*/
+
+            // =========================================================
+            // PASO 7
+            // Guardar configuración
+            // =========================================================
+
+            var config =
+                new UsuarioWhatsAppConfig
+                {
+                    UsuarioId = usuarioId,
+
+                    AccessToken =
+                        longToken.AccessToken,
+
+                    PhoneNumberId =
+                        request.PhoneNumberId,
+
+                    PhoneNumber =
+                        phoneInfo.DisplayPhoneNumber ??
+                        string.Empty,
+
+                    WabaId =
+                        request.WabaId,
+
+                    BusinessId =
+                        request.BusinessId,
+
+                    SystemUserId = null,
+
+                    CreatedAt =
+                        DateTime.UtcNow,
+
+                    IsActive = true
+                };
+
+            var action =
+                await _whatsAppConfigUnitOfWork
+                    .AddFullAsync(config);
 
             if (!action.Success)
-                return StatusCode(500, new { error = action.Message });
+            {
+                return StatusCode(500, new
+                {
+                    error = action.Message
+                });
+            }
+
+            Console.WriteLine(
+                "✅ Paso 7: Configuración guardada");
 
             return Ok(new
             {
                 success = true,
+
                 configId = config.Id,
-                phoneNumber = config.PhoneNumber,
-                systemUserId = config.SystemUserId,
-                message = "WhatsApp configurado correctamente. Ya puedes enviar mensajes."
+
+                phoneNumber =
+                    config.PhoneNumber,
+
+                phoneNumberId =
+                    config.PhoneNumberId,
+
+                wabaId =
+                    config.WabaId,
+
+                businessId =
+                    config.BusinessId,
+
+                message =
+                    "WhatsApp configurado correctamente."
             });
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"❌ Error en onboarding: {ex.Message}");
+            Console.WriteLine(
+                $"❌ Error onboarding WhatsApp: {ex}");
+
             return StatusCode(500, new
             {
-                error = "No se pudo completar la configuración de WhatsApp",
-                detalle = ex.Message
+                error =
+                    "No se pudo completar la configuración",
+
+                detalle =
+                    ex.Message
             });
         }
     }

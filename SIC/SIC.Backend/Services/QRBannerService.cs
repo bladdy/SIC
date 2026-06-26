@@ -205,7 +205,7 @@ public class QRBannerService
         // URL QR
         // =====================================================
 
-        string qrUrl = $"{BASE_URL}/upload-photo/{data.Code}";
+        string qrUrl = $"{BASE_URL}upload-photo/{data.Code}";
 
         // =====================================================
         // QR

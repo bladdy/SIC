@@ -292,7 +292,7 @@ namespace SIC.Backend.Controllers
                 worksheet.Cell(row, 3).Value = invitation.Email;
                 worksheet.Cell(row, 4).Value = invitation.PhoneNumber;
                 worksheet.Cell(row, 5).Value = invitation.NumberAdults;
-                worksheet.Cell(row, 6).Value = invitation.NumberConfirmedYouths;
+                worksheet.Cell(row, 6).Value = invitation.NumberYouths;
                 worksheet.Cell(row, 7).Value = invitation.NumberChildren;
                 worksheet.Cell(row, 8).Value = invitation.NumberConfirmedAdults;
                 worksheet.Cell(row, 9).Value = invitation.NumberConfirmedYouths;

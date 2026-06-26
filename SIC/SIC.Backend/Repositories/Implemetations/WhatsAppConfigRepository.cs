@@ -75,7 +75,7 @@ namespace SIC.Backend.Repositories.Implemetations
                     whatsAppConfig.Usuario = user;
                     whatsAppConfig.IsActive = true;
                     whatsAppConfig.CreatedAt = DateTime.UtcNow;
-
+                    whatsAppConfig.SystemUserId = "";
                     _context.UsuarioWhatsAppConfigs.Add(whatsAppConfig);
                 }
 

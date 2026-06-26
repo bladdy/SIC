@@ -322,5 +322,37 @@ namespace SIC.Backend.Services
 
             return Convert.ToHexString(hash).ToLower();
         }
+        // ============================================================
+        // 100 Register number
+        // ============================================================
+        public async Task RegisterPhoneNumberAsync(
+        string phoneNumberId,
+        string accessToken,
+        string pin)
+        {
+            var request = new HttpRequestMessage(
+                HttpMethod.Post,
+                $"https://graph.facebook.com/v25.0/{phoneNumberId}/register");
+
+            request.Headers.Authorization =
+                new AuthenticationHeaderValue(
+                    "Bearer",
+                    accessToken);
+
+            request.Content = JsonContent.Create(new
+            {
+                messaging_product = "whatsapp",
+                pin = pin
+            });
+
+            var response = await _http.SendAsync(request);
+
+            var json = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+                throw new Exception(json);
+
+            Console.WriteLine("✅ Número registrado");
+        }
     }
 }
