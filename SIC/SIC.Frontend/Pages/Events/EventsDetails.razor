@@ -305,7 +305,7 @@ else
                                             <div><h5><strong>@invitation.Name</strong></h5></div>
                                             <div><strong>Móvil:</strong> @invitation.PhoneNumber</div>
                                             <div>
-                                                <strong>Mesa:</strong>
+                                                <strong>Mesa:</strong>@(invitation.Table ?? invitation.TablesEvents?.Name ?? "Sin mesa")
                                                     
                                             </div>
                                         </div>

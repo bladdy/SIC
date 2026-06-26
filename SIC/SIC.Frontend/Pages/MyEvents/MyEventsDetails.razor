@@ -554,7 +554,7 @@ else
                                             </div>
                                             <div><h5><strong>@invitation.Name</strong></h5></div>
                                             <div><strong>Móvil:</strong> @invitation.PhoneNumber</div>
-                                            <div><strong>Mesa:</strong> @invitation.Table</div>
+                                            <div><strong>Mesa:</strong>@( invitation.TablesEvents?.Name?? invitation.Table ?? "Sin mesa") </div>
                                         </div>
 
                                         <!-- ===== COLUMNA 2 ===== -->
@@ -861,7 +861,7 @@ else
                     </div>
                     @if (!string.IsNullOrEmpty(invitation.Table))
                     {
-                        <p class="mb-1"><strong>Mesa:</strong> @invitation.Table</p>
+                        <p class="mb-1"><strong>Mesa:</strong>@(invitation.TablesEvents?.Name ?? invitation.Table  ?? "Sin mesa")</p>
                         
                     }
                     @if (!string.IsNullOrEmpty(invitation.Comments))
