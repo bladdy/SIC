@@ -25,6 +25,7 @@ namespace SIC.Backend.Repositories.Implemetations
         public async Task<ActionResponse<Invitation>> GetByCodeAsync(string code)
         {
             var invitations = await _context.Invitations.Include(e => e.Event).ThenInclude(e => e!.EventType).Include(g => g.Guests).
+                Include(t => t.TablesEvents).
                 FirstOrDefaultAsync(x => x.Code == code);
             if (invitations == null)
             {
