@@ -10,7 +10,7 @@ namespace SIC.Backend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class PaymentsController :Controller
+public class PaymentsController : Controller
 {
     private readonly ProductService _product;
     private readonly IGenericUnitOfWork<SIC.Shared.Entities.Product> _unitOfWorkProduct;
@@ -18,23 +18,21 @@ public class PaymentsController :Controller
     private readonly IWhatsAppConfigUnitOfWork _whatsAppConfigUnitOfWork;
 
     public PaymentsController(ProductService product,
-            IWhatsAppConfigUnitOfWork whatsAppConfigUnitOfWork, IUserCreditUnitsOfWork creditUnitsOfWork, IGenericUnitOfWork<SIC.Shared.Entities.Product> unitOfWorkProduct) 
+            IWhatsAppConfigUnitOfWork whatsAppConfigUnitOfWork, IUserCreditUnitsOfWork creditUnitsOfWork, IGenericUnitOfWork<SIC.Shared.Entities.Product> unitOfWorkProduct)
     {
         _product = product;
         _whatsAppConfigUnitOfWork = whatsAppConfigUnitOfWork;
         _creditUnitsOfWork = creditUnitsOfWork;
         _unitOfWorkProduct = unitOfWorkProduct;
-
     }
 
     [HttpPost("pay/{productid}/{userId}")]
     public async Task<IActionResult> Pay(int productid, string userId)
     {
-
         var products = await _unitOfWorkProduct.GetAsync(productid);
         if (products.Result == null)
             return BadRequest(new { error = "El producto no existe." });
-        
+
         var stripe = await _whatsAppConfigUnitOfWork.GetStripeConfig("DEV");
         if (stripe.Result == null)
             return BadRequest(new { error = "No se puedo encontrar Stripe." });
@@ -60,7 +58,6 @@ public class PaymentsController :Controller
                                 products.Result.URLImagen
                             ],
                             Description = string.Join(", ", products.Result.Items)
-
                         }
                     }
                 }
@@ -97,11 +94,13 @@ public class PaymentsController :Controller
         var products = _product.List(options);
         return Ok(products.Data);
     }
+
     [HttpPost("webhook")]
     public async Task<IActionResult> Index()
     {
         var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
-        const string endpointSecret = "whsec_P2tDvgNJUOkpz4ICIyD5IcXmxVeSifSb";
+        //const string endpointSecret = "whsec_P2tDvgNJUOkpz4ICIyD5IcXmxVeSifSb";
+        const string endpointSecret = "whsec_oSYmdn9KVRVCkOc0qQ7e6W1OQgFKWyu6";
         try
         {
             var signatureHeader = Request.Headers["Stripe-Signature"];
@@ -128,11 +127,11 @@ public class PaymentsController :Controller
                     if (exists.Result) return Ok();
 
                     // Guardar la compra
-                     await _creditUnitsOfWork.AddStripeEventLogAsync(new StripeEventLog
-                     {
-                         EventId = stripeEvent.Id,
-                         ProcessedAt = DateTime.UtcNow
-                     });
+                    await _creditUnitsOfWork.AddStripeEventLogAsync(new StripeEventLog
+                    {
+                        EventId = stripeEvent.Id,
+                        ProcessedAt = DateTime.UtcNow
+                    });
 
                     var userCredit = new AddCreditsRequest
                     {
@@ -170,5 +169,4 @@ public class PaymentsController :Controller
             return StatusCode(500);
         }
     }
-
 }
