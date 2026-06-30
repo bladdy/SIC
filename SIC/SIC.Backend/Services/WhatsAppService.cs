@@ -516,11 +516,11 @@ namespace SIC.Backend.Services
             return true;
         }
 
-    public async Task<bool> CreateWhatsAppTemplateAsync(
-        string accessToken,
-        string wabaId,
-        string requestJson,
-        CreateTemplateModel model)
+        public async Task<bool> CreateWhatsAppTemplateAsync(
+            string accessToken,
+            string wabaId,
+            string requestJson,
+            CreateTemplateModel model)
         {
             if (string.IsNullOrWhiteSpace(accessToken))
                 throw new ArgumentException("Access token is required");
@@ -566,7 +566,6 @@ namespace SIC.Backend.Services
                 // ========================================
                 // HEADER MEDIA
                 // ========================================
-
                 else if (
                     model.MediaType == "IMAGE"
                     || model.MediaType == "VIDEO"
@@ -603,9 +602,9 @@ namespace SIC.Backend.Services
                     }
 
                     exampleObject["header_handle"] = new JsonArray
-            {
-                uploadedHandle
-            };
+                    {
+                        uploadedHandle
+                    };
                 }
             }
 
@@ -651,9 +650,9 @@ namespace SIC.Backend.Services
                     body["example"] = new JsonObject
                     {
                         ["body_text"] = new JsonArray
-                {
-                    bodyExamples
-                }
+                        {
+                            bodyExamples
+                        }
                     };
                 }
             }
@@ -850,6 +849,38 @@ namespace SIC.Backend.Services
             return true;
         }
 
+        public async Task CreateTemplateAsync(
+                UsuarioWhatsAppConfig config,
+                object template)
+        {
+            var json = template switch
+            {
+                string s => s,
+                _ => System.Text.Json.JsonSerializer.Serialize(template)
+            };
+
+            var root = JsonNode.Parse(json)!.AsObject();
+
+            root = await ReplaceHeaderHandleAsync(
+                root,
+                config.AccessToken,
+                "https://invboxv.com/wp-content/uploads/2026/05/WhatsApp-Image-2026-05-28-at-7.22.03-PM.jpeg");
+
+            // 🔥 convertir de vuelta a string JSON
+            var finalJson = root.ToJsonString();
+
+            using var client = new HttpClient();
+
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", config.AccessToken);
+
+            var response = await client.PostAsync(
+                $"https://graph.facebook.com/v23.0/{config.WabaId}/message_templates",
+                new StringContent(finalJson, Encoding.UTF8, "application/json"));
+
+            response.EnsureSuccessStatusCode();
+        }
+
         private async Task<string> UploadTemplateImageAsync(
             string accessToken,
             string imageUrl)
@@ -950,6 +981,40 @@ namespace SIC.Backend.Services
                     "Meta no devolvió header handle.");
 
             return handle;
+        }
+
+        private async Task<JsonObject> ReplaceHeaderHandleAsync(
+            JsonObject root,
+            string accessToken,
+            string imageUrl)
+        {
+            var components = root["components"]?.AsArray();
+
+            if (components == null)
+                return root;
+
+            foreach (var component in components)
+            {
+                if (component is not JsonObject obj)
+                    continue;
+
+                if (obj["type"]?.GetValue<string>() == "HEADER"
+                    && obj["format"]?.GetValue<string>() == "IMAGE")
+                {
+                    var handle = await UploadTemplateImageAsync(
+                        accessToken,
+                        imageUrl);
+
+                    obj["example"] = new JsonObject
+                    {
+                        ["header_handle"] = new JsonArray(handle)
+                    };
+
+                    break;
+                }
+            }
+
+            return root;
         }
 
         public async Task<string> UploadTemplateImageAsyncsWSD(string accessToken, string imageUrl)

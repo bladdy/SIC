@@ -26,7 +26,7 @@ public partial class WhatsappInboxPage : IAsyncDisposable
 
             SignalR.OnInboxUpdated += UpdateInbox;
 
-            await SignalR.StartAsync("https://invboxv-app.com/hubs/whatsapp-chat");
+            await SignalR.StartAsync();
 
             await LoadInbox();
         }

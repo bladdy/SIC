@@ -859,7 +859,7 @@ else
 
                         }
                     </div>
-                    @if (!string.IsNullOrEmpty(invitation.Table))
+                    @if (!string.IsNullOrEmpty(invitation.Table) || invitation.TablesEvents != null)
                     {
                         <p class="mb-1"><strong>Mesa:</strong>@(invitation.TablesEvents?.Name ?? invitation.Table  ?? "Sin mesa")</p>
                         

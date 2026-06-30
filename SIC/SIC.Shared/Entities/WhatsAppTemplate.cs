@@ -14,5 +14,7 @@
         public int OrderTemplate { get; set; }
         public string? Content { get; set; }
         public int TemplateNumber { get; set; }
+        public string? MetaDefinitionJson { get; set; }
+        public bool IsSuggested { get; set; } = false;
     }
 }

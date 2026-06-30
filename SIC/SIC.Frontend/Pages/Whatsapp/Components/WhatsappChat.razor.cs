@@ -34,10 +34,7 @@ public partial class WhatsappChat : ComponentBase, IAsyncDisposable
     {
         SignalR.OnMessageReceived += OnMessage;
 
-        await SignalR.StartAsync(
-            "https://invboxv-app.com/hubs/whatsapp-chat"
-        // "https://localhost:7141/hubs/whatsapp-chat"
-        );
+        await SignalR.StartAsync();
     }
 
     protected override async Task OnParametersSetAsync()

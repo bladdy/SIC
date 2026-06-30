@@ -79,6 +79,12 @@ builder.Services.AddScoped<FtpStorageService>();
 builder.Services.AddScoped<MetaAuthService>();
 builder.Services.AddScoped<IWhatsAppTemplateBuilderService, WhatsAppTemplateBuilderService>();
 
+builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+
+builder.Services.AddHostedService<TemplateWorker>();
+
+
+
 // Inyeccion de dependencias gen�rica
 
 builder.Services.AddScoped(typeof(IGenericUnitOfWork<>), typeof(GenericUnitOfWork<>));

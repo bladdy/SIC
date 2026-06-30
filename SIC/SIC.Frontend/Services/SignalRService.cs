@@ -6,23 +6,30 @@ namespace SIC.Frontend.Services;
 public class SignalRService
 {
     private HubConnection? _connection;
+    private readonly string _hubUrl;
 
     private string? _ownerPhone;
     private string? _eventCode;
     private string? _chatContact;
+    private string? _userId;
 
     public event Action<RealtimeChatMessageDto>? OnMessageReceived;
-
     public event Action<InboxConversationDto>? OnInboxUpdated;
+    public event Action<string>? OnNotification;
 
-    public async Task StartAsync(string hubUrl)
+    public SignalRService(string backendUrl)
+    {
+        _hubUrl = $"{backendUrl.TrimEnd('/')}/hubs/whatsapp-chat";
+    }
+
+    public async Task StartAsync()
     {
         if (_connection != null &&
             _connection.State == HubConnectionState.Connected)
             return;
 
         _connection = new HubConnectionBuilder()
-            .WithUrl(hubUrl)
+            .WithUrl(_hubUrl)
             .WithAutomaticReconnect()
             .Build();
 
@@ -36,7 +43,13 @@ public class SignalRService
             inbox => OnInboxUpdated?.Invoke(inbox)
         );
 
-        // 🔁 Rejoin automático después de reconectar
+        _connection.On<string>(
+            "Notification",
+            message =>
+            {
+                OnNotification?.Invoke(message);
+            });
+
         _connection.Reconnected += async _ =>
         {
             if (_connection.State != HubConnectionState.Connected)
@@ -61,16 +74,32 @@ public class SignalRService
                     _chatContact
                 );
             }
+
+            if (!string.IsNullOrWhiteSpace(_userId))
+            {
+                await _connection.InvokeAsync(
+                    "JoinNotifications",
+                    _userId);
+            }
         };
 
         await _connection.StartAsync();
     }
 
-    // 📥 Inbox por evento
+    private async Task EnsureConnectedAsync()
+    {
+        if (_connection == null || _connection.State != HubConnectionState.Connected)
+        {
+            await StartAsync();
+        }
+    }
+
     public async Task JoinEventInbox(string ownerPhone, string eventCode)
     {
         _ownerPhone = ownerPhone;
         _eventCode = eventCode;
+
+        await EnsureConnectedAsync();
 
         if (_connection?.State == HubConnectionState.Connected)
         {
@@ -82,26 +111,28 @@ public class SignalRService
         }
     }
 
-    public async Task LeaveEventInbox(string ownerPhone, string eventCode)
+    public async Task JoinNotifications(string userId)
     {
-        if (_eventCode == eventCode)
-            _eventCode = null;
+        _userId = userId;
 
-        if (_connection?.State == HubConnectionState.Connected)
+        Console.WriteLine($"JoinNotifications: {userId}");
+
+        await EnsureConnectedAsync();
+
+        if (_connection != null)
         {
             await _connection.InvokeAsync(
-                "LeaveEventInbox",
-                ownerPhone,
-                eventCode
-            );
+                "JoinNotifications",
+                userId);
         }
     }
 
-    // 💬 Chat activo
     public async Task JoinChat(string ownerPhone, string contactPhone)
     {
         _ownerPhone = ownerPhone;
         _chatContact = contactPhone;
+
+        await EnsureConnectedAsync();
 
         if (_connection?.State == HubConnectionState.Connected)
         {
@@ -128,6 +159,21 @@ public class SignalRService
         }
     }
 
+    public async Task LeaveEventInbox(string ownerPhone, string eventCode)
+    {
+        if (_eventCode == eventCode)
+            _eventCode = null;
+
+        if (_connection?.State == HubConnectionState.Connected)
+        {
+            await _connection.InvokeAsync(
+                "LeaveEventInbox",
+                ownerPhone,
+                eventCode
+            );
+        }
+    }
+
     public async Task StopAsync()
     {
         if (_connection != null)
@@ -140,5 +186,6 @@ public class SignalRService
         _ownerPhone = null;
         _eventCode = null;
         _chatContact = null;
+        _userId = null;
     }
 }

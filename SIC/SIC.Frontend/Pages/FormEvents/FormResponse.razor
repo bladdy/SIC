@@ -1,0 +1,100 @@
+﻿@page "/responder"
+
+<h3>@Formulario.Titulo</h3>
+
+@foreach (var pregunta in Formulario.Preguntas)
+{
+    <div class="mb-4">
+
+        <label>@pregunta.Titulo</label>
+
+        @switch (pregunta.Tipo)
+        {
+            case TipoPregunta.Texto:
+
+                <input class="form-control" />
+
+                break;
+
+            case TipoPregunta.Numero:
+
+                <input type="number"
+                       class="form-control" />
+
+                break;
+
+            case TipoPregunta.SiNo:
+
+                <select class="form-select">
+
+                    <option>Si</option>
+
+                    <option>No</option>
+
+                </select>
+
+                break;
+
+            case TipoPregunta.Fecha:
+
+                <input type="date"
+                       class="form-control" />
+
+                break;
+
+            case TipoPregunta.Foto:
+
+                <InputFile />
+
+                break;
+        }
+
+    </div>
+}
+
+<button class="btn btn-success">
+
+    Enviar
+
+</button>
+
+@code {
+
+    private FormularioModel Formulario = new()
+        {
+            Titulo = "Inspección de Seguridad",
+
+            Preguntas =
+        [
+            new()
+        {
+            Titulo="Nombre del inspector",
+            Tipo=TipoPregunta.Texto
+        },
+
+        new()
+        {
+            Titulo="Temperatura",
+            Tipo=TipoPregunta.Numero
+        },
+
+        new()
+        {
+            Titulo="¿Hay riesgos?",
+            Tipo=TipoPregunta.SiNo
+        },
+
+        new()
+        {
+            Titulo="Fecha",
+            Tipo=TipoPregunta.Fecha
+        },
+
+        new()
+        {
+            Titulo="Fotografía",
+            Tipo=TipoPregunta.Foto
+        }
+        ]
+        };
+}

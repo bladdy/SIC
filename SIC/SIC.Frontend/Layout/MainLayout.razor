@@ -1,4 +1,14 @@
-﻿@inherits LayoutComponentBase
+﻿@using CurrieTechnologies.Razor.SweetAlert2
+@using SIC.Frontend.Services
+@implements IDisposable
+@inherits LayoutComponentBase
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject SignalRService SignalRService
+@inject SweetAlertService Swal
+@using System.Security.Claims
+
+
 <div class="page">
     <div class="sidebar">
         <NavMenu />
@@ -14,3 +24,58 @@
         </article>
     </main>
 </div>
+@code {
+
+    private bool _joinedNotifications;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || _joinedNotifications)
+            return;
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!string.IsNullOrWhiteSpace(userId))
+            {
+                await SignalRService.JoinNotifications(userId);
+                _joinedNotifications = true;
+            }
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        Console.WriteLine("Iniciando notification");
+        SignalRService.OnNotification += NotificationReceived;
+    }
+
+    private async void NotificationReceived(string message)
+    {
+        await InvokeAsync(async () =>
+        {
+
+            Console.WriteLine("Ejecutando notification");
+            await Swal.FireAsync(new SweetAlertOptions
+            {
+                    Toast = true,
+                    Position = SweetAlertPosition.TopEnd,
+                    Icon = SweetAlertIcon.Success,
+                    Title = message,
+                    ShowConfirmButton = true,
+                    ConfirmButtonText = "Cerrar",
+                    Timer = null,
+                    TimerProgressBar = false
+            });
+        });
+    }
+
+    public void Dispose()
+    {
+        SignalRService.OnNotification -= NotificationReceived;
+    }
+}

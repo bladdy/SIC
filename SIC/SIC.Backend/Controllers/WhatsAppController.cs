@@ -1,20 +1,22 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using SIC.Backend.Services;
-using SIC.Backend.UnitOfWork.Interfaces;
-using SIC.Shared.Helpers;
-using SIC.Shared.Response;
-using SIC.Shared.DTOs;
-using System.Security.Claims;
+﻿using DocumentFormat.OpenXml.Drawing;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using SIC.Shared.Entities;
-using SIC.Backend.Repositories.Interfaces;
-using SIC.Shared.Request;
-using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using SIC.Backend.Helpers;
+using SIC.Backend.Hubs;
+using SIC.Backend.Repositories.Interfaces;
+using SIC.Backend.Services;
+using SIC.Backend.UnitOfWork.Interfaces;
+using SIC.Shared.DTOs;
+using SIC.Shared.Entities;
+using SIC.Shared.Helpers;
+using SIC.Shared.Request;
+using SIC.Shared.Response;
+using System.Security.Claims;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using SIC.Backend.UnitOfWork.Implemetations;
 
 namespace SIC.Backend.Controllers
 {
@@ -24,21 +26,25 @@ namespace SIC.Backend.Controllers
     {
         private readonly WhatsAppService _whatsAppService;
         private readonly IWhatsAppConfigUnitOfWork _whatsAppConfigUnitOfWork;
+        private readonly IHubContext<WhatsappChatHub> _hub;
         private readonly IInvitationUnitOfWork _invitationUnitOfWork;
         private readonly IMessageUnitOfWork _iMessageUnitOfWork;
         private readonly IWhatsAppTemplateBuilderService _templateBuilderService;
         private readonly IWhatsAppTemplateRepository _templateRepository;
+        private readonly IBackgroundTaskQueue _queue;
 
         public WhatsAppController(
-            WhatsAppService whatsAppService, IInvitationUnitOfWork invitationUnitOfWork, IWhatsAppTemplateBuilderService templateBuilderService, IWhatsAppTemplateRepository templateRepository,
+            WhatsAppService whatsAppService, IInvitationUnitOfWork invitationUnitOfWork, IWhatsAppTemplateBuilderService templateBuilderService, IWhatsAppTemplateRepository templateRepository, IBackgroundTaskQueue queue, IHubContext<WhatsappChatHub> hub,
             IWhatsAppConfigUnitOfWork whatsAppConfigUnitOfWork, IMessageUnitOfWork iMessageUnitOfWork)
         {
+            _hub = hub;
             _whatsAppService = whatsAppService;
             _templateBuilderService = templateBuilderService;
             _whatsAppConfigUnitOfWork = whatsAppConfigUnitOfWork;
             _invitationUnitOfWork = invitationUnitOfWork;
             _iMessageUnitOfWork = iMessageUnitOfWork;
             _templateRepository = templateRepository;
+            _queue = queue;
         }
 
         //ToDo:Agregar una tabla para ver si se envio o no la invitacion, para evitar enviar varias veces la misma invitacion a un mismo numero, y agregar un campo de fecha de envio para llevar un control de cuando se envio la invitacion
@@ -154,22 +160,100 @@ namespace SIC.Backend.Controllers
             return Ok(templates.Result);
         }
 
-        [HttpPost("create-templates")]
-        public async Task<IActionResult> CreateTemplate([FromBody] CreateTemplateModel model)
-        {/*
+        [HttpPost("generate-templates")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(Roles = "Admin,WeddingPlanner,User")]
+        public async Task<IActionResult> GenerateTemplate()
+        {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
                 return BadRequest(new { error = "Usuario no autenticado" });
 
             var userWhatsAppConfig = await _whatsAppConfigUnitOfWork.GetByUserIdAsync(userId);
             if (!userWhatsAppConfig.Success)
-                return BadRequest(new { error = "Este usuario no tiene WhatsApp configurado" });*/
+                return BadRequest(new { error = "Este usuario no tiene WhatsApp configurado" });
+            if (userWhatsAppConfig.Result == null)
+                return BadRequest(new { error = "Este usuario no tiene WhatsApp configurado" });
+            if (userWhatsAppConfig.Result.TemplatesGenerated)
+                return Ok(new { message = "Las plantillas sugeridas ya han sido generada para esta cuenta." });
+            var templates = await _templateRepository.GetAllAsync();
 
+            var templatesResult = templates.Result;
+            if (templatesResult == null || templatesResult.Any(t => t == null))
+            {
+                return BadRequest(new { error = "Hubo un problema al obtener las templates sugeridas." });
+            }
+            List<WhatsAppTemplate> templatesGenerated = templatesResult
+                .Where(t => t != null) // Filter out null values
+                .Select(t => t!) // Use the null-forgiving operator to indicate non-null values
+                .OrderBy(t => t.OrderTemplate)
+                .ToList();
+            //Proceso de enviar las plantillas a whatsapp
+            await _queue.QueueBackgroundWorkItemAsync(async token =>
+            {
+                using var scope = HttpContext.RequestServices.CreateScope();
+
+                var templateService =
+                    scope.ServiceProvider.GetRequiredService<WhatsAppService>();
+                var whatsAppConfigUnitOfWork = scope.ServiceProvider
+                                .GetRequiredService<IWhatsAppConfigUnitOfWork>();
+
+                await templateService.CreateTemplateAsync(userWhatsAppConfig.Result, templatesGenerated[0].MetaDefinitionJson!);
+
+                await Task.Delay(TimeSpan.FromSeconds(30), token);
+
+                await templateService.CreateTemplateAsync(userWhatsAppConfig.Result, templatesGenerated[1].MetaDefinitionJson!);
+
+                await Task.Delay(TimeSpan.FromSeconds(30), token);
+
+                await templateService.CreateTemplateAsync(userWhatsAppConfig.Result, templatesGenerated[2].MetaDefinitionJson!);
+
+                await Task.Delay(TimeSpan.FromSeconds(30), token);
+
+                await templateService.CreateTemplateAsync(userWhatsAppConfig.Result, templatesGenerated[3].MetaDefinitionJson!);
+
+                await Task.Delay(TimeSpan.FromSeconds(30), token);
+
+                await templateService.CreateTemplateAsync(userWhatsAppConfig.Result, templatesGenerated[4].MetaDefinitionJson!);
+                userWhatsAppConfig.Result.TemplatesGenerated = true;
+
+                await whatsAppConfigUnitOfWork.UpdateFullAsync(userWhatsAppConfig.Result);
+
+                // Avisar por SignalR
+                await _hub.Clients
+                .Group($"notifications-{userId}")
+                .SendAsync("Notification",
+                    "Las plantillas fueron generadas correctamente.");
+            });
+
+            return Ok(new
+            {
+                message = "La generación de plantillas inició en segundo plano."
+            });
+        }
+
+        [HttpPost("create-templates")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(Roles = "Admin,WeddingPlanner,User")]
+        public async Task<IActionResult> CreateTemplate([FromBody] CreateTemplateModel model)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return BadRequest(new { error = "Usuario no autenticado" });
+
+            var userWhatsAppConfig = await _whatsAppConfigUnitOfWork.GetByUserIdAsync(userId);
+            if (!userWhatsAppConfig.Success)
+                return BadRequest(new { error = "Este usuario no tiene WhatsApp configurado" });
+            if (userWhatsAppConfig.Result == null)
+                return BadRequest(new { error = "Este usuario no tiene WhatsApp configurado" });
+            /*
             var accessToken = "EAAUu8FHu8ZAwBQsU6ZAoXcUw8GZClIsc7h1JGvgz0ZBQdWO7XxIMkafA1TzRls0Jn1ZCMeQRkg95Cj4PeUkuCAR3YvpzpWCuEr3HmdL3D5w0meDRVqwZC5vE9O4fK1MVnrHT64UsfQQb25BWATpEm2nEa822WdceVjoFe9lHYlcxlb4BkGpyYK3uEIoZCzkfggiMgZDZD";//userWhatsAppConfig.Result!.AccessToken;
-            var wabaId = "1265194188987559";//userWhatsAppConfig.Result.WabaId;
+            var wabaId = "1265194188987559"
+            ;*/
+            //userWhatsAppConfig.Result.WabaId;
             var request = BuildWhatsappTemplateJson(model);
             //Este tiene que recibir el model para que la funcion itere sobre los componentes y arme el json dinamicamente, detectando variables {{param}} en el texto del body para crear el example necesario para que WhatsApp acepte la plantilla, y tambien detectando si el header es de tipo texto o media (imagen/video/documento) para armar el json correctamente, y lo mismo con los botones, detectando si son de tipo URL o QUICK_REPLY, y si son URL detectar si la URL es dinámica (tiene {{param}}) para agregar el example necesario, etc.
-            var result = await _whatsAppService.CreateWhatsAppTemplateAsync(accessToken, wabaId, request, model);
+            var result = await _whatsAppService.CreateWhatsAppTemplateAsync(userWhatsAppConfig.Result.AccessToken, userWhatsAppConfig.Result.WabaId, request, model);
             //Despues que se envie la plantilla a Meta, si la respuesta es exitosa, guardar en la base de datos la plantilla creada con su nombre, categoría, idioma, contenido, etc. para tener un registro de las plantillas creadas y poder usarlas posteriormente para enviar mensajes dinámicos. Si la respuesta no es exitosa, devolver un mensaje de error con el motivo del error que devuelva WhatsApp.
 
             //Arreglar el resultado para que devuelva un mensaje de éxito o error dependiendo de la respuesta de WhatsApp, y también guardar en la base de datos la plantilla creada con su nombre, categoría, idioma, contenido, etc. para tener un registro de las plantillas creadas y poder usarlas posteriormente para enviar mensajes dinámicos.
@@ -527,7 +611,7 @@ namespace SIC.Backend.Controllers
                     );
                     if (components == null)
                         continue;
-                    var fullnumber = string.Concat(invitacion.Result.CountryCode, invitacion.Result.PhoneNumber);// +1 
+                    var fullnumber = string.Concat(invitacion.Result.CountryCode, invitacion.Result.PhoneNumber);// +1
 
                     var result = await _whatsAppService.EnviarTemplateDinamicoAsync(
                         accessToken,

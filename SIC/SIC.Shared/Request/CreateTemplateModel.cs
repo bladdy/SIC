@@ -13,7 +13,7 @@
         public List<string> BodyExampleTypes { get; set; } = new();
         public List<ButtonModel> Buttons { get; set; } = new();
         public string MediaType { get; set; } = ""; // IMAGE / VIDEO / DOCUMENT
-        public string? MediaUrl { get; set; } = "https://invboxv.com/wp-content/uploads/2026/05/WhatsApp-Image-2026-05-28-at-7.22.03-PM.jpeg";
+        public string? MediaUrl { get; set; } = "";//"https://invboxv.com/wp-content/uploads/2026/05/WhatsApp-Image-2026-05-28-at-7.22.03-PM.jpeg";
         public string? MediaCaption { get; set; }
     }
 

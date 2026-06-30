@@ -1,9 +1,17 @@
 ﻿@page "/whatsapp_templates"
 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
     <h3 class="mb-0">Plantillas</h3>
-    <a href="/whatsapp_templates/template-builder" class="btn btn-custom mt-2 mt-md-0">
-        <i class="oi oi-plus"></i> Crear Plantilla
-    </a>
+    <div>
+        <a href="/whatsapp_templates/template-builder" class="btn btn-custom mt-2 mt-md-0">
+            <i class="oi oi-plus"></i> Crear Plantilla
+        </a>
+        <button class="btn btn-custom mt-2 mt-md-0"
+                @onclick="GenerateTemplates"
+                disabled="@isGenerating">
+            @(isGenerating ? "Iniciando..." : "Generar plantillas sugeridas")
+        </button>
+
+    </div>
 </div>
 <table class="table table-striped table-bordered">
     <thead>

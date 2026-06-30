@@ -41,5 +41,6 @@ namespace SIC.Shared.Entities
 
         public DateTime? RevokedAt { get; set; }
         public DateTime TokenExpiresAt { get; set; }
+        public bool TemplatesGenerated { get; set; } = false;
     }
 }

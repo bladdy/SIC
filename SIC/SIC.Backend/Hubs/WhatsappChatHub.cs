@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using SIC.Shared.DTOs;
 
 namespace SIC.Backend.Hubs;
 
@@ -34,6 +33,31 @@ public class WhatsappChatHub : Hub
         await Groups.RemoveFromGroupAsync(
             Context.ConnectionId,
             SignalRGroups.EventInbox(ownerPhone, eventCode)
+        );
+    }
+
+    public async Task JoinUserNotifications(string userId)
+    {
+        await Groups.AddToGroupAsync(
+            Context.ConnectionId,
+            $"user-{userId}"
+        );
+    }
+
+    public async Task JoinNotifications(string userId)
+    {
+        Console.WriteLine($"🔥 HUB JOIN: {userId}");
+
+        await Groups.AddToGroupAsync(
+            Context.ConnectionId,
+            $"notifications-{userId}");
+    }
+
+    public async Task LeaveUserNotifications(string userId)
+    {
+        await Groups.RemoveFromGroupAsync(
+            Context.ConnectionId,
+            $"user-{userId}"
         );
     }
 }

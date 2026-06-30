@@ -1,0 +1,242 @@
+﻿<style>
+
+    .question-card {
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.05);
+    }
+
+    .question-title {
+        border: none;
+        border-bottom: 2px solid transparent;
+        font-size: 1.1rem;
+        font-weight: 600;
+        width: 100%;
+        outline: none;
+        transition: .2s;
+    }
+
+        .question-title:focus {
+            border-bottom-color: #0d6efd;
+        }
+
+    .child-container {
+        margin-left: 45px;
+        margin-top: 20px;
+        padding-left: 20px;
+        border-left: 3px solid #d9d9d9;
+    }
+
+    .condition-title {
+        font-size: .9rem;
+        color: #0d6efd;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    .toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    .menu-btn {
+        border: none;
+        background: transparent;
+        font-size: 22px;
+        color: gray;
+    }
+
+    .add-sub {
+        width: 100%;
+        border: 2px dashed #ced4da;
+        background: transparent;
+        border-radius: 8px;
+        padding: 10px;
+        transition: .2s;
+    }
+
+        .add-sub:hover {
+            background: #f8f9fa;
+        }
+
+</style>
+
+<div class="question-card">
+
+    <!-- CABECERA -->
+
+    <div class="d-flex justify-content-between align-items-start">
+
+        <input class="question-title"
+               @bind="Pregunta.Titulo" />
+
+        <div class="dropdown">
+
+            <button class="menu-btn"
+                    data-bs-toggle="dropdown">
+
+                ⋮
+
+            </button>
+
+            <ul class="dropdown-menu dropdown-menu-end">
+
+                <li>
+                    <button class="dropdown-item"
+                            @onclick="Eliminar">
+
+                        🗑 Eliminar
+
+                    </button>
+                </li>
+
+            </ul>
+
+        </div>
+
+    </div>
+
+    <!-- CONFIGURACIÓN -->
+
+    <div class="row mt-4">
+
+        <div class="col-md-4">
+
+            <label class="form-label">
+
+                Tipo
+
+            </label>
+
+            <select class="form-select"
+                    @bind="Pregunta.Tipo">
+
+                @foreach (var tipo in Enum.GetValues<TipoPregunta>())
+                {
+                    <option value="@tipo">
+                        @tipo
+                    </option>
+                }
+
+            </select>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <label class="form-label">
+
+                Obligatoria
+
+            </label>
+
+            <div class="form-check mt-2">
+
+                <input class="form-check-input"
+                       type="checkbox"
+                       @bind="Pregunta.Obligatoria" />
+
+                <label class="form-check-label">
+
+                    Sí
+
+                </label>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- REGLAS -->
+    @if (Pregunta.Tipo == TipoPregunta.SiNo)
+    {
+        <div class="mt-4">
+
+            @foreach (var regla in Pregunta.Reglas)
+            {
+                <div class="child-container">
+
+                    <div class="condition-title">
+
+                        ▼ Cuando responda
+                        <strong>@regla.ValorDisparador</strong>
+
+                    </div>
+
+                    <select class="form-select mb-3"
+                            @bind="regla.ValorDisparador">
+
+                        <option>Si</option>
+                        <option>No</option>
+
+                    </select>
+
+                    @foreach (var sub in regla.SubPreguntas)
+                    {
+                        <PreguntaBuilder Pregunta="sub"
+                                         OnDelete="@(() => EliminarSub(regla, sub))" />
+                    }
+
+                    <button class="add-sub mt-2"
+                            @onclick="() => AgregarSub(regla)">
+
+                        ➕ Agregar Subpregunta
+
+                    </button>
+
+                </div>
+            }
+
+            <button class="btn btn-outline-primary mt-4"
+                    @onclick="AgregarRegla">
+
+                ➕ Agregar Condición
+
+            </button>
+
+        </div>
+    }
+
+</div>
+
+@code {
+
+    [Parameter]
+    public PreguntaModel Pregunta { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<PreguntaModel> OnDelete { get; set; }
+
+    async Task Eliminar()
+    {
+        await OnDelete.InvokeAsync(Pregunta);
+    }
+
+    void AgregarRegla()
+    {
+        Pregunta.Reglas.Add(new()
+            {
+                ValorDisparador = "Si"
+            });
+    }
+
+    void AgregarSub(ReglaPreguntaModel regla)
+    {
+        regla.SubPreguntas.Add(new()
+            {
+                Titulo = "Nueva Subpregunta",
+                Tipo = TipoPregunta.Texto
+            });
+    }
+
+    void EliminarSub(ReglaPreguntaModel regla, PreguntaModel pregunta)
+    {
+        regla.SubPreguntas.Remove(pregunta);
+    }
+
+}
