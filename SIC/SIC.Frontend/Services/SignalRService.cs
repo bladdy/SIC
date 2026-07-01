@@ -14,12 +14,14 @@ public class SignalRService
     private string? _userId;
 
     public event Action<RealtimeChatMessageDto>? OnMessageReceived;
+
     public event Action<InboxConversationDto>? OnInboxUpdated;
+
     public event Action<string>? OnNotification;
 
     public SignalRService(string backendUrl)
     {
-        _hubUrl = $"{backendUrl.TrimEnd('/')}/hubs/whatsapp-chat";
+        _hubUrl = backendUrl;
     }
 
     public async Task StartAsync()
