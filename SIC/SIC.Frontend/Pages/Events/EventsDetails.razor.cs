@@ -77,6 +77,7 @@ public partial class EventsDetails
         await LoadTemplates();
         await LoadTablesEventsAsync();
     }
+
     private async Task LoadTablesEventsAsync()
     {
         var result = await Repository.GetAsync<List<TablesEvents>>($"api/Tables/{EventDetail.Id}");
@@ -88,6 +89,7 @@ public partial class EventsDetails
         }
         Tables = result.Response ?? new List<TablesEvents>();
     }
+
     private async Task LoadTemplates()
     {
         var url = $"api/whatsapp/get-templates";
@@ -675,12 +677,30 @@ public partial class EventsDetails
         return true;
     }
 
-    private async Task EnviarInvitacion(string code, string template, int invitationId)
+    private async Task EnviarInvitacion(string code, string template, int invitationId, string displayedName)
     {
         try
         {
             loadingWhatsappId1 = invitationId;
+            var confirmResult = await SweetAlertService.FireAsync(new SweetAlertOptions
+            {
+                Html = $@"
+                        <div style='text-align:center'>
+                            <p>Estas seguro de enviar la plantilla:</p>
+                            <h2 style='color:#3C6A79'><strong>{displayedName}</strong></h2>
+                            <p>¿Deseas continuar?</p>
+                        </div>
+                    ",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Sí, Continuar",
+                CancelButtonText = "Cancelar",
+                ConfirmButtonColor = "#3C6A79",
+                CancelButtonColor = "#d33"
+            });
 
+            if (confirmResult.IsDismissed)
+                return;
             var codes = new List<string> { code };
 
             var dto = new MasiveSendTemplateDTO
@@ -724,6 +744,7 @@ public partial class EventsDetails
         finally
         {
             loadingWhatsappId1 = null;
+            await LoadInvitations(currentPage);
             StateHasChanged();
         }
     }

@@ -4,7 +4,6 @@ using SIC.Shared.Entities;
 
 namespace SIC.Backend.Controllers;
 
-
 [ApiController]
 [Route("api/[controller]")]
 public class PlansController : GenericController<Plan>
@@ -15,6 +14,7 @@ public class PlansController : GenericController<Plan>
     {
         _planUnitOfWork = planUnitOfWork;
     }
+
     [HttpGet]
     public override async Task<IActionResult> GetAsync()
     {
@@ -25,8 +25,9 @@ public class PlansController : GenericController<Plan>
         }
         return BadRequest(action.Message);
     }
+
     [HttpGet("{id}")]
-    public override async Task<IActionResult> GetAsync(int id) 
+    public override async Task<IActionResult> GetAsync(int id)
     {
         var action = await _planUnitOfWork.GetAsync(id);
         if (action.Success)

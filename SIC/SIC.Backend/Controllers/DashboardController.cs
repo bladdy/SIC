@@ -24,6 +24,7 @@ namespace SIC.Backend.Controllers
         {
             // Extraer el ID del usuario autenticado desde el token JWT
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId)) return Unauthorized("No se pudo obtener el ID del usuario autenticado.");
             var action = await _dashboardUnitOfWork.GetAdminDashboardAsync(userId);
             if (action.Success)
             {

@@ -12,7 +12,7 @@ namespace SIC.Shared.Entities
         public int Amount { get; set; }
         public decimal Price { get; set; }
         public decimal PriceTotal { get; set; }
-
+        //Activo inactivo
         public List<string> Items { get; set; } = new();
     }
 }

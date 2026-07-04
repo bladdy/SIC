@@ -1,0 +1,185 @@
+﻿@page "/products"
+@using System.Globalization
+<PageTitle>Productos</PageTitle>
+<h3>Productos</h3>
+
+<div class="mb-3">
+    <button class="btn btn-custom" @onclick="ShowCreateModal">Crear Productos</button>
+</div>
+
+<GenericList MyList="Products">
+    <Body>
+        <table class="table table-striped table-hover table-bordered align-middle">
+            <thead class="" style="background-color:#3C6A79; color: white;">
+                <tr class="text-center">
+                    <th>Imagen</th>
+                    <th>Cantidad</th>
+                    <th>Nombre</th>
+                    <th>Descripcion</th>
+                    <th>Precio</th>
+                    <th>Precio Total</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var Product in Products!)
+                {
+                    <tr  class="align-middle">
+                        <td style="width:80px;"><img style="max-width:80px; max-height:auto;" src="@Product.URLImagen" /></td>
+                        <td>@Product.Amount</td>
+                        <td>@Product.Name</td>
+                        <td>@Product.Description</td>
+                        <td>@Product.Price.ToString("C2", CultureInfo.GetCultureInfo("es-MX"))</td>
+                        <td>@Product.PriceTotal.ToString("C2", CultureInfo.GetCultureInfo("es-MX"))</td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-custom me-2" @onclick="() => ShowEditModal(Product)">
+                                <i class="bi bi-pencil-fill"></i> Editar
+                            </button>
+                            <button class="btn btn-sm btn-custom" @onclick="() => ConfirmDelete(Product)">
+                                <i class="bi bi-trash-fill"></i> Borrar
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </Body>
+</GenericList>
+
+
+@if (IsModalVisible)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,.5);">
+        <div class="modal-dialog modal-md modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        @(IsEditMode ? "Editar Producto" : "Crear Producto")
+                    </h5>
+                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <EditForm Model="@NewProduct" OnValidSubmit="@SaveProduct">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+
+                        <!-- Imagen -->
+                        <div class="mb-3">
+                            <label class="form-label">URL de la imagen</label>
+                            <InputText class="form-control"
+                                       @bind-Value="NewProduct.URLImagen" />
+
+                            @if (!string.IsNullOrWhiteSpace(NewProduct.URLImagen))
+                            {
+                                <div class="mt-2">
+                                    <img src="@NewProduct.URLImagen"
+                                         class="img-thumbnail"
+                                         style="width:120px;height:120px;object-fit:cover;" />
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Nombre -->
+                        <div class="mb-3">
+                            <label class="form-label">Nombre</label>
+                            <InputText class="form-control"
+                                       @bind-Value="NewProduct.Name" />
+                            <ValidationMessage For="@(() => NewProduct.Name)" />
+                        </div>
+
+                        <!-- Descripción -->
+                        <div class="mb-3">
+                            <label class="form-label">Descripción</label>
+                            <InputTextArea class="form-control"
+                                           rows="4"
+                                           @bind-Value="NewProduct.Description" />
+                        </div>
+
+                        <div class="row">
+
+                            <!-- Cantidad -->
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Cantidad</label>
+
+                                <InputNumber TValue="int"
+                                             class="form-control"
+                                             Value="NewProduct.Amount"
+                                             ValueChanged="@(value => OnAmountChanged(value))"
+                                             ValueExpression="@(() => NewProduct.Amount)" />
+                            </div>
+
+                            <!-- Total -->
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Total</label>
+
+                                <InputNumber TValue="decimal" class="form-control"
+                                             Value="NewProduct.PriceTotal"
+                                             ValueChanged="@( value => OnTotalChanged(value))"
+                                             ValueExpression="@(() => NewProduct.PriceTotal)" />
+                            </div>
+
+                            <!-- Precio Unitario -->
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Precio Unitario</label>
+
+                                <input class="form-control"
+                                       readonly
+                                       value="@NewProduct.Price.ToString("C2", CultureInfo.GetCultureInfo("es-MX"))" />
+                            </div>
+
+                        </div>
+
+                        <!-- Items -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-3">
+                                <label class="form-label">Características</label>
+                                <button type="button"
+                                        class="btn btn-custom btn-sm"
+                                        @onclick="AddItem">
+                                    <i class="bi bi-plus-lg"></i>
+                                    Agregar característica
+                                </button>
+
+                            </div>
+
+                            @for (int i = 0; i < NewProduct.Items.Count; i++)
+                            {
+                                var index = i;
+
+                                <div class="input-group mb-2">
+                                    <input class="form-control"
+                                           value="@NewProduct.Items[index]"
+                                           @oninput="@(e => NewProduct.Items[index] = e.Value?.ToString() ?? string.Empty)" />
+
+                                    <button type="button"
+                                            class="btn btn-custom"
+                                            @onclick="() => RemoveItem(index)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            }
+
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-custom">
+                                Guardar
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-secondary"
+                                    @onclick="CloseModal">
+                                Cancelar
+                            </button>
+                        </div>
+
+                    </EditForm>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}

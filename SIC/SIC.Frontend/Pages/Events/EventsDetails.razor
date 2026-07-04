@@ -63,10 +63,171 @@ else
         <!-- Body: Información detallada -->
         <div class="card-body">
 
+            <div class="accordion" id="accordionPanelsStayOpenExample">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="panelsStayOpen-headingOne">
+                        <button class="accordion-button collapsed" style="background-color:#3C6A79 !important; color:white;"
+                                type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+                            <div class="w-100 d-flex justify-content-between align-items-center me-3">
+
+                                <strong class="text-uppercase">Invitados:</strong>
+                                <span>@(EventDetail.NumberAdults + EventDetail.NumberYouths + EventDetail.NumberChildren)</span>
+                            </div>
+                        </button>
+                    </h2>
+                    <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingOne">
+                        <div class="accordion-body row">
+                            <div class="col-12 col-md-4">
+                                <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#3C6A79;">
+                                    <strong>Adultos:</strong>
+                                    <span>@EventDetail.NumberAdults</span>
+                                </p>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#3C6A79;">
+                                    <strong>Jóvenes:</strong>
+                                    <span>@EventDetail.NumberYouths</span>
+                                </p>
+                            </div>
+
+                            <!-- Niños -->
+                            <div class="col-12 col-md-4">
+                                <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#3C6A79;">
+                                    <strong>Niños:</strong>
+                                    <span>@EventDetail.NumberChildren</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
+                        <button class="accordion-button collapsed bg-success" style="color:white; margin-top: 2px;" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
+                            <div class="w-100 d-flex justify-content-between align-items-center me-3">
+
+                                <strong>Total SÍ ASISTIRÉ:</strong>
+                                <span>@(EventDetail.NumberAdultsConfirmed + EventDetail.NumberChildrenConfirmed + EventDetail.NumberYouthsConfirmed)</span>
+
+                            </div>
+                        </button>
+                    </h2>
+                    <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingTwo">
+                        <div class="accordion-body row">
+                            <!-- Adultos (Sí asistiré) -->
+                            <div class="col-12 col-md-4 m-0">
+                                <p class="d-flex justify-content-between px-3 py-1 text-white bg-success ">
+                                    <strong>Adultos:</strong>
+                                    <span>@EventDetail.NumberAdultsConfirmed</span>
+                                </p>
+                            </div>
+
+                            <!-- Jóvenes (Sí asistiré) -->
+                            <div class="col-12 col-md-4 m-0">
+                                <p class="d-flex justify-content-between px-3 py-1 text-white bg-success ">
+                                    <strong>Jóvenes:</strong>
+                                    <span>@EventDetail.NumberYouthsConfirmed</span>
+                                </p>
+                            </div>
+
+                            <!-- Niños (Sí asistiré) -->
+                            <div class="col-12 col-md-4 m-0">
+                                <p class="d-flex justify-content-between px-3 py-1 text-white bg-success ">
+                                    <strong>Niños:</strong>
+                                    <span>@EventDetail.NumberChildrenConfirmed</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="panelsStayOpen-headingThree">
+                        <button class="accordion-button collapsed bg-danger" style="color:white; margin-top: 2px;" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+                            <div class="w-100 d-flex justify-content-between align-items-center me-3">
+
+                                <strong>Total NO ASISTIRÉ:</strong>
+                                <span>@(EventDetail.NumberAdultsNotAttend + EventDetail.NumberChildrenNotAttend + EventDetail.NumberYouthNotAttend)</span>
+                            </div>
+                        </button>
+                    </h2>
+                    <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingThree">
+                        <div class="accordion-body row">
+                            <!-- No asistiré -->
+                            <div class="col-12 col-md-4 m-0">
+                                <p class="d-flex justify-content-between px-3 py-1 text-white bg-danger ">
+                                    <strong>Adultos:</strong>
+                                    <span>@(EventDetail.NumberAdultsNotAttend)</span>
+                                </p>
+                            </div>
+                            <!-- No asistiré -->
+                            <div class="col-12 col-md-4 m-0">
+                                <p class="d-flex justify-content-between px-3 py-1 text-white bg-danger ">
+                                    <strong>Jóvenes:</strong>
+                                    <span>@(EventDetail.NumberYouthNotAttend)</span>
+                                </p>
+                            </div>
+
+                            <!-- No asistiré -->
+                            <div class="col-12 col-md-4 m-0">
+                                <p class="d-flex justify-content-between px-3 py-1 text-white bg-danger ">
+                                    <strong>Niños:</strong>
+                                    <span>@(EventDetail.NumberChildrenNotAttend)</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="panelsStayOpen-headingFour">
+                        <button class="accordion-button collapsed bg-warning" type="button" style="color:white; margin-top: 2px;" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseFour" aria-expanded="false" aria-controls="panelsStayOpen-collapseFour">
+                            <div class="w-100 d-flex justify-content-between align-items-center me-3">
+
+                                <strong>Invitados PENDIENTES:</strong>
+                                <span>@(EventDetail.NumberAdultsPending + EventDetail.NumberChildrenPending + EventDetail.NumberYouthPending)</span>
+
+                            </div>
+                        </button>
+                    </h2>
+                    <div id="panelsStayOpen-collapseFour" class="accordion-collapse collapse " aria-labelledby="panelsStayOpen-headingFour">
+                        <div class="accordion-body row">
+                            <!-- Invitados Pendientes -->
+                            <div class="col-12 col-md-4 m-0">
+                                <p class="d-flex justify-content-between px-3 py-1 text-white bg-warning">
+                                    <strong>Adultos:</strong>
+                                    <span>@(EventDetail.NumberAdultsPending)</span>
+                                </p>
+                            </div>
+                            <!-- Invitados Pendientes -->
+                            <div class="col-12 col-md-4 m-0">
+                                <p class="d-flex justify-content-between px-3 py-1 text-white bg-warning">
+                                    <strong>Jóvenes:</strong>
+                                    <span>@(EventDetail.NumberYouthPending)</span>
+                                </p>
+                            </div>
+                            <!-- Invitados Pendientes -->
+                            <div class="col-12 col-md-4 m-0">
+                                <p class="d-flex justify-content-between px-3 py-1 text-white bg-warning">
+                                    <strong>Niños:</strong>
+                                    <span>@(EventDetail.NumberChildrenPending)</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-2">
+
+                <div class="col-12 col-md-4 m-0">
+                    <p class="d-flex justify-content-between px-3 py-3 text-black" style="background-color: whitesmoke;">
+                        <strong>Invitaciones SIN CONFIRMAR :</strong>
+                        <span>@(EventDetail.Pending)</span>
+                    </p>
+                </div>
+            </div>
+
             <!-- ======================== -->
             <!-- SECCIÓN 2: Invitados -->
             <!-- ======================== -->
-            <div class="row text-center align-items-stretch g-1 g-md-3 mt-0">
+            <div class="row text-center align-items-stretch g-1 g-md-3 mt-0 d-none">
                 <!-- Invitados -->
                 <div class="col-12 col-md-3 mb-0">
                     <p class="d-flex justify-content-between px-3 py-1 text-white" style="background-color:#3C6A79;">
@@ -101,7 +262,7 @@ else
             <!-- ======================== -->
             <!-- SECCIÓN 3: Confirmaciones -->
             <!-- ======================== -->
-            <div class="row text-center align-items-stretch g-1 g-md-3 mt-0">
+            <div class="row text-center align-items-stretch g-1 g-md-3 mt-0 d-none">
                 <!-- (Sí asistiré) -->
                 <div class="col-12 col-md-3 m-0">
                     <p class="d-flex justify-content-between px-3 py-1 text-white bg-success">
@@ -135,18 +296,67 @@ else
                 </div>
 
                 <!-- No asistiré -->
-                <div class="col-12 col-md-4 m-0">
+                <div class="col-12 col-md-3 m-0">
                     <p class="d-flex justify-content-between px-3 py-1 text-white bg-danger ">
                         <strong>Total NO ASISTIRÉ:</strong>
                         <span>@(EventDetail.NumberAdultsNotAttend + EventDetail.NumberChildrenNotAttend + EventDetail.NumberYouthNotAttend)</span>
                     </p>
                 </div>
+                <!-- No asistiré -->
+                <div class="col-6 col-md-3 m-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-danger ">
+                        <strong>Adultos:</strong>
+                        <span>@(EventDetail.NumberAdultsNotAttend)</span>
+                    </p>
+                </div>
+                <!-- No asistiré -->
+                <div class="col-6 col-md-3 m-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-danger ">
+                        <strong>Jóvenes:</strong>
+                        <span>@(EventDetail.NumberYouthNotAttend)</span>
+                    </p>
+                </div>
 
-                <!-- Pendientes -->
-                <div class="col-12 col-md-4 m-0">
-                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-warning ">
-                        <strong>Pendientes:</strong>
+                <!-- No asistiré -->
+                <div class="col-6 col-md-3 m-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-danger ">
+                        <strong>Niños:</strong>
+                        <span>@(EventDetail.NumberChildrenNotAttend)</span>
+                    </p>
+                </div>
+                <!-- Invitados Pendientes -->
+                <div class="col-12 col-md-3 m-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-warning">
+                        <strong>Invitados PENDIENTES:</strong>
                         <span>@(EventDetail.NumberAdultsPending + EventDetail.NumberChildrenPending + EventDetail.NumberYouthPending)</span>
+                    </p>
+                </div>
+                <!-- Invitados Pendientes -->
+                <div class="col-6 col-md-3 m-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-warning">
+                        <strong>Adultos:</strong>
+                        <span>@(EventDetail.NumberAdultsPending)</span>
+                    </p>
+                </div>
+                <!-- Invitados Pendientes -->
+                <div class="col-6 col-md-3 m-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-warning">
+                        <strong>Jóvenes:</strong>
+                        <span>@(EventDetail.NumberYouthPending)</span>
+                    </p>
+                </div>
+                <!-- Invitados Pendientes -->
+                <div class="col-6 col-md-3 m-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-warning">
+                        <strong>Niños:</strong>
+                        <span>@(EventDetail.NumberChildrenPending)</span>
+                    </p>
+                </div>
+                <!-- Invitaciones Pendientes -->
+                <div class="col-12 col-md-4 m-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-black" style="background-color:whitesmoke;">
+                        <strong>Invitaciones SIN CONFIRMAR :</strong>
+                        <span>@(EventDetail.Pending)</span>
                     </p>
                 </div>
             </div>
@@ -293,9 +503,9 @@ else
                             <!-- ======== COLUMNA 1: INFORMACIÓN GENERAL ======== -->
                             <td style="white-space: normal; vertical-align: top;">
                                 <div class="container-fluid">
-                                    <div class="row g-3 small text-secondary">
+                                    <div class="row g-1 small text-secondary">
                                         <!-- ===== COLUMNA 1 ===== -->
-                                        <div class="col-12 col-md-4 d-flex flex-column">
+                                        <div class="col-12 col-md-3 d-flex flex-column">
                                             <div class="d-none">
                                                 <strong>Código:</strong>
                                                 <a style="color:#3C6A79; cursor:pointer;" @onclick="() => ShowEditModal(invitation)">
@@ -304,14 +514,16 @@ else
                                             </div>
                                             <div><h5><strong>@invitation.Name</strong></h5></div>
                                             <div><strong>Móvil:</strong> @invitation.PhoneNumber</div>
-                                            <div>
-                                                <strong>Mesa:</strong>@(invitation.Table ?? invitation.TablesEvents?.Name ?? "Sin mesa")
-                                                    
-                                            </div>
+                                            @if (invitation.TablesEvents != null)
+                                            {
+                                                <p class="mb-1"><strong>Mesa:</strong>@(invitation.TablesEvents?.Name ?? invitation.Table ?? "Sin mesa")</p>
+
+                                            }
                                         </div>
 
                                         <!-- ===== COLUMNA 2 ===== -->
-                                        <div class="col-12 col-md-4 d-flex flex-column">
+                                        <div class="col-12 col-md-2 d-flex flex-column">
+
                                             @if (invitation.Guests.Any())
                                             {
                                                 @foreach (var guest in invitation.Guests)
@@ -325,155 +537,185 @@ else
                                                     </div>
 
                                                 }
-
                                             }
                                         </div>
 
+
                                         <!-- ===== COLUMNA 3 ===== -->
-                                        <div class="col-12 col-md-4 d-flex flex-wrap align-items-center gap-2">
-                                            @if (usarWhatsApp)
-                                            {
+                                        <div class="col-12 col-md-7 d-flex flex-wrap align-items-center justify-content-center gap-2">
+
+                                            <div class="d-flex align-items-center">
                                                 @if (EventDetail.User.UserWhatsAppConfigs != null)
                                                 {
-                                                    <!--
 
-                                                    <button class="btn d-inline-flex align-items-center gap-2 text-white"
-                                                    style="background-color:#25d366;"
-                                                    @onclick="() => EnviarInvitacion(invitation.Code!)"
-                                                    disabled="@(loadingWhatsappId1 == invitation.Id)">
-                                                    @if (loadingWhatsappId1 == invitation.Id)
-                                                    {
-                                                    <span class="spinner-border spinner-border-sm"></span>
-                                                    <span>Invitando...</span>
-                                                    }
-                                                    else
-                                                    {
-                                                    <i class="bi bi-whatsapp"></i>
-                                                    <span>Invitar</span>
-                                                    }
-                                                    </button>
-                                                    -->
-                                                    @if (Templates != null && Templates.Any())
-                                                    {
-                                                        <div class="dropdown">
-                                                            <button class="btn btn-success dropdown-toggle d-flex align-items-center gap-2"
-                                                                    type="button"
-                                                                    data-bs-toggle="dropdown"
-                                                                    disabled="@(loadingWhatsappId1 == invitation.Id)">
-                                                                @if (IsSendingMassive)
-                                                                {
-                                                                    <span class="spinner-border spinner-border-sm"></span>
-                                                                    <span>Enviando...</span>
-                                                                }
-                                                                else
-                                                                {
-                                                                    <i class="bi bi-whatsapp"></i>
-                                                                    <span>Seleccionar Plantilla</span>
-                                                                }
-                                                            </button>
-                                                            <ul class="dropdown-menu">
-                                                                @if (Templates != null)
-                                                                {
-                                                                    @foreach (var template in Templates)
-                                                                    {
-                                                                        <li>
-                                                                            <button type="button"
-                                                                                    class="dropdown-item"
-                                                                                    @onclick="() => EnviarInvitacion(invitation.Code!, template.Name, invitation.Id)">
-                                                                                @template.DisplayName
-                                                                            </button>
-                                                                        </li>
-                                                                    }
-                                                                }
-                                                            </ul>
+
+                                                    <div class="steps-wrapper">
+                                                        @{
+                                                            var sentTemplates = invitation.TemplateSents
+                                                            .Select(t => t.TemplateNumber)
+                                                            .ToList();
+                                                        }
+                                                        <div class="steps-container">
+
+                                                            <div class="step-circle @(sentTemplates.Contains(1) ? "active-step" : "inactive-step")">
+                                                                <!-- SVG 1 -->
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circle-number-1"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 10l2 -2v8" /></svg>
+                                                            </div>
+
+                                                            <div class="step-circle @(sentTemplates.Contains(2) ? "active-step" : "inactive-step")">
+                                                                <!-- SVG 2 -->
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circle-number-2"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 8h3a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 0 -1 1v2a1 1 0 0 0 1 1h3" /></svg>
+                                                            </div>
+
+                                                            <div class="step-circle @(sentTemplates.Contains(3) ? "active-step" : "inactive-step")">
+                                                                <!-- SVG 3 -->
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circle-number-3"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 9a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1" /></svg>
+                                                            </div>
+
+                                                            <div class="step-circle @(sentTemplates.Contains(4) ? "active-step" : "inactive-step")">
+                                                                <!-- SVG 4 -->
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circle-number-4"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 8v3a1 1 0 0 0 1 1h3" /><path d="M14 8v8" /></svg>
+                                                            </div>
+
                                                         </div>
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <!-- ===== COLUMNA 4 ===== -->
+                                            <div class="d-flex align-items-center gap-2">
+                                                @if (usarWhatsApp)
+                                                {
+                                                    @if (EventDetail.User.UserWhatsAppConfigs != null)
+                                                    {
+                                                        <!--
+
+                                                        <button class="btn d-inline-flex align-items-center gap-2 text-white"
+                                                        style="background-color:#25d366;"
+                                                        @onclick="() => EnviarInvitacion(invitation.Code!)"
+                                                        disabled="@(loadingWhatsappId1 == invitation.Id)">
+                                                        @if (loadingWhatsappId1 == invitation.Id)
+                                                        {
+                                                        <span class="spinner-border spinner-border-sm"></span>
+                                                        <span>Invitando...</span>
+                                                        }
+                                                        else
+                                                        {
+                                                        <i class="bi bi-whatsapp"></i>
+                                                        <span>Invitar</span>
+                                                        }
+                                                        </button>
+                                                        -->
+                                                        @if (Templates != null && Templates.Any())
+                                                        {
+                                                            <div class="dropdown">
+                                                                <button class="btn btn-success dropdown-toggle d-flex align-items-center gap-2"
+                                                                        type="button"
+                                                                        data-bs-toggle="dropdown"
+                                                                        disabled="@(loadingWhatsappId1 == invitation.Id)">
+                                                                    @if (IsSendingMassive)
+                                                                    {
+                                                                        <span class="spinner-border spinner-border-sm"></span>
+                                                                        <span>Enviando...</span>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <i class="bi bi-whatsapp"></i>
+                                                                        <span>Seleccionar Plantilla</span>
+                                                                    }
+                                                                </button>
+                                                                <ul class="dropdown-menu">
+                                                                    @if (Templates != null)
+                                                                    {
+                                                                        @foreach (var template in Templates)
+                                                                        {
+                                                                            <li>
+                                                                                <button type="button"
+                                                                                        class="dropdown-item"
+                                                                                        @onclick="() => EnviarInvitacion(invitation.Code!, template.Name, invitation.Id, template.DisplayName)">
+                                                                                    @template.DisplayName
+                                                                                </button>
+                                                                            </li>
+                                                                        }
+                                                                    }
+                                                                </ul>
+                                                            </div>
+                                                        }
+
                                                     }
+
 
                                                 }
                                                 else
                                                 {
-                                                    <button class="btn d-inline-flex align-items-center gap-2 text-white"
-                                                            style="background-color:#25d366;"
-                                                            @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)"
-                                                            disabled="@(loadingWhatsappId1 == invitation.Id)">
-                                                        @if (loadingWhatsappId1 == invitation.Id)
-                                                        {
-                                                            <span class="spinner-border spinner-border-sm"></span>
-                                                            <span>Invitando...</span>
-                                                        }
-                                                        else
-                                                        {
-                                                            <i class="bi bi-whatsapp"></i>
-                                                            <span>Invitar</span>
-                                                        }
-                                                    </button>
+                                                    <div class="row g-4 mx-4">
+                                                        <div class="col-6">
 
+                                                            <button class="btn d-inline-flex align-items-center justify-content-center gap-2 text-white"
+                                                                    style="background-color:#25d366;"
+                                                                    @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)"
+                                                                    disabled="@(loadingWhatsappId1 == invitation.Id)">
+                                                                @if (loadingWhatsappId1 == invitation.Id)
+                                                                {
+                                                                    <span class="spinner-border spinner-border-sm"></span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <i class="bi bi-whatsapp"></i>
+                                                                    <span>I</span>
+                                                                }
+                                                            </button>
+                                                       
+                                                            <button class="btn d-inline-flex align-items-center justify-content-center gap-2 text-white"
+                                                                    style="background-color:#25d366;"
+                                                                    @onclick="() => AbrirWhatsapp(invitation.CountryCode + invitation.PhoneNumber, invitation.Code!, invitation.Id, 2)"
+                                                                    disabled="@(loadingWhatsappId2 == invitation.Id)">
+                                                                @if (loadingWhatsappId2 == invitation.Id)
+                                                                {
+                                                                    <span class="spinner-border spinner-border-sm"></span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <i class="bi bi-whatsapp"></i>
+                                                                    <span>A</span>
+                                                                }
+                                                            </button>
+                                                       
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <button class="btn btn-info d-inline-flex align-items-center justify-content-center gap-2 text-white"
+                                                                    @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 1)"
+                                                                    disabled="@(copyingId1 == invitation.Id)">
+                                                                @if (copyingId1 == invitation.Id)
+                                                                {
+                                                                    <span class="spinner-border spinner-border-sm"></span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <i class="bi bi-clipboard"></i>
+                                                                    <span>I</span>
+                                                                }
+                                                            </button>
+                                                      
+                                                            <button class="btn btn-info d-inline-flex align-items-center justify-content-center gap-2 text-white"
+                                                                    @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 2)"
+                                                                    disabled="@(copyingId2 == invitation.Id)">
+                                                                @if (copyingId2 == invitation.Id)
+                                                                {
+                                                                    <span class="spinner-border spinner-border-sm"></span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <i class="bi bi-clipboard"></i>
+                                                                    <span>A</span>
+                                                                }
+                                                            </button>
+
+                                                        </div>
+
+                                                    </div>
                                                 }
-
-                                                <button class="btn d-inline-flex align-items-center gap-2 text-white"
-                                                        style="background-color:#25d366;"
-                                                        @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)"
-                                                        disabled="@(loadingWhatsappId1 == invitation.Id)">
-                                                    @if (loadingWhatsappId1 == invitation.Id)
-                                                    {
-                                                        <span class="spinner-border spinner-border-sm"></span>
-                                                        <span>Invitando...</span>
-                                                    }
-                                                    else
-                                                    {
-                                                        <i class="bi bi-whatsapp"></i>
-                                                        <span>Invitar</span>
-                                                    }
-                                                </button>
-
-                                                <button class="btn d-inline-flex align-items-center gap-2 text-white"
-                                                        style="background-color:#25d366;"
-                                                        @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 2)"
-                                                        disabled="@(loadingWhatsappId2 == invitation.Id)">
-                                                    @if (loadingWhatsappId2 == invitation.Id)
-                                                    {
-                                                        <span class="spinner-border spinner-border-sm"></span>
-                                                        <span>Avisando...</span>
-                                                    }
-                                                    else
-                                                    {
-                                                        <i class="bi bi-whatsapp"></i>
-                                                        <span>Avisar</span>
-                                                    }
-                                                </button>
-                                            }
-                                            else
-                                            {
-                                                <button class="btn btn-info d-inline-flex align-items-center gap-2 text-white"
-                                                        @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 1)"
-                                                        disabled="@(copyingId1 == invitation.Id)">
-                                                    @if (copyingId1 == invitation.Id)
-                                                    {
-                                                        <span class="spinner-border spinner-border-sm"></span>
-                                                        <span>Copiando...</span>
-                                                    }
-                                                    else
-                                                    {
-                                                        <i class="bi bi-clipboard"></i>
-                                                        <span>Invitar</span>
-                                                    }
-                                                </button>
-
-                                                <button class="btn btn-info d-inline-flex align-items-center gap-2 text-white"
-                                                        @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 2)"
-                                                        disabled="@(copyingId2 == invitation.Id)">
-                                                    @if (copyingId2 == invitation.Id)
-                                                    {
-                                                        <span class="spinner-border spinner-border-sm"></span>
-                                                        <span>Copiando...</span>
-                                                    }
-                                                    else
-                                                    {
-                                                        <i class="bi bi-clipboard"></i>
-                                                        <span>Avisar</span>
-                                                    }
-                                                </button>
-                                            }
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -569,8 +811,16 @@ else
 
                         }
                     </div>
-                    <p class="mb-1"><strong>Mesa:</strong>@(invitation.Table ?? invitation.TablesEvents?.Name ?? "Sin mesa")</p>
-                    <p class="mb-1"><strong>Dedicatoria:</strong> @invitation.Comments</p>
+                    @if (!string.IsNullOrEmpty(invitation.Table) || invitation.TablesEvents != null)
+                    {
+                        <p class="mb-1"><strong>Mesa:</strong>@(invitation.TablesEvents?.Name ?? invitation.Table ?? "Sin mesa")</p>
+
+                    }
+                    @if (!string.IsNullOrEmpty(invitation.Comments))
+                    {
+                        <p class="mb-1"><strong>Dedicatoria:</strong> @invitation.Comments</p>
+
+                    }
 
                     <div class="d-flex flex-wrap gap-1 mt-3">
                         @if (usarWhatsApp)
@@ -604,7 +854,7 @@ else
                                                     <li>
                                                         <button type="button"
                                                                 class="dropdown-item"
-                                                                @onclick="() => EnviarInvitacion(invitation.Code!, template.Name, invitation.Id)">
+                                                                @onclick="() => EnviarInvitacion(invitation.Code!, template.Name, invitation.Id, template.DisplayName)">
                                                             @template.DisplayName
                                                         </button>
                                                     </li>
@@ -614,44 +864,31 @@ else
                                     </div>
                                 }
                             }
-                            else
-                            {
-                                <button class="btn d-flex align-items-center gap-1 flex-fill" style="background-color:#25d366; color:white;"
-                                        @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)">
-                                    <i class="bi bi-whatsapp"></i> Invitar
-                                </button>
-                            }
-                            <button class="btn d-flex align-items-center gap-1 flex-fill" style="background-color:#25d366; color:white;"
-                                    @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 2)">
-                                <i class="bi bi-whatsapp"></i> Aviso
-                            </button>
+                            
+                            
                         }
                         else
                         {
-                            <!--
-
-                            <button class="btn btn-info d-flex align-items-center gap-1 flex-fill text-white"
-                            @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 1)">
-                            <i class="bi bi-clipboard"></i> Invitar
+                            <button class="btn d-flex align-items-center gap-1 flex-fill" style="background-color:#25d366; color:white;"
+                                    @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)">
+                                <i class="bi bi-whatsapp"></i> I
                             </button>
-                            <button class="btn btn-info fd-flex align-items-center gap-1 flex-fill text-white"
-                            @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 2)">
-                            <i class="bi bi-clipboard"></i> Aviso
+                            <button class="btn d-flex align-items-center gap-1 flex-fill" style="background-color:#25d366; color:white;"
+                                    @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 2)">
+                                <i class="bi bi-whatsapp"></i> A
                             </button>
-                            -->
-
                             <button class="btn btn-info fd-flex align-items-center gap-1 flex-fill text-white"
                                     @onclick="() => CopiarInvitacionm(invitation.Code!, invitation.Id, 1)"
                                     disabled="@(copyingIdm1 == invitation.Id)">
                                 @if (copyingIdm1 == invitation.Id)
                                 {
                                     <span class="spinner-border spinner-border-sm"></span>
-                                    <span>Copiando...</span>
+                                    
                                 }
                                 else
                                 {
                                     <i class="bi bi-clipboard"></i>
-                                    <span>Invitar</span>
+                                    <span>I</span>
                                 }
                             </button>
 
@@ -661,14 +898,16 @@ else
                                 @if (copyingIdm2 == invitation.Id)
                                 {
                                     <span class="spinner-border spinner-border-sm"></span>
-                                    <span>Copiando...</span>
+                                    
                                 }
                                 else
                                 {
                                     <i class="bi bi-clipboard"></i>
-                                    <span>Avisar</span>
+                                    <span>A</span>
                                 }
                             </button>
+
+
                         }
 
                         <button class="btn btn-custom d-flex align-items-center gap-1 flex-fill" @onclick="() => ShowEditModal(invitation)">
@@ -1049,3 +1288,99 @@ else
         </div>
     </div>
 }
+
+<style>
+    .accordion-button::after {
+        filter: brightness(0) invert(1);
+    }
+
+    .steps-wrapper {
+        background-color: #3C6A79;
+        padding: 12px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 12px;
+    }
+
+    /* Contenedor horizontal fijo */
+    .steps-container {
+        display: flex;
+        flex-direction: row;
+        gap: 12px;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: nowrap;
+    }
+
+    /* Círculo base (Desktop) */
+    .step-circle {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+    }
+
+    /* Cuando fue enviado */
+    .active-step {
+        background-color: #098f09;
+    }
+
+    /* Cuando NO fue enviado */
+    .inactive-step {
+        background-color: #6c757d; /* secondary */
+        opacity: 0.6;
+    }
+
+    .step-circle svg {
+        width: 20px;
+        height: 20px;
+        stroke: white;
+    }
+
+    /* Hover */
+    .step-circle:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* ===== Tablet ===== */
+    @@media (max-width: 768px) {
+        .steps-container {
+            gap: 8px;
+        }
+
+        .step-circle {
+            width: 32px;
+            height: 32px;
+        }
+
+            .step-circle svg {
+                width: 15px;
+                height: 15px;
+            }
+    }
+
+    /* ===== Mobile ===== */
+    @@media (max-width: 480px) {
+        .steps-container {
+            gap: 6px;
+        }
+
+
+        .step-circle {
+            width: 30px;
+            height: 30px;
+        }
+
+            .step-circle svg {
+                width: 20px;
+                height: 20px;
+            }
+    }
+
+</style>

@@ -60,16 +60,16 @@ public class DashboardReporsitory : IDashboardReporsitory
             .Where(e => e.UserId == adminUserId)
             .Select(e => new
             {
-                TotalGuests = e.Invitations.Sum(i => i.NumberAdults + i.NumberChildren),
+                TotalGuests = e.Invitations.Sum(i => i.NumberAdults + i.NumberChildren + i.NumberConfirmedYouths),
                 ConfirmedGuests = e.Invitations
                     .Where(i => i.Status == Status.Attend)
-                    .Sum(i => i.NumberConfirmedAdults + i.NumberConfirmedChildren),
+                    .Sum(i => i.NumberConfirmedAdults + i.NumberConfirmedChildren + i.NumberConfirmedYouths),
                 PendingGuests = e.Invitations
                     .Where(i => i.Status == Status.Pending)
-                    .Sum(i => i.NumberAdults + i.NumberChildren),
+                    .Sum(i => i.NumberAdults + i.NumberChildren + i.NumberConfirmedYouths),
                 NotAttendingGuests = e.Invitations
                     .Where(i => i.Status == Status.NotAttend)
-                    .Sum(i => i.NumberAdults + i.NumberChildren)
+                    .Sum(i => i.NumberAdults + i.NumberChildren + i.NumberConfirmedYouths)
             })
             .ToListAsync();
 
@@ -88,39 +88,60 @@ public class DashboardReporsitory : IDashboardReporsitory
                 Code = e.Code,
                 EventName = e.Name,
                 Date = e.Date,
-                TotalGuests = e.Invitations.Sum(i => i.NumberAdults + i.NumberChildren),
+                // Total de invitados
+                TotalGuests = e.Invitations
+                    .SelectMany(i => i.Guests)
+                    .Count(),
+
+                // Invitados confirmados
                 ConfirmedGuests = e.Invitations
-                    .Where(i => i.Status == Status.Attend)
-                    .Sum(i => i.NumberConfirmedAdults + i.NumberConfirmedChildren),
+                    .SelectMany(i => i.Guests)
+                    .Count(g => g.Status == Status.Attend),
+
+                // Invitados pendientes
                 PendingGuests = e.Invitations
-                    .Where(i => i.Status == Status.Pending)
-                    .Sum(i => i.NumberAdults + i.NumberChildren),
+                    .SelectMany(i => i.Guests)
+                    .Count(g => g.Status == Status.Pending),
+
+                // Invitados que no asistirán
                 NotAttendingGuests = e.Invitations
-                    .Where(i => i.Status == Status.NotAttend)
-                    .Sum(i => i.NumberAdults + i.NumberChildren)
+                    .SelectMany(i => i.Guests)
+                    .Count(g => g.Status == Status.NotAttend)
             }).
             Where(e => e.Date > DateTime.Now.Date)
             .ToListAsync();
 
         // 📅 Próximos eventos (solo del admin actual)
         var upcomingEventsRaw = await _context.Events
-            .Where(e => e.UserId == adminUserId && e.Status == Status.Active && e.Date >= DateTime.Now)
+            .Where(e => e.UserId == adminUserId &&
+                        e.Status == Status.Active &&
+                        e.Date >= DateTime.Now)
             .OrderBy(e => e.Date)
             .Take(15)
             .Select(e => new EventDashboardItemDto
             {
                 EventName = e.Name,
                 Date = e.Date,
-                TotalGuests = e.Invitations.Sum(i => i.NumberAdults + i.NumberChildren),
+
+                // Total de invitados
+                TotalGuests = e.Invitations
+                    .SelectMany(i => i.Guests)
+                    .Count(),
+
+                // Invitados confirmados
                 ConfirmedGuests = e.Invitations
-                    .Where(i => i.Status == Status.Attend)
-                    .Sum(i => i.NumberConfirmedAdults + i.NumberConfirmedChildren),
+                    .SelectMany(i => i.Guests)
+                    .Count(g => g.Status == Status.Attend),
+
+                // Invitados pendientes
                 PendingGuests = e.Invitations
-                    .Where(i => i.Status == Status.Pending)
-                    .Sum(i => i.NumberAdults + i.NumberChildren),
+                    .SelectMany(i => i.Guests)
+                    .Count(g => g.Status == Status.Pending),
+
+                // Invitados que no asistirán
                 NotAttendingGuests = e.Invitations
-                    .Where(i => i.Status == Status.NotAttend)
-                    .Sum(i => i.NumberAdults + i.NumberChildren)
+                    .SelectMany(i => i.Guests)
+                    .Count(g => g.Status == Status.NotAttend)
             })
             .ToListAsync();
 
@@ -310,6 +331,7 @@ public class DashboardReporsitory : IDashboardReporsitory
         var confirmed = userEvent.Invitations.Count(i => i.Status == Status.Attend);
         var pending = userEvent.Invitations.Count(i => i.Status == Status.Pending);
         var adultsConfirmed = userEvent.Invitations.Where(i => i.Status == Status.Attend).Sum(i => i.NumberConfirmedAdults);
+        var youthsConfirmed = userEvent.Invitations.Where(i => i.Status == Status.Attend).Sum(i => i.NumberConfirmedYouths);
         var childrenConfirmed = userEvent.Invitations.Where(i => i.Status == Status.Attend).Sum(i => i.NumberConfirmedChildren);
 
         var entries = await _context.InvitationEntries.CountAsync(x => x.EventId == userEvent.Id);
@@ -324,6 +346,7 @@ public class DashboardReporsitory : IDashboardReporsitory
             Pending = pending,
             AdultsConfirmed = adultsConfirmed,
             ChildrenConfirmed = childrenConfirmed,
+            YoungConfirmed = youthsConfirmed,
             Entries = entries
         };
 

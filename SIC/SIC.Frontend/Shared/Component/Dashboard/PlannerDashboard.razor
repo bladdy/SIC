@@ -1,4 +1,5 @@
-﻿@if (PlannerDashboards != null)
+﻿@using System.Globalization
+@if (PlannerDashboards != null)
 {
 
     <div class="row g-4">
@@ -48,7 +49,8 @@
             </div>
         </div>
         <!-- Resumen de invitados del planner -->
-        @if (PlannerDashboards != null)
+@using System.Globalization
+@if (PlannerDashboards != null)
         {
             <div class="col-12 mt-3 d-none">
                 <div class="card shadow-sm">
@@ -112,7 +114,6 @@
                                     <div>
                                         <a href="/my-events/details/@e.Code" style="text-decoration:none;">
                                             <strong>@e.EventName</strong><br />
-
                                         </a>
                                         <small class="text-muted">@e.Date.ToString("dd/MM/yyyy")</small>
                                     </div>
@@ -120,9 +121,27 @@
                                 </div>
 
                                 <div class="progress" style="height: 22px;">
-                                    <div class="progress-bar bg-success" style="width:@confirmedPct%">@e.ConfirmedGuests</div>
-                                    <div class="progress-bar bg-warning text-dark" style="width:@pendingPct%">@e.PendingGuests</div>
-                                    <div class="progress-bar bg-danger" style="width:@notAttendPct%">@e.NotAttendingGuests</div>
+                                    @if (e.ConfirmedGuests > 0)
+                                    {
+                                        <div class="progress-bar bg-success"
+                                             style="width: @confirmedPct.ToString("F2", CultureInfo.InvariantCulture)%; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                            <span class="small">@e.ConfirmedGuests</span>
+                                        </div>
+                                    }
+                                    @if (e.PendingGuests > 0)
+                                    {
+                                        <div class="progress-bar bg-warning text-dark"
+                                             style="width: @pendingPct.ToString("F2", CultureInfo.InvariantCulture)%; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                            <span class="small">@e.PendingGuests</span>
+                                        </div>
+                                    }
+                                    @if (e.NotAttendingGuests > 0)
+                                    {
+                                        <div class="progress-bar bg-danger"
+                                             style="width: @notAttendPct.ToString("F2", CultureInfo.InvariantCulture)%; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                            <span class="small">@e.NotAttendingGuests</span>
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         }

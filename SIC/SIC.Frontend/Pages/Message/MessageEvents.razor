@@ -40,12 +40,59 @@
                 </div>
                 <div class="form-group col-12 col-md-4">
                     <h3>Tokens que puede usar en mensajes:</h3>
-                    <ul>
-                        @foreach (var token in Tokens!)
-                        {
-                            <li>@token.Key - @token.Description</li>
-                        }
-                    </ul>
+                    <div class="token-list">
+
+                        <h5>👤 Información del Invitado</h5>
+                        <ul>
+                            <li><strong>{nombre_invitacion}</strong> - Nombre del invitado.</li>
+                        </ul>
+
+                        <h5>👥 Invitados Asignados</h5>
+                        <ul>
+                            <li><strong>{numero_de_lugares}</strong> - Cantidad de adultos invitados.</li>
+                            <li><strong>{invitados_menores}</strong> - Cantidad de niños invitados.</li>
+                            <li><strong>{numberYouths}</strong> - Cantidad de jóvenes invitados.</li>
+                            <li><strong>{totalInvitados}</strong> - Total de personas invitadas (adultos + jóvenes + niños).</li>
+                        </ul>
+
+                        <h5>✅ Confirmación de asistencia</h5>
+                        <ul>
+                            <li><strong>{NumberConfirmedAdults}</strong> - Número de adultos confirmados.</li>
+                            <li><strong>{NumberConfirmedChildren}</strong> - Número de niños confirmados.</li>
+                            <li><strong>{numberConfirmedYouths}</strong> - Número de jóvenes confirmados.</li>
+                        </ul>
+
+                        <h5>🎉 Información del evento</h5>
+                        <ul>
+                            <li><strong>{evento_titulo}</strong> - Anfitrión(es).</li>
+                            <li><strong>{evento_subtitulo}</strong> - Tipo de evento.</li>
+                            <li><strong>{evento_fecha}</strong> - Fecha del evento.</li>
+                        </ul>
+
+                        <h5>🔗 Enlaces</h5>
+                        <ul>
+                            <li><strong>{linkinvitacion}</strong> - Enlace de la invitación.</li>
+                            <li><strong>{linkconfirmacion}</strong> - Enlace para confirmar asistencia.</li>
+                        </ul>
+
+                        <h5>🪑 Asignación</h5>
+                        <ul>
+                            <li><strong>{mesa_asignada}</strong> - Mesa asignada al invitado.</li>
+                        </ul>
+
+                        <h5>✨ Formato</h5>
+                        <p>
+                            Para mostrar cualquier token en <strong>negritas</strong>, simplemente escríbelo entre llaves.
+                        </p>
+
+                        <div class="alert alert-light border">
+                            <strong>Ejemplo:</strong><br />
+                            <code>{nombre_invitacion}</code><br />
+                            <code>{evento_titulo}</code><br />
+                            <code>{totalInvitados}</code>
+                        </div>
+
+                    </div>
 
                 </div>
             </div>

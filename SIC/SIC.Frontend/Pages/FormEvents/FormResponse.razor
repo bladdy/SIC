@@ -1,62 +1,64 @@
 ﻿@page "/responder"
 
-<h3>@Formulario.Titulo</h3>
+<PageTitle>Responder Formulario</PageTitle>
 
-@foreach (var pregunta in Formulario.Preguntas)
-{
-    <div class="mb-4">
+<div class="container" style="max-width: 800px; margin: auto;">
 
-        <label>@pregunta.Titulo</label>
-
-        @switch (pregunta.Tipo)
-        {
-            case TipoPregunta.Texto:
-
-                <input class="form-control" />
-
-                break;
-
-            case TipoPregunta.Numero:
-
-                <input type="number"
-                       class="form-control" />
-
-                break;
-
-            case TipoPregunta.SiNo:
-
-                <select class="form-select">
-
-                    <option>Si</option>
-
-                    <option>No</option>
-
-                </select>
-
-                break;
-
-            case TipoPregunta.Fecha:
-
-                <input type="date"
-                       class="form-control" />
-
-                break;
-
-            case TipoPregunta.Foto:
-
-                <InputFile />
-
-                break;
-        }
-
+    <!-- ENCABEZADO -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="mb-0">@Formulario.Titulo</h3>
+            <small class="text-muted">Completa los campos requeridos</small>
+        </div>
     </div>
-}
 
-<button class="btn btn-success">
+    @foreach (var pregunta in Formulario.Preguntas)
+    {
+        <div class="card shadow-sm p-3 mb-3" style="border-radius: 10px;">
+            <label class="form-label fw-semibold mb-2">
+                @pregunta.Titulo
+                @if (pregunta.Obligatoria)
+                {
+                    <span class="text-danger ms-1">*</span>
+                }
+            </label>
 
-    Enviar
+            @switch (pregunta.Tipo)
+            {
+                case TipoPregunta.Texto:
+                    <input class="form-control" placeholder="Escribe tu respuesta..." />
+                    break;
 
-</button>
+                case TipoPregunta.Numero:
+                    <input type="number" class="form-control" placeholder="0" />
+                    break;
+
+                case TipoPregunta.SiNo:
+                    <select class="form-select">
+                        <option value="">-- Selecciona --</option>
+                        <option value="Si">Sí</option>
+                        <option value="No">No</option>
+                    </select>
+                    break;
+
+                case TipoPregunta.Fecha:
+                    <input type="date" class="form-control" />
+                    break;
+
+                case TipoPregunta.Foto:
+                    <InputFile class="form-control" />
+                    break;
+            }
+        </div>
+    }
+
+    <div class="text-end mt-4">
+        <button class="btn btn-custom btn-lg px-5">
+            <i class="bi bi-check-lg me-2"></i>Enviar
+        </button>
+    </div>
+
+</div>
 
 @code {
 

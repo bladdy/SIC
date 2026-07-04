@@ -201,6 +201,7 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
             Result = totalPages
         };
     }
+
     //ToDo: Formatear la fecha al ingles
     public override async Task<ActionResponse<IEnumerable<Event>>> GetAsync(PaginationDTO pagination)
     {
@@ -257,8 +258,9 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
         else
         {
             // Orden por defecto si no selecciona nada
-            queryable = queryable.OrderBy(x => x.Name);
-            queryable = queryable.OrderBy(x => x.Status);
+            queryable = queryable
+                .OrderBy(x => x.Status)
+                .ThenBy(x => x.Date);
         }
 
         if (pagination.Date.HasValue)

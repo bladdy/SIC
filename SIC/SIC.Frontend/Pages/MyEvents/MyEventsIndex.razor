@@ -33,10 +33,10 @@
             <input style="width:400px;" type="text" class="form-control focus:border-[#3C6A79]" placeholder="Buscar Evento..." @bind="Filter" />
 
             <!-- Fecha -->
-            <InputDate class="form-control" @bind-Value="DateSelectd" style="width:150px;" />
+            <InputDate class="form-control d-none" @bind-Value="DateSelectd" style="width:150px;" />
 
             <!-- Tipo de Evento -->
-            <InputSelect class="form-select" @bind-Value="SelectedEventType" style="width:300px;">
+            <InputSelect class="form-select d-none" @bind-Value="SelectedEventType" style="width:300px;">
                 <option value="">-- Selecciona un tipo de Evento --</option>
                 @if (EventTypes != null)
                 {
@@ -48,7 +48,7 @@
             </InputSelect>
 
             <!-- Orden -->
-            <InputSelect class="form-select" @bind-Value="OrderBy" style="width:200px;">
+            <InputSelect class="form-select d-none" @bind-Value="OrderBy" style="width:200px;">
                 <option value="">-- Ordernar por --</option>
                 <option value="FechaAsc">Fecha Ascendente </option>
                 <option value="FechaDesc">Fecha Descendente</option>
