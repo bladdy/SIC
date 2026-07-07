@@ -1,5 +1,4 @@
-﻿@page "/my-events/details/{Code}"
-
+﻿@page ﻿"/my-events/details/{Code}"
 @using SIC.Frontend.Shared
 <PageTitle>Detalles del Evento</PageTitle>
 <!--
@@ -64,10 +63,171 @@ else
         <!-- Body: Información detallada -->
         <div class="card-body">
 
+            <div class="accordion" id="accordionPanelsStayOpenExample">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="panelsStayOpen-headingOne">
+                        <button class="accordion-button collapsed" style="background-color:#3C6A79 !important; color:white;"
+                        type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+                            <div class="w-100 d-flex justify-content-between align-items-center me-3">
+
+                                <strong class="text-uppercase">Invitados:</strong>
+                                <span>@(EventDetail.NumberAdults + EventDetail.NumberYouths + EventDetail.NumberChildren)</span>
+                            </div>
+                        </button>
+                    </h2>
+                    <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingOne">
+                        <div class="accordion-body row">
+                            <div class="col-12 col-md-4">
+                                <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#3C6A79;">
+                                    <strong>Adultos:</strong>
+                                    <span>@EventDetail.NumberAdults</span>
+                                </p>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#3C6A79;">
+                                    <strong>Jóvenes:</strong>
+                                    <span>@EventDetail.NumberYouths</span>
+                                </p>
+                            </div>
+
+                            <!-- Niños -->
+                            <div class="col-12 col-md-4">
+                                <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#3C6A79;">
+                                    <strong>Niños:</strong>
+                                    <span>@EventDetail.NumberChildren</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
+                        <button class="accordion-button collapsed bg-success" style="color:white; margin-top: 2px;" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
+                            <div class="w-100 d-flex justify-content-between align-items-center me-3">
+
+                                <strong>Total SÍ ASISTIRÉ:</strong>
+                                <span>@(EventDetail.NumberAdultsConfirmed + EventDetail.NumberChildrenConfirmed + EventDetail.NumberYouthsConfirmed)</span>
+
+                            </div>
+                        </button>
+                    </h2>
+                    <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingTwo">
+                        <div class="accordion-body row">
+                            <!-- Adultos (Sí asistiré) -->
+                            <div class="col-12 col-md-4 m-0">
+                                <p class="d-flex justify-content-between px-3 py-1 text-white bg-success ">
+                                    <strong>Adultos:</strong>
+                                    <span>@EventDetail.NumberAdultsConfirmed</span>
+                                </p>
+                            </div>
+
+                            <!-- Jóvenes (Sí asistiré) -->
+                            <div class="col-12 col-md-4 m-0">
+                                <p class="d-flex justify-content-between px-3 py-1 text-white bg-success ">
+                                    <strong>Jóvenes:</strong>
+                                    <span>@EventDetail.NumberYouthsConfirmed</span>
+                                </p>
+                            </div>
+
+                            <!-- Niños (Sí asistiré) -->
+                            <div class="col-12 col-md-4 m-0">
+                                <p class="d-flex justify-content-between px-3 py-1 text-white bg-success ">
+                                    <strong>Niños:</strong>
+                                    <span>@EventDetail.NumberChildrenConfirmed</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="panelsStayOpen-headingThree">
+                        <button class="accordion-button collapsed bg-danger" style="color:white; margin-top: 2px;" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+                            <div class="w-100 d-flex justify-content-between align-items-center me-3">
+
+                                <strong>Total NO ASISTIRÉ:</strong>
+                                <span>@(EventDetail.NumberAdultsNotAttend + EventDetail.NumberChildrenNotAttend + EventDetail.NumberYouthNotAttend)</span>
+                            </div>
+                        </button>
+                    </h2>
+                    <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingThree">
+                        <div class="accordion-body row">
+                            <!-- No asistiré -->
+                            <div class="col-12 col-md-4 m-0">
+                                <p class="d-flex justify-content-between px-3 py-1 text-white bg-danger ">
+                                    <strong>Adultos:</strong>
+                                    <span>@(EventDetail.NumberAdultsNotAttend)</span>
+                                </p>
+                            </div>
+                            <!-- No asistiré -->
+                            <div class="col-12 col-md-4 m-0">
+                                <p class="d-flex justify-content-between px-3 py-1 text-white bg-danger ">
+                                    <strong>Jóvenes:</strong>
+                                    <span>@(EventDetail.NumberYouthNotAttend)</span>
+                                </p>
+                            </div>
+
+                            <!-- No asistiré -->
+                            <div class="col-12 col-md-4 m-0">
+                                <p class="d-flex justify-content-between px-3 py-1 text-white bg-danger ">
+                                    <strong>Niños:</strong>
+                                    <span>@(EventDetail.NumberChildrenNotAttend)</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="panelsStayOpen-headingFour">
+                        <button class="accordion-button collapsed bg-warning" type="button" style="color:white; margin-top: 2px;" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseFour" aria-expanded="false" aria-controls="panelsStayOpen-collapseFour">
+                            <div class="w-100 d-flex justify-content-between align-items-center me-3">
+
+                                <strong>Invitados PENDIENTES:</strong>
+                                <span>@(EventDetail.NumberAdultsPending + EventDetail.NumberChildrenPending + EventDetail.NumberYouthPending)</span>
+
+                            </div>
+                        </button>
+                    </h2>
+                    <div id="panelsStayOpen-collapseFour" class="accordion-collapse collapse " aria-labelledby="panelsStayOpen-headingFour">
+                        <div class="accordion-body row">
+                            <!-- Invitados Pendientes -->
+                            <div class="col-12 col-md-4 m-0">
+                                <p class="d-flex justify-content-between px-3 py-1 text-white bg-warning">
+                                    <strong>Adultos:</strong>
+                                    <span>@(EventDetail.NumberAdultsPending)</span>
+                                </p>
+                            </div>
+                            <!-- Invitados Pendientes -->
+                            <div class="col-12 col-md-4 m-0">
+                                <p class="d-flex justify-content-between px-3 py-1 text-white bg-warning">
+                                    <strong>Jóvenes:</strong>
+                                    <span>@(EventDetail.NumberYouthPending)</span>
+                                </p>
+                            </div>
+                            <!-- Invitados Pendientes -->
+                            <div class="col-12 col-md-4 m-0">
+                                <p class="d-flex justify-content-between px-3 py-1 text-white bg-warning">
+                                    <strong>Niños:</strong>
+                                    <span>@(EventDetail.NumberChildrenPending)</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-2">
+
+                <div class="col-12 col-md-4 m-0">
+                    <p class="d-flex justify-content-between px-3 py-3 text-black" style="background-color: whitesmoke;">
+                        <strong>Invitaciones SIN CONFIRMAR :</strong>
+                        <span>@(EventDetail.Pending)</span>
+                    </p>
+                </div>
+            </div>
+
             <!-- ======================== -->
             <!-- SECCIÓN 2: Invitados -->
             <!-- ======================== -->
-            <div class="row text-center align-items-stretch g-1 g-md-3 mt-0">
+            <div class="row text-center align-items-stretch g-1 g-md-3 mt-0 d-none">
                 <!-- Invitados -->
                 <div class="col-12 col-md-3 mb-0">
                     <p class="d-flex justify-content-between px-3 py-1 text-white" style="background-color:#3C6A79;">
@@ -102,7 +262,7 @@ else
             <!-- ======================== -->
             <!-- SECCIÓN 3: Confirmaciones -->
             <!-- ======================== -->
-            <div class="row text-center align-items-stretch g-1 g-md-3 mt-0">
+            <div class="row text-center align-items-stretch g-1 g-md-3 mt-0 d-none">
                 <!-- (Sí asistiré) -->
                 <div class="col-12 col-md-3 m-0">
                     <p class="d-flex justify-content-between px-3 py-1 text-white bg-success">
@@ -136,24 +296,66 @@ else
                 </div>
 
                 <!-- No asistiré -->
-                <div class="col-12 col-md-4 m-0">
+                <div class="col-12 col-md-3 m-0">
                     <p class="d-flex justify-content-between px-3 py-1 text-white bg-danger ">
                         <strong>Total NO ASISTIRÉ:</strong>
                         <span>@(EventDetail.NumberAdultsNotAttend + EventDetail.NumberChildrenNotAttend + EventDetail.NumberYouthNotAttend)</span>
                     </p>
                 </div>
+                <!-- No asistiré -->
+                <div class="col-6 col-md-3 m-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-danger ">
+                        <strong>Adultos:</strong>
+                        <span>@(EventDetail.NumberAdultsNotAttend )</span>
+                    </p>
+                </div>
+                <!-- No asistiré -->
+                <div class="col-6 col-md-3 m-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-danger ">
+                        <strong>Jóvenes:</strong>
+                        <span>@(EventDetail.NumberYouthNotAttend)</span>
+                    </p>
+                </div>
 
+                <!-- No asistiré -->
+                <div class="col-6 col-md-3 m-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-danger ">
+                        <strong>Niños:</strong>
+                        <span>@(EventDetail.NumberChildrenNotAttend)</span>
+                    </p>
+                </div>
                 <!-- Invitados Pendientes -->
-                <div class="col-12 col-md-4 m-0">
+                <div class="col-12 col-md-3 m-0">
                     <p class="d-flex justify-content-between px-3 py-1 text-white bg-warning">
-                        <strong>Invitados Pendientes:</strong>
+                        <strong>Invitados PENDIENTES:</strong>
                         <span>@(EventDetail.NumberAdultsPending + EventDetail.NumberChildrenPending + EventDetail.NumberYouthPending)</span>
+                    </p>
+                </div>
+                <!-- Invitados Pendientes -->
+                <div class="col-6 col-md-3 m-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-warning">
+                        <strong>Adultos:</strong>
+                        <span>@(EventDetail.NumberAdultsPending )</span>
+                    </p>
+                </div>
+                <!-- Invitados Pendientes -->
+                <div class="col-6 col-md-3 m-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-warning">
+                        <strong>Jóvenes:</strong>
+                        <span>@( EventDetail.NumberYouthPending)</span>
+                    </p>
+                </div>
+                <!-- Invitados Pendientes -->
+                <div class="col-6 col-md-3 m-0">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-warning">
+                        <strong>Niños:</strong>
+                        <span>@( EventDetail.NumberChildrenPending)</span>
                     </p>
                 </div>
                 <!-- Invitaciones Pendientes -->
                 <div class="col-12 col-md-4 m-0">
                     <p class="d-flex justify-content-between px-3 py-1 text-black" style="background-color:whitesmoke;">
-                        <strong>Invitaciones Pendientes :</strong>
+                        <strong>Invitaciones SIN CONFIRMAR :</strong>
                         <span>@(EventDetail.Pending)</span>
                     </p>
                 </div>
@@ -190,6 +392,9 @@ else
                     <div>
                         <button class="btn btn-sm btn-custom" @onclick="ShowCreateModal">Agregar Invitado</button>
                     </div>
+                    <div>
+                        <button class="btn btn-sm btn-custom" @onclick="NavegateToControlTables">Asignar Mesas</button>
+                    </div>
                     @if (EventDetail.User.UserType == UserType.WeddingPlanner || EventDetail.User.UserType == UserType.Admin)
                     {
                         <div class="d-flex justify-content-center gap-2 mb-2 mb-lg-0">
@@ -222,7 +427,7 @@ else
                                 }
                             </button>
                         </div>
-                        
+
                     }
                 </div>
             </div>
@@ -651,8 +856,16 @@ else
 
                         }
                     </div>
-                    <p class="mb-1"><strong>Mesa:</strong> @invitation.Table</p>
-                    <p class="mb-1"><strong>Dedicatoria:</strong> @invitation.Comments</p>
+                    @if (!string.IsNullOrEmpty(invitation.Table))
+                    {
+                        <p class="mb-1"><strong>Mesa:</strong> @invitation.Table</p>
+                        
+                    }
+                    @if (!string.IsNullOrEmpty(invitation.Comments))
+                    {
+                        <p class="mb-1"><strong>Dedicatoria:</strong> @invitation.Comments</p>
+
+                    }
 
                     <div class="d-flex flex-wrap gap-1 mt-3">
                         @if (usarWhatsApp)
@@ -907,18 +1120,18 @@ else
 
                                 <!-- Country Code Select -->
                                 <InputSelect class="form-select"
-                                style="max-width: 190px;"
-                                @bind-Value="NewInvitation.CountryCode">
+                                             style="max-width: 190px;"
+                                             @bind-Value="NewInvitation.CountryCode">
                                     <option value="">Selecciona un País</option>
-                                    <option value="+521">MX +52</option>
+                                    <option value="+52">MX +52</option>
                                     <option value="+1">US +1</option>
 
                                 </InputSelect>
 
                                 <!-- Phone Number -->
                                 <InputText class="form-control"
-                                @bind-Value="NewInvitation.PhoneNumber"
-                                placeholder="Número de WhatsApp" />
+                                           @bind-Value="NewInvitation.PhoneNumber"
+                                           placeholder="Número de WhatsApp" />
 
                             </div>
 
@@ -931,8 +1144,8 @@ else
                                 <button type="button" class="btn btn-custom rounded-circle p-2" @onclick="AddGuest">
 
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round">
+                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                         stroke-linecap="round" stroke-linejoin="round">
                                         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                         <path d="M5 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
                                         <path d="M3 21v-2a4 4 0 0 1 4 -4h4c.96 0 1.84 .338 2.53 .901" />
@@ -973,7 +1186,7 @@ else
                                             <InputSelect class="form-select w-auto"
                                                          @bind-Value="guest.Status">
                                                 @foreach (var status in Enum.GetValues<Status>()
-                                        .Where(s => s == Status.NotAttend || s == Status.Pending || s == Status.Attend))
+                                    .Where(s => s == Status.NotAttend || s == Status.Pending || s == Status.Attend))
                                                 {
                                                     <option value="@status">@status.GetDescription()</option>
                                                 }
@@ -999,7 +1212,7 @@ else
                                     </div>
 
                                 }
-                                
+
                             }
 
                         </div>
@@ -1027,8 +1240,8 @@ else
 
                             <div class="mb-3">
                                 <label class="form-label">Estado</label>
-                                <InputSelect class="form-select" @bind-Value="NewInvitation.Status" 
-                                @bind-Value:after="OnStatusChanged">
+                                <InputSelect class="form-select" @bind-Value="NewInvitation.Status"
+                                             @bind-Value:after="OnStatusChanged">
                                     <option value="">-- Selecciona un Estado --</option>
                                     @foreach (var status in Enum.GetValues<Status>()
                             .Where(s => s == Status.NotAttend || s == Status.Pending || s == Status.Attend || s == Status.Warned))
@@ -1121,6 +1334,25 @@ else
                                 <InputText class="form-control" @bind-Value="NewInvitation.Table" />
                                 <ValidationMessage For="@(() => NewInvitation.Table)" />
                             </div>
+
+
+                            <div class="mb-3">
+                                <label>Mesa</label>
+                                <InputSelect class="form-select"
+                                             @bind-Value="NewInvitation.TablesEventsId"
+                                             disabled="@(NewInvitation.Status != Status.Attend)">
+                                    <option value="">-- Selecciona la Mesa --</option>
+                                    @foreach (var table in Tables)
+                                    {
+                                        <option value="@table.Id">
+                                            @table.Name - Disponibles: @(table.Seats - table.OccupiedSeats)
+                                        </option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => NewInvitation.TablesEventsId)" />
+                            </div>
+
+
                             <div class="mb-3">
                                 <label class="form-label">Dedicatoria</label>
                                 <InputTextArea class="form-control" @bind-Value="NewInvitation.Comments" />
@@ -1151,9 +1383,10 @@ else
     </div>
 }
 
-
-
 <style>
+    .accordion-button::after {
+        filter: brightness(0) invert(1);
+    }
     .steps-wrapper {
         background-color: #3C6A79;
         padding: 12px;

@@ -59,6 +59,7 @@ public partial class MyEventsDetails
     public Event? EventDetail { get; set; }
     public List<Invitation>? Invitations { get; set; }
     public List<WhatsAppTemplate>? Templates { get; set; }
+    private List<TablesEvents> Tables = new();
     [Inject] private IRepository Repository { get; set; } = default!;
     [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
@@ -76,6 +77,19 @@ public partial class MyEventsDetails
         await LoadEvent();
         await LoadInvitations();
         await LoadTemplates();
+        await LoadTablesEventsAsync();
+    }
+
+    private async Task LoadTablesEventsAsync()
+    {
+        var result = await Repository.GetAsync<List<TablesEvents>>($"api/Tables/{EventDetail.Id}");
+        if (result.Error)
+        {
+            var message = await result.GetErrorMessageAsync();
+            await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+        Tables = result.Response ?? new List<TablesEvents>();
     }
 
     private async Task LoadTemplates()
@@ -128,6 +142,11 @@ public partial class MyEventsDetails
     private void CloseModalExcel()
     {
         IsModalExcelVisible = false;
+    }
+
+    private void NavegateToControlTables()
+    {
+        NavigationManager.NavigateTo($"/events/tables/{EventDetail!.Code}");
     }
 
     private void NavegateToMessage()
@@ -214,6 +233,8 @@ public partial class MyEventsDetails
             SentDate = invitation.SentDate,
             ConfirmationDate = invitation.ConfirmationDate,
             Name = invitation.Name,
+            TablesEvents = invitation.TablesEvents,
+            TablesEventsId = invitation.TablesEventsId,
             Status = invitation.Status
         };
         IsEditMode = true;
@@ -280,6 +301,28 @@ public partial class MyEventsDetails
         HttpResponseWrapper<object>? responseHttp;
         isSavingInvitation = true;
 
+        if (NewInvitation.TablesEventsId.HasValue)
+        {
+            var table = Tables.FirstOrDefault(t => t.Id == NewInvitation.TablesEventsId);
+
+            if (table != null &&
+                (table.Seats - table.OccupiedSeats) <
+                NewInvitation.Guests.Count(x => x.Status == Status.Attend))
+            {
+                await SweetAlertService.FireAsync(
+                    "Error",
+                    "No se pudo guardar la invitación. La cantidad de invitados es mayor a la cantidad de lugares disponibles en la mesa, favor de cambiar de mesa o adicionar más lugares.",
+                    SweetAlertIcon.Error);
+                isSavingInvitation = false;
+
+                return;
+            }
+        }
+        else
+        {
+            NewInvitation.TablesEvents = null;
+        }
+
         if (IsEditMode)
         {
             // PUT -> Editar
@@ -295,6 +338,7 @@ public partial class MyEventsDetails
         {
             var message = await responseHttp.GetErrorMessageAsync() ?? "No se pudo guardar la Inivitacion.";
             await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            isSavingInvitation = false;
             return;
         }
 
@@ -316,7 +360,8 @@ public partial class MyEventsDetails
         );
         isSavingInvitation = false;
         await LoadEvent();
-        await LoadInvitations(currentPage);
+        await LoadInvitations();
+        await LoadTablesEventsAsync();
     }
 
     private async Task DescargarExcel()
