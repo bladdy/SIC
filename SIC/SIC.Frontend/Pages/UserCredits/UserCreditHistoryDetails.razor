@@ -1,44 +1,77 @@
 ﻿@page "/users-credits/details"
 @page "/users-credits/details/{Id?}"
 <PageTitle>Historial de Creditos</PageTitle>
-<div class="mb-3">
-    <h1>Historial</h1> 
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+    <h1 class="mb-2 mb-md-0">Historial</h1>
     <button class="btn btn-custom" @onclick="Pay">Comprar Creditos</button>
 </div>
 <GenericList MyList="userCreditHistories">
     <Body>
-        <table class="table table-striped table-hover table-bordered align-middle">
-            <thead class="" style="background-color:#3C6A79; color: white;">
-                <tr class="text-center">
-                    <th>Tipo de accion</th>
-                    <th>Creditos</th>
-                    <th>Disponibles</th>
-                    <th>Fecha</th>
-                    <th>Nota</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (userCreditHistories is null)
-                {
-                    <Loading />
-                }
-                else
-                {
-                    @foreach (var userCreditHistory in userCreditHistories)
+        <div class="table-responsive d-none d-md-block">
+            <table class="table table-striped table-hover table-bordered align-middle">
+                <thead class="" style="background-color:#3C6A79; color: white;">
+                    <tr class="text-center">
+                        <th>Tipo de accion</th>
+                        <th>Creditos</th>
+                        <th>Disponibles</th>
+                        <th>Fecha</th>
+                        <th>Nota</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (userCreditHistories is null)
                     {
-                        <tr class="text-center">
-
-                            <td>@userCreditHistory.ActionType</td>
-                            <td>@userCreditHistory.Amount</td>
-                            <td>@userCreditHistory.AvailableAfter</td>
-                            <td>@userCreditHistory.Date.ToString("dd/MM/yyyy")</td>
-                            <td>@userCreditHistory.Notes</td>
-                            
-                        </tr>
+                        <Loading />
                     }
+                    else
+                    {
+                        @foreach (var userCreditHistory in userCreditHistories)
+                        {
+                            <tr class="text-center">
+                                <td>@userCreditHistory.ActionType</td>
+                                <td>@userCreditHistory.Amount</td>
+                                <td>@userCreditHistory.AvailableAfter</td>
+                                <td>@userCreditHistory.Date.ToString("dd/MM/yyyy")</td>
+                                <td>@userCreditHistory.Notes</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-block d-md-none">
+            @if (userCreditHistories is not null)
+            {
+                @foreach (var h in userCreditHistories)
+                {
+                    <div class="card mb-3 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                <strong>Fecha:</strong>
+                                <span>@h.Date.ToString("dd/MM/yyyy")</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <strong>Tipo de accion:</strong>
+                                <span>@h.ActionType</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <strong>Creditos:</strong>
+                                <span>@h.Amount</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <strong>Nota:</strong>
+                                <span>@h.Notes</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <strong>Disponibles:</strong>
+                                <span>@h.AvailableAfter</span>
+                            </div>
+                        </div>
+                    </div>
                 }
-            </tbody>
-        </table>
+            }
+        </div>
 
         <div class="d-flex justify-content-center my-3">
             <Pagination CurrentPage="currentPage"

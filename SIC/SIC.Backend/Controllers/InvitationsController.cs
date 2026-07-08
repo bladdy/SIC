@@ -54,6 +54,7 @@ public class InvitationsController : GenericController<Invitation>
         }
         return BadRequest();
     }
+
     [HttpGet("byEventCode/{code}")]
     public async Task<IActionResult> GetByEventCodeAsync(string code)
     {
@@ -64,7 +65,6 @@ public class InvitationsController : GenericController<Invitation>
         }
         return NotFound();
     }
-
 
     [HttpGet("byCode/{code}")]
     public async Task<IActionResult> GetByCodeAsync(string code)
@@ -184,7 +184,7 @@ public class InvitationsController : GenericController<Invitation>
                 Niños = invitacion.NumberConfirmedChildren,
                 Jovenes = invitacion.NumberConfirmedYouths,
                 Adultos = invitacion.NumberConfirmedAdults,
-                MesaAsignada = invitacion.Table ?? "Sin asignar",
+                MesaAsignada = invitacion.TablesEvents?.Name ?? "Sin asignar",
                 CodigoQr = invitacion.Code ?? $"INV-{invitacion.Id}-{evento}"
             };
 

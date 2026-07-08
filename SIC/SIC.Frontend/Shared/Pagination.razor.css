@@ -1,0 +1,17 @@
+@media (max-width: 767.98px) {
+    nav {
+        display: flex;
+        justify-content: center;
+    }
+    .pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.15rem;
+    }
+    .page-item .page-link {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+        min-width: 2rem;
+        text-align: center;
+    }
+}

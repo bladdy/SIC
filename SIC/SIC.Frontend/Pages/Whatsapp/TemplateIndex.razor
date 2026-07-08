@@ -1,6 +1,7 @@
 ﻿@page "/whatsapp_templates"
-<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
-    <h3 class="mb-0">Plantillas</h3>
+<PageTitle>Plantillas</PageTitle>
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+    <h3 class="mb-2 mb-md-0">Plantillas</h3>
     <div>
         <a href="/whatsapp_templates/template-builder" class="btn btn-custom mt-2 mt-md-0">
             <i class="oi oi-plus"></i> Crear Plantilla
@@ -10,28 +11,78 @@
                 disabled="@isGenerating">
             @(isGenerating ? "Iniciando..." : "Generar plantillas sugeridas")
         </button>
-
     </div>
 </div>
-<table class="table table-striped table-bordered">
-    <thead>
-        <tr>
-            <th>Nombre de la plantilla</th>
-            <th>Categoría</th>
-            <th>Idioma</th>
-            <th>Estado</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (WhatsappTemplates?.Data != null && WhatsappTemplates.Data.Any())
-        {
-            @foreach (var template in WhatsappTemplates.Data)
+
+<div class="table-responsive d-none d-md-block">
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Nombre de la plantilla</th>
+                <th>Categoria</th>
+                <th>Idioma</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (WhatsappTemplates?.Data != null && WhatsappTemplates.Data.Any())
+            {
+                @foreach (var template in WhatsappTemplates.Data)
+                {
+                    <tr>
+                        <td>@template.Name</td>
+                        <td>@template.Category</td>
+                        <td>@template.Language</td>
+                        <td>
+                            @if (template.Status == "APPROVED")
+                            {
+                                <span class="badge bg-success">Aprobada</span>
+                            }
+                            else if (template.Status == "PENDING")
+                            {
+                                <span class="badge bg-warning text-dark">Pendiente</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">@template.Status</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+            else
             {
                 <tr>
-                    <td>@template.Name</td>
-                    <td>@template.Category</td>
-                    <td>@template.Language</td>
-                    <td>
+                    <td colspan="4" class="text-center text-muted">
+                        No hay plantillas registradas
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="d-block d-md-none">
+    @if (WhatsappTemplates?.Data != null && WhatsappTemplates.Data.Any())
+    {
+        @foreach (var template in WhatsappTemplates.Data)
+        {
+            <div class="card mb-3 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <strong>Nombre:</strong>
+                        <span>@template.Name</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <strong>Categoria:</strong>
+                        <span>@template.Category</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <strong>Idioma:</strong>
+                        <span>@template.Language</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <strong>Estado:</strong>
                         @if (template.Status == "APPROVED")
                         {
                             <span class="badge bg-success">Aprobada</span>
@@ -44,19 +95,15 @@
                         {
                             <span class="badge bg-danger">@template.Status</span>
                         }
-                    </td>
-                </tr>
-            }
+                    </div>
+                </div>
+            </div>
         }
-        else
-        {
-            <tr>
-                <td colspan="4" class="text-center text-muted">
-                    No hay plantillas registradas
-                </td>
-            </tr>
-        }
-
-    </tbody>
-
-</table>
+    }
+    else
+    {
+        <div class="text-center text-muted py-4">
+            No hay plantillas registradas
+        </div>
+    }
+</div>
