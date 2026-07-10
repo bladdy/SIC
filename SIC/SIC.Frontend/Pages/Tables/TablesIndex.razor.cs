@@ -14,6 +14,7 @@ namespace SIC.Frontend.Pages.Tables
         private int totalPages = 2;
         private TablesEvents? Table { get; set; }
         private List<Invitation> Invitations = new();
+
         private List<TablesEvents>? Tables { get; set; }
         private string filterText = string.Empty;
 
