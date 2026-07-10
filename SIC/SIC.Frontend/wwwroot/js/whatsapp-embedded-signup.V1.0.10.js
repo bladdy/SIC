@@ -6,8 +6,8 @@
 window.fbSdkReady = false;
 let AUTH_CODE = null;
 
-const API_BASE_URL = "https://localhost:7141";
-//const API_BASE_URL = "https://invboxv-app.com";
+//const API_BASE_URL = "https://localhost:7141";
+const API_BASE_URL = "https://invboxv-app.com";
 /* ============================
    SDK INIT
 ============================ */
