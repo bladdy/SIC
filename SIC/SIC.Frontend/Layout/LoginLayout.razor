@@ -1,4 +1,39 @@
-﻿@inherits LayoutComponentBase
+﻿@using SIC.Frontend.Services
+@inherits LayoutComponentBase
+@inject PageMetaService Meta
+@implements IDisposable
+<HeadContent>
+
+    <title>@Meta.Title</title>
+
+    <meta name="description" content="@Meta.Description" />
+    <meta name="keywords" content="@Meta.Keywords" />
+
+    @if (!string.IsNullOrWhiteSpace(Meta.CanonicalUrl))
+    {
+        <link rel="canonical" href="@Meta.CanonicalUrl" />
+    }
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="@Meta.Title" />
+    <meta property="og:description" content="@Meta.Description" />
+    <meta property="og:image" content="@Meta.OgImage" />
+    <meta property="og:type" content="@Meta.OgType" />
+    <meta property="og:site_name" content="@Meta.SiteName" />
+
+    @if (!string.IsNullOrWhiteSpace(Meta.CanonicalUrl))
+    {
+        <meta property="og:url" content="@Meta.CanonicalUrl" />
+    }
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="@Meta.TwitterCard" />
+    <meta name="twitter:title" content="@Meta.Title" />
+    <meta name="twitter:description" content="@Meta.Description" />
+    <meta name="twitter:image" content="@Meta.OgImage" />
+
+</HeadContent>
+
 
 <div class="d-flex justify-content-center bg-light"
      style="min-height: 100vh; align-items: stretch;">
@@ -6,3 +41,16 @@
         @Body
     </div>
 </div>
+
+
+@code {
+    protected override void OnInitialized()
+    {
+        Meta.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        Meta.OnChange -= StateHasChanged;
+    }
+}

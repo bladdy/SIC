@@ -1,55 +1,56 @@
 ﻿@using System.Globalization
 @if (PlannerDashboards != null)
 {
+    <!--Datos generales planner-->
+<div class="row g-4">
+        <div class="row g-4 d-none d-md-flex">
+            <div class="col-md-4">
+                <div class="card shadow-sm text-center h-100">
+                    <div class="card-body">
+                        <h6>Mis Créditos Disponibles</h6>
+                        <h3>@UserCreditDTO?.AvailableCredits</h3>
+                    </div>
+                </div>
+            </div>
 
-    <div class="row g-4">
-        <div class="col-md-3">
-            <div class="card shadow-sm text-center">
-                <div class="card-body">
-                    <h6>Mis Creditos Disponibles</h6>
-                    <h3>@UserCreditDTO?.AvailableCredits</h3>
+            <div class="col-md-4">
+                <div class="card shadow-sm text-center h-100">
+                    <div class="card-body">
+                        <h6>Mis Eventos Activos</h6>
+                        <h3>@PlannerDashboards.MyEventsActive</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm text-center h-100">
+                    <div class="card-body">
+                        <h6>Mis Eventos Completados</h6>
+                        <h3>@PlannerDashboards.MyEventsCompleted</h3>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm text-center">
+        <div class="col-12 d-block d-md-none">
+            <div class="card mb-3 shadow-sm">
                 <div class="card-body">
-                    <h6>Mis Eventos Activos</h6>
-                    <h3>@PlannerDashboards.MyEventsActive</h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm text-center">
-                <div class="card-body">
-                    <h6>Mis Eventos Completados</h6>
-                    <h3>@PlannerDashboards.MyEventsCompleted</h3>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3 d-none">
-            <div class="card shadow-sm text-center">
-                <div class="card-body">
-                    <h6>Invitaciones (mis eventos)</h6>
-                    <h3>@PlannerDashboards.MyInvitationsTotal</h3>
-                    <small class="text-muted">Enviadas</small>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="col-md-3 d-none">
-            <div class="card shadow-sm text-center">
-                <div class="card-body">
-                    <h6>Confirmadas</h6>
-                    <h3>@PlannerDashboards.MyInvitationsConfirmed</h3>
-                    <small class="text-muted">Estado = Si asistire</small>
+                    <div class="d-flex justify-content-between mb-2">
+                        <strong>Mís Créditos Disponibles</strong>
+                        <span>@UserCreditDTO?.AvailableCredits</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <strong>Eventos Activos</strong>
+                        <span>@PlannerDashboards.MyEventsActive</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <strong>Eventos Completados</strong>
+                        <span>@PlannerDashboards.MyEventsCompleted</span>
+                    </div>
                 </div>
             </div>
         </div>
         <!-- Resumen de invitados del planner -->
-@using System.Globalization
+
 @if (PlannerDashboards != null)
         {
             <div class="col-12 mt-3 d-none">
@@ -104,10 +105,10 @@
                     <div class="flex-grow-1 overflow-auto">
                         @foreach (var e in TopEventsPage)
                         {
-                            var total = e.TotalGuests > 0 ? e.TotalGuests : 1;
-                            var confirmedPct = (double)e.ConfirmedGuests / total * 100;
-                            var pendingPct = (double)e.PendingGuests / total * 100;
-                            var notAttendPct = (double)e.NotAttendingGuests / total * 100;
+                            var total = Math.Max(e.TotalGuests, 1);
+                            var confirmedPct = e.ConfirmedGuests * 100.0 / total;
+                            var pendingPct = e.PendingGuests * 100.0 / total;
+                            var notAttendPct = e.NotAttendingGuests * 100.0 / total;
 
                             <div class="mb-3">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
@@ -120,7 +121,7 @@
                                     <small>@e.ConfirmedGuests Asistirán / @e.TotalGuests invitados</small>
                                 </div>
 
-                                <div class="progress" style="height: 22px;">
+                                <div class="progress" style="height:22px;">
                                     @if (e.ConfirmedGuests > 0)
                                     {
                                         <div class="progress-bar bg-success"

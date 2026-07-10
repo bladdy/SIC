@@ -1,3 +1,14 @@
-﻿<div class="spinner-border" role="status">
-    <span class="visually-hidden">Loading...</span>
+﻿@* Parámetros *@
+@code {
+    [Parameter] public string Text { get; set; } = "Cargando...";
+    [Parameter] public string MinHeight { get; set; } = "30vh";
+}
+
+<div class="d-flex justify-content-center align-items-center" style="min-height: @MinHeight;">
+    <div class="text-center">
+        <div class="spinner-border mb-3" role="status" style="width: 3rem; height: 3rem; color: #3C6A79;">
+            <span class="visually-hidden">@Text</span>
+        </div>
+        <div class="text-muted">@Text</div>
+    </div>
 </div>

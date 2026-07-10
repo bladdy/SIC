@@ -4,7 +4,6 @@ using SIC.Frontend.Repositories;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using SIC.Shared.Enums;
-using System.Net;
 
 namespace SIC.Frontend.Pages.Tables
 {
@@ -13,7 +12,6 @@ namespace SIC.Frontend.Pages.Tables
         [Parameter] public string? Code { get; set; }
         private int currentPage = 1;
         private int totalPages = 2;
-        private Event Event = new();
         private TablesEvents Table = new();
         private List<Invitation> Invitations = new();
         private List<TablesEvents> Tables = new();
@@ -43,14 +41,13 @@ namespace SIC.Frontend.Pages.Tables
 
         protected override async Task OnInitializedAsync()
         {
-            await LoadEventAsync();
             await LoadTablesEventsAsync();
             await LoadInvitationsAsync();
         }
 
         private async Task LoadInvitationsAsync()
         {
-            var result = await Repository.GetAsync<List<Invitation>>($"api/Invitations/byEventCode/{Event.Code}");
+            var result = await Repository.GetAsync<List<Invitation>>($"api/Invitations/byEventCode/{Code}");
             if (result.Error)
             {
                 var message = await result.GetErrorMessageAsync();
@@ -61,7 +58,7 @@ namespace SIC.Frontend.Pages.Tables
         }
         private async Task LoadTablesEventsAsync()
         {
-            var result = await Repository.GetAsync<List<TablesEvents>>($"api/Tables/{Event.Id}");
+            var result = await Repository.GetAsync<List<TablesEvents>>($"api/Tables/tablesbycode/{Code}");
             if (result.Error)
             {
                 var message = await result.GetErrorMessageAsync();
@@ -71,22 +68,6 @@ namespace SIC.Frontend.Pages.Tables
             Tables = result.Response ?? new List<TablesEvents>();
         }
 
-        private async Task LoadEventAsync()
-        {
-            var result = await Repository.GetAsync<Event>($"api/Events/byCode/{Code}");
-            if (result.Error)
-            {
-                if (result.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
-                {
-                    NavigationManager.NavigateTo("/events");
-                    return;
-                }
-                var message = await result.GetErrorMessageAsync();
-                await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
-                return;
-            }
-            Event = result?.Response ?? new Event();
-        }
 
         private async Task SelectedPageAsync(int page)
         {
@@ -190,7 +171,7 @@ namespace SIC.Frontend.Pages.Tables
         {
 
             HttpResponseWrapper<object>? responseHttp;
-            GenerateTablesDto.EventoId = Event.Id;
+            GenerateTablesDto.EventoId = Invitations.FirstOrDefault()!.EventId;
             responseHttp = await Repository.PostAsync("api/Tables/Generate", GenerateTablesDto);
             if (responseHttp.Error)
             {
@@ -216,14 +197,13 @@ namespace SIC.Frontend.Pages.Tables
                 SweetAlertIcon.Success
             );
             GenerateTablesDto = new();
-            await LoadEventAsync();
             await LoadTablesEventsAsync();
             await LoadInvitationsAsync();
         }
         private async Task SaveMesa()
         {
             HttpResponseWrapper<object>? responseHttp;
-            createOrEditTablesDto.EventoId = Event.Id;
+            createOrEditTablesDto.EventoId = Invitations.FirstOrDefault()!.EventId;
 
             if (IsEditMode)
             {
@@ -260,7 +240,6 @@ namespace SIC.Frontend.Pages.Tables
                 SweetAlertIcon.Success
             );
             createOrEditTablesDto = new();
-            await LoadEventAsync();
             await LoadTablesEventsAsync();
             await LoadInvitationsAsync();
         }
@@ -293,7 +272,6 @@ namespace SIC.Frontend.Pages.Tables
                 SweetAlertIcon.Success
             ); 
             AssignTablesDto = new();
-            await LoadEventAsync();
             await LoadTablesEventsAsync();
             await LoadInvitationsAsync();
         }

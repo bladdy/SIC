@@ -365,36 +365,62 @@ else
 
         <!-- Footer: Botones de acción -->
         <div class="card-footer d-flex justify-content-center flex-wrap gap-2">
-            <div class="text-center">
+            <div class="text-center w-100">
                 <!-- Título centrado arriba -->
-                <h4 class="mb-1">Crear Lista de Invitados</h4>
+                <h4 class="mb-2">Crear Lista de Invitados</h4>
 
                 <!-- Contenedor responsive -->
-                <div class="d-flex flex-column flex-lg-row justify-content-center align-items-center  gap-2 mt-2">
-                    <!-- En mobile: los botones se apilan como indicas -->
-                    <!-- En PC: se ponen en una fila juntos debajo del título -->
-                    <div class="d-flex justify-content-center gap-2 mb-2 mb-lg-0">
-                        <button class="btn btn-sm btn-custom" @onclick="DescargarExcel" disabled="@isLoading">
-                            @if (isLoading)
-                            {
-                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                <span> Generando... </span>
-                            }
-                            else
-                            {
-                                <span>Exportar Excel</span>
-                            }
-                        </button>
-                        <button class="btn btn-sm btn-custom" @onclick="ShowModalExcel">Importar Excel</button>
-                    </div>
-
-                    <!-- Botón que en móvil queda debajo, pero en escritorio en la misma fila -->
-                    <div>
-                        <button class="btn btn-sm btn-custom" @onclick="ShowCreateModal">Agregar Invitado</button>
-                    </div>
-                    <div>
-                        <button class="btn btn-sm btn-custom" @onclick="NavegateToControlTables">Asignar Mesas</button>
-                    </div>
+                <div class="d-flex flex-wrap justify-content-center gap-1">
+                    <button class="btn btn-sm btn-custom" @onclick="DescargarExcel" disabled="@isLoading">
+                        @if (isLoading)
+                        {
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            <span> Generando... </span>
+                        }
+                        else
+                        {
+                            <span>Exportar Excel</span>
+                        }
+                    </button>
+                    <button class="btn btn-sm btn-custom" @onclick="ShowModalExcel">Importar Excel</button>
+                    <button class="btn btn-sm btn-custom" @onclick="ShowCreateModal">Agregar Invitado</button>
+                    <button class="btn btn-sm btn-custom" @onclick="NavegateToControlTables">Asignar Mesas</button>
+                    <button class="btn btn-sm btn-custom" @onclick="CopiarEventUrl" disabled="@IsCopyURl">
+                        @if (IsCopyURl)
+                        {
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            <span> Copiando... </span>
+                        }
+                        else
+                        {
+                            <span>Compartir Evento</span>
+                        }
+                    </button>
+                    
+                    <button class="btn btn-sm btn-custom" @onclick="CopiarMesasUrl" disabled="@IsCopyMesasURl">
+                        @if (IsCopyMesasURl)
+                        {
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            <span> Copiando... </span>
+                        }
+                        else
+                        {
+                            <span>Compartir Mesas</span>
+                        }
+                    </button>
+                    <button class="btn btn-sm btn-custom" @onclick="GeneratedPDF" disabled="@IsProcessList">
+                        @if (IsProcessList)
+                        {
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            <span> Generando lista... </span>
+                        }
+                        else
+                        {
+                            <span>Lista de asistentes (PDF)</span>
+                        }
+                    </button>
+                    
+                    
                 </div>
             </div>
 
@@ -576,7 +602,10 @@ else
                                                                 <!-- SVG 4 -->
                                                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circle-number-4"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 8v3a1 1 0 0 0 1 1h3" /><path d="M14 8v8" /></svg>
                                                             </div>
-
+                                                            <div class="step-circle @(sentTemplates.Contains(5) ? "active-step" : "inactive-step")">
+                                                                <!-- SVG 5 -->
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circle-number-5"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 15a1 1 0 0 0 1 1h2a1 1 0 0 0 1 -1v-2a1 1 0 0 0 -1 -1h-3v-4h4" /></svg>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 }

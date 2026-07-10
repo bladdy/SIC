@@ -29,6 +29,7 @@ public partial class MyEventsDetails
     private bool SelectAll = false;
     private bool IsSendingMassive = false;
     private bool IsCopyURl = false;
+    private bool IsCopyMesasURl = false;
     private bool IsProcessList = false;
 
     private bool HasSelectedInvitations = false;
@@ -416,6 +417,16 @@ public partial class MyEventsDetails
         await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", url);
         await Task.Delay(1500);
         IsCopyURl = false;
+    }
+
+    private async Task CopiarMesasUrl()
+    {
+        IsCopyMesasURl = true;
+        var url = $"{NavigationManager.BaseUri}status-tables/{Code}";
+
+        await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", url);
+        await Task.Delay(1500);
+        IsCopyMesasURl = false;
     }
 
     private async Task AbrirWhatsapp(string phoneNumber, string code, int invitationId, int column)

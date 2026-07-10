@@ -17,10 +17,14 @@ else
     <div class="container-fluid p-0 p-md-4">
 
     <div class="col-6 col-sm-3 col-md-2 text-start">
-            <h3 class="mb-0 d-flex align-items-start justify-content-start justify-content-sm-start justify-content-md-start gap-1">
-                    
-            @Event.Name
-        </h3>
+            @{
+                var firstTable = Tables.FirstOrDefault();
+            }
+
+            @if (firstTable?.Event != null)
+            {
+                <h3>@firstTable.Event.Name</h3>
+            }
     </div>
 
     <!-- Encabezado -->

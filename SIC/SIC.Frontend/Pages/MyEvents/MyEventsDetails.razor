@@ -397,6 +397,20 @@ else
                             }
                         </button>
                     }
+                    @if (EventDetail.User.UserType == UserType.WeddingPlanner || EventDetail.User.UserType == UserType.Admin)
+                    {
+                        <button class="btn btn-sm btn-custom" @onclick="CopiarMesasUrl" disabled="@IsCopyMesasURl">
+                            @if (IsCopyMesasURl)
+                            {
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                <span> Copiando... </span>
+                            }
+                            else
+                            {
+                                <span>Compartir Mesas</span>
+                            }
+                        </button>
+                    }
                     @if (EventDetail.User.UserType == UserType.WeddingPlanner || EventDetail.User.UserType == UserType.User)
                     {
                         <button class="btn btn-sm btn-custom" @onclick="GeneratedPDF" disabled="@IsProcessList">
@@ -424,14 +438,7 @@ else
         <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center; justify-content: start;">
             <button type="button" class="btn btn-custom" style="display: flex; align-items: center; gap: 4px;" @onclick="ApplyFilterAsync"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-search"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg> Buscar</button>
             <button type="button" class="btn btn-custom" style="display: flex; align-items: center; gap: 4px;" @onclick="CleanFilterAsync"><i class="bi bi-x-circle" /> Limpiar</button>
-            @if (usarWhatsApp)
-            {
-                @if (EventDetail.User.UserWhatsAppConfigs == null)
-                {
-                    <button type="button" class="btn btn-custom mt-2 mt-lg-0" style="display: flex; align-items: center; gap: 4px;" @onclick="NavegateToMessage"> <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-mail"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" /><path d="M3 7l9 6l9 -6" /></svg>Mensajes</button>
-                }
-
-            }
+            <button type="button" class="btn btn-custom" style="display: flex; align-items: center; gap: 4px;" @onclick="NavegateToMessage"> <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-mail"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" /><path d="M3 7l9 6l9 -6" /></svg>Mensajes</button>
 
         </div>
         <div class="form-check form-switch">
@@ -535,7 +542,7 @@ else
                                             @if (invitation.TablesEvents != null)
                                             {
                                                 <div><strong>Mesa:</strong> @(invitation.TablesEvents?.Name ?? invitation.Table ?? "Sin mesa")</div>
-                                                
+
                                             }
                                         </div>
 
@@ -594,7 +601,10 @@ else
                                                                 <!-- SVG 4 -->
                                                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circle-number-4"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 8v3a1 1 0 0 0 1 1h3" /><path d="M14 8v8" /></svg>
                                                             </div>
-
+                                                            <div class="step-circle @(sentTemplates.Contains(5) ? "active-step" : "inactive-step")">
+                                                                <!-- SVG 5 -->
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circle-number-5"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 15a1 1 0 0 0 1 1h2a1 1 0 0 0 1 -1v-2a1 1 0 0 0 -1 -1h-3v-4h4" /></svg>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 }
@@ -715,6 +725,56 @@ else
                                                 }
                                                 else
                                                 {
+                                                    @if (EventDetail.User.UserWhatsAppConfigs != null)
+                                                    {
+                                                        <button class="btn d-inline-flex align-items-center gap-2 text-white"
+                                                        style="background-color:#25d366;"
+                                                        @onclick="() => AbrirWhatsapp(invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)"
+                                                        disabled="@(loadingWhatsappId1 == invitation.Id)">
+                                                            @if (loadingWhatsappId1 == invitation.Id)
+                                                            {
+                                                                <span class="spinner-border spinner-border-sm"></span>
+                                                                <span>Invitando...</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <i class="bi bi-whatsapp"></i>
+                                                                <span>Invitar</span>
+                                                            }
+                                                        </button>
+
+                                                        <button class="btn d-inline-flex align-items-center gap-2 text-white d-none"
+                                                        style="background-color:#25d366;"
+                                                        @onclick="() => AbrirWhatsapp(invitation.CountryCode+invitation.PhoneNumber , invitation.Code!, invitation.Id, 1)"
+                                                        disabled="@(loadingWhatsappId1 == invitation.Id)">
+                                                            @if (loadingWhatsappId1 == invitation.Id)
+                                                            {
+                                                                <span class="spinner-border spinner-border-sm"></span>
+                                                                <span>Invitando...</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <i class="bi bi-whatsapp"></i>
+                                                                <span>Invitar</span>
+                                                            }
+                                                        </button>
+
+                                                        <button class="btn d-inline-flex align-items-center gap-2 text-white"
+                                                        style="background-color:#25d366;"
+                                                        @onclick="() => AbrirWhatsapp(invitation.CountryCode+invitation.PhoneNumber, invitation.Code!, invitation.Id, 2)"
+                                                        disabled="@(loadingWhatsappId2 == invitation.Id)">
+                                                            @if (loadingWhatsappId2 == invitation.Id)
+                                                            {
+                                                                <span class="spinner-border spinner-border-sm"></span>
+                                                                <span>Avisando...</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <i class="bi bi-whatsapp"></i>
+                                                                <span>Avisar</span>
+                                                            }
+                                                        </button>
+                                                    }
                                                     <button class="btn btn-info d-inline-flex align-items-center gap-2 text-white"
                                                     @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 1)"
                                                     disabled="@(copyingId1 == invitation.Id)">
@@ -744,6 +804,7 @@ else
                                                             <span>Avisar</span>
                                                         }
                                                     </button>
+
                                                 }
                                             </div>
                                         </div>
@@ -798,7 +859,7 @@ else
                 checked="@SelectAll"
                 @onchange="e => ToggleSelectAll((bool)e.Value!)" />
                 <label class="form-check-label" for="flexCheckDefault">
-                Seleccionar todos
+                    Seleccionar todos
                 </label>
             </div>
         }
@@ -854,7 +915,7 @@ else
 
                     }
 
-                    <div class="d-flex flex-wrap gap-1 mt-3">
+                    <div class="d-flex flex-wrap mt-3 acciones" >
                         @if (usarWhatsApp)
                         {
                             @if (EventDetail.User.UserWhatsAppConfigs != null)
@@ -910,19 +971,19 @@ else
                         }
                         else
                         {
-                            <!--
-
-                            <button class="btn btn-info d-flex align-items-center gap-1 flex-fill text-white"
-                            @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 1)">
-                            <i class="bi bi-clipboard"></i> Invitar
-                            </button>
-                            <button class="btn btn-info fd-flex align-items-center gap-1 flex-fill text-white"
-                            @onclick="() => CopiarInvitacion(invitation.Code!, invitation.Id, 2)">
-                            <i class="bi bi-clipboard"></i> Aviso
-                            </button>
-                            -->
-
-                            <button class="btn btn-info fd-flex align-items-center gap-1 flex-fill text-white"
+                            
+                            @if (EventDetail.User.UserWhatsAppConfigs != null)
+                            {
+                                <button class="btn accion accion-2" style="background-color:#25d366; color:white;"
+                                @onclick="() => AbrirWhatsapp(invitation.CountryCode+invitation.PhoneNumber, invitation.Code!, invitation.Id, 1)">
+                                    <i class="bi bi-whatsapp"></i> Invitar
+                                </button>
+                                <button class="btn align-items-center  flex-fill accion accion-2 " style="background-color:#25d366; color:white;"
+                                @onclick="() => AbrirWhatsapp(invitation.CountryCode+invitation.PhoneNumber, invitation.Code!, invitation.Id, 2)">
+                                    <i class="bi bi-whatsapp"></i> Aviso
+                                </button>
+                            }
+                            <button class="btn btn-info text-white accion accion-3" 
                             @onclick="() => CopiarInvitacionm(invitation.Code!, invitation.Id, 1)"
                             disabled="@(copyingIdm1 == invitation.Id)">
                                 @if (copyingIdm1 == invitation.Id)
@@ -937,7 +998,7 @@ else
                                 }
                             </button>
 
-                            <button class="btn btn-info d-inline-flex align-items-center gap-2 text-white"
+                            <button class="btn btn-info text-white accion accion-3"
                             @onclick="() => CopiarInvitacionm(invitation.Code!, invitation.Id, 2)"
                             disabled="@(copyingIdm2 == invitation.Id)">
                                 @if (copyingIdm2 == invitation.Id)
@@ -953,7 +1014,7 @@ else
                             </button>
                         }
 
-                        <button class="btn btn-custom d-flex align-items-center gap-1 flex-fill" @onclick="() => ShowEditModal(invitation)">
+                        <button class="btn btn-custom text-white accion accion-3" @onclick="() => ShowEditModal(invitation)">
                             <i class="bi bi-pencil-fill"></i>Editar
                         </button>
                     </div>
@@ -990,7 +1051,10 @@ else
                                         <!-- SVG 4 -->
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circle-number-4"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 8v3a1 1 0 0 0 1 1h3" /><path d="M14 8v8" /></svg>
                                     </div>
-
+                                     <div class="step-circle @(sentTemplates.Contains(5) ? "active-step" : "inactive-step")">
+                                                                <!-- SVG 5 -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circle-number-5"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 15a1 1 0 0 0 1 1h2a1 1 0 0 0 1 -1v-2a1 1 0 0 0 -1 -1h-3v-4h4" /></svg>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1382,7 +1446,21 @@ else
         align-items: center;
         border-radius: 12px;
     }
+    .acciones{
+    gap:.5rem;
+    }
 
+    .accion{
+        white-space: nowrap;
+    }
+
+    .accion-2{
+        flex: 0 0 calc(50% - .25rem);
+    }
+
+    .accion-3{
+        flex: 0 0 calc(33.333% - .35rem);
+    }
     /* Contenedor horizontal fijo */
     .steps-container {
         display: flex;

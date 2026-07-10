@@ -5,6 +5,7 @@ using Microsoft.JSInterop;
 using SIC.Frontend.Helpers;
 using SIC.Frontend.Repositories;
 using SIC.Frontend.Resources;
+using SIC.Frontend.Services;
 using SIC.Shared.Entities;
 using System.Net;
 
@@ -15,6 +16,7 @@ namespace SIC.Frontend.Pages.Album
         //ToDo: boton GenerarQR para cada evento
         [Parameter] public string? Code { get; set; }
 
+        [Inject] private PageMetaService PageMetaService { get; set; } = default!;
         [Inject] private IStringLocalizer<SharedResource> Localizer { get; set; } = default!;
         [Inject] private IRepository Repository { get; set; } = default!;
         [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
@@ -33,6 +35,17 @@ namespace SIC.Frontend.Pages.Album
             if (Event is not null && Event.HasAlbum)
             {
                 await LoadEventImage();
+                if (Event is not null && !string.IsNullOrEmpty(Event.CoverAlbumImageUrl))
+                {
+                    PageMetaService.Set(
+                        title: Event.Name,
+                        description: Event.SubTitle,
+                        image: Event.CoverAlbumImageUrl,
+                        canonicalUrl: $"https://invboxv-app.com/upload-photo/{Event.Code}",
+                        keywords: "",
+                        ogType: "website"
+                    );
+                }
             }
         }
 
@@ -179,6 +192,42 @@ namespace SIC.Frontend.Pages.Album
                     TimerProgressBar = true,
                 });
                 await toast.FireAsync("Error", "Algo salio mal, intentalo de nuevo más tarde.", SweetAlertIcon.Error);
+            }
+        }
+
+        private async Task DownloadAllTexts(string code)
+        {
+            try
+            {
+                IsLoadingBanner = true;
+                var url = $"api/images/DownloadAllTexts/{code}";
+                var bytes = await Repository.GetFileAsync(url);
+                if (bytes == null || bytes.Length == 0)
+                {
+                    await SweetAlertService.FireAsync(
+                        "Error",
+                        "No se pudo generar el banner.",
+                        SweetAlertIcon.Error
+                    );
+                    return;
+                }
+                await JsRuntime.DownloadFileAsync(
+                    $"Texts-Event-{Event?.Name}.pdf",
+                    bytes,
+                    "application/pdf"
+                );
+            }
+            catch (Exception ex)
+            {
+                await SweetAlertService.FireAsync(
+                    "Error",
+                    ex.Message,
+                    SweetAlertIcon.Error
+                );
+            }
+            finally
+            {
+                IsLoadingBanner = false;
             }
         }
 

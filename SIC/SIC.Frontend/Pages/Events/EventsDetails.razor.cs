@@ -28,6 +28,10 @@ public partial class EventsDetails
     private bool SelectAll = false;
     private bool IsSendingMassive = false;
 
+    private bool IsCopyURl = false;
+    private bool IsCopyMesasURl = false;
+    private bool IsProcessList = false;
+
     private bool HasSelectedInvitations = false;
 
     private bool isLoadingWhatsapp = false;
@@ -150,6 +154,52 @@ public partial class EventsDetails
     private void NavegateToMessage()
     {
         NavigationManager.NavigateTo($"/events/message-events/{EventDetail!.Code}");
+    }
+
+    private async Task CopiarEventUrl()
+    {
+        IsCopyURl = true;
+        var url = $"{NavigationManager.BaseUri}status-events/{Code}";
+
+        await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", url);
+        await Task.Delay(1500);
+        IsCopyURl = false;
+    }
+
+    private async Task CopiarMesasUrl()
+    {
+        IsCopyMesasURl = true;
+        var url = $"{NavigationManager.BaseUri}status-tables/{Code}";
+
+        await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", url);
+        await Task.Delay(1500);
+        IsCopyMesasURl = false;
+    }
+
+    private async Task GeneratedPDF()
+    {
+        try
+        {
+            IsProcessList = true;
+
+            var content = await Repository.GetFileAsync($"api/Invitations/generatedpdf?evento={EventDetail!.Code}");
+
+            if (content != null && content.Length > 0)
+            {
+                await JsRuntime.DownloadFileAsync(
+                    $"{EventDetail.Name}.pdf",
+                    content,
+                    "application/pdf");
+            }
+            else
+            {
+                await SweetAlertService.FireAsync("Generar .PDF", "No tienes ningun invitado confirmado aun, espere a que los invitados confirmen para generar la lista de invitados", SweetAlertIcon.Info);
+            }
+        }
+        finally
+        {
+            IsProcessList = false;
+        }
     }
 
     private void AddGuest()

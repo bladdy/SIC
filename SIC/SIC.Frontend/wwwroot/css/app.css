@@ -48,7 +48,7 @@ body {
     background-color: #f8f9fa;
 }
 
-/* Contenedor del número actual */
+/* Contenedor del nï¿½mero actual */
 .number-display {
     background: linear-gradient(135deg, #4facfe, #00f2fe);
     color: #fff;
@@ -60,7 +60,7 @@ body {
     transition: transform 0.3s ease-in-out;
 }
 
-/* Animación de rebote */
+/* Animaciï¿½n de rebote */
 .animated-number {
     animation: bounceNumber 0.5s ease-in-out;
 }
@@ -96,7 +96,7 @@ body {
     }
 }
 
-/* Lista más atractiva */
+/* Lista mï¿½s atractiva */
 .list-group-item {
     transition: transform 0.2s, background-color 0.2s;
 }
@@ -107,7 +107,7 @@ body {
         transform: scale(1.05);
     }
 
-/* Botón con efecto */
+/* Botï¿½n con efecto */
 .btn-lg:hover {
     transform: scale(1.05);
     transition: transform 0.2s;
@@ -140,6 +140,10 @@ a, .btn-link {
 .form-check-inputres {
     accent-color: #6f42c1; /* Morado elegante */
 }
+.text-custom {
+    color: #3C6A79 !important;
+}
+
 .btn-custom {
     background-color: #3C6A79 !important; /* Color de fondo */
     color: white !important; /* Color del texto */
@@ -158,7 +162,7 @@ a, .btn-link {
     .btn-custom:hover {
         background-color: #2e4e59 !important; /* Color de fondo al pasar el mouse (opcional) */
         color: white !important; /* Mantener el color blanco */
-        border-color: #2e4e59; /* Opcional: Añadir color al borde */
+        border-color: #2e4e59; /* Opcional: Aï¿½adir color al borde */
     }
 
 .btn-primary {
@@ -169,13 +173,13 @@ a, .btn-link {
 
 /* Cambiar el color de la clase active */
 .pagination .page-item.active .page-link {
-    background-color: #3C6A79 !important; /* Color de fondo del ítem activo */
-    border-color: #3C6A79 !important; /* Color del borde del ítem activo */
+    background-color: #3C6A79 !important; /* Color de fondo del ï¿½tem activo */
+    border-color: #3C6A79 !important; /* Color del borde del ï¿½tem activo */
 }
 
     .pagination .page-item.active .page-link:hover {
-        background-color: #3C6A79; /* Color de fondo al pasar el ratón sobre el ítem activo */
-        border-color: #3C6A79; /* Color del borde al pasar el ratón */
+        background-color: #3C6A79; /* Color de fondo al pasar el ratï¿½n sobre el ï¿½tem activo */
+        border-color: #3C6A79; /* Color del borde al pasar el ratï¿½n */
     }
 
 input.form-control:focus {
