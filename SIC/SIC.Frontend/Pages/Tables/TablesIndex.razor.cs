@@ -14,14 +14,12 @@ namespace SIC.Frontend.Pages.Tables
         private int totalPages = 2;
         private TablesEvents? Table { get; set; }
         private List<Invitation> Invitations = new();
-        private List<TablesEvents> Tables = new();
+        private List<TablesEvents>? Tables { get; set; }
         private string filterText = string.Empty;
-
 
         private CreateOrEditTablesDto createOrEditTablesDto = new();
         private AssignTablesDto AssignTablesDto = new();
         private GenerateTablesDto GenerateTablesDto = new();
-
 
         private bool modaAsignarMesa = false;
         private bool modaCrearOrEditaMesa = false;
@@ -31,6 +29,7 @@ namespace SIC.Frontend.Pages.Tables
         [Inject] private IRepository Repository { get; set; } = default!;
         [Inject] private NavigationManager NavigationManager { get; set; } = default!;
         [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
+
         private IEnumerable<Invitation> FilteredInvitation =>
             Invitations
                 .Where(i => string.IsNullOrWhiteSpace(filterText) ||
@@ -56,6 +55,7 @@ namespace SIC.Frontend.Pages.Tables
             }
             Invitations = result.Response ?? new List<Invitation>();
         }
+
         private async Task LoadTablesEventsAsync()
         {
             var result = await Repository.GetAsync<List<TablesEvents>>($"api/Tables/tablesbycode/{Code}");
@@ -67,7 +67,6 @@ namespace SIC.Frontend.Pages.Tables
             }
             Tables = result.Response ?? new List<TablesEvents>();
         }
-
 
         private async Task SelectedPageAsync(int page)
         {
@@ -90,10 +89,11 @@ namespace SIC.Frontend.Pages.Tables
                 Icon = SweetAlertIcon.Warning,
                 ShowCancelButton = true
             });
-            
+
             if (!string.IsNullOrEmpty(result.Value))
                 await DeleTable(table);
         }
+
         private async Task DeleTable(TablesEvents table)
         {
             var response = await Repository.DeleteAsync<TablesEvents>($"api/Tables/{table.Id}");
@@ -107,7 +107,6 @@ namespace SIC.Frontend.Pages.Tables
 
         private async Task ConfirmDeleteAssign(Invitation table)
         {
-
             var result = await SweetAlertService.FireAsync(new SweetAlertOptions
             {
                 Title = "¿Eliminar invitados esta mesa?",
@@ -119,6 +118,7 @@ namespace SIC.Frontend.Pages.Tables
             if (!string.IsNullOrEmpty(result.Value))
                 await DeleteAssing(table);
         }
+
         private async Task DeleteAssing(Invitation table)
         {
             var response = await Repository.DeleteAsync<TablesEvents>($"api/Tables/delete/{table.Id}");
@@ -130,6 +130,7 @@ namespace SIC.Frontend.Pages.Tables
                 await LoadInvitationsAsync();
             }
         }
+
         private async Task ShowModaEditaMesa(TablesEvents updateTableEvent)
         {
             modaCrearOrEditaMesa = !modaCrearOrEditaMesa;
@@ -141,35 +142,41 @@ namespace SIC.Frontend.Pages.Tables
 
             IsEditMode = true;
         }
+
         private async Task ShowModaCrearMesa()
         {
             modaCrearOrEditaMesa = !modaCrearOrEditaMesa;
             IsEditMode = false;
         }
+
         private void CloseModaCrearOrEditaMesa()
         {
             modaCrearOrEditaMesa = !modaCrearOrEditaMesa;
         }
+
         private async Task ModaAsignarMes(TablesEvents tables)
         {
             modaAsignarMesa = !modaAsignarMesa;
             AssignTablesDto.TableId = tables.Id;
         }
+
         private void CloseModaAsignarMesa()
         {
             modaAsignarMesa = !modaAsignarMesa;
         }
+
         private async Task ModaGenerarMesa()
         {
             modaGenerarMesa = !modaGenerarMesa;
         }
+
         private void CloseModaGenerarMesa()
         {
             modaGenerarMesa = !modaGenerarMesa;
         }
+
         private async Task GenerarMesa()
         {
-
             HttpResponseWrapper<object>? responseHttp;
             GenerateTablesDto.EventoId = Invitations.FirstOrDefault()!.EventId;
             responseHttp = await Repository.PostAsync("api/Tables/Generate", GenerateTablesDto);
@@ -200,6 +207,7 @@ namespace SIC.Frontend.Pages.Tables
             await LoadTablesEventsAsync();
             await LoadInvitationsAsync();
         }
+
         private async Task SaveMesa()
         {
             HttpResponseWrapper<object>? responseHttp;
@@ -243,6 +251,7 @@ namespace SIC.Frontend.Pages.Tables
             await LoadTablesEventsAsync();
             await LoadInvitationsAsync();
         }
+
         private async Task AssignTable()
         {
             //Validar que la mesa no tenga
@@ -270,7 +279,7 @@ namespace SIC.Frontend.Pages.Tables
             await toast.FireAsync(
                 "Éxito", "Se ha asignado la mesa correctamente.",
                 SweetAlertIcon.Success
-            ); 
+            );
             AssignTablesDto = new();
             await LoadTablesEventsAsync();
             await LoadInvitationsAsync();
