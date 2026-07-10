@@ -12,7 +12,7 @@ namespace SIC.Frontend.Pages.Tables
         [Parameter] public string? Code { get; set; }
         private int currentPage = 1;
         private int totalPages = 2;
-        private TablesEvents Table = new();
+        private TablesEvents? Table { get; set; }
         private List<Invitation> Invitations = new();
         private List<TablesEvents> Tables = new();
         private string filterText = string.Empty;

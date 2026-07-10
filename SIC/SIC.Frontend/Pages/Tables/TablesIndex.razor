@@ -17,14 +17,14 @@ else
     <div class="container-fluid p-0 p-md-4">
 
     <div class="col-6 col-sm-3 col-md-2 text-start">
-            @{
-                var firstTable = Tables.FirstOrDefault();
-            }
+    @{
+        var firstTable = Tables.FirstOrDefault();
+    }
 
-            @if (firstTable?.Event != null)
-            {
-                <h3>@firstTable.Event.Name</h3>
-            }
+    @if (firstTable?.Event != null)
+    {
+        <h3>@firstTable.Event.Name</h3>
+    }
     </div>
 
     <!-- Encabezado -->
