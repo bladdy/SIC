@@ -34,8 +34,8 @@ namespace SIC.Frontend.Pages.Album
             await LoadEvent();
             if (Event is not null && Event.HasAlbum)
             {
-                await LoadEventImage();
-                if (Event is not null && !string.IsNullOrEmpty(Event.CoverAlbumImageUrl))
+                await LoadEventImage(); 
+                if (Event is not null && !string.IsNullOrEmpty(Event.CoverImageUrl))
                 {
                     PageMetaService.Set(
                         title: Event.Name,
