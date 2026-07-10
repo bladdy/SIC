@@ -223,7 +223,7 @@ public class DashboardReporsitory : IDashboardReporsitory
                                                  .CountAsync();
 
         // 🔹 Top eventos por invitados
-        var topEventsRaw = await _context.Events
+        /*var topEventsRaw = await _context.Events
             .Where(e => eventIds.Contains(e.Id) && e.Status == Status.Active)//Eventos
             .OrderByDescending(e => e.Invitations
                 .Where(i => i.Status == Status.Attend)//Invitaciones
@@ -251,6 +251,39 @@ public class DashboardReporsitory : IDashboardReporsitory
                     .Where(i => i.Status == Status.NotAttend)
                     .Sum(i => i.NumberAdults + i.NumberChildren + i.NumberYouths)
             })
+            .ToListAsync();*/
+
+        // 🔝 Top 15 eventos (solo del admin actual)
+        var topEventsRaw = await myEventsQuery
+            .Where(e => e.Date >= DateTime.Now && e.Status == Status.Active)// para traiga todos los eventos de todos
+            .OrderBy(e => e.Date)
+            .Take(20)
+            .Select(e => new EventDashboardItemDto
+            {
+                Code = e.Code,
+                EventName = e.Name,
+                Date = e.Date,
+                // Total de invitados
+                TotalGuests = e.Invitations
+                    .SelectMany(i => i.Guests)
+                    .Count(),
+
+                // Invitados confirmados
+                ConfirmedGuests = e.Invitations
+                    .SelectMany(i => i.Guests)
+                    .Count(g => g.Status == Status.Attend),
+
+                // Invitados pendientes
+                PendingGuests = e.Invitations
+                    .SelectMany(i => i.Guests)
+                    .Count(g => g.Status == Status.Pending),
+
+                // Invitados que no asistirán
+                NotAttendingGuests = e.Invitations
+                    .SelectMany(i => i.Guests)
+                    .Count(g => g.Status == Status.NotAttend)
+            }).
+            Where(e => e.Date > DateTime.Now.Date)
             .ToListAsync();
 
         // 🔹 Totales de invitados del planner
@@ -288,13 +321,12 @@ public class DashboardReporsitory : IDashboardReporsitory
                 .OrderBy(d => d.Date)
                 .Select(x => new PlannerDashboardDto.TopEvent
                 {
-                    EventId = x.Id,
-                    EventName = x.Name,
+                    EventName = x.EventName,
                     Code = x.Code,
-                    Confirmed = x.Confirmed,
-                    Pending = x.Pending,
-                    NotAttending = x.NotAttending,
-                    TotalInvitations = x.TotalInvitations,
+                    Confirmed = x.ConfirmedGuests,
+                    Pending = x.PendingGuests,
+                    NotAttending = x.NotAttendingGuests,
+                    TotalInvitations = x.TotalGuests,
                     Date = x.Date,
                     TotalGuests = x.TotalGuests,
                     ConfirmedGuests = x.ConfirmedGuests,

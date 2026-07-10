@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata;
 using SIC.Backend.Services;
 using SIC.Backend.UnitOfWork.Implemetations;
 using SIC.Backend.UnitOfWork.Interfaces;
@@ -208,6 +209,30 @@ public class ImagesController : ControllerBase
                 pdfBytes,
                 "application/pdf",
                 $"BannerQR-{response.Result.Name}.pdf"
+            );
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet("DownloadAllTexts/{code}")]
+    public async Task<IActionResult> DownloadAllTexts(string code)
+    {
+        try
+        {
+            var response = await _imageUnitOfWork.GetAsync(code);
+
+            if (response.Result == null)
+                return NotFound("Este evento no Existe.");
+
+            var pdfBytes = await _qRBannerService.TextsPDF(response.Result);
+
+            return File(
+                pdfBytes,
+                "application/pdf",
+                $"Texts-Event-{response.Result.FirstOrDefault()!.Event.Name}.pdf"
             );
         }
         catch (Exception ex)

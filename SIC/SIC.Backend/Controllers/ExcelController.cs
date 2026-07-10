@@ -305,6 +305,14 @@ namespace SIC.Backend.Controllers
 
                 row++;
             }
+            // Toda la hoja desbloqueada
+            worksheet.Style.Protection.Locked = false;
+
+            // Solo Código bloqueado
+            worksheet.Column(1).Style.Protection.Locked = true;
+
+            // Activar protección
+            worksheet.Protect();
 
             worksheet.Columns().AdjustToContents();
 

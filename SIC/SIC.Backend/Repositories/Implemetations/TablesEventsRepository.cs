@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using Microsoft.EntityFrameworkCore;
 using SIC.Backend.Data;
 using SIC.Backend.Helpers;
 using SIC.Backend.Repositories.Interfaces;
@@ -12,6 +13,7 @@ namespace SIC.Backend.Repositories.Implemetations
     public class TablesEventsRepository : GenericRepository<TablesEvents>, ITablesEventsRepository
     {
         private readonly DataContext _context;
+
         public TablesEventsRepository(DataContext context) : base(context)
         {
             _context = context;
@@ -38,7 +40,6 @@ namespace SIC.Backend.Repositories.Implemetations
                 Description = createOrEditTablesDto.Description,
                 Seats = createOrEditTablesDto.Seats,
                 OccupiedSeats = 0
-
             };
             _context.Add(newTable);
             await _context.SaveChangesAsync();
@@ -48,11 +49,12 @@ namespace SIC.Backend.Repositories.Implemetations
                 Result = newTable,
             };
         }
+
         public async Task<ActionResponse<TablesEvents>> UpdateFullAsync(CreateOrEditTablesDto createOrEditTablesDto)
         {
-            var updateTable = await _context.TablesEvents.Include(e => e.Event).Include(i=>i.Invitation).FirstOrDefaultAsync(x => x.Id == createOrEditTablesDto.Id);
+            var updateTable = await _context.TablesEvents.Include(e => e.Event).Include(i => i.Invitation).FirstOrDefaultAsync(x => x.Id == createOrEditTablesDto.Id);
 
-            if (updateTable == null) 
+            if (updateTable == null)
             {
                 return new ActionResponse<TablesEvents>
                 {
@@ -73,6 +75,7 @@ namespace SIC.Backend.Repositories.Implemetations
                 Result = updateTable,
             };
         }
+
         public async Task<ActionResponse<TablesEvents>> AssignTablesAsync(AssignTablesDto tablesDto)
         {
             var table = await _context.TablesEvents
@@ -121,7 +124,6 @@ namespace SIC.Backend.Repositories.Implemetations
                     Success = false,
                     Message = "El invitado aun no ha confirmado asistencia"
                 };
-
             }
 
             var occupiedSeats = table.OccupiedSeats + confirmedGuests;
@@ -204,8 +206,8 @@ namespace SIC.Backend.Repositories.Implemetations
                 {
                     EventId = generateTablesDto.EventoId,
                     Number = i,
-                    Name = $"Mesa {i}",
-                    Description = $"Mesa {i}",
+                    Name = $"{i}",
+                    Description = $"{i}",
                     Seats = generateTablesDto.NumberOfSeats,
                     OccupiedSeats = 0,
                     Invitation = new List<Invitation>()
@@ -223,9 +225,9 @@ namespace SIC.Backend.Repositories.Implemetations
             };
         }
 
-        public async Task<ActionResponse<IEnumerable<TablesEvents>>>GetAsync(int id)
+        public async Task<ActionResponse<IEnumerable<TablesEvents>>> GetAsync(int id)
         {
-            var entities = await _context.TablesEvents.Include(e => e.Event).Include(i => i.Invitation).ThenInclude(g => g.Guests).Where(e =>e.EventId == id).ToListAsync();
+            var entities = await _context.TablesEvents.Include(e => e.Event).Include(i => i.Invitation).ThenInclude(g => g.Guests).Where(e => e.EventId == id).ToListAsync();
 
             return new ActionResponse<IEnumerable<TablesEvents>>
             {
@@ -233,6 +235,7 @@ namespace SIC.Backend.Repositories.Implemetations
                 Result = entities
             };
         }
+
         public override async Task<ActionResponse<int>> GetTotalRecordAsync(PaginationDTO pagination)
         {
             var queryable = _context.TablesEvents
@@ -263,6 +266,7 @@ namespace SIC.Backend.Repositories.Implemetations
                 Result = totalPages
             };
         }
+
         public override async Task<ActionResponse<IEnumerable<TablesEvents>>> GetAsync(PaginationDTO pagination)
         {
             var queryable = _context.TablesEvents
@@ -294,6 +298,7 @@ namespace SIC.Backend.Repositories.Implemetations
                     .ToListAsync()
             };
         }
+
         public override async Task<ActionResponse<IEnumerable<TablesEvents>>> GetAsync()
         {
             var queryable = await _context.TablesEvents
@@ -305,6 +310,7 @@ namespace SIC.Backend.Repositories.Implemetations
                 Result = queryable
             };
         }
+
         public async Task<ActionResponse<bool>> DeleteInvitatonFromTablesAsync(int id)
         {
             try
@@ -358,6 +364,7 @@ namespace SIC.Backend.Repositories.Implemetations
                 };
             }
         }
+
         public async Task<ActionResponse<bool>> DeleteTablesAsync(int id)
         {
             var table = await _context.TablesEvents
@@ -387,6 +394,17 @@ namespace SIC.Backend.Repositories.Implemetations
             {
                 Success = true,
                 Message = $"La mesa '{table.Name}' fue eliminada correctamente."
+            };
+        }
+
+        public async Task<ActionResponse<IEnumerable<TablesEvents>>> GetTablesByCodeAsync(string code)
+        {
+            var entities = await _context.TablesEvents.Include(e => e.Event).Include(i => i.Invitation).ThenInclude(g => g.Guests).Where(e => e.Event!.Code == code).ToListAsync();
+
+            return new ActionResponse<IEnumerable<TablesEvents>>
+            {
+                Success = true,
+                Result = entities
             };
         }
     }

@@ -4,11 +4,13 @@ using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 
 namespace SIC.Backend.Controllers;
+
 [ApiController]
 [Route("api/[controller]")]
 public class TablesController : GenericController<TablesEvents>
 {
     private readonly ITablesEventsUnitOfWork _tablesEventsUnit;
+
     public TablesController(IGenericUnitOfWork<TablesEvents> unitOfWork, ITablesEventsUnitOfWork tablesEventsUnit) : base(unitOfWork)
     {
         _tablesEventsUnit = tablesEventsUnit;
@@ -24,6 +26,18 @@ public class TablesController : GenericController<TablesEvents>
         }
         return NotFound();
     }
+
+    [HttpGet("tablesbycode/{code}")]
+    public async Task<IActionResult> GetTablesByCodeAsync(string code)
+    {
+        var response = await _tablesEventsUnit.GetTablesByCodeAsync(code);
+        if (response.Success)
+        {
+            return Ok(response.Result);
+        }
+        return NotFound();
+    }
+
     [HttpGet]
     public override async Task<IActionResult> GetAsync()
     {
@@ -78,6 +92,7 @@ public class TablesController : GenericController<TablesEvents>
         }
         return NotFound(action.Message);
     }
+
     [HttpPost("Assign")]
     public async Task<IActionResult> PostFullAsync(AssignTablesDto table)
     {
@@ -88,6 +103,7 @@ public class TablesController : GenericController<TablesEvents>
         }
         return BadRequest(action.Message);
     }
+
     [HttpPost("Generate")]
     public async Task<IActionResult> PostFullAsync(GenerateTablesDto table)
     {
@@ -109,5 +125,4 @@ public class TablesController : GenericController<TablesEvents>
         }
         return BadRequest(action.Message);
     }
-
 }

@@ -138,6 +138,56 @@ public class QRBannerService
         return stream.ToArray();
     }
 
+    public async Task<byte[]> TextsPDF(IEnumerable<EventImage> result)
+    {
+        using MemoryStream ms = new();
+        Document document = new(PageSize.A4, 40, 40, 40, 40);
+        PdfWriter.GetInstance(document, ms);
+        document.Open();
+
+        Font titleFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16);
+        Font headerFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 11, BaseColor.White);
+        Font cellFont = FontFactory.GetFont(FontFactory.HELVETICA, 11);
+
+        Paragraph title = new("Lista de Mensajes", titleFont)
+        {
+            Alignment = Element.ALIGN_CENTER,
+            SpacingAfter = 15
+        };
+        document.Add(title);
+
+        PdfPTable table = new(2)
+        {
+            WidthPercentage = 100
+        };
+        table.SetWidths(new float[] { 1, 3 });
+
+        BaseColor headerBg = new(33, 37, 41);
+        BaseColor borderColor = new(222, 226, 230);
+
+        foreach (var header in new[] { "Autor", "Mensaje" })
+        {
+            table.AddCell(new PdfPCell(new Phrase(header, headerFont))
+            {
+                BackgroundColor = headerBg,
+                HorizontalAlignment = Element.ALIGN_CENTER,
+                Padding = 6,
+                BorderColor = borderColor
+            });
+        }
+
+        foreach (var item in result)
+        {
+            table.AddCell(new PdfPCell(new Phrase(item.Author ?? "", cellFont)) { Padding = 5 });
+            table.AddCell(new PdfPCell(new Phrase(item.Message ?? "", cellFont)) { Padding = 5 });
+        }
+
+        document.Add(table);
+        document.Close();
+
+        return await Task.FromResult(ms.ToArray());
+    }
+
     private async Task DrawBannerAsync(
         Document document,
         PdfWriter writer,

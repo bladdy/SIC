@@ -19,5 +19,6 @@ namespace SIC.Backend.Repositories.Interfaces
         Task<ActionResponse<GenerateTablesDto>> GenerateTablesAsync(GenerateTablesDto generateTablesDto);
         Task<ActionResponse<bool>> DeleteTablesAsync(int id);
         Task<ActionResponse<bool>> DeleteInvitatonFromTablesAsync(int id);
+        Task<ActionResponse<IEnumerable<TablesEvents>>> GetTablesByCodeAsync(string code);
     }
 }
