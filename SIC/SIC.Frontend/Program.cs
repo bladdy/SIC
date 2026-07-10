@@ -40,6 +40,8 @@ builder.Services.AddSweetAlert2();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddSingleton<SignalRService>(sp => new SignalRService("https://invboxv-app.com/hubs/whatsapp-chat"));
 builder.Services.AddSingleton<DocumentationState>();
+
+builder.Services.AddScoped<PageMetaService>();
 builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<IRepository, Repository>();
 
