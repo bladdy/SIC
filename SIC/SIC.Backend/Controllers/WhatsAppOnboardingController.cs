@@ -5,7 +5,10 @@ using SIC.Backend.Services;
 using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
+using SIC.Shared.Enums;
+using System.Net.NetworkInformation;
 using System.Security.Claims;
+using System.Security.Cryptography;
 
 namespace SIC.Backend.Controllers;
 
@@ -41,12 +44,11 @@ public class WhatsAppOnboardingController : ControllerBase
     [HttpPost("exchange-code")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> ExchangeCode(
-    [FromBody] ExchangeCodeRequest request)
+        [FromBody] ExchangeCodeRequest request)
     {
-        var usuarioId =
-            User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var usuarioId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        if (usuarioId == null)
+        if (string.IsNullOrWhiteSpace(usuarioId))
             return Unauthorized();
 
         if (string.IsNullOrWhiteSpace(request.Code) ||
@@ -56,168 +58,188 @@ public class WhatsAppOnboardingController : ControllerBase
         {
             return BadRequest(new
             {
-                error = "Datos incompletos"
+                error = "Datos incompletos."
             });
         }
 
         try
         {
-            // =========================================================
-            // VALIDAR QUE NO EXISTA
-            // =========================================================
+            //==========================================================
+            // VALIDAR SI YA EXISTE
+            //==========================================================
 
-            var existing =
-                await _repo.GetByPhoneNumberIdAsync(
-                    request.PhoneNumberId);
+            var existing = await _repo.GetByPhoneNumberIdAsync(request.PhoneNumberId);
 
             if (existing != null)
             {
+                if (existing.UsuarioId == usuarioId)
+                {
+                    return Ok(new
+                    {
+                        success = true,
+                        configId = existing.Id,
+                        phoneNumber = existing.PhoneNumber,
+                        phoneNumberId = existing.PhoneNumberId,
+                        businessId = existing.BusinessId,
+                        wabaId = existing.WabaId,
+                        message = "La configuración ya existía."
+                    });
+                }
+
                 return Conflict(new
                 {
-                    error = "Este número ya está configurado"
+                    error = "Este número ya está asociado a otro usuario."
                 });
             }
 
-            // =========================================================
+            //==========================================================
             // PASO 1
-            // Exchange Code -> Short Lived Token
-            // =========================================================
+            // Exchange Code -> Short Token
+            //==========================================================
 
             var shortToken =
-                await _metaAuth.ExchangeCodeAsync(
-                    request.Code);
+                await _metaAuth.ExchangeCodeAsync(request.Code);
 
-            Console.WriteLine(
-                "✅ Paso 1: Short-lived token obtenido");
+            Console.WriteLine("✅ Paso 1 - Short Token obtenido");
 
-            // =========================================================
+            //==========================================================
             // PASO 2
-            // Short -> Long Lived Token
-            // =========================================================
+            // Short -> Long Token
+            //==========================================================
 
             var longToken =
                 await _metaAuth.ExchangeForLongLivedTokenAsync(
                     shortToken.AccessToken);
 
-            Console.WriteLine(
-                "✅ Paso 2: Long-lived token obtenido");
+            Console.WriteLine("✅ Paso 2 - Long Token obtenido");
 
-            // =========================================================
+            //==========================================================
             // PASO 3
-            // Validar token
-            // =========================================================
+            // Validar Token
+            //==========================================================
 
             var tokenInfo =
                 await _metaAuth.DebugTokenAsync(
                     longToken.AccessToken);
 
-            if (!tokenInfo.TryGetProperty(
-                    "is_valid",
-                    out var isValidProp) ||
-                !isValidProp.GetBoolean())
+            if (!tokenInfo.TryGetProperty("is_valid", out var validProp) ||
+                !validProp.GetBoolean())
             {
-                throw new Exception(
-                    "El token obtenido no es válido");
+                throw new Exception("El token obtenido no es válido.");
             }
 
-            Console.WriteLine(
-                "✅ Paso 3: Token validado");
+            Console.WriteLine("✅ Paso 3 - Token válido");
 
-            // =========================================================
+            //==========================================================
             // PASO 4
-            // Suscribir App al WABA
-            // =========================================================
+            // Suscribir App
+            //==========================================================
 
             await _metaAuth.SubscribeAppAsync(
                 request.WabaId,
                 longToken.AccessToken);
 
-            Console.WriteLine(
-                "✅ Paso 4: App suscrita al WABA");
+            Console.WriteLine("✅ Paso 4 - App suscrita al WABA");
 
-            // =========================================================
+            //==========================================================
             // PASO 5
             // Obtener información del número
-            // =========================================================
+            //==========================================================
 
             var phoneInfo =
                 await _metaAuth.GetPhoneNumberAsync(
                     request.PhoneNumberId,
                     longToken.AccessToken);
 
-            Console.WriteLine(
-                $"✅ Paso 5: Número obtenido: {phoneInfo.DisplayPhoneNumber}");
+            Console.WriteLine($"✅ Paso 5 - Número: {phoneInfo.DisplayPhoneNumber}");
 
-            // =========================================================
+            //==========================================================
             // PASO 6
-            // Verificar acceso al Phone Number
-            // =========================================================
+            // Registrar número SOLO si es necesario
+            //==========================================================
 
-            await _metaAuth.RegisterPhoneNumberAsync(request.PhoneNumberId,longToken.AccessToken, "123456");
-            /*try
+            bool coexistence = false;
+
+            try
             {
-                await _metaAuth.SendTestMessageAsync(
-                    request.PhoneNumberId,
-                    "528661425258", // tu número de prueba
-                    longToken.AccessToken);
+                var isRegistered =
+                    await _metaAuth.IsPhoneNumberRegisteredAsync(
+                        request.PhoneNumberId,
+                        longToken.AccessToken);
 
-                Console.WriteLine(
-                    "✅ Paso 6: Mensaje de prueba enviado");
+                if (!isRegistered)
+                {
+                    var pin = RandomNumberGenerator
+                        .GetInt32(100000, 999999)
+                        .ToString();
+
+                    Console.WriteLine($"📲 Registrando número con PIN {pin}");
+
+                    await _metaAuth.RegisterPhoneNumberAsync(
+                        request.PhoneNumberId,
+                        longToken.AccessToken,
+                        pin);
+
+                    Console.WriteLine("✅ Número registrado");
+                }
+                else
+                {
+                    coexistence = true;
+                    Console.WriteLine("✅ Número ya registrado (Coexistence)");
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(
-                    $"⚠️ Mensaje de prueba omitido: {ex.Message}");
-            }*/
+                Console.WriteLine($"⚠️ RegisterPhoneNumber: {ex.Message}");
 
-            // =========================================================
+                // Si Meta responde que el número ya existe,
+                // simplemente continuamos.
+                coexistence = true;
+            }
+
+            //==========================================================
             // PASO 7
-            // Guardar configuración
-            // =========================================================
+            // Guardar Configuración
+            //==========================================================
 
-            var config =
-                new UsuarioWhatsAppConfig
-                {
-                    UsuarioId = usuarioId,
+            var config = new UsuarioWhatsAppConfig
+            {
+                UsuarioId = usuarioId,
 
-                    AccessToken =
-                        longToken.AccessToken,
+                AccessToken = longToken.AccessToken,
 
-                    PhoneNumberId =
-                        request.PhoneNumberId,
+                PhoneNumberId = request.PhoneNumberId,
 
-                    PhoneNumber =
-                        phoneInfo.DisplayPhoneNumber ??
-                        string.Empty,
+                PhoneNumber = phoneInfo.DisplayPhoneNumber ?? "",
 
-                    WabaId =
-                        request.WabaId,
+                WabaId = request.WabaId,
 
-                    BusinessId =
-                        request.BusinessId,
+                BusinessId = request.BusinessId,
 
-                    SystemUserId = null,
+                SystemUserId = null,
 
-                    CreatedAt =
-                        DateTime.UtcNow,
+                CreatedAt = DateTime.UtcNow,
 
-                    IsActive = true
-                };
+                IsActive = true,
 
-            var action =
-                await _whatsAppConfigUnitOfWork
-                    .AddFullAsync(config);
+                // Si agregas esta propiedad en tu entidad
+                ConnectionType = coexistence
+                    ? WhatsAppConnectionType.Coexistence
+                    : WhatsAppConnectionType.CloudApi
+            };
 
-            if (!action.Success)
+            var result =
+                await _whatsAppConfigUnitOfWork.AddFullAsync(config);
+
+            if (!result.Success)
             {
                 return StatusCode(500, new
                 {
-                    error = action.Message
+                    error = result.Message
                 });
             }
 
-            Console.WriteLine(
-                "✅ Paso 7: Configuración guardada");
+            Console.WriteLine("✅ Paso 7 - Configuración guardada");
 
             return Ok(new
             {
@@ -225,34 +247,30 @@ public class WhatsAppOnboardingController : ControllerBase
 
                 configId = config.Id,
 
-                phoneNumber =
-                    config.PhoneNumber,
+                phoneNumber = config.PhoneNumber,
 
-                phoneNumberId =
-                    config.PhoneNumberId,
+                phoneNumberId = config.PhoneNumberId,
 
-                wabaId =
-                    config.WabaId,
+                businessId = config.BusinessId,
 
-                businessId =
-                    config.BusinessId,
+                wabaId = config.WabaId,
 
-                message =
-                    "WhatsApp configurado correctamente."
+                coexistence,
+
+                message = coexistence
+                    ? "WhatsApp Business conectado mediante Coexistence."
+                    : "WhatsApp Business configurado correctamente."
             });
         }
         catch (Exception ex)
         {
-            Console.WriteLine(
-                $"❌ Error onboarding WhatsApp: {ex}");
+            Console.WriteLine($"❌ Error ExchangeCode: {ex}");
 
-            return StatusCode(500, new
+            return StatusCode(StatusCodes.Status500InternalServerError, new
             {
-                error =
-                    "No se pudo completar la configuración",
-
-                detalle =
-                    ex.Message
+                success = false,
+                error = "No se pudo completar la configuración de WhatsApp.",
+                detail = ex.Message
             });
         }
     }

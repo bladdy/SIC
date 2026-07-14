@@ -66,6 +66,8 @@ namespace SIC.Backend.Repositories.Implemetations
                     existingConfig.IsActive = true;
                     existingConfig.TokenExpiresAt = whatsAppConfig.TokenExpiresAt;
                     existingConfig.RevokedAt = null;
+                    existingConfig.TemplatesGenerated = whatsAppConfig.TemplatesGenerated;
+                    existingConfig.ConnectionType = whatsAppConfig.ConnectionType;
 
                     _context.Update(existingConfig);
                 }
@@ -76,6 +78,9 @@ namespace SIC.Backend.Repositories.Implemetations
                     whatsAppConfig.IsActive = true;
                     whatsAppConfig.CreatedAt = DateTime.UtcNow;
                     whatsAppConfig.SystemUserId = "";
+
+                    whatsAppConfig.TemplatesGenerated = false;
+                    whatsAppConfig.ConnectionType = whatsAppConfig.ConnectionType;
                     _context.UsuarioWhatsAppConfigs.Add(whatsAppConfig);
                 }
 
@@ -149,7 +154,7 @@ namespace SIC.Backend.Repositories.Implemetations
 
         public async Task<ActionResponse<StripeSettings?>> GetStripeConfig(string env)
         {
-            var stripe = await _context.StripeSettings.FirstOrDefaultAsync(x => x.ENVIRONMENT ==env);
+            var stripe = await _context.StripeSettings.FirstOrDefaultAsync(x => x.ENVIRONMENT == env);
             if (stripe == null)
             {
                 return new ActionResponse<StripeSettings?>

@@ -1,5 +1,6 @@
 ﻿using SIC.Shared.DTOs;
 using SIC.Shared.Response;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
@@ -322,6 +323,7 @@ namespace SIC.Backend.Services
 
             return Convert.ToHexString(hash).ToLower();
         }
+
         // ============================================================
         // 100 Register number
         // ============================================================
@@ -353,6 +355,55 @@ namespace SIC.Backend.Services
                 throw new Exception(json);
 
             Console.WriteLine("✅ Número registrado");
+        }
+
+        // ============================================================
+        // 110 Check if phone number is registered
+        // ============================================================
+        public async Task<bool> IsPhoneNumberRegisteredAsync(
+            string phoneNumberId,
+            string accessToken)
+        {
+            var request = new HttpRequestMessage(
+                HttpMethod.Get,
+                $"https://graph.facebook.com/v25.0/{phoneNumberId}" +
+                "?fields=id,display_phone_number,verified_name,name_status,code_verification_status,quality_rating");
+
+            request.Headers.Authorization =
+                new AuthenticationHeaderValue(
+                    "Bearer",
+                    accessToken);
+
+            var response = await _http.SendAsync(request);
+
+            var json = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+                throw new Exception(json);
+
+            Console.WriteLine($"📥 Phone Info: {json}");
+
+            using var doc = JsonDocument.Parse(json);
+
+            var root = doc.RootElement;
+
+            // OJO:
+            // Esto es solamente un ejemplo. Debes revisar qué campos
+            // devuelve tu número para decidir la lógica.
+
+            if (root.TryGetProperty("code_verification_status", out var status))
+            {
+                Console.WriteLine($"Verification Status: {status.GetString()}");
+            }
+
+            if (root.TryGetProperty("name_status", out var nameStatus))
+            {
+                Console.WriteLine($"Name Status: {nameStatus.GetString()}");
+            }
+
+            // Temporalmente devolvemos false.
+            // La lógica real dependerá de la respuesta de Meta.
+            return false;
         }
     }
 }
