@@ -32,9 +32,10 @@ namespace SIC.Backend.Controllers
         private readonly IWhatsAppTemplateBuilderService _templateBuilderService;
         private readonly IWhatsAppTemplateRepository _templateRepository;
         private readonly IBackgroundTaskQueue _queue;
+        private readonly IServiceScopeFactory _scopeFactory;
 
         public WhatsAppController(
-            WhatsAppService whatsAppService, IInvitationUnitOfWork invitationUnitOfWork, IWhatsAppTemplateBuilderService templateBuilderService, IWhatsAppTemplateRepository templateRepository, IBackgroundTaskQueue queue, IHubContext<WhatsappChatHub> hub,
+            WhatsAppService whatsAppService, IInvitationUnitOfWork invitationUnitOfWork, IWhatsAppTemplateBuilderService templateBuilderService, IWhatsAppTemplateRepository templateRepository, IBackgroundTaskQueue queue, IHubContext<WhatsappChatHub> hub, IServiceScopeFactory scopeFactory,
             IWhatsAppConfigUnitOfWork whatsAppConfigUnitOfWork, IMessageUnitOfWork iMessageUnitOfWork)
         {
             _hub = hub;
@@ -44,6 +45,7 @@ namespace SIC.Backend.Controllers
             _invitationUnitOfWork = invitationUnitOfWork;
             _iMessageUnitOfWork = iMessageUnitOfWork;
             _templateRepository = templateRepository;
+            _scopeFactory = scopeFactory;
             _queue = queue;
         }
 
@@ -166,64 +168,81 @@ namespace SIC.Backend.Controllers
         public async Task<IActionResult> GenerateTemplate()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null)
+
+            if (string.IsNullOrWhiteSpace(userId))
                 return BadRequest(new { error = "Usuario no autenticado" });
 
-            var userWhatsAppConfig = await _whatsAppConfigUnitOfWork.GetByUserIdAsync(userId);
-            if (!userWhatsAppConfig.Success)
+            var configResult = await _whatsAppConfigUnitOfWork.GetByUserIdAsync(userId);
+
+            if (!configResult.Success || configResult.Result == null)
                 return BadRequest(new { error = "Este usuario no tiene WhatsApp configurado" });
-            if (userWhatsAppConfig.Result == null)
-                return BadRequest(new { error = "Este usuario no tiene WhatsApp configurado" });
-            if (userWhatsAppConfig.Result.TemplatesGenerated)
-                return Ok(new { message = "Las plantillas sugeridas ya han sido generada para esta cuenta." });
+
+            if (configResult.Result.TemplatesGenerated)
+                return Ok(new
+                {
+                    message = "Las plantillas sugeridas ya fueron generadas para esta cuenta."
+                });
+
             var templates = await _templateRepository.GetAllAsync();
 
-            var templatesResult = templates.Result;
-            if (templatesResult == null || templatesResult.Any(t => t == null))
-            {
-                return BadRequest(new { error = "Hubo un problema al obtener las templates sugeridas." });
-            }
-            List<WhatsAppTemplate> templatesGenerated = templatesResult
-                .Where(t => t != null) // Filter out null values
-                .Select(t => t!) // Use the null-forgiving operator to indicate non-null values
-                .OrderBy(t => t.OrderTemplate)
+            if (!templates.Success || templates.Result == null)
+                return BadRequest(new
+                {
+                    error = "Hubo un problema al obtener las plantillas sugeridas."
+                });
+
+            var templateJsons = templates.Result
+                .Where(t => t != null)
+                .OrderBy(t => t!.OrderTemplate)
+                .Select(t => t!.MetaDefinitionJson!)
                 .ToList();
-            //Proceso de enviar las plantillas a whatsapp
+
+            if (templateJsons.Count < 5)
+            {
+                return BadRequest(new
+                {
+                    error = "No existen suficientes plantillas configuradas."
+                });
+            }
+
+            // Solo guardar datos primitivos para el Background
+            var configId = configResult.Result.UsuarioId;
+            var notificationUserId = userId;
+
             await _queue.QueueBackgroundWorkItemAsync(async token =>
             {
-                using var scope = HttpContext.RequestServices.CreateScope();
+                using var scope = _scopeFactory.CreateScope();
 
-                var templateService =
-                    scope.ServiceProvider.GetRequiredService<WhatsAppService>();
-                var whatsAppConfigUnitOfWork = scope.ServiceProvider
-                                .GetRequiredService<IWhatsAppConfigUnitOfWork>();
+                var templateService = scope.ServiceProvider.GetRequiredService<WhatsAppService>();
+                var whatsAppConfigUnitOfWork = scope.ServiceProvider.GetRequiredService<IWhatsAppConfigUnitOfWork>();
 
-                await templateService.CreateTemplateAsync(userWhatsAppConfig.Result, templatesGenerated[0].MetaDefinitionJson!);
+                // Obtener nuevamente la configuración desde la BD
+                var configResponse = await whatsAppConfigUnitOfWork.GetByUserIdAsync(configId);
 
-                await Task.Delay(TimeSpan.FromSeconds(30), token);
+                if (!configResponse.Success || configResponse.Result == null)
+                    return;
 
-                await templateService.CreateTemplateAsync(userWhatsAppConfig.Result, templatesGenerated[1].MetaDefinitionJson!);
+                var config = configResponse.Result;
 
-                await Task.Delay(TimeSpan.FromSeconds(30), token);
+                foreach (var templateJson in templateJsons)
+                {
+                    token.ThrowIfCancellationRequested();
 
-                await templateService.CreateTemplateAsync(userWhatsAppConfig.Result, templatesGenerated[2].MetaDefinitionJson!);
+                    await templateService.CreateTemplateAsync(config, templateJson);
 
-                await Task.Delay(TimeSpan.FromSeconds(30), token);
+                    await Task.Delay(TimeSpan.FromSeconds(30), token);
+                }
 
-                await templateService.CreateTemplateAsync(userWhatsAppConfig.Result, templatesGenerated[3].MetaDefinitionJson!);
+                config.TemplatesGenerated = true;
 
-                await Task.Delay(TimeSpan.FromSeconds(30), token);
+                await whatsAppConfigUnitOfWork.UpdateFullAsync(config);
 
-                await templateService.CreateTemplateAsync(userWhatsAppConfig.Result, templatesGenerated[4].MetaDefinitionJson!);
-                userWhatsAppConfig.Result.TemplatesGenerated = true;
-
-                await whatsAppConfigUnitOfWork.UpdateFullAsync(userWhatsAppConfig.Result);
-
-                // Avisar por SignalR
                 await _hub.Clients
-                .Group($"notifications-{userId}")
-                .SendAsync("Notification",
-                    "Las plantillas fueron generadas correctamente.");
+                    .Group($"notifications-{notificationUserId}")
+                    .SendAsync(
+                        "Notification",
+                        "Las plantillas fueron generadas correctamente.",
+                        cancellationToken: token);
             });
 
             return Ok(new
