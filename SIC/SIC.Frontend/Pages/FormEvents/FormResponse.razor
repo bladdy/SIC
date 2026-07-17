@@ -14,42 +14,7 @@
 
     @foreach (var pregunta in Formulario.Preguntas)
     {
-        <div class="card shadow-sm p-3 mb-3" style="border-radius: 10px;">
-            <label class="form-label fw-semibold mb-2">
-                @pregunta.Titulo
-                @if (pregunta.Obligatoria)
-                {
-                    <span class="text-danger ms-1">*</span>
-                }
-            </label>
-
-            @switch (pregunta.Tipo)
-            {
-                case TipoPregunta.Texto:
-                    <input class="form-control" placeholder="Escribe tu respuesta..." />
-                    break;
-
-                case TipoPregunta.Numero:
-                    <input type="number" class="form-control" placeholder="0" />
-                    break;
-
-                case TipoPregunta.SiNo:
-                    <select class="form-select">
-                        <option value="">-- Selecciona --</option>
-                        <option value="Si">Sí</option>
-                        <option value="No">No</option>
-                    </select>
-                    break;
-
-                case TipoPregunta.Fecha:
-                    <input type="date" class="form-control" />
-                    break;
-
-                case TipoPregunta.Foto:
-                    <InputFile class="form-control" />
-                    break;
-            }
-        </div>
+        <PreguntaResponse Pregunta="pregunta" Respuestas="Respuestas" />
     }
 
     <div class="text-end mt-4">
@@ -62,41 +27,51 @@
 
 @code {
 
-    private FormularioModel Formulario = new()
-        {
-            Titulo = "Inspección de Seguridad",
+    private Dictionary<Guid, string> Respuestas = new();
 
-            Preguntas =
+    private FormularioModel Formulario = new()
+    {
+        Titulo = "Cuestionario de Seguridad",
+        Preguntas =
         [
             new()
-        {
-            Titulo="Nombre del inspector",
-            Tipo=TipoPregunta.Texto
-        },
-
-        new()
-        {
-            Titulo="Temperatura",
-            Tipo=TipoPregunta.Numero
-        },
-
-        new()
-        {
-            Titulo="¿Hay riesgos?",
-            Tipo=TipoPregunta.SiNo
-        },
-
-        new()
-        {
-            Titulo="Fecha",
-            Tipo=TipoPregunta.Fecha
-        },
-
-        new()
-        {
-            Titulo="Fotografía",
-            Tipo=TipoPregunta.Foto
-        }
+            {
+                Titulo = "Nombre completo",
+                Tipo = TipoPregunta.Texto,
+                Obligatoria = true
+            },
+            new()
+            {
+                Titulo = "Edad",
+                Tipo = TipoPregunta.Numero
+            },
+            new()
+            {
+                Titulo = "¿Tiene restricciones alimentarias?",
+                Tipo = TipoPregunta.SiNo,
+                Obligatoria = true,
+                Reglas =
+                [
+                    new()
+                    {
+                        ValorDisparador = "Si",
+                        SubPreguntas =
+                        [
+                            new()
+                            {
+                                Titulo = "¿Cuáles restricciones?",
+                                Tipo = TipoPregunta.Texto,
+                                Obligatoria = true
+                            },
+                            new()
+                            {
+                                Titulo = "Foto del comprobante médico",
+                                Tipo = TipoPregunta.Foto
+                            }
+                        ]
+                    }
+                ]
+            }
         ]
-        };
+    };
 }

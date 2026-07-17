@@ -1,0 +1,43 @@
+@if (IsVisible)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content" style="border-radius: 12px; border: none;">
+                <div class="modal-header" style="background: #dc3545; color: white; border-radius: 12px 12px 0 0;">
+                    <h5 class="modal-title fw-semibold">
+                        <i class="bi bi-exclamation-triangle me-2"></i>Confirmar Eliminacion
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" @onclick="OnClose"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <div class="mb-3">
+                        <i class="bi bi-trash" style="font-size: 3rem; color: #dc3545;"></i>
+                    </div>
+                    <p class="mb-0 fw-semibold">@Message</p>
+                    <small class="text-muted">Esta accion no se puede deshacer.</small>
+                </div>
+                <div class="modal-footer justify-content-center" style="border-top: 1px solid #e9ecef;">
+                    <button class="btn btn-danger btn-sm" @onclick="OnConfirm">
+                        <i class="bi bi-trash me-1"></i>Eliminar
+                    </button>
+                    <button class="btn btn-secondary btn-sm" @onclick="OnClose">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
+    [Parameter] public string Message { get; set; } = "Estas seguro que deseas eliminar este elemento?";
+    [Parameter] public EventCallback OnConfirmAction { get; set; }
+
+    private async Task OnClose() => await IsVisibleChanged.InvokeAsync(false);
+
+    private async Task OnConfirm()
+    {
+        await OnConfirmAction.InvokeAsync();
+        await IsVisibleChanged.InvokeAsync(false);
+    }
+}

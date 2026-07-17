@@ -1,0 +1,103 @@
+<div class="card shadow-sm p-3 mb-3" style="border-radius: 10px;">
+    <label class="form-label fw-semibold mb-2">
+        @Pregunta.Titulo
+        @if (Pregunta.Obligatoria)
+        {
+            <span class="text-danger ms-1">*</span>
+        }
+    </label>
+
+    @switch (Pregunta.Tipo)
+    {
+        case TipoPregunta.Texto:
+            <input class="form-control" placeholder="Escribe tu respuesta..."
+                   value="@(GetRespuesta())"
+                   @oninput="OnInputChanged" />
+            break;
+
+        case TipoPregunta.Numero:
+            <input type="number" class="form-control" placeholder="0"
+                   value="@(GetRespuesta())"
+                   @oninput="OnInputChanged" />
+            break;
+
+        case TipoPregunta.SiNo:
+            <select class="form-select"
+                    value="@(GetRespuesta())"
+                    @onchange="OnInputChanged">
+                <option value="">-- Selecciona --</option>
+                <option value="Si">Sí</option>
+                <option value="No">No</option>
+            </select>
+            break;
+
+        case TipoPregunta.Lista:
+            <select class="form-select"
+                    value="@(GetRespuesta())"
+                    @onchange="OnInputChanged">
+                <option value="">-- Selecciona --</option>
+                @foreach (var opcion in Pregunta.Opciones)
+                {
+                    <option value="@opcion">@opcion</option>
+                }
+            </select>
+            break;
+
+        case TipoPregunta.Fecha:
+            <input type="date" class="form-control"
+                   value="@(GetRespuesta())"
+                   @oninput="OnInputChanged" />
+            break;
+
+        case TipoPregunta.Foto:
+            <InputFile class="form-control" />
+            break;
+    }
+
+    @if (Pregunta.Tipo == TipoPregunta.SiNo && Pregunta.Reglas.Any())
+    {
+        var respuestaActual = GetRespuesta();
+        foreach (var regla in Pregunta.Reglas)
+        {
+            if (respuestaActual == regla.ValorDisparador && regla.SubPreguntas.Any())
+            {
+                <div style="margin-left: 45px; margin-top: 16px; padding-left: 20px; border-left: 3px solid #d9d9d9;">
+                    <div class="fw-semibold mb-2" style="color: #3C6A79; font-size: .85rem;">
+                        <i class="bi bi-chevron-down"></i> Cuando responda
+                        <strong>@regla.ValorDisparador</strong>
+                    </div>
+
+                    @foreach (var sub in regla.SubPreguntas)
+                    {
+                        <PreguntaResponse Pregunta="sub" Respuestas="Respuestas" />
+                    }
+                </div>
+            }
+        }
+    }
+</div>
+
+@code {
+
+    [Parameter]
+    public PreguntaModel Pregunta { get; set; } = default!;
+
+    [Parameter]
+    public Dictionary<Guid, string> Respuestas { get; set; } = new();
+
+    string GetRespuesta()
+    {
+        return Respuestas.TryGetValue(Pregunta.Id, out var valor) ? valor : "";
+    }
+
+    void SetRespuesta(string valor)
+    {
+        Respuestas[Pregunta.Id] = valor;
+    }
+
+    void OnInputChanged(ChangeEventArgs e)
+    {
+        SetRespuesta(e.Value?.ToString() ?? "");
+    }
+
+}

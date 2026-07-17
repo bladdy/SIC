@@ -11,7 +11,6 @@
                 <i class="bi bi-pencil-square"></i>
                 Constructor de Formularios
             </h3>
-            <small class="text-muted">Diseña tu checklist o inspección</small>
         </div>
         <button class="btn btn-custom">
             <i class="bi bi-floppy"></i> Guardar
@@ -35,14 +34,14 @@
 
     <!-- BOTÓN AGREGAR -->
     <button class="btn btn-custom w-100 mt-4 py-3 fw-semibold"
-            style="border: 2px dashed #ced4da; background: white; color: #3C6A79; border-radius: 12px; transition: .2s;"
+            style="background: white; color: #3C6A79; border-radius: 12px; transition: .2s;"
             @onclick="Agregar"
             onmouseover="this.style.background='#f8f9fa'; this.style.borderColor='#3C6A79';"
             onmouseout="this.style.background='white'; this.style.borderColor='#ced4da';">
         <i class="bi bi-plus-lg"></i> Agregar Nueva Pregunta
     </button>
 
-    #if DEBUG
+  
     <hr />
     <details class="mt-4">
         <summary class="fw-semibold text-muted">JSON del formulario</summary>
@@ -55,52 +54,33 @@
                 })
         </pre>
     </details>
-    #endif
 
 </div>
 
 @code {
 
     FormularioModel Formulario = new()
-        {
-            Titulo = "Inspección de Seguridad",
+    {
+        Titulo = "Restricciones alimenticias",
 
-            Preguntas =
+        Preguntas =
         {
             new()
             {
-                Titulo="¿El área está limpia?",
+                Titulo="¿Eres alergico?",
                 Tipo=TipoPregunta.SiNo,
                 Obligatoria=true
-            },
-
-            new()
-            {
-                Titulo="Temperatura del equipo",
-                Tipo=TipoPregunta.Numero
-            },
-
-            new()
-            {
-                Titulo="Nombre del inspector",
-                Tipo=TipoPregunta.Texto
-            },
-
-            new()
-            {
-                Titulo="Fecha de inspección",
-                Tipo=TipoPregunta.Fecha
             }
         }
-        };
+    };
 
     void Agregar()
     {
         Formulario.Preguntas.Add(new()
-            {
-                Titulo = "Nueva pregunta",
-                Tipo = TipoPregunta.Texto
-            });
+        {
+            Titulo = "Nueva pregunta",
+            Tipo = TipoPregunta.Texto
+        });
     }
 
     void Eliminar(PreguntaModel pregunta)

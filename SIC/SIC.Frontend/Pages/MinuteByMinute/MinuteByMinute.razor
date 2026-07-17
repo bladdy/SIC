@@ -1,0 +1,275 @@
+@page "/events/{EventId}/minute-by-minute"
+@using SIC.Frontend.Shared.Component.MinuteByMinute
+
+<PageTitle>Minuto a Minuto</PageTitle>
+
+<div style="max-width: 950px; margin: auto;">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h3 class="mb-0 d-flex align-items-center gap-2">
+                <i class="bi bi-stopwatch" style="color: #3C6A79;"></i>
+                Minuto a Minuto
+            </h3>
+            <small class="text-muted">@EventName</small>
+        </div>
+        <button class="btn btn-custom" @onclick="OpenCreateActivityModal">
+            <i class="bi bi-plus-lg me-1"></i>Agregar Actividad
+        </button>
+    </div>
+
+    <!-- DASHBOARD -->
+    <SummaryCards Total="@TotalActivities"
+                  Completed="@CompletedCount"
+                  InProgress="@InProgressCount"
+                  Pending="@PendingCount" />
+
+    <!-- FILTROS -->
+    <div class="card shadow-sm mb-4" style="border-radius: 12px; border: none;">
+        <div class="card-body py-3">
+            <div class="mbm-filter-bar">
+                <div class="flex-grow-1" style="min-width: 200px;">
+                    <div class="input-group">
+                        <span class="input-group-text" style="background: white; border-color: #ced4da;">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
+                        <input type="text" class="form-control" placeholder="Buscar actividad..."
+                               @bind="FilterText" @bind:event="oninput" />
+                    </div>
+                </div>
+                <select class="form-select" style="width: auto; min-width: 160px;" @bind="FilterStatus">
+                    <option value="">Todos los estados</option>
+                    @foreach (var s in Enum.GetValues<ActivityStatus>())
+                    {
+                        <option value="@s">@s</option>
+                    }
+                </select>
+                <select class="form-select" style="width: auto; min-width: 160px;" @bind="FilterPriority">
+                    <option value="">Todas las prioridades</option>
+                    @foreach (var p in Enum.GetValues<Priority>())
+                    {
+                        <option value="@p">@p</option>
+                    }
+                </select>
+                @if (!string.IsNullOrWhiteSpace(FilterText) || !string.IsNullOrWhiteSpace(FilterStatus) || !string.IsNullOrWhiteSpace(FilterPriority))
+                {
+                    <button class="btn btn-outline-secondary btn-sm" @onclick="ClearFilters">
+                        <i class="bi bi-x-circle me-1"></i>Limpiar
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <ul class="nav nav-tabs mb-4" style="border-bottom-color: #3C6A79;">
+        <li class="nav-item">
+            <button class="nav-link @(ActiveTab == "timeline" ? "active" : "")"
+                    style="@(ActiveTab == "timeline" ? "background: #3C6A79; color: white; border-color: #3C6A79;" : "color: #3C6A79;")"
+                    @onclick='() => ActiveTab = "timeline"'>
+                <i class="bi bi-clock-history me-1"></i>Minuto a Minuto
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link @(ActiveTab == "activities" ? "active" : "")"
+                    style="@(ActiveTab == "activities" ? "background: #3C6A79; color: white; border-color: #3C6A79;" : "color: #3C6A79;")"
+                    @onclick='() => ActiveTab = "activities"'>
+                <i class="bi bi-list-task me-1"></i>Actividades
+            </button>
+        </li>
+    </ul>
+
+    @if (FilteredActivities.Any())
+    {
+        <!-- TAB: MINUTO A MINUTO -->
+        @if (ActiveTab == "timeline")
+        {
+            <!-- DESKTOP -->
+            <div class="table-responsive d-none d-md-block">
+                <table class="table table-hover align-middle mb-0">
+                    <thead style="background-color: #3C6A79; color: white;">
+                        <tr class="text-center">
+                            <th style="width: 100px;">Hora</th>
+                            <th class="text-start">Actividad</th>
+                            <th class="text-start">Proveedor / Responsable</th>
+                            <th style="width: 130px;">Estado</th>
+                            <th style="width: 80px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var activity in FilteredActivities)
+                        {
+                            <tr>
+                                <td class="text-center">
+                                    <span class="mbm-time-badge">
+                                        @activity.StartTime.ToString("HH:mm")
+                                        @if (activity.EndTime.HasValue)
+                                        {
+                                            <span> - @activity.EndTime.Value.ToString("HH:mm")</span>
+                                        }
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="mbm-timeline-dot-sm status-@activity.Status.ToString().ToLower()"></div>
+                                        <div>
+                                            <div class="fw-semibold">@activity.Title</div>
+                                            <small class="text-muted">@activity.Description</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    @if (activity.Providers.Any())
+                                    {
+                                        <div class="d-flex flex-column">
+                                            @foreach (var provider in activity.Providers.Take(2))
+                                            {
+                                                <small class="fw-semibold">@provider.Name</small>
+                                                <small class="text-muted">@provider.Service</small>
+                                            }
+                                            @if (activity.Providers.Count > 2)
+                                            {
+                                                <small class="text-muted">+@(activity.Providers.Count - 2) mas</small>
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <small class="text-muted fst-italic">Sin asignar</small>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-@(GetStatusColor(activity.Status))">@activity.Status</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-link text-secondary p-0" data-bs-toggle="dropdown">
+                                            <i class="bi bi-three-dots-vertical fs-5"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li>
+                                                <button class="dropdown-item" @onclick="() => OpenEditActivityModal(activity)">
+                                                    <i class="bi bi-pencil me-2 text-primary"></i>Editar
+                                                </button>
+                                            </li>
+                                            <li><hr class="dropdown-divider" /></li>
+                                            <li>
+                                                <button class="dropdown-item text-danger" @onclick="() => ConfirmDeleteActivity(activity)">
+                                                    <i class="bi bi-trash me-2"></i>Eliminar
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- MOBILE -->
+            <div class="d-block d-md-none">
+                @foreach (var activity in FilteredActivities)
+                {
+                    <div class="card mb-3 shadow-sm" style="border-radius: 10px; border-left: 4px solid @(GetStatusColorBorder(activity.Status));">
+                        <div class="card-body py-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="d-flex gap-2 flex-grow-1">
+                                    <span class="mbm-time-badge mt-1">@activity.StartTime.ToString("HH:mm")</span>
+                                    <div>
+                                        <div class="fw-bold">@activity.Title</div>
+                                        <small class="text-muted d-block">@activity.Description</small>
+                                        <div class="mt-1">
+                                            @if (activity.Providers.Any())
+                                            {
+                                                <small><i class="bi bi-truck me-1 text-muted"></i>@activity.Providers.First().Name</small>
+                                            }
+                                            else
+                                            {
+                                                <small class="text-muted fst-italic"><i class="bi bi-person me-1"></i>Sin asignar</small>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-link text-secondary p-0" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li>
+                                            <button class="dropdown-item" @onclick="() => OpenEditActivityModal(activity)">
+                                                <i class="bi bi-pencil me-2 text-primary"></i>Editar
+                                            </button>
+                                        </li>
+                                        <li><hr class="dropdown-divider" /></li>
+                                        <li>
+                                            <button class="dropdown-item text-danger" @onclick="() => ConfirmDeleteActivity(activity)">
+                                                <i class="bi bi-trash me-2"></i>Eliminar
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <span class="badge bg-@(GetStatusColor(activity.Status))">@activity.Status</span>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        <!-- TAB: ACTIVIDADES -->
+        @if (ActiveTab == "activities")
+        {
+            
+                @foreach (var activity in FilteredActivities)
+                {
+                    <div class="mbm-timeline-item">
+                        <ActivityCard Activity="activity"
+                                      OnEditActivity="OpenEditActivityModal"
+                                      OnDeleteActivity="ConfirmDeleteActivity"
+                                      OnAddTaskClick="HandleAddTask"
+                                      OnEditTaskClick="HandleEditTask"
+                                      OnDeleteTaskClick="HandleDeleteTask"
+                                      OnToggleTaskClick="HandleToggleTask"
+                                      OnAddProviderClick="HandleAddProvider"
+                                      OnEditProviderClick="HandleEditProvider"
+                                      OnDeleteProviderClick="HandleDeleteProvider" />
+                    </div>
+                }
+        }
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-calendar-x text-muted" style="font-size: 3rem;"></i>
+            <p class="text-muted mt-3 mb-0">No se encontraron actividades con los filtros aplicados.</p>
+        </div>
+    }
+</div>
+
+<!-- MODALS -->
+<ActivityModal IsVisible="@IsActivityModalVisible"
+               IsVisibleChanged="@(v => IsActivityModalVisible = v)"
+               IsEdit="@IsActivityEditMode"
+               Model="@EditingActivity"
+               OnSave="SaveActivity" />
+
+<ProviderModal IsVisible="@IsProviderModalVisible"
+               IsVisibleChanged="@(v => IsProviderModalVisible = v)"
+               IsEdit="@(EditingProvider.Id != Guid.Empty)"
+               Model="@EditingProvider"
+               OnSave="SaveProvider" />
+
+<TaskModal IsVisible="@IsTaskModalVisible"
+           IsVisibleChanged="@(v => IsTaskModalVisible = v)"
+           IsEdit="@(EditingTask.Id != Guid.Empty)"
+           Model="@EditingTask"
+           OnSave="SaveTask" />
+
+<ConfirmModal IsVisible="@IsConfirmVisible"
+              IsVisibleChanged="@(v => IsConfirmVisible = v)"
+              Message="Estas seguro que deseas eliminar esta actividad y todo su contenido?"
+              OnConfirmAction="DeleteActivity" />

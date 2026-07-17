@@ -1,0 +1,162 @@
+::deep .mbm-timeline {
+    position: relative;
+    padding-left: 2.5rem;
+}
+
+::deep .mbm-timeline::before {
+    content: "";
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, #3C6A79, #d9d9d9);
+    border-radius: 2px;
+}
+
+::deep .mbm-timeline-item {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+::deep .mbm-timeline-dot {
+    position: absolute;
+    left: -2.5rem;
+    top: 1.5rem;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 2px #3C6A79;
+    z-index: 2;
+}
+
+::deep .mbm-timeline-dot.status-completada {
+    background-color: #198754;
+    box-shadow: 0 0 0 2px #198754;
+}
+
+::deep .mbm-timeline-dot.status-enprogreso {
+    background-color: #ffc107;
+    box-shadow: 0 0 0 2px #ffc107;
+}
+
+::deep .mbm-timeline-dot.status-pendiente {
+    background-color: #6c757d;
+    box-shadow: 0 0 0 2px #6c757d;
+}
+
+::deep .mbm-timeline-dot.status-cancelada {
+    background-color: #dc3545;
+    box-shadow: 0 0 0 2px #dc3545;
+}
+
+::deep .mbm-card {
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    transition: all 0.2s ease;
+    overflow: hidden;
+}
+
+::deep .mbm-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-color: #3C6A79;
+}
+
+::deep .mbm-card-header {
+    cursor: pointer;
+    user-select: none;
+}
+
+::deep .mbm-expand-section {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+::deep .mbm-expand-section.expanded {
+    max-height: 2000px;
+}
+
+::deep .mbm-stat-card {
+    border-radius: 12px;
+    border: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+::deep .mbm-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+}
+
+::deep .mbm-stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+}
+
+::deep .mbm-task-check {
+    accent-color: #3C6A79;
+}
+
+::deep .mbm-provider-card {
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    background: #f8f9fa;
+    transition: background 0.15s ease;
+}
+
+::deep .mbm-provider-card:hover {
+    background: #e9ecef;
+}
+
+::deep .mbm-time-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    background: #e9ecef;
+    color: #495057;
+    white-space: nowrap;
+}
+
+::deep .mbm-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+::deep .mbm-timeline-dot-sm {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 4px;
+}
+
+::deep .mbm-timeline-dot-sm.status-completada { background-color: #198754; }
+::deep .mbm-timeline-dot-sm.status-enprogreso { background-color: #ffc107; }
+::deep .mbm-timeline-dot-sm.status-pendiente { background-color: #6c757d; }
+::deep .mbm-timeline-dot-sm.status-cancelada { background-color: #dc3545; }
+
+@media (max-width: 767.98px) {
+    ::deep .mbm-timeline {
+        padding-left: 2rem;
+    }
+
+    ::deep .mbm-timeline-dot {
+        left: -2rem;
+        width: 12px;
+        height: 12px;
+    }
+
+    ::deep .mbm-timeline::before {
+        left: 11px;
+    }
+}

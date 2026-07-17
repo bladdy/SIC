@@ -1,0 +1,61 @@
+@using SIC.Frontend.Pages.MinuteByMinute
+
+@if (IsVisible)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content" style="border-radius: 12px; border: none;">
+                <div class="modal-header" style="background: #3C6A79; color: white; border-radius: 12px 12px 0 0;">
+                    <h5 class="modal-title fw-semibold">
+                        <i class="bi bi-check2-square me-2"></i>@(IsEdit ? "Editar Tarea" : "Nueva Tarea")
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" @onclick="OnClose"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Titulo *</label>
+                        <input class="form-control" @bind="Model.Title" placeholder="Ej. Verificar menu final" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Asignado a</label>
+                        <input class="form-control" @bind="Model.AssignedTo" placeholder="Ej. Carlos (Planner)" />
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label class="form-label fw-semibold">Fecha Limite</label>
+                            <input type="datetime-local" class="form-control" @bind="Model.DueDate" />
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-semibold">Prioridad</label>
+                            <select class="form-select" @bind="Model.Priority">
+                                @foreach (var p in Enum.GetValues<Priority>())
+                                {
+                                    <option value="@p">@p</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid #e9ecef;">
+                    <button class="btn btn-custom btn-sm" @onclick="OnSave">
+                        <i class="bi bi-check-lg me-1"></i>Guardar
+                    </button>
+                    <button class="btn btn-secondary btn-sm" @onclick="OnClose">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
+    [Parameter] public bool IsEdit { get; set; }
+    [Parameter] public MbMTask Model { get; set; } = default!;
+    [Parameter] public EventCallback OnSave { get; set; }
+
+    private async Task OnClose()
+    {
+        await IsVisibleChanged.InvokeAsync(false);
+    }
+}
