@@ -1,5 +1,7 @@
 @page "/events/{EventId}/minute-by-minute"
 @using SIC.Frontend.Shared.Component.MinuteByMinute
+@using SIC.Shared.Enums
+@using SIC.Shared.Entities
 
 <PageTitle>Minuto a Minuto</PageTitle>
 
@@ -14,9 +16,12 @@
             </h3>
             <small class="text-muted">@EventName</small>
         </div>
-        <button class="btn btn-custom" @onclick="OpenCreateActivityModal">
-            <i class="bi bi-plus-lg me-1"></i>Agregar Actividad
-        </button>
+        @if (!ShowCreateMbM)
+        {
+            <button class="btn btn-custom" @onclick="OpenCreateActivityModal">
+                <i class="bi bi-plus-lg me-1"></i>Agregar Actividad
+            </button>
+        }
     </div>
 
     <!-- DASHBOARD -->
@@ -38,6 +43,12 @@
                                @bind="FilterText" @bind:event="oninput" />
                     </div>
                 </div>
+                @if (!string.IsNullOrWhiteSpace(FilterText) || !string.IsNullOrWhiteSpace(FilterStatus) || !string.IsNullOrWhiteSpace(FilterPriority))
+                {
+                    <button class="btn btn-outline-secondary btn-sm" @onclick="ClearFilters">
+                        <i class="bi bi-x-circle me-1"></i>Limpiar
+                    </button>
+                }
                 <select class="form-select" style="width: auto; min-width: 160px;" @bind="FilterStatus">
                     <option value="">Todos los estados</option>
                     @foreach (var s in Enum.GetValues<ActivityStatus>())
@@ -47,17 +58,11 @@
                 </select>
                 <select class="form-select" style="width: auto; min-width: 160px;" @bind="FilterPriority">
                     <option value="">Todas las prioridades</option>
-                    @foreach (var p in Enum.GetValues<Priority>())
+                    @foreach (var p in Enum.GetValues<ActivityPriority>())
                     {
                         <option value="@p">@p</option>
                     }
                 </select>
-                @if (!string.IsNullOrWhiteSpace(FilterText) || !string.IsNullOrWhiteSpace(FilterStatus) || !string.IsNullOrWhiteSpace(FilterPriority))
-                {
-                    <button class="btn btn-outline-secondary btn-sm" @onclick="ClearFilters">
-                        <i class="bi bi-x-circle me-1"></i>Limpiar
-                    </button>
-                }
             </div>
         </div>
     </div>
@@ -86,7 +91,7 @@
         @if (ActiveTab == "timeline")
         {
             <!-- DESKTOP -->
-            <div class="table-responsive d-none d-md-block">
+            <div class="d-none d-md-block">
                 <table class="table table-hover align-middle mb-0">
                     <thead style="background-color: #3C6A79; color: white;">
                         <tr class="text-center">
@@ -174,45 +179,45 @@
                 {
                     <div class="card mb-3 shadow-sm" style="border-radius: 10px; border-left: 4px solid @(GetStatusColorBorder(activity.Status));">
                         <div class="card-body py-3">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div class="d-flex gap-2 flex-grow-1">
-                                    <span class="mbm-time-badge mt-1">@activity.StartTime.ToString("HH:mm")</span>
-                                    <div>
-                                        <div class="fw-bold">@activity.Title</div>
-                                        <small class="text-muted d-block">@activity.Description</small>
-                                        <div class="mt-1">
-                                            @if (activity.Providers.Any())
-                                            {
-                                                <small><i class="bi bi-truck me-1 text-muted"></i>@activity.Providers.First().Name</small>
-                                            }
-                                            else
-                                            {
-                                                <small class="text-muted fst-italic"><i class="bi bi-person me-1"></i>Sin asignar</small>
-                                            }
-                                        </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="mbm-time-badge">@activity.StartTime.ToString("HH:mm")</span>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-@(GetStatusColor(activity.Status))">@activity.Status</span>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-link text-secondary p-0" data-bs-toggle="dropdown">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li>
+                                                <button class="dropdown-item" @onclick="() => OpenEditActivityModal(activity)">
+                                                    <i class="bi bi-pencil me-2 text-primary"></i>Editar
+                                                </button>
+                                            </li>
+                                            <li><hr class="dropdown-divider" /></li>
+                                            <li>
+                                                <button class="dropdown-item text-danger" @onclick="() => ConfirmDeleteActivity(activity)">
+                                                    <i class="bi bi-trash me-2"></i>Eliminar
+                                                </button>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </div>
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-link text-secondary p-0" data-bs-toggle="dropdown">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end">
-                                        <li>
-                                            <button class="dropdown-item" @onclick="() => OpenEditActivityModal(activity)">
-                                                <i class="bi bi-pencil me-2 text-primary"></i>Editar
-                                            </button>
-                                        </li>
-                                        <li><hr class="dropdown-divider" /></li>
-                                        <li>
-                                            <button class="dropdown-item text-danger" @onclick="() => ConfirmDeleteActivity(activity)">
-                                                <i class="bi bi-trash me-2"></i>Eliminar
-                                            </button>
-                                        </li>
-                                    </ul>
-                                </div>
                             </div>
-                            <div class="mt-2">
-                                <span class="badge bg-@(GetStatusColor(activity.Status))">@activity.Status</span>
+                            <div class="mt-2 fw-bold">@activity.Title</div>
+                            <div class="mt-1 small text-muted">@activity.Description</div>
+                            <div class="mt-1">
+                                @if (activity.Providers.Any())
+                                {
+                                    <small>
+                                        <i class="bi bi-truck me-1 text-muted"></i>@string.Join(", ", activity.Providers
+                                        .Where(p => !string.IsNullOrWhiteSpace(p.Name))
+                                        .Select(p => p.Name))
+                                    </small>
+                                }
+                                else
+                                {
+                                    <small class="text-muted fst-italic"><i class="bi bi-person me-1"></i>Sin asignar</small>
+                                }
                             </div>
                         </div>
                     </div>
@@ -241,7 +246,32 @@
                 }
         }
     }
-    else
+
+    @if (ShowCreateMbM)
+    {
+        <div class="card shadow-sm mt-4" style="border-radius: 12px; border: none;">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-stopwatch text-muted" style="font-size: 3rem;"></i>
+                <h5 class="mt-3" style="color: #3C6A79;">No existe un Minuto a Minuto para este evento</h5>
+                <p class="text-muted mb-4">Crea uno para comenzar a planificar las actividades.</p>
+                <div class="row justify-content-center">
+                    <div class="col-12 col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: white; border-color: #ced4da;">
+                                <i class="bi bi-pencil text-muted"></i>
+                            </span>
+                            <input type="text" class="form-control" placeholder="Título del Minuto a Minuto"
+                                   @bind="NewMbMTitle" />
+                            <button class="btn" style="background: #3C6A79; color: white;" @onclick="CreateMbMAsync">
+                                <i class="bi bi-plus-lg me-1"></i>Crear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else if (!FilteredActivities.Any())
     {
         <div class="text-center py-5">
             <i class="bi bi-calendar-x text-muted" style="font-size: 3rem;"></i>
@@ -259,17 +289,17 @@
 
 <ProviderModal IsVisible="@IsProviderModalVisible"
                IsVisibleChanged="@(v => IsProviderModalVisible = v)"
-               IsEdit="@(EditingProvider.Id != Guid.Empty)"
+               IsEdit="@(EditingProvider.Id > 0)"
                Model="@EditingProvider"
                OnSave="SaveProvider" />
 
 <TaskModal IsVisible="@IsTaskModalVisible"
            IsVisibleChanged="@(v => IsTaskModalVisible = v)"
-           IsEdit="@(EditingTask.Id != Guid.Empty)"
+           IsEdit="@(EditingTask.Id > 0)"
            Model="@EditingTask"
            OnSave="SaveTask" />
 
 <ConfirmModal IsVisible="@IsConfirmVisible"
               IsVisibleChanged="@(v => IsConfirmVisible = v)"
-              Message="Estas seguro que deseas eliminar esta actividad y todo su contenido?"
-              OnConfirmAction="DeleteActivity" />
+              Message="@ConfirmMessage"
+              OnConfirmAction="ConfirmAction" />

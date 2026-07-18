@@ -29,6 +29,7 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
         options.JsonSerializerOptions.DefaultIgnoreCondition =
            JsonIgnoreCondition.WhenWritingNull;
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -134,6 +135,18 @@ builder.Services.AddScoped<IUsuarioWhatsAppConfigUnitOfWork, UsuarioWhatsAppConf
 
 builder.Services.AddScoped<IWhatsAppTemplateRepository, WhatsAppTemplateRepository>();
 builder.Services.AddScoped<IWhatsAppTemplateUnitOfWork, WhatsAppTemplateUnitOfWork>();
+
+builder.Services.AddScoped<IMinuteByMinuteRepository, MinuteByMinuteRepository>();
+builder.Services.AddScoped<IMinuteByMinuteUnitOfWork, MinuteByMinuteUnitOfWork>();
+
+builder.Services.AddScoped<IMbMActivityRepository, MbMActivityRepository>();
+builder.Services.AddScoped<IMbMActivityUnitOfWork, MbMActivityUnitOfWork>();
+
+builder.Services.AddScoped<IMbMProviderRepository, MbMProviderRepository>();
+builder.Services.AddScoped<IMbMProviderUnitOfWork, MbMProviderUnitOfWork>();
+
+builder.Services.AddScoped<IMbMTaskRepository, MbMTaskRepository>();
+builder.Services.AddScoped<IMbMTaskUnitOfWork, MbMTaskUnitOfWork>();
 
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {

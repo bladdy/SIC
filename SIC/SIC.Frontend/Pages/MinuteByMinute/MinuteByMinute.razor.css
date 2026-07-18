@@ -159,4 +159,43 @@
     ::deep .mbm-timeline::before {
         left: 11px;
     }
+
+    ::deep .mbm-filter-bar {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    ::deep .mbm-filter-bar .flex-grow-1 {
+        flex: 1 1 100%;
+        min-width: 0 !important;
+    }
+
+    ::deep .mbm-filter-bar:has(.btn) .flex-grow-1 {
+        flex: 1 1 calc(50% - 3px);
+    }
+
+    ::deep .mbm-filter-bar .btn {
+        flex: 1 1 calc(50% - 3px);
+        min-width: 0 !important;
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    ::deep .mbm-filter-bar .form-select {
+        flex: 1 1 calc(50% - 3px);
+        min-width: 0 !important;
+        width: auto !important;
+        font-size: 0.8rem;
+        padding: 0.25rem 1.5rem 0.25rem 0.5rem;
+    }
+
+    ::deep .mbm-filter-bar .form-control {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    ::deep .mbm-filter-bar .input-group-text {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
 }

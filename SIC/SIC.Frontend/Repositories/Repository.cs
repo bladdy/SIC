@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace SIC.Frontend.Repositories;
 
@@ -16,7 +17,8 @@ public class Repository : IRepository
 
     private JsonSerializerOptions _jsonDefaultOptions => new JsonSerializerOptions
     {
-        PropertyNameCaseInsensitive = true
+        PropertyNameCaseInsensitive = true,
+        Converters = { new JsonStringEnumConverter() }
     };
 
     public Repository(HttpClient httpClient, AuthenticationProviderJWT authProvider)
@@ -175,7 +177,11 @@ public class Repository : IRepository
             var responseBody = await response.Content.ReadAsStringAsync();
             var result = JsonSerializer.Deserialize<TResponse>(
                 responseBody,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                    Converters = { new JsonStringEnumConverter() }
+                });
 
             return new HttpResponseWrapper<TResponse>(result, false, response);
         }

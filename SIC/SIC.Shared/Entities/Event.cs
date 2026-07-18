@@ -82,6 +82,9 @@ public class Event : IEntityWithName
 
     public Message? Message { get; set; }
 
+    // 🔹 Minute by Minute
+    public MinuteByMinute? MinuteByMinute { get; set; }
+
     public User? User { get; set; }
     public string? UserId { get; set; }
 

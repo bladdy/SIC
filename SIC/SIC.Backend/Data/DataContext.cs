@@ -38,6 +38,10 @@ public class DataContext : IdentityDbContext<User>
     public DbSet<TemplateSent> TemplateSents { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<StripeEventLog> StripeEventLogs { get; set; }
+    public DbSet<MinuteByMinute> MinuteByMinutes { get; set; }
+    public DbSet<MbMActivity> MbMActivities { get; set; }
+    public DbSet<MbMProvider> MbMProviders { get; set; }
+    public DbSet<MbMTask> MbMTasks { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -47,6 +51,7 @@ public class DataContext : IdentityDbContext<User>
         modelBuilder.Entity<Plan>().HasIndex(x => x.Name).IsUnique();
         modelBuilder.Entity<PlanItem>().HasIndex(x => new { x.PlanId, x.ItemId }).IsUnique();
         modelBuilder.Entity<InvitationEntry>().HasIndex(x => x.Code).IsUnique();
+        modelBuilder.Entity<MinuteByMinute>().HasIndex(x => x.EventId).IsUnique();
 
         DisableCascadingDelete(modelBuilder);
 
