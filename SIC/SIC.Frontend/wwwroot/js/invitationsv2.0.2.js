@@ -2,8 +2,8 @@
 //  VARIABLES GLOBALES
 // ===============================================================
 let invitacion = null;
-//const apiUrl = "https://localhost:7141/api/Invitations"; // Cambia si es necesario
-const apiUrl = "https://invboxv-app.com/api/Invitations"; // Cambia si es necesario
+const apiUrl = "https://localhost:7141/api/Invitations"; // Cambia si es necesario
+//const apiUrl = "https://invboxv-app.com/api/Invitations"; // Cambia si es necesario
 
 // ===============================================================
 //  CARGAR INVITACIÓN POR CÓDIGO EN LA URL
@@ -75,9 +75,9 @@ function renderFormulario() {
 //  CONTAR ADULTOS / JÓVENES / NIÑOS
 // ===============================================================
 function contarInvitados() {
-    let adultos = invitacion.guests.filter(g => g.guestType === 1).length;
-    let jovenes = invitacion.guests.filter(g => g.guestType === 2).length;
-    let menores = invitacion.guests.filter(g => g.guestType === 3).length;
+    let adultos = invitacion.guests.filter(g => g.guestType === "Adult").length;
+    let jovenes = invitacion.guests.filter(g => g.guestType === "Youth").length;
+    let menores = invitacion.guests.filter(g => g.guestType === "Children").length;
 
     document.getElementById("invitados_mayores").innerText = `Adultos invitados: ${adultos}`;
 
@@ -126,8 +126,8 @@ function generarListadoInvitados() {
                                type="radio"
                                name="guest_${index}"
                                value="19"
-                               onchange="marcarAsistencia(${index}, 19)"
-                               ${Number(g.status) === 19 ? "checked" : ""}>
+                               onchange="marcarAsistencia(${index}, 'Attend')"
+                               ${String(g.status) === 'Attend' ? "checked" : ""}>
                         Sí
                     </label>
 
@@ -137,8 +137,8 @@ function generarListadoInvitados() {
                                type="radio"
                                name="guest_${index}"
                                value="20"
-                               onchange="marcarAsistencia(${index}, 20)"
-                               ${Number(g.status) === 20 ? "checked" : ""}>
+                               onchange="marcarAsistencia(${index}, 'NotAttend')"
+                               ${String(g.status) === 'NotAttend' ? "checked" : ""}>
                         No
                     </label>
 
@@ -160,10 +160,12 @@ function marcarAsistencia(index, valor) {
 //  SELECCIÓN "SÍ ASISTIRÉ / NO ASISTIRÉ"
 // ===============================================================
 function fn_asistencia(tipo) {
+
+    console.log(invitacion)
     if (tipo === "n") {
         // NO ASISTIRÁ → todos status = 20
         invitacion.status = 20;
-        invitacion.guests.forEach(g => g.status = 20);
+        invitacion.guests.forEach(g => g.status = 'NotAttend');
 
         document.getElementById("guestListContainer").style.display = "none";
     }
@@ -171,7 +173,7 @@ function fn_asistencia(tipo) {
     if (tipo === "s") {
         // SÍ ASISTIRÁ → todos status = 19
         invitacion.status = 19;
-        invitacion.guests.forEach(g => g.status = 19);
+        invitacion.guests.forEach(g => g.status = 'Attend');
 
         document.getElementById("guestListContainer").style.display = "block";
     }
@@ -203,7 +205,7 @@ async function sendRespuesta() {
         });
         const data = await response.json();
         mostrarGracias(data);
-        if (invitacion.status === 19) {
+        if (invitacion.status === "Attend") {
             cargarQRAndPdf(invitacion.code, invitacion.event.code)
         }
     } catch (error) {
@@ -239,7 +241,6 @@ function mostrarNoInvitacion(code) {
 }
 
 function cargarQRAndPdf(codigoInvitacion, codigoEvento) {
-    console.log(codigoInvitacion, codigoEvento)
     const qrUrl = `${apiUrl}/qr?codigo=${codigoInvitacion}&evento=${codigoEvento}`;
 
     fetch(qrUrl)

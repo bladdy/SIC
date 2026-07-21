@@ -141,9 +141,9 @@ namespace SIC.Frontend.Pages.Confirmations
                     {
                         Id = g.Id,
                         GuestName = g.GuestName,
-                        GuestType = (int)g.GuestType,
+                        GuestType = g.GuestType.ToString(),
                         InvitationId = g.InvitationId,
-                        Status = (int)g.Status
+                        Status = g.Status.ToString(),
                     })
                     .ToList()
             };
@@ -167,6 +167,7 @@ namespace SIC.Frontend.Pages.Confirmations
                 await sweetAlertService.FireAsync("Error", error, SweetAlertIcon.Error);
             }
         }
+
         private async Task CargarQr()
         {
             try

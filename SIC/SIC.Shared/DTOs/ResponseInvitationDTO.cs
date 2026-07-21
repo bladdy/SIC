@@ -18,9 +18,9 @@ namespace SIC.Shared.DTOs
     {
         public int Id { get; set; }
         public string? GuestName { get; set; }
-        public int GuestType { get; set; }
+        public string? GuestType { get; set; }
         public int InvitationId { get; set; }
-        public int Status { get; set; }
+        public string? Status { get; set; }
         public object? Invitation { get; set; }
     }
 }

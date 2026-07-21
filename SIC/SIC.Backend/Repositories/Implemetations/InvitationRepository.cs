@@ -45,7 +45,7 @@ namespace SIC.Backend.Repositories.Implemetations
         public override async Task<ActionResponse<IEnumerable<Invitation>>> GetAsync(PaginationDTO pagination)
         {
             //ToDo: Agregar el filtro para que filte cada uno de los Guests
-            var queryable = _context.Invitations.Include(t => t.TemplateSents).Include(g => g.Guests).Include(t =>t.TablesEvents).AsQueryable();
+            var queryable = _context.Invitations.Include(t => t.TemplateSents).Include(g => g.Guests).Include(t => t.TablesEvents).AsQueryable();
             queryable = queryable.Where(x => x.EventId == pagination.Id);
 
             if (!string.IsNullOrWhiteSpace(pagination.Filter))
@@ -274,7 +274,7 @@ namespace SIC.Backend.Repositories.Implemetations
         public async Task<ActionResponse<IEnumerable<Invitation>>> GetAllAsync(string code)
         {
             var invitations = await _context.Invitations.Include(e => e.Event)
-                .ThenInclude(e => e!.EventType).Include(g=> g.Guests).Include(t=> t.TablesEvents)
+                .ThenInclude(e => e!.EventType).Include(g => g.Guests).Include(t => t.TablesEvents)
                 .Where(x => x.Event!.Code == code && x.Status == Status.Attend && x.TablesEvents == null)
                 .ToListAsync();
             if (invitations == null)
@@ -433,9 +433,9 @@ namespace SIC.Backend.Repositories.Implemetations
                 var dbGuestsDict = invitations.Guests.ToDictionary(g => g.Id);
 
                 // Actualizar los contadores de confirmación
-                invitations.NumberConfirmedAdults = invitation.Guests.Count(T => T.GuestType == 1 && T.Status == 19);
-                invitations.NumberConfirmedYouths = invitation.Guests.Count(T => T.GuestType == 2 && T.Status == 19);
-                invitations.NumberConfirmedChildren = invitation.Guests.Count(T => T.GuestType == 3 && T.Status == 19);
+                invitations.NumberConfirmedAdults = invitation.Guests.Count(T => T.GuestType == "Adult" && T.Status == "Attend");
+                invitations.NumberConfirmedYouths = invitation.Guests.Count(T => T.GuestType == "Youth" && T.Status == "Attend");
+                invitations.NumberConfirmedChildren = invitation.Guests.Count(T => T.GuestType == "Children" && T.Status == "Attend");
                 invitations.ConfirmationDate = DateTime.Now;
                 invitations.Comments = invitation.Comments;
 
