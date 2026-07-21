@@ -2,8 +2,8 @@
 //  VARIABLES GLOBALES
 // ===============================================================
 let invitacion = null;
-const apiUrl = "https://localhost:7141/api/Invitations"; // Cambia si es necesario
-//const apiUrl = "https://invboxv-app.com/api/Invitations"; // Cambia si es necesario
+//const apiUrl = "https://localhost:7141/api/Invitations"; // Cambia si es necesario
+const apiUrl = "https://invboxv-app.com/api/Invitations"; // Cambia si es necesario
 
 // ===============================================================
 //  CARGAR INVITACIÓN POR CÓDIGO EN LA URL
@@ -160,7 +160,6 @@ function marcarAsistencia(index, valor) {
 //  SELECCIÓN "SÍ ASISTIRÉ / NO ASISTIRÉ"
 // ===============================================================
 function fn_asistencia(tipo) {
-
     console.log(invitacion)
     if (tipo === "n") {
         // NO ASISTIRÁ → todos status = 20
