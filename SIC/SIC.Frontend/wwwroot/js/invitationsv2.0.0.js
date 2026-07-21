@@ -33,19 +33,20 @@ function cargarInvitacion(code) {
                 return response.json();
             })
             .then(data => {
+                console.log(data);
                 if (!data || Object.keys(data).length === 0) {
                     mostrarNoInvitacion(code);
                     return;
                 }
                 invitacion = data;
-                if (invitacion.status === 19) {
+                if (invitacion.status === "Attend") {
                     mostrarGracias(data);
                     cargarQRAndPdf(invitacion.code, invitacion.event.code)
                 }
-                else if (invitacion.status === 20) {
+                else if (invitacion.status === "NotAttend") {
                     mostrarGracias(data);
                 }
-                else if (data.status === 2) {
+                else if (data.status === "Pending") {
                     renderFormulario();
                 }
             })
