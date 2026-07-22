@@ -134,7 +134,7 @@ namespace SIC.Frontend.Pages.Confirmations
             var dto = new ResponseInvitationDTO
             {
                 Code = Invitacion.Code!,
-                Status = (int)Invitacion.Status,
+                Status = Invitacion.Status.ToString(),
                 Comments = Comentarios,
                 Guests = Invitacion.Guests
                     .Select(g => new GuestDTO
