@@ -448,7 +448,18 @@ namespace SIC.Backend.Repositories.Implemetations
                     }
                 }
 
-                invitations.Status = (Shared.Enums.Status)invitation.Status;
+                if (Enum.TryParse<Status>(invitation.Status, true, out var status))
+                {
+                    invitations.Status = status;
+                }
+                else
+                {
+                    return new ActionResponse<ResponseInvitationDTO>
+                    {
+                        Success = false,
+                        Message = "El estado no es compatible"
+                    };
+                }
 
                 // Guardar cambios en la invitación
                 _context.Update(invitations);

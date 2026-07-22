@@ -10,7 +10,7 @@ namespace SIC.Shared.DTOs
     {
         public List<GuestDTO> Guests { get; set; } = null!;
         public string Code { get; set; } = null!;
-        public int Status { get; set; }
+        public string? Status { get; set; }
         public string? Comments { get; set; }
     }
 
