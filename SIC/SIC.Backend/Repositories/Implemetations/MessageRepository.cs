@@ -440,43 +440,62 @@ namespace SIC.Backend.Repositories.Implemetations
 
         public async Task<List<InboxConversationDto>> GetInboxAsync(string phoneNumber, string eventC)
         {
-            var lastMessages = await _context.ResponseFromWhatsApps
-                    .AsNoTracking()
-                    .Where(m => m.PhoneNumber == phoneNumber && m.EventCode == eventC) // Filtrar por usuario
-                    .GroupBy(m => new
-                    {
-                        m.From,
-                        m.EventCode,
-                        m.EventName,
-                        m.NameConversation
-                    })
-                    .Select(g => g
-                        .OrderByDescending(m => m.CreatedAt)
-                        .First())
-                    .ToListAsync(); // 👈 aquí se ejecuta en SQL
+            // Último mensaje OUT por contacto
+            var ultimoMensajePorContacto = await _context.ResponseFromWhatsApps
+                .AsNoTracking()
+                .Where(x =>
+                    x.PhoneNumber == phoneNumber &&
+                    x.Direction == "OUT")
+                .GroupBy(x => x.From)
+                .Select(g => g
+                    .OrderByDescending(x => x.CreatedAt)
+                    .First())
+                .ToListAsync();
 
-            return lastMessages
-                .Select(m => new InboxConversationDto
+            // Solo los contactos cuyo último OUT pertenece al evento seleccionado
+            var contactosDelEvento = ultimoMensajePorContacto
+                .Where(x => x.EventCode == eventC)
+                .ToList();
+
+            var unreadCounts = await _context.ResponseFromWhatsApps
+                .AsNoTracking()
+                .Where(x =>
+                    x.PhoneNumber == phoneNumber &&
+                    x.Direction == "IN" &&
+                    !string.IsNullOrEmpty(x.MessageId) &&
+                    x.Status != "seen")
+                .GroupBy(x => new { x.From, x.EventCode })
+                .Select(g => new
                 {
-                    PhoneNumber = m.From,
-                    EventCode = m.EventCode,
-                    EventName = m.EventName,
-                    NameConversation = m.NameConversation,
+                    g.Key.From,
+                    g.Key.EventCode,
+                    Count = g.Count()
+                })
+                .ToDictionaryAsync(
+                    x => $"{x.From}|{x.EventCode}",
+                    x => x.Count);
 
-                    LastMessage = m.Message,
-                    LastMessageAt = m.CreatedAt,
-                    Direction = m.Direction,
-                    Type = m.Type,
+            return contactosDelEvento
+                .Select(m =>
+                {
+                    var key = $"{m.From}|{m.EventCode}";
 
-                    UnreadCount = _context.ResponseFromWhatsApps.Count(x =>
-                        x.From == m.From &&
-                        x.EventCode == m.EventCode &&
-                        x.NameConversation == m.NameConversation &&
-                        x.Direction == "IN" &&
-                        !string.IsNullOrEmpty(x.MessageId) &&
-                        //!string.IsNullOrEmpty(x.Status) &&
-                        x.Status != "seen"
-                    )
+                    return new InboxConversationDto
+                    {
+                        PhoneNumber = m.From ?? "",
+                        EventCode = m.EventCode ?? "",
+                        EventName = m.EventName ?? "",
+                        NameConversation = m.NameConversation ?? "",
+
+                        LastMessage = m.Message ?? "",
+                        LastMessageAt = m.CreatedAt,
+                        Direction = m.Direction ?? "",
+                        Type = m.Type ?? "",
+
+                        UnreadCount = unreadCounts.TryGetValue(key, out var count)
+                            ? count
+                            : 0
+                    };
                 })
                 .OrderByDescending(x => x.LastMessageAt)
                 .ToList();
@@ -491,22 +510,33 @@ namespace SIC.Backend.Repositories.Implemetations
 
                 var baseQuery = _context.ResponseFromWhatsApps
                     .AsNoTracking()
-                    .Where(m => m.PhoneNumber != null && m.PhoneNumber == phoneNumber);
+                    .Where(x => x.PhoneNumber == phoneNumber);
 
-                var lastMessages = await baseQuery
-                    .GroupBy(m => m.EventCode)
+                // Último mensaje OUT por cada contacto (From)
+                var ultimoMensajePorContacto = await baseQuery
+                    .Where(x => x.Direction == "OUT")
+                    .GroupBy(x => x.From)
                     .Select(g => g
-                        .OrderByDescending(m => m.CreatedAt)
+                        .OrderByDescending(x => x.CreatedAt)
                         .FirstOrDefault())
                     .ToListAsync();
 
-                if (lastMessages == null || !lastMessages.Any())
+                if (!ultimoMensajePorContacto.Any())
                     return new List<InboxConversationDto>();
 
-                // Obtener conteos en una sola consulta
+                // De esos últimos mensajes, quedarse con el más reciente por evento
+                var lastMessages = ultimoMensajePorContacto
+                    .Where(x => x != null)
+                    .GroupBy(x => x.EventCode)
+                    .Select(g => g
+                        .OrderByDescending(x => x.CreatedAt)
+                        .First())
+                    .ToList();
+
+                // Conteo de mensajes no leídos
                 var unreadCounts = await baseQuery
                     .Where(x =>
-                        x.EventCode != null &&   // 🔥 FIX
+                        x.EventCode != null &&
                         x.Direction == "IN" &&
                         !string.IsNullOrEmpty(x.MessageId) &&
                         x.Status != "seen")
@@ -519,9 +549,9 @@ namespace SIC.Backend.Repositories.Implemetations
                     .ToDictionaryAsync(x => x.EventCode, x => x.Count);
 
                 return lastMessages
-                    .Where(m => m != null)
                     .Select(m => new InboxConversationDto
                     {
+                        // Se mantienen exactamente los mismos datos que esperaba el frontend
                         PhoneNumber = m.From ?? "",
                         EventCode = m.EventCode ?? "",
                         EventName = m.EventName ?? "",
@@ -532,8 +562,9 @@ namespace SIC.Backend.Repositories.Implemetations
                         Direction = m.Direction ?? "",
                         Type = m.Type ?? "",
 
-                        UnreadCount = unreadCounts.ContainsKey(m.EventCode)
-                            ? unreadCounts[m.EventCode]
+                        UnreadCount = m.EventCode != null &&
+                                      unreadCounts.TryGetValue(m.EventCode, out var count)
+                            ? count
                             : 0
                     })
                     .OrderByDescending(x => x.LastMessageAt)
@@ -545,7 +576,6 @@ namespace SIC.Backend.Repositories.Implemetations
                 return new List<InboxConversationDto>();
             }
         }
-
         public async Task UpdateStatusAsync(
             string messageId,
             string status,

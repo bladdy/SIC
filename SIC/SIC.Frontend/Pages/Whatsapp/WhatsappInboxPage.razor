@@ -11,7 +11,13 @@
             {
                 <div class="wa-inbox-item @(SelectedEventCode == ev.EventCode ? "active" : "")"
                      @onclick="() => SelectEvent(ev.EventCode!)">
-                    <div class="wa-avatar">@ev.EventCode?[^2..]</div>
+                    <div class="wa-avatar">
+                        @(string.IsNullOrEmpty(ev.EventCode)
+                            ? ""
+                            : ev.EventCode.Length <= 2
+                            ? ev.EventCode
+                            : ev.EventCode[^2..])
+                    </div>
                     <div class="wa-text">
                         <span class="wa-title">@ev.EventName</span>
                         <div class="wa-preview">@ev.EventCode</div>

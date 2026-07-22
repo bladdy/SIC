@@ -163,7 +163,7 @@ function fn_asistencia(tipo) {
     console.log(invitacion)
     if (tipo === "n") {
         // NO ASISTIRÁ → todos status = 20
-        invitacion.status = 20;
+        invitacion.status = 'NotAttend';
         invitacion.guests.forEach(g => g.status = 'NotAttend');
 
         document.getElementById("guestListContainer").style.display = "none";
@@ -171,7 +171,7 @@ function fn_asistencia(tipo) {
 
     if (tipo === "s") {
         // SÍ ASISTIRÁ → todos status = 19
-        invitacion.status = 19;
+        invitacion.status = 'Attend';
         invitacion.guests.forEach(g => g.status = 'Attend');
 
         document.getElementById("guestListContainer").style.display = "block";
@@ -204,7 +204,7 @@ async function sendRespuesta() {
         });
         const data = await response.json();
         mostrarGracias(data);
-        if (invitacion.status === "Attend") {
+        if (invitacion.status === 'Attend') {
             cargarQRAndPdf(invitacion.code, invitacion.event.code)
         }
     } catch (error) {
@@ -218,7 +218,7 @@ async function sendRespuesta() {
 // ===============================================================
 function mostrarGracias(data) {
     document.getElementById("formulario_respuesta").style.display = "none";
-    if (data.status == 19) {
+    if (data.status == 'Attend') {
         document.getElementById("mensaje_gracias_asistire").style.display = "block";
     } else {
         document.getElementById("mensaje_gracias_noasistire").style.display = "block";
