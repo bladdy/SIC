@@ -51,6 +51,10 @@ namespace SIC.Frontend.Pages.Album
         protected override async Task OnInitializedAsync()
         {
             RecordsNumber ??= 15;
+            if (!string.IsNullOrWhiteSpace(Page) && int.TryParse(Page, out var pageFromQuery))
+            {
+                currentPage = pageFromQuery;
+            }
             await LoadEventTypes();
             await LoadEvents(currentPage);
         }
@@ -64,10 +68,6 @@ namespace SIC.Frontend.Pages.Album
 
         private async Task LoadEvents(int page = 1)
         {
-            if (!string.IsNullOrWhiteSpace(Page))
-            {
-                page = Convert.ToInt32(Page);
-            }
             var ok = await LoadListAsync(page);
             if (ok)
             {
@@ -77,7 +77,7 @@ namespace SIC.Frontend.Pages.Album
 
         private async Task LoadPagesAsync()
         {
-            var url = $"api/Events/totalRecords?PageSize={RecordsNumber}";
+            var url = $"api/Events/totalRecords?PageSize={RecordsNumber ?? 15}";
 
             url += $"&HasAlbum={true}";
             if (!string.IsNullOrWhiteSpace(Filter))
@@ -109,11 +109,11 @@ namespace SIC.Frontend.Pages.Album
         {
             var result = await SweetAlertService.FireAsync(new SweetAlertOptions
             {
-                Title = "¿Está seguro?",
-                Text = $"Se eliminara esta foto. Esta acción no se puede deshacer.",
+                Title = "ï¿½Estï¿½ seguro?",
+                Text = $"Se eliminara esta foto. Esta acciï¿½n no se puede deshacer.",
                 Icon = SweetAlertIcon.Warning,
                 ShowCancelButton = true,
-                ConfirmButtonText = "Sí, borrar",
+                ConfirmButtonText = "Sï¿½, borrar",
                 CancelButtonText = "Cancelar"
             });
 
@@ -149,7 +149,7 @@ namespace SIC.Frontend.Pages.Album
 
         private async Task<bool> LoadListAsync(int page)
         {
-            var url = $"api/Events/paginated?PageNumber={page}&PageSize={RecordsNumber}";
+            var url = $"api/Events/paginated?PageNumber={page}&PageSize={RecordsNumber ?? 15}";
             url += $"&HasAlbum={true}";
             if (!string.IsNullOrWhiteSpace(Filter))
             {
@@ -223,7 +223,7 @@ namespace SIC.Frontend.Pages.Album
 
             await JS.InvokeVoidAsync("previewImageFromInput");
 
-            // Espera mínima para que el src se aplique
+            // Espera mï¿½nima para que el src se aplique
             await Task.Delay(50);
 
             await JS.InvokeVoidAsync("initCropper");
@@ -282,7 +282,7 @@ namespace SIC.Frontend.Pages.Album
 
                     await toast.FireAsync(
                         "Subir foto",
-                        "La foto fue subida con éxito.",
+                        "La foto fue subida con ï¿½xito.",
                         SweetAlertIcon.Success
                     );
 
@@ -292,7 +292,7 @@ namespace SIC.Frontend.Pages.Album
                 {
                     await SweetAlertService.FireAsync(
                         "Error",
-                        "Ha ocurrido un error, inténtalo más tarde.",
+                        "Ha ocurrido un error, intï¿½ntalo mï¿½s tarde.",
                         SweetAlertIcon.Error
                     );
                 }
@@ -301,7 +301,7 @@ namespace SIC.Frontend.Pages.Album
             {
                 await SweetAlertService.FireAsync(
                     "Error",
-                    "Ha ocurrido un error, inténtalo más tarde.",
+                    "Ha ocurrido un error, intï¿½ntalo mï¿½s tarde.",
                     SweetAlertIcon.Error
                 );
             }

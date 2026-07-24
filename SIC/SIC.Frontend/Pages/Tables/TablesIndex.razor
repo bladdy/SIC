@@ -51,22 +51,22 @@ else
             <div class="row g-1 text-center">
 
                 <div class="col">
-                    <h5 class="fw-bold mb-0">@Tables.Count()</h5>
+                    <h5 class="fw-bold mb-0">@totalTables</h5>
                     <small class="text-muted">Total</small>
                 </div>
 
                 <div class="col">
-                    <h5 class="fw-bold mb-0">@Tables.Sum(s =>s.Seats)</h5>
+                    <h5 class="fw-bold mb-0">@totalSeats</h5>
                     <small class="text-muted">Lugares</small>
                 </div>
 
                 <div class="col">
-                    <h5 class="fw-bold mb-0">@(@Tables.Sum(s => s.Seats) - @Tables.Sum(s => s.OccupiedSeats))</h5>
+                    <h5 class="fw-bold mb-0">@availableSeats</h5>
                     <small class="text-muted">Disponibles</small>
                 </div>
 
                 <div class="col">
-                    <h5 class="fw-bold mb-0">@Tables.Sum(s => s.OccupiedSeats)</h5>
+                    <h5 class="fw-bold mb-0">@occupiedSeats</h5>
                     <small class="text-muted">Ocupados</small>
                 </div>
 

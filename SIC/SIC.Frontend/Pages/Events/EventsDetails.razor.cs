@@ -76,10 +76,16 @@ public partial class EventsDetails
 
     protected override async Task OnInitializedAsync()
     {
+        if (!string.IsNullOrWhiteSpace(Page) && int.TryParse(Page, out var pageFromQuery))
+        {
+            currentPage = pageFromQuery;
+        }
         await LoadEvent();
-        await LoadInvitations();
-        await LoadTemplates();
-        await LoadTablesEventsAsync();
+
+        var invitationsTask = LoadInvitations();
+        var templatesTask = LoadTemplates();
+        var tablesTask = LoadTablesEventsAsync();
+        await Task.WhenAll(invitationsTask, templatesTask, tablesTask);
     }
 
     private async Task LoadTablesEventsAsync()
@@ -341,7 +347,9 @@ public partial class EventsDetails
         );
 
         await LoadEvent();
-        await LoadInvitations();
+        var invitationsTask = LoadInvitations();
+        var tablesTask = LoadTablesEventsAsync();
+        await Task.WhenAll(invitationsTask, tablesTask);
     }
 
     private async Task SaveInvitation()
@@ -408,8 +416,9 @@ public partial class EventsDetails
         );
         isSavingInvitation = false;
         await LoadEvent();
-        await LoadInvitations();
-        await LoadTablesEventsAsync();
+        var invitationsTask = LoadInvitations();
+        var tablesTask = LoadTablesEventsAsync();
+        await Task.WhenAll(invitationsTask, tablesTask);
     }
 
     private async Task DescargarExcel()
@@ -674,15 +683,9 @@ public partial class EventsDetails
 
     private async Task LoadInvitations(int page = 1)
     {
-        if (!string.IsNullOrWhiteSpace(Page))
-        {
-            page = Convert.ToInt32(Page);
-        }
-        var ok = await LoadListAsync(page);
-        if (ok)
-        {
-            await LoadPagesAsync();
-        }
+        var listTask = LoadListAsync(page);
+        var pagesTask = LoadPagesAsync();
+        await Task.WhenAll(listTask, pagesTask);
 
         SelectedInvitations = Invitations!
         .ToDictionary(i => i.Id, _ => false);
@@ -703,7 +706,7 @@ public partial class EventsDetails
 
     private async Task<bool> LoadListAsync(int page)
     {
-        var url = $"api/Invitations/paginated?Id={EventDetail!.Id}&PageNumber={page}&RecordsNumber={RecordsNumber}";
+        var url = $"api/Invitations/paginated?Id={EventDetail!.Id}&PageNumber={page}&RecordsNumber={(RecordsNumber == 0 ? 50 : RecordsNumber)}";
 
         if (!string.IsNullOrWhiteSpace(Filter))
         {

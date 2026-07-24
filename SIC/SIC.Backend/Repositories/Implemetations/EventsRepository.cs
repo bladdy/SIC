@@ -24,7 +24,7 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
             .ThenInclude(g => g.Guests)
             .Include(u => u.User)
             .ThenInclude(uc => uc!.UserWhatsAppConfigs)
-            .Include(et => et.EventType).FirstOrDefaultAsync(x => x.Code!.Contains(code));
+            .Include(et => et.EventType).AsNoTracking().FirstOrDefaultAsync(x => x.Code!.Contains(code));
         if (events == null)
         {
             return new ActionResponse<Event>

@@ -38,19 +38,17 @@ public partial class InvitationsEntriesIndex
 
     protected override async Task OnInitializedAsync()
     {
-        // Si RecordsNumber viene null, lo asignamos a 15
         RecordsNumber ??= 15;
-
+        if (!string.IsNullOrWhiteSpace(Page) && int.TryParse(Page, out var pageFromQuery))
+        {
+            currentPage = pageFromQuery;
+        }
         await base.OnInitializedAsync();
         await LoadInvitationEntries(currentPage);
     }
 
     private async Task LoadInvitationEntries(int page = 1)
     {
-        if (!string.IsNullOrWhiteSpace(Page))
-        {
-            page = Convert.ToInt32(Page);
-        }
         var ok = await LoadListAsync(page);
         if (ok)
         {
@@ -60,7 +58,7 @@ public partial class InvitationsEntriesIndex
 
     private async Task<bool> LoadPagesAsync()
     {
-        var url = $"api/InvitationEntry/paginated?Code={Code}&RecordsNumber={RecordsNumber}";
+        var url = $"api/InvitationEntry/paginated?Code={Code}&RecordsNumber={RecordsNumber ?? 15}";
 
         if (!string.IsNullOrWhiteSpace(Filter))
         {
@@ -90,7 +88,7 @@ public partial class InvitationsEntriesIndex
 
     private async Task<bool> LoadListAsync(int page)
     {
-        var url = $"api/InvitationEntry/paginated?Code={Code}&PageNumber={page}&PageSize={RecordsNumber}";
+        var url = $"api/InvitationEntry/paginated?Code={Code}&PageNumber={page}&PageSize={RecordsNumber ?? 15}";
 
         if (!string.IsNullOrWhiteSpace(Filter))
         {

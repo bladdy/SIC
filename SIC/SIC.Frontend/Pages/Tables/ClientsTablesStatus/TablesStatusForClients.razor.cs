@@ -11,7 +11,11 @@ namespace SIC.Frontend.Pages.Tables.ClientsTablesStatus
         [Parameter] public string? Code { get; set; }
         private int currentPage = 1;
         private int totalPages = 2;
-        private List<TablesEvents> Tables = new();
+        private List<TablesEvents>? Tables;
+        private int totalTables;
+        private int totalSeats;
+        private int occupiedSeats;
+        private int availableSeats;
 
         [Inject] private IRepository Repository { get; set; } = default!;
         [Inject] private NavigationManager NavigationManager { get; set; } = default!;
@@ -20,6 +24,15 @@ namespace SIC.Frontend.Pages.Tables.ClientsTablesStatus
         protected override async Task OnInitializedAsync()
         {
             await LoadTablesEventsAsync();
+            ComputeStats();
+        }
+
+        private void ComputeStats()
+        {
+            totalTables = Tables?.Count ?? 0;
+            totalSeats = Tables?.Sum(s => s.Seats) ?? 0;
+            occupiedSeats = Tables?.Sum(s => s.OccupiedSeats) ?? 0;
+            availableSeats = totalSeats - occupiedSeats;
         }
 
         private async Task SelectedPageAsync(int page)

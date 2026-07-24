@@ -38,7 +38,11 @@ namespace SIC.Frontend.Pages.UserCredits
                 }
             }
             RecordsNumber ??= 15;
-            await LoadCreditHistoriy();
+            if (!string.IsNullOrWhiteSpace(Page) && int.TryParse(Page, out var pageFromQuery))
+            {
+                currentPage = pageFromQuery;
+            }
+            await LoadCreditHistoriy(currentPage);
         }
 
         private async Task SelectedPage(int page)
@@ -49,10 +53,6 @@ namespace SIC.Frontend.Pages.UserCredits
 
         private async Task LoadCreditHistoriy(int page = 1)
         {
-            if (!string.IsNullOrWhiteSpace(Page))
-            {
-                page = Convert.ToInt32(Page);
-            }
             var ok = await LoadListAsync(page);
             if (ok)
             {
@@ -62,7 +62,7 @@ namespace SIC.Frontend.Pages.UserCredits
 
         private async Task LoadPagesAsync()
         {//https://localhost:7141/api/UserCredits/paginated?UserId=2c71487c-5df3-429e-b527-b1d9f9b4a241
-            var url = $"api/UserCredits/totalRecords?UserId={Id}&RecordsNumber={RecordsNumber}";
+            var url = $"api/UserCredits/totalRecords?UserId={Id}&RecordsNumber={RecordsNumber ?? 15}";
 
             var responseHttp = await Repository.GetAsync<int>(url);
             if (responseHttp.Error)
@@ -72,13 +72,13 @@ namespace SIC.Frontend.Pages.UserCredits
                 return;
             }
 
-            // Backend ya devuelve total de páginas, no de registros
+            // Backend ya devuelve total de pï¿½ginas, no de registros
             totalPages = responseHttp.Response;
         }
 
         private async Task<bool> LoadListAsync(int page)
         {
-            var url = $"api/UserCredits/paginated?UserId={Id}&PageNumber={page}&PageSize={RecordsNumber}";
+            var url = $"api/UserCredits/paginated?UserId={Id}&PageNumber={page}&PageSize={RecordsNumber ?? 15}";
             var responseHttp = await Repository.GetAsync<List<UserCreditHistory>>(url);
 
             if (responseHttp.Error)

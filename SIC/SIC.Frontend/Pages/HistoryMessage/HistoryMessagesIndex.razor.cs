@@ -14,6 +14,7 @@ namespace SIC.Frontend.Pages.HistoryMessage
     {
         private int totalPages;
         private int currentPage = 1;
+        private int _lastLoadedPage = 0;
         private string? userId;
 
         [Parameter, SupplyParameterFromQuery]
@@ -43,13 +44,11 @@ namespace SIC.Frontend.Pages.HistoryMessage
 
         protected override async Task OnParametersSetAsync()
         {
-            // Validar RecordsNumber
             await base.OnInitializedAsync();
             var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             var user = authState.User;
             RecordsNumber = RecordsNumber is null or <= 0 ? 15 : RecordsNumber;
 
-            // Validar Page desde Query
             if (!string.IsNullOrWhiteSpace(Page) && int.TryParse(Page, out var pageFromQuery))
             {
                 currentPage = pageFromQuery <= 0 ? 1 : pageFromQuery;
@@ -58,8 +57,10 @@ namespace SIC.Frontend.Pages.HistoryMessage
             {
                 currentPage = 1;
             }
-            if (user.Identity is not null && user.Identity.IsAuthenticated)
+
+            if (currentPage != _lastLoadedPage && user.Identity is not null && user.Identity.IsAuthenticated)
             {
+                _lastLoadedPage = currentPage;
                 userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 await LoadHistoryMessages(currentPage);
             }
@@ -68,6 +69,7 @@ namespace SIC.Frontend.Pages.HistoryMessage
         private async Task SelectedPage(int page)
         {
             currentPage = page;
+            _lastLoadedPage = page;
             await LoadHistoryMessages(currentPage);
         }
 
@@ -97,7 +99,7 @@ namespace SIC.Frontend.Pages.HistoryMessage
         {
             try
             {
-                var url = $"api/messages/totalRecordAsync?RecordsNumber={RecordsNumber}&UserId={userId}";
+                var url = $"api/messages/totalRecordAsync?RecordsNumber={RecordsNumber ?? 15}&UserId={userId}";
 
                 if (SelectedPageSize != null)
                 {
@@ -116,7 +118,7 @@ namespace SIC.Frontend.Pages.HistoryMessage
                     return;
                 }
 
-                // El backend ya devuelve el total de páginas
+                // El backend ya devuelve el total de pï¿½ginas
                 totalPages = responseHttp.Response;
             }
             catch (Exception ex)

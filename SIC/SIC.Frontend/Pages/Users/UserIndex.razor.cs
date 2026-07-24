@@ -40,16 +40,15 @@ namespace SIC.Frontend.Pages.Users
         protected override async Task OnInitializedAsync()
         {
             RecordsNumber ??= 15;
-            await LoadAsync();
+            if (!string.IsNullOrWhiteSpace(Page) && int.TryParse(Page, out var pageFromQuery))
+            {
+                currentPage = pageFromQuery;
+            }
+            await LoadAsync(currentPage);
         }
 
         private async Task LoadAsync(int page = 1)
         {
-            if (!string.IsNullOrWhiteSpace(Page))
-            {
-                page = Convert.ToInt32(Page);
-            }
-
             var ok = await LoadListAsync(page);
             if (ok)
             {
@@ -70,7 +69,7 @@ namespace SIC.Frontend.Pages.Users
 
         private async Task<bool> LoadListAsync(int page)
         {
-            var url = $"api/accounts/all?PageNumber={page}&PageSize={RecordsNumber}";
+            var url = $"api/accounts/all?PageNumber={page}&PageSize={RecordsNumber ?? 15}";
             if (!string.IsNullOrEmpty(Filter))
             {
                 url += $"&filter={Filter}";
@@ -88,7 +87,7 @@ namespace SIC.Frontend.Pages.Users
 
         private async Task LoadPagesAsync()
         {
-            var url = $"api/accounts/totalPages?PageSize={RecordsNumber}";
+            var url = $"api/accounts/totalPages?PageSize={RecordsNumber ?? 15}";
 
             if (!string.IsNullOrWhiteSpace(Filter))
             {

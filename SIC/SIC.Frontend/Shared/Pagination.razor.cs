@@ -1,9 +1,13 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace SIC.Frontend.Shared
 {
     public partial class Pagination
     {
+        [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+        [Inject] private IJSRuntime JS { get; set; } = default!;
+
         private List<PageModel> links = null!;
 
         [Parameter] public int CurrentPage { get; set; } = 1;
@@ -70,6 +74,12 @@ namespace SIC.Frontend.Shared
             }
 
             await SelectedPage.InvokeAsync(pageModel.Page);
+
+            NavigationManager.NavigateTo(
+                NavigationManager.GetUriWithQueryParameter("Page", pageModel.Page.ToString()),
+                new NavigationOptions { ReplaceHistoryEntry = true });
+
+            await JS.InvokeVoidAsync("window.scrollTo", new { top = 0, behavior = "smooth" });
         }
 
         private class OptionModel

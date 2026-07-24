@@ -227,7 +227,7 @@ namespace SIC.Backend.Repositories.Implemetations
 
         public async Task<ActionResponse<IEnumerable<TablesEvents>>> GetAsync(int id)
         {
-            var entities = await _context.TablesEvents.Include(e => e.Event).Include(i => i.Invitation).ThenInclude(g => g.Guests).Where(e => e.EventId == id).ToListAsync();
+            var entities = await _context.TablesEvents.Include(e => e.Event).Include(i => i.Invitation).ThenInclude(g => g.Guests).Where(e => e.EventId == id).AsNoTracking().ToListAsync();
 
             return new ActionResponse<IEnumerable<TablesEvents>>
             {
@@ -399,7 +399,7 @@ namespace SIC.Backend.Repositories.Implemetations
 
         public async Task<ActionResponse<IEnumerable<TablesEvents>>> GetTablesByCodeAsync(string code)
         {
-            var entities = await _context.TablesEvents.Include(e => e.Event).Include(i => i.Invitation).ThenInclude(g => g.Guests).Where(e => e.Event!.Code == code).ToListAsync();
+            var entities = await _context.TablesEvents.Include(e => e.Event).Include(i => i.Invitation).ThenInclude(g => g.Guests).Where(e => e.Event!.Code == code).AsNoTracking().ToListAsync();
 
             return new ActionResponse<IEnumerable<TablesEvents>>
             {

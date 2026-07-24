@@ -35,6 +35,10 @@ namespace SIC.Frontend.Pages.MyEvents.ClientsEventsStatus
 
         protected override async Task OnInitializedAsync()
         {
+            if (!string.IsNullOrWhiteSpace(Page) && int.TryParse(Page, out var pageFromQuery))
+            {
+                currentPage = pageFromQuery;
+            }
             await LoadEvent();
             await LoadInvitations();
             await LoadTemplates();
@@ -70,10 +74,6 @@ namespace SIC.Frontend.Pages.MyEvents.ClientsEventsStatus
 
         private async Task LoadInvitations(int page = 1)
         {
-            if (!string.IsNullOrWhiteSpace(Page))
-            {
-                page = Convert.ToInt32(Page);
-            }
             var ok = await LoadListAsync(page);
             if (ok)
             {
@@ -96,7 +96,7 @@ namespace SIC.Frontend.Pages.MyEvents.ClientsEventsStatus
 
         private async Task<bool> LoadListAsync(int page)
         {
-            var url = $"api/Invitations/paginated?Id={EventDetail!.Id}&PageNumber={page}&RecordsNumber={RecordsNumber}";
+            var url = $"api/Invitations/paginated?Id={EventDetail!.Id}&PageNumber={page}&RecordsNumber={(RecordsNumber == 0 ? 50 : RecordsNumber)}";
 
             if (!string.IsNullOrWhiteSpace(Filter))
             {

@@ -71,7 +71,7 @@ namespace SIC.Backend.Repositories.Implemetations
 
         public async Task<ActionResponse<IEnumerable<WhatsAppTemplate?>>> GetAllAsync()
         {
-            var entities = await _context.WhatsAppTemplates.OrderBy(o => o.OrderTemplate).ToListAsync();
+            var entities = await _context.WhatsAppTemplates.OrderBy(o => o.OrderTemplate).AsNoTracking().ToListAsync();
 
             return new ActionResponse<IEnumerable<WhatsAppTemplate?>>
             {

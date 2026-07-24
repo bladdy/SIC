@@ -41,6 +41,10 @@ namespace SIC.Frontend.Pages.Events
         protected override async Task OnInitializedAsync()
         {
             RecordsNumber ??= 15;
+            if (!string.IsNullOrWhiteSpace(Page) && int.TryParse(Page, out var pageFromQuery))
+            {
+                currentPage = pageFromQuery;
+            }
             await LoadEventTypes();
             await LoadUsersAsync();
             await LoadEvents(currentPage);
@@ -77,10 +81,6 @@ namespace SIC.Frontend.Pages.Events
 
         private async Task LoadEvents(int page = 1)
         {
-            if (!string.IsNullOrWhiteSpace(Page))
-            {
-                page = Convert.ToInt32(Page);
-            }
             var ok = await LoadListAsync(page);
             if (ok)
             {
@@ -90,7 +90,7 @@ namespace SIC.Frontend.Pages.Events
 
         private async Task LoadPagesAsync()
         {
-            var url = $"api/Events/totalRecords?PageSize={RecordsNumber}";
+            var url = $"api/Events/totalRecords?PageSize={RecordsNumber ?? 15}";
 
             if (!string.IsNullOrWhiteSpace(Filter))
             {
@@ -119,7 +119,7 @@ namespace SIC.Frontend.Pages.Events
 
         private async Task<bool> LoadListAsync(int page)
         {
-            var url = $"api/Events/paginated?PageNumber={page}&PageSize={RecordsNumber}";
+            var url = $"api/Events/paginated?PageNumber={page}&PageSize={RecordsNumber ?? 15}";
 
             if (!string.IsNullOrWhiteSpace(Filter))
             {
@@ -212,7 +212,7 @@ namespace SIC.Frontend.Pages.Events
                 Status = evnt.Status
             };
 
-            // Ahora el usuario también puede cambiar la asignación
+            // Ahora el usuario tambiï¿½n puede cambiar la asignaciï¿½n
             isPreselectedUser = false;
             IsEditMode = true;
             IsModalVisible = true;
@@ -220,13 +220,13 @@ namespace SIC.Frontend.Pages.Events
 
         private void CloseModal() => IsModalVisible = false;
 
-        // Confirmar eliminación
+        // Confirmar eliminaciï¿½n
         private async Task ConfirmDelete(Event evnt)
         {
             var result = await SweetAlertService.FireAsync(new SweetAlertOptions
             {
-                Title = "¿Eliminar evento?",
-                Text = $"Se eliminará '{evnt.Name}'. Esta acción no se puede deshacer.",
+                Title = "ï¿½Eliminar evento?",
+                Text = $"Se eliminarï¿½ '{evnt.Name}'. Esta acciï¿½n no se puede deshacer.",
                 Icon = SweetAlertIcon.Warning,
                 ShowCancelButton = true
             });
@@ -256,7 +256,7 @@ namespace SIC.Frontend.Pages.Events
             var HostUser = AllUsers.FirstOrDefault(u => u.Id == NewEvent.UserId);
             if (HostUser == null)
             {
-                await SweetAlertService.FireAsync("Error", "El usuario asignado no es válido.", SweetAlertIcon.Error);
+                await SweetAlertService.FireAsync("Error", "El usuario asignado no es vï¿½lido.", SweetAlertIcon.Error);
                 return;
             }
             if (HostUser.UserCredit != null)
@@ -286,7 +286,7 @@ namespace SIC.Frontend.Pages.Events
                 HttpResponseWrapper<object>? responseHttps;
                 responseHttps = await repository.PostAsync<object>($"api/UserCredits/consume/{NewEvent.UserId}/{NewEvent.Name}");
             }
-            await SweetAlertService.FireAsync("Éxito", IsEditMode ? "Evento actualizado." : "Evento creado.", SweetAlertIcon.Success);
+            await SweetAlertService.FireAsync("ï¿½xito", IsEditMode ? "Evento actualizado." : "Evento creado.", SweetAlertIcon.Success);
             CloseModal();
             await LoadEvents(currentPage);
             await LoadUsersAsync();

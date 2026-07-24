@@ -45,7 +45,7 @@ namespace SIC.Backend.Repositories.Implemetations
         public override async Task<ActionResponse<IEnumerable<Invitation>>> GetAsync(PaginationDTO pagination)
         {
             //ToDo: Agregar el filtro para que filte cada uno de los Guests
-            var queryable = _context.Invitations.Include(t => t.TemplateSents).Include(g => g.Guests).Include(t => t.TablesEvents).AsQueryable();
+            var queryable = _context.Invitations.Include(t => t.TemplateSents).Include(g => g.Guests).Include(t => t.TablesEvents).AsNoTracking().AsQueryable();
             queryable = queryable.Where(x => x.EventId == pagination.Id);
 
             if (!string.IsNullOrWhiteSpace(pagination.Filter))

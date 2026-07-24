@@ -52,6 +52,10 @@ public partial class MyEventsIndex
             await LoadAvailableCreditsAsync();
         }
         RecordsNumber ??= 15;
+        if (!string.IsNullOrWhiteSpace(Page) && int.TryParse(Page, out var pageFromQuery))
+        {
+            currentPage = pageFromQuery;
+        }
 
         await LoadEventTypes();
         await LoadEvents(currentPage);
@@ -65,7 +69,7 @@ public partial class MyEventsIndex
 
     private async Task<bool> LoadListAsync(int page)
     {
-        var url = $"api/Events/paginated?UserId={_userId}&PageNumber={page}&PageSize={RecordsNumber}";
+        var url = $"api/Events/paginated?UserId={_userId}&PageNumber={page}&PageSize={RecordsNumber ?? 15}";
 
         if (!string.IsNullOrWhiteSpace(Filter))
         {
@@ -109,7 +113,7 @@ public partial class MyEventsIndex
         }
         else
         {
-            EventTypes = new List<EventType>(); // Inicializa como lista vacía si no se obtiene información
+            EventTypes = new List<EventType>(); // Inicializa como lista vacï¿½a si no se obtiene informaciï¿½n
         }
     }
 
@@ -155,10 +159,6 @@ public partial class MyEventsIndex
 
     private async Task LoadEvents(int page = 1)
     {
-        if (!string.IsNullOrWhiteSpace(Page))
-        {
-            page = Convert.ToInt32(Page);
-        }
         var ok = await LoadListAsync(page);
         if (ok)
         {
@@ -168,7 +168,7 @@ public partial class MyEventsIndex
 
     private async Task LoadPagesAsync()
     {
-        var url = $"api/Events/totalRecords?PageSize={RecordsNumber}&UserId={_userId}";
+        var url = $"api/Events/totalRecords?PageSize={RecordsNumber ?? 15}&UserId={_userId}";
 
         if (!string.IsNullOrWhiteSpace(Filter))
         {
@@ -276,7 +276,7 @@ public partial class MyEventsIndex
 
         CloseModal();
 
-        // Luego mostrar la notificación
+        // Luego mostrar la notificaciï¿½n
         var toast = sweetAlertService.Mixin(new SweetAlertOptions
         {
             Toast = true,
@@ -286,8 +286,8 @@ public partial class MyEventsIndex
             TimerProgressBar = true,
         });
         await toast.FireAsync(
-            "Éxito",
-            IsEditMode ? "Plan actualizado con éxito." : "Plan creado con éxito.",
+            "ï¿½xito",
+            IsEditMode ? "Plan actualizado con ï¿½xito." : "Plan creado con ï¿½xito.",
             SweetAlertIcon.Success
         );
 
@@ -298,11 +298,11 @@ public partial class MyEventsIndex
     {
         var result = await sweetAlertService.FireAsync(new SweetAlertOptions
         {
-            Title = "¿Está seguro?",
-            Text = $"Se eliminará el evento '{events.Name}'. Esta acción no se puede deshacer.",
+            Title = "ï¿½Estï¿½ seguro?",
+            Text = $"Se eliminarï¿½ el evento '{events.Name}'. Esta acciï¿½n no se puede deshacer.",
             Icon = SweetAlertIcon.Warning,
             ShowCancelButton = true,
-            ConfirmButtonText = "Sí, borrar",
+            ConfirmButtonText = "Sï¿½, borrar",
             CancelButtonText = "Cancelar"
         });
 

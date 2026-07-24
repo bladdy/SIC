@@ -39,10 +39,25 @@ namespace SIC.Frontend.Pages.Tables
                 )
                 .Take(10);
 
+        private int totalTables;
+        private int totalSeats;
+        private int occupiedSeats;
+        private int availableSeats;
+
         protected override async Task OnInitializedAsync()
         {
-            await LoadTablesEventsAsync();
-            await LoadInvitationsAsync();
+            var tablesTask = LoadTablesEventsAsync();
+            var invitationsTask = LoadInvitationsAsync();
+            await Task.WhenAll(tablesTask, invitationsTask);
+            ComputeStats();
+        }
+
+        private void ComputeStats()
+        {
+            totalTables = Tables?.Count ?? 0;
+            totalSeats = Tables?.Sum(s => s.Seats) ?? 0;
+            occupiedSeats = Tables?.Sum(s => s.OccupiedSeats) ?? 0;
+            availableSeats = totalSeats - occupiedSeats;
         }
 
         private async Task LoadInvitationsAsync()
@@ -85,8 +100,8 @@ namespace SIC.Frontend.Pages.Tables
 
             var result = await SweetAlertService.FireAsync(new SweetAlertOptions
             {
-                Title = "¿Eliminar esta mesa?",
-                Text = $"Se eliminará '{table.Name}'. Esta acción no se puede deshacer.",
+                Title = "Eliminar esta mesa?",
+                Text = $"Se eliminara '{table.Name}'. Esta accion no se puede deshacer.",
                 Icon = SweetAlertIcon.Warning,
                 ShowCancelButton = true
             });
@@ -103,6 +118,7 @@ namespace SIC.Frontend.Pages.Tables
                 await SweetAlertService.FireAsync("Eliminado", "Mesa eliminada correctamente.", SweetAlertIcon.Success);
 
                 await LoadTablesEventsAsync();
+                ComputeStats();
             }
         }
 
@@ -110,8 +126,8 @@ namespace SIC.Frontend.Pages.Tables
         {
             var result = await SweetAlertService.FireAsync(new SweetAlertOptions
             {
-                Title = "¿Eliminar invitados esta mesa?",
-                Text = $"Se eliminará los invitados de esta mesa '{table.Name}'. Esta acción no se puede deshacer.",
+                Title = "ï¿½Eliminar invitados esta mesa?",
+                Text = $"Se eliminarï¿½ los invitados de esta mesa '{table.Name}'. Esta acciï¿½n no se puede deshacer.",
                 Icon = SweetAlertIcon.Warning,
                 ShowCancelButton = true
             });
@@ -127,8 +143,10 @@ namespace SIC.Frontend.Pages.Tables
             {
                 await SweetAlertService.FireAsync("Eliminado", "Eliminiado invitados de esta mesa correctamente.", SweetAlertIcon.Success);
 
-                await LoadTablesEventsAsync();
-                await LoadInvitationsAsync();
+                var tablesTask = LoadTablesEventsAsync();
+                var invitationsTask = LoadInvitationsAsync();
+                await Task.WhenAll(tablesTask, invitationsTask);
+                ComputeStats();
             }
         }
 
@@ -190,7 +208,7 @@ namespace SIC.Frontend.Pages.Tables
 
             CloseModaGenerarMesa();
 
-            // Luego mostrar la notificación
+            // Luego mostrar la notificaciï¿½n
             var toast = SweetAlertService.Mixin(new SweetAlertOptions
             {
                 Toast = true,
@@ -200,13 +218,15 @@ namespace SIC.Frontend.Pages.Tables
                 TimerProgressBar = true,
             });
             await toast.FireAsync(
-                "Éxito",
-                IsEditMode ? "Mesa actualizada con éxito." : "Mesa creada con éxito.",
+                "ï¿½xito",
+                IsEditMode ? "Mesa actualizada con ï¿½xito." : "Mesa creada con ï¿½xito.",
                 SweetAlertIcon.Success
             );
             GenerateTablesDto = new();
-            await LoadTablesEventsAsync();
-            await LoadInvitationsAsync();
+            var tablesTask = LoadTablesEventsAsync();
+            var invitationsTask = LoadInvitationsAsync();
+            await Task.WhenAll(tablesTask, invitationsTask);
+            ComputeStats();
         }
 
         private async Task SaveMesa()
@@ -234,7 +254,7 @@ namespace SIC.Frontend.Pages.Tables
 
             CloseModaCrearOrEditaMesa();
 
-            // Luego mostrar la notificación
+            // Luego mostrar la notificaciï¿½n
             var toast = SweetAlertService.Mixin(new SweetAlertOptions
             {
                 Toast = true,
@@ -244,13 +264,15 @@ namespace SIC.Frontend.Pages.Tables
                 TimerProgressBar = true,
             });
             await toast.FireAsync(
-                "Éxito",
-                IsEditMode ? "Mesa actualizada con éxito." : "Mesa creada con éxito.",
+                "ï¿½xito",
+                IsEditMode ? "Mesa actualizada con ï¿½xito." : "Mesa creada con ï¿½xito.",
                 SweetAlertIcon.Success
             );
             createOrEditTablesDto = new();
-            await LoadTablesEventsAsync();
-            await LoadInvitationsAsync();
+            var tablesTask = LoadTablesEventsAsync();
+            var invitationsTask = LoadInvitationsAsync();
+            await Task.WhenAll(tablesTask, invitationsTask);
+            ComputeStats();
         }
 
         private async Task AssignTable()
@@ -268,7 +290,7 @@ namespace SIC.Frontend.Pages.Tables
             //Cerrar el modal
             CloseModaAsignarMesa();
 
-            // Luego mostrar la notificación
+            // Luego mostrar la notificaciï¿½n
             var toast = SweetAlertService.Mixin(new SweetAlertOptions
             {
                 Toast = true,
@@ -278,12 +300,14 @@ namespace SIC.Frontend.Pages.Tables
                 TimerProgressBar = true,
             });
             await toast.FireAsync(
-                "Éxito", "Se ha asignado la mesa correctamente.",
+                "ï¿½xito", "Se ha asignado la mesa correctamente.",
                 SweetAlertIcon.Success
             );
             AssignTablesDto = new();
-            await LoadTablesEventsAsync();
-            await LoadInvitationsAsync();
+            var tablesTask = LoadTablesEventsAsync();
+            var invitationsTask = LoadInvitationsAsync();
+            await Task.WhenAll(tablesTask, invitationsTask);
+            ComputeStats();
         }
     }
 }

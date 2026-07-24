@@ -79,8 +79,13 @@ function contarInvitados() {
     let jovenes = invitacion.guests.filter(g => g.guestType === "Youth").length;
     let menores = invitacion.guests.filter(g => g.guestType === "Children").length;
 
-    document.getElementById("invitados_mayores").innerText = `Adultos invitados: ${adultos}`;
-
+    const invAdutlos = document.getElementById("invitados_mayores")
+    if (adultos) {
+        invAdutlos.innerText = `Adultos invitados: ${adultos}`
+    }
+    else {
+        invAdutlos.style.display = "none";
+    }
     const invJovenes = document.getElementById("invitados_jovenes");
     if (jovenes) {
         invJovenes.innerText = `Jóvenes invitados: ${jovenes}`;
