@@ -524,7 +524,7 @@ namespace SIC.Backend.Repositories.Implemetations
                 if (!ultimoMensajePorContacto.Any())
                     return new List<InboxConversationDto>();
 
-                // De esos últimos mensajes, quedarse con el más reciente por evento
+                // Último mensaje por evento
                 var lastMessages = ultimoMensajePorContacto
                     .Where(x => x != null)
                     .GroupBy(x => x.EventCode)
@@ -533,7 +533,25 @@ namespace SIC.Backend.Repositories.Implemetations
                         .First())
                     .ToList();
 
-                // Conteo de mensajes no leídos
+                // Filtrar solo eventos que pertenecen al usuario actual
+                var userConfig = await _context.UsuarioWhatsAppConfigs
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.PhoneNumber == phoneNumber);
+
+                if (userConfig != null)
+                {
+                    var userEventCodes = await _context.Events
+                        .AsNoTracking()
+                        .Where(e => e.UserId == userConfig.UsuarioId && e.Code != null)
+                        .Select(e => e.Code!)
+                        .ToListAsync();
+
+                    if (userEventCodes.Count > 0)
+                        lastMessages = lastMessages.Where(m =>
+                            m.EventCode != null && userEventCodes.Contains(m.EventCode)).ToList();
+                }
+
+                // Conteo de mensajes no leídos por evento
                 var unreadCounts = await baseQuery
                     .Where(x =>
                         x.EventCode != null &&
@@ -551,7 +569,6 @@ namespace SIC.Backend.Repositories.Implemetations
                 return lastMessages
                     .Select(m => new InboxConversationDto
                     {
-                        // Se mantienen exactamente los mismos datos que esperaba el frontend
                         PhoneNumber = m.From ?? "",
                         EventCode = m.EventCode ?? "",
                         EventName = m.EventName ?? "",
