@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SIC.Backend.Data;
 
@@ -11,9 +12,11 @@ using SIC.Backend.Data;
 namespace SIC.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20260728031750_addsuply")]
+    partial class addsuply
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -204,9 +207,6 @@ namespace SIC.Backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("InvitationInvboxv")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -293,125 +293,6 @@ namespace SIC.Backend.Migrations
                     b.ToTable("EventImages");
                 });
 
-            modelBuilder.Entity("SIC.Shared.Entities.EventRequirement", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("InputType")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsRequired")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("MaxImages")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MinImages")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Placeholder")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Section")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("EventRequirements");
-                });
-
-            modelBuilder.Entity("SIC.Shared.Entities.EventRequirementAnswer", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("EventId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RequirementId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Value")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RequirementId");
-
-                    b.HasIndex("EventId", "RequirementId")
-                        .IsUnique();
-
-                    b.ToTable("EventRequirementAnswers");
-                });
-
-            modelBuilder.Entity("SIC.Shared.Entities.EventRequirementImage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
-
-                    b.Property<string>("OriginalName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Path")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("RequirementAnswerId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RequirementAnswerId");
-
-                    b.ToTable("EventRequirementImages");
-                });
-
             modelBuilder.Entity("SIC.Shared.Entities.EventType", b =>
                 {
                     b.Property<int>("Id")
@@ -431,33 +312,6 @@ namespace SIC.Backend.Migrations
                         .IsUnique();
 
                     b.ToTable("EventTypes");
-                });
-
-            modelBuilder.Entity("SIC.Shared.Entities.EventTypeRequirement", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("EventTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RequirementId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RequirementId");
-
-                    b.HasIndex("EventTypeId", "RequirementId")
-                        .IsUnique();
-
-                    b.ToTable("EventTypeRequirements");
                 });
 
             modelBuilder.Entity("SIC.Shared.Entities.HistoryMessages", b =>
@@ -1689,55 +1543,6 @@ namespace SIC.Backend.Migrations
                     b.Navigation("Event");
                 });
 
-            modelBuilder.Entity("SIC.Shared.Entities.EventRequirementAnswer", b =>
-                {
-                    b.HasOne("SIC.Shared.Entities.Event", "Event")
-                        .WithMany()
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("SIC.Shared.Entities.EventRequirement", "Requirement")
-                        .WithMany("Answers")
-                        .HasForeignKey("RequirementId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Event");
-
-                    b.Navigation("Requirement");
-                });
-
-            modelBuilder.Entity("SIC.Shared.Entities.EventRequirementImage", b =>
-                {
-                    b.HasOne("SIC.Shared.Entities.EventRequirementAnswer", "RequirementAnswer")
-                        .WithMany("Images")
-                        .HasForeignKey("RequirementAnswerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("RequirementAnswer");
-                });
-
-            modelBuilder.Entity("SIC.Shared.Entities.EventTypeRequirement", b =>
-                {
-                    b.HasOne("SIC.Shared.Entities.EventType", "EventType")
-                        .WithMany()
-                        .HasForeignKey("EventTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("SIC.Shared.Entities.EventRequirement", "Requirement")
-                        .WithMany("EventTypeRequirements")
-                        .HasForeignKey("RequirementId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("EventType");
-
-                    b.Navigation("Requirement");
-                });
-
             modelBuilder.Entity("SIC.Shared.Entities.HistoryMessages", b =>
                 {
                     b.HasOne("SIC.Shared.Entities.Event", "Event")
@@ -1979,18 +1784,6 @@ namespace SIC.Backend.Migrations
                     b.Navigation("MinuteByMinute");
 
                     b.Navigation("TablesEvents");
-                });
-
-            modelBuilder.Entity("SIC.Shared.Entities.EventRequirement", b =>
-                {
-                    b.Navigation("Answers");
-
-                    b.Navigation("EventTypeRequirements");
-                });
-
-            modelBuilder.Entity("SIC.Shared.Entities.EventRequirementAnswer", b =>
-                {
-                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("SIC.Shared.Entities.Invitation", b =>

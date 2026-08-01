@@ -148,6 +148,18 @@ builder.Services.AddScoped<IMbMProviderUnitOfWork, MbMProviderUnitOfWork>();
 builder.Services.AddScoped<IMbMTaskRepository, MbMTaskRepository>();
 builder.Services.AddScoped<IMbMTaskUnitOfWork, MbMTaskUnitOfWork>();
 
+builder.Services.AddScoped<IEventRequirementsRepository, EventRequirementsRepository>();
+builder.Services.AddScoped<IEventRequirementsUnitOfWork, EventRequirementsUnitOfWork>();
+
+builder.Services.AddScoped<IEventTypeRequirementsRepository, EventTypeRequirementsRepository>();
+builder.Services.AddScoped<IEventTypeRequirementsUnitOfWork, EventTypeRequirementsUnitOfWork>();
+
+builder.Services.AddScoped<IEventRequirementAnswersRepository, EventRequirementAnswersRepository>();
+builder.Services.AddScoped<IEventRequirementAnswersUnitOfWork, EventRequirementAnswersUnitOfWork>();
+
+builder.Services.AddScoped<IEventRequirementImagesRepository, EventRequirementImagesRepository>();
+builder.Services.AddScoped<IEventRequirementImagesUnitOfWork, EventRequirementImagesUnitOfWork>();
+
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
     options.User.RequireUniqueEmail = true;

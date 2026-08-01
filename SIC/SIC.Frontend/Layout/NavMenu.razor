@@ -92,6 +92,45 @@
                         </NavLink>
                     </div>
 
+                    <div class="nav-item px-3 whatsapp-section">
+                        <span @onclick:stopPropagation>
+                            <NavLink class="dropdown-item flex gap-2" @onclick="ToggleRequirements" title="Requisitos">
+                                <span class="nav-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-clipboard-list"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" /><path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" /><path d="M9 14l2 2l4 -4" /></svg>
+                                </span>
+                                <span class="nav-label flex-1 text-left">Requisitos</span>
+                                <span class="chevron @(requirementsOpen ? "open" : "")">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <path d="M6 10l6 6l6 -6h-12" />
+                                    </svg>
+                                </span>
+                            </NavLink>
+                        </span>
+
+                        @if (requirementsOpen)
+                        {
+                            <div class="flex-column whatsapp-submenu">
+                                <div class="nav-item">
+                                    <NavLink class="dropdown-item flex gap-2" href="event-requirements" Match="NavLinkMatch.All" title="Requisitos">
+                                        <span class="nav-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-clipboard-list"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" /><path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" /><path d="M9 14l2 2l4 -4" /></svg>
+                                        </span>
+                                        <span class="nav-label">Requisitos</span>
+                                    </NavLink>
+                                </div>
+                                <div class="nav-item">
+                                    <NavLink class="dropdown-item flex gap-2" href="event-requirements/available" Match="NavLinkMatch.All" title="Catálogo de Requisitos">
+                                        <span class="nav-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-list-details"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M13 5h8" /><path d="M13 9h5" /><path d="M13 15h8" /><path d="M13 19h5" /><path d="M3 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /><path d="M3 14m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /></svg>
+                                        </span>
+                                        <span class="nav-label">Catálogo de Requisitos</span>
+                                    </NavLink>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
                     <div class="nav-item px-3 d-none">
                         <NavLink class="dropdown-item flex gap-2" href="plans" Match="NavLinkMatch.All" title="Planes">
                             <span class="nav-icon">
@@ -301,6 +340,7 @@
 @code {
     private bool sidebarCollapsed = true;
     private bool whatsappOpen;
+    private bool requirementsOpen;
 
     private string NavMenuCssClass => sidebarCollapsed ? "sidebar-wrapper collapsed" : "sidebar-wrapper";
 
@@ -312,6 +352,11 @@
     private void ToggleWhatsapp()
     {
         whatsappOpen = !whatsappOpen;
+    }
+
+    private void ToggleRequirements()
+    {
+        requirementsOpen = !requirementsOpen;
     }
 
     private async Task CloseNav()

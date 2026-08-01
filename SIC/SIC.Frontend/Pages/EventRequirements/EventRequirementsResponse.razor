@@ -1,0 +1,178 @@
+@page "/event/{EventCode}/requisitos/respuesta"
+@using SIC.Shared.Entities
+@using SIC.Shared.Enums
+@using SIC.Shared.DTOs
+
+<PageTitle>Respuestas del Evento</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+    <div>
+        <h3 class="mb-0">Respuestas del Evento</h3>
+        @if (EventName != null)
+        {
+            <small class="text-muted">@EventName (Código: @EventCode)</small>
+        }
+    </div>
+</div>
+
+@if (Loading)
+{
+    <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+    </div>
+}
+else if (HasError)
+{
+    <div class="alert alert-danger">@ErrorMessage</div>
+}
+else if (Sections == null || Sections.Count == 0)
+{
+    <div class="text-center py-5 text-muted">
+        <i class="bi bi-inbox" style="font-size:3rem;"></i>
+        <p class="mt-2 fs-5">No hay respuestas registradas para este evento.</p>
+    </div>
+}
+else
+{
+    @foreach (var sec in Sections)
+    {
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header" style="background-color:#3C6A79; color:white;">
+                <h5 class="mb-0">@sec.Key</h5>
+            </div>
+            <div class="card-body">
+                @foreach (var req in sec.Value)
+                {
+                    var answer = GetAnswer(req.RequirementId);
+                    var images = GetImages(req.RequirementId);
+
+                    <div class="mb-3 pb-3 border-bottom">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="fw-semibold">@req.RequirementName</span>
+                            <span class="badge bg-info" style="font-size:0.65em;">@req.RequirementInputType?.GetDescription()</span>
+                            @if (req.RequirementIsRequired == true)
+                            {
+                                <span class="badge bg-danger" style="font-size:0.65em;">Obligatorio</span>
+                            }
+                        </div>
+
+                        @if (req.RequirementInputType == RequirementInputType.Image)
+                        {
+                            if (images != null && images.Count > 0)
+                            {
+                                <div class="row g-2">
+                                    @foreach (var img in images)
+                                    {
+                                        <div class="col-6 col-md-4 col-lg-3">
+                                            <div class="card border rounded">
+                                                <div class="position-relative" style="cursor:pointer;">
+                                                    <img src="@img.Path" alt="@img.OriginalName"
+                                                         class="card-img-top" style="height:150px; object-fit:cover;"
+                                                         @onclick="() => OpenLightbox(img)" />
+                                                </div>
+                                                <div class="card-body p-2 text-center">
+                                                    <small class="text-muted d-block text-truncate" title="@img.OriginalName">@img.OriginalName</small>
+                                                    <a href="@img.Path" target="_blank" class="btn btn-sm btn-custom mt-1" title="Descargar">
+                                                        <i class="bi bi-download"></i> Descargar
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="text-muted fst-italic">Sin imágenes</span>
+                            }
+                        }
+                        else if (req.RequirementInputType == RequirementInputType.Url)
+                        {
+                            if (!string.IsNullOrWhiteSpace(answer))
+                            {
+                                <a href="@answer" target="_blank" rel="noopener noreferrer" class="text-break">@answer</a>
+                            }
+                            else
+                            {
+                                <span class="text-muted fst-italic">Sin respuesta</span>
+                            }
+                        }
+                        else if (req.RequirementInputType == RequirementInputType.Date)
+                        {
+                            if (!string.IsNullOrWhiteSpace(answer) && DateTime.TryParse(answer, out var dateVal))
+                            {
+                                <span>@dateVal.ToString("dd/MM/yyyy")</span>
+                            }
+                            else if (!string.IsNullOrWhiteSpace(answer))
+                            {
+                                <span>@answer</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted fst-italic">Sin respuesta</span>
+                            }
+                        }
+                        else if (req.RequirementInputType == RequirementInputType.Time)
+                        {
+                            if (!string.IsNullOrWhiteSpace(answer) && TimeSpan.TryParse(answer, out var timeVal))
+                            {
+                                <span>@timeVal.ToString(@"hh\:mm")</span>
+                            }
+                            else if (!string.IsNullOrWhiteSpace(answer))
+                            {
+                                <span>@answer</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted fst-italic">Sin respuesta</span>
+                            }
+                        }
+                        else
+                        {
+                            if (!string.IsNullOrWhiteSpace(answer))
+                            {
+                                @if (req.RequirementInputType == RequirementInputType.MultilineText)
+                                {
+                                    <pre class="mb-0 text-break" style="white-space:pre-wrap; font-family:inherit;">@answer</pre>
+                                }
+                                else
+                                {
+                                    <span class="text-break">@answer</span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted fst-italic">Sin respuesta</span>
+                            }
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+}
+
+@if (IsLightboxVisible && SelectedImage != null)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.8);">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content bg-transparent border-0">
+                <div class="modal-header border-0">
+                    <small class="text-white text-truncate me-2">@SelectedImage.OriginalName</small>
+                    <button type="button" class="btn-close btn-close-white" @onclick="CloseLightbox"></button>
+                </div>
+                <div class="modal-body text-center p-0">
+                    <img src="@SelectedImage.Path" alt="@SelectedImage.OriginalName" class="img-fluid" style="max-height:80vh;" />
+                </div>
+                <div class="modal-footer border-0 justify-content-center">
+                    <a href="@SelectedImage.Path" target="_blank" class="btn btn-light">
+                        <i class="bi bi-download"></i> Descargar
+                    </a>
+                    <button type="button" class="btn btn-secondary" @onclick="CloseLightbox">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

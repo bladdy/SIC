@@ -1,0 +1,104 @@
+@page "/event-requirements/{EventTypeId:int}"
+<PageTitle>Requisitos del Tipo de Evento</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+    <div>
+        <span class="fs-5 fw-bold">Requisitos: @EventTypeName</span>
+    </div>
+</div>
+
+@if (Loading)
+{
+    <div class="text-center py-4">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row">
+        <!-- Assigned requirements (left) -->
+        <div class="col-md-7 mb-4">
+            <div class="card">
+                <div class="card-header" style="background-color:#3C6A79; color:white;">
+                    <h5 class="mb-0">Requisitos Asignados (@AssignedRequirements.Count)</h5>
+                </div>
+                <div class="card-body">
+                    @if (AssignedRequirements.Count == 0)
+                    {
+                        <p class="text-muted text-center py-3">No hay requisitos asignados. Agrega desde la lista de la derecha.</p>
+                    }
+                    else
+                    {
+                        @foreach (var item in AssignedRequirements)
+                        {
+                            <div class="d-flex align-items-center justify-content-between border rounded p-2 mb-2" style="background-color:#f8f9fa;">
+                                <div class="d-flex align-items-center gap-2 flex-grow-1">
+                                    <div>
+                                        <span class="fw-semibold">@item.RequirementName</span>
+                                        <br />
+                                        <small class="text-muted">@item.RequirementSection &middot; @item.RequirementInputType?.GetDescription()</small>
+                                        @if (item.RequirementIsRequired == true)
+                                        {
+                                            <span class="badge bg-danger ms-1" style="font-size:0.65em;">Obligatorio</span>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-1">
+                                    <button class="btn btn-sm btn-custom" @onclick="() => MoveUp(item)" disabled="@(item.SortOrder <= 1)" title="Subir">
+                                        <i class="bi bi-arrow-up"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-custom d-none" @onclick="() => MoveDown(item)" disabled="@(item.SortOrder >= AssignedRequirements.Count)" title="Bajar">
+                                        <i class="bi bi-arrow-down"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-custom" @onclick="() => RemoveRequirement(item)" title="Remover">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                        <div class="text-end mt-3">
+                            <button class="btn btn-custom" @onclick="SaveOrder">
+                                <i class="bi bi-check-lg"></i> Guardar Orden
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Available requirements (right) -->
+        <div class="col-md-5 mb-4">
+            <div class="card">
+                <div class="card-header" style="background-color:#3C6A79; color:white;">
+                    <h5 class="mb-0">Requisitos Disponibles</h5>
+                </div>
+                <div class="card-body">
+                    <input type="text" class="form-control mb-3" placeholder="Buscar requisito..." @bind="SearchTerm" @bind:event="oninput" />
+                    @foreach (var req in FilteredAvailableRequirements)
+                    {
+                        <div class="d-flex align-items-center justify-content-between border rounded p-2 mb-2">
+                            <div>
+                                <span class="fw-semibold">@req.Name</span>
+                                <br />
+                                <small class="text-muted">@req.Section &middot; @req.InputType.GetDescription()</small>
+                                @if (req.IsRequired)
+                                {
+                                    <span class="badge bg-danger ms-1" style="font-size:0.65em;">Obligatorio</span>
+                                }
+                            </div>
+                            <button class="btn btn-sm btn-custom" @onclick="() => AddRequirement(req)">
+                                <i class="bi bi-plus-lg"></i>
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    // Rendered via code-behind
+}

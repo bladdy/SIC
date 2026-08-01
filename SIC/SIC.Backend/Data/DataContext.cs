@@ -42,6 +42,12 @@ public class DataContext : IdentityDbContext<User>
     public DbSet<MbMActivity> MbMActivities { get; set; }
     public DbSet<MbMProvider> MbMProviders { get; set; }
     public DbSet<MbMTask> MbMTasks { get; set; }
+    public DbSet<Supplier> Supplier { get; set; }
+    public DbSet<EventRequirement> EventRequirements { get; set; }
+    public DbSet<EventTypeRequirement> EventTypeRequirements { get; set; }
+    public DbSet<EventRequirementAnswer> EventRequirementAnswers { get; set; }
+    public DbSet<EventRequirementImage> EventRequirementImages { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -81,6 +87,14 @@ public class DataContext : IdentityDbContext<User>
             .WithOne(c => c.User)
             .HasForeignKey<UserCredit>(c => c.UserId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<EventTypeRequirement>()
+            .HasIndex(x => new { x.EventTypeId, x.RequirementId })
+            .IsUnique();
+
+        modelBuilder.Entity<EventRequirementAnswer>()
+            .HasIndex(x => new { x.EventId, x.RequirementId })
+            .IsUnique();
     }
 
     private void DisableCascadingDelete(ModelBuilder modelBuilder)

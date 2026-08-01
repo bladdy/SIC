@@ -48,6 +48,7 @@ public class Event : IEntityWithName
 
     public string? Planner { get; set; }
     public string? PlannerPhone { get; set; }
+    public bool InvitationInvboxv { get; set; } = false;
     public bool HasAlbum { get; set; } = false;
     public bool OnlyAlbum { get; set; } = false;
     public bool AlbumPublic { get; set; } = true;
@@ -95,7 +96,7 @@ public class Event : IEntityWithName
     public int Confirmations => Invitations?.SelectMany(i => i.Guests).Count(g => g.Status == Status.Attend) ?? 0;
 
     // 🔹 Invitaciones Pendientes
-    public int Pending => Invitations?.Count(i => i.Status == Status.Pending ) ?? 0;
+    public int Pending => Invitations?.Count(i => i.Status == Status.Pending) ?? 0;
 
     // 🔹 Total Adultos invitados
     public int NumberAdults => Invitations?.SelectMany(i => i.Guests).Count(g => g.GuestType == GuestType.Adult) ?? 0;

@@ -2,6 +2,7 @@ using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.JSInterop;
 using SIC.Frontend.Repositories;
 using SIC.Shared.Entities;
 using System.Net;
@@ -12,11 +13,13 @@ namespace SIC.Frontend.Pages.Events
     public partial class EventsIndex
     {
         [Inject] private IRepository repository { get; set; } = default!;
+        [Inject] private IJSRuntime JsRuntime { get; set; } = default!;
         [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
         [Inject] private NavigationManager NavigationManager { get; set; } = default!;
         [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
         [Inject] private HttpClient Http { get; set; } = default!;
 
+        private bool IsCopyURl = false;
         private List<Event>? Events;
         private List<EventType>? EventTypes;
         private List<User> AllUsers = new();
@@ -206,6 +209,7 @@ namespace SIC.Frontend.Pages.Events
                 Planner = evnt.Planner,
                 AlbumPublic = evnt.AlbumPublic,
                 HasAlbum = evnt.HasAlbum,
+                InvitationInvboxv = evnt.InvitationInvboxv,
                 OnlyAlbum = evnt.OnlyAlbum,
                 PlannerPhone = evnt.PlannerPhone,
                 EventType = evnt.EventType,
@@ -243,6 +247,16 @@ namespace SIC.Frontend.Pages.Events
                 await SweetAlertService.FireAsync("Eliminado", "Evento borrado correctamente.", SweetAlertIcon.Success);
                 await LoadEvents(currentPage);
             }
+        }
+
+        private async Task CopiarEventUrl(string Code)
+        {
+            IsCopyURl = true;
+            var url = $"{NavigationManager.BaseUri}event/{Code}/requisitos";
+
+            await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", url);
+            await Task.Delay(1500);
+            IsCopyURl = false;
         }
 
         // Guardar evento (crear o editar)

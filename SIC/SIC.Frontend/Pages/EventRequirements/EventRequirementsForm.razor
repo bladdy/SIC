@@ -1,0 +1,129 @@
+@page "/event/{EventCode}/requisitos"
+@layout LoginLayout
+<PageTitle>Requisitos del Evento</PageTitle>
+
+@if (Loading)
+{
+    <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p class="mt-2 text-muted">Cargando formulario...</p>
+    </div>
+}
+else if (FormDTO == null || FormDTO.Requirements.Count == 0)
+{
+    <div class="text-center py-5">
+        <h4>No hay requisitos configurados para este evento</h4>
+        <p class="text-muted">Contacta al organizador para más información.</p>
+    </div>
+}
+else
+{
+    <div class="container" style="max-width: 700px;">
+        <div class="text-center mb-4">
+            <h3 class="fw-bold">@FormDTO.EventName</h3>
+            <p class="text-muted">Por favor completa la información requerida para tu evento.</p>
+        </div>
+
+        <EditForm Model="this" OnValidSubmit="SaveAll">
+            @foreach (var reqSection in Sections)
+            {
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-header" style="background-color:#3C6A79; color:white;">
+                        <h5 class="mb-0">@reqSection.Key</h5>
+                    </div>
+                    <div class="card-body">
+                        @foreach (var req in reqSection.Value)
+                        {
+                            var answer = GetAnswer(req.RequirementId);
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    @req.RequirementName
+                                    @if (req.RequirementIsRequired == true)
+                                    {
+                                        <span class="text-danger">*</span>
+                                    }
+                                </label>
+
+                                @switch (req.RequirementInputType)
+                                {
+                                    case RequirementInputType.Text:
+                                        <input type="text" class="@GetInputClass(req.RequirementId)" placeholder="@req.RequirementPlaceholder"
+                                               value="@answer?.Value"
+                                               @onchange="e => SetAnswer(req.RequirementId, e.Value?.ToString())" />
+                                        break;
+
+                                    case RequirementInputType.MultilineText:
+                                        <textarea class="@GetInputClass(req.RequirementId)" rows="3" placeholder="@req.RequirementPlaceholder"
+                                                  @onchange="e => SetAnswer(req.RequirementId, e.Value?.ToString())">@answer?.Value</textarea>
+                                        break;
+
+                                    case RequirementInputType.Number:
+                                        <input type="number" class="@GetInputClass(req.RequirementId)" placeholder="@req.RequirementPlaceholder"
+                                               value="@answer?.Value"
+                                               @onchange="e => SetAnswer(req.RequirementId, e.Value?.ToString())" />
+                                        break;
+
+                                    case RequirementInputType.Date:
+                                        <input type="date" class="@GetInputClass(req.RequirementId)"
+                                               value="@answer?.Value"
+                                               @onchange="e => SetAnswer(req.RequirementId, e.Value?.ToString())" />
+                                        break;
+
+                                    case RequirementInputType.Time:
+                                        <input type="time" class="@GetInputClass(req.RequirementId)"
+                                               value="@answer?.Value"
+                                               @onchange="e => SetAnswer(req.RequirementId, e.Value?.ToString())" />
+                                        break;
+
+                                    case RequirementInputType.Url:
+                                        <input type="url" class="@GetInputClass(req.RequirementId)" placeholder="@req.RequirementPlaceholder"
+                                               value="@answer?.Value"
+                                               @onchange="e => SetAnswer(req.RequirementId, e.Value?.ToString())" />
+                                        break;
+
+                                    case RequirementInputType.Image:
+                                        <div class="@(SubmitAttempted && FailedFields.Contains(req.RequirementId) ? "is-invalid" : "")">
+                                            <InputFile class="form-control" OnChange="e => HandleImageUpload(req.RequirementId, e)" accept="image/*" />
+                                            @if (ImagesByRequirement.TryGetValue(req.RequirementId, out var imgs) && imgs.Count > 0)
+                                            {
+                                                <div class="d-flex flex-wrap gap-2 mt-2">
+                                                    @foreach (var img in imgs)
+                                                    {
+                                                        <div class="position-relative">
+                                                            <img src="@img.Path" alt="@img.OriginalName" style="max-height:100px; border-radius:8px;" class="border" />
+                                                            <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0"
+                                                                    style="transform:translate(50%,-50%);border-radius:50%;"
+                                                                    @onclick="() => RemoveImage(req.RequirementId, img)">
+                                                                <i class="bi bi-x"></i>
+                                                            </button>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            }
+                                        </div>
+                                        break;
+                                }
+                                @if (SubmitAttempted && FailedFields.Contains(req.RequirementId))
+                                {
+                                    <span class="text-danger small">Este campo es obligatorio.</span>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            <div class="text-center mb-5">
+                <button type="submit" class="btn btn-custom btn-lg px-5" disabled="@Saving">
+                    @if (Saving)
+                    {
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                    }
+                    <i class="bi bi-check-lg"></i> Guardar Información
+                </button>
+            </div>
+        </EditForm>
+    </div>
+}

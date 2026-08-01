@@ -77,15 +77,65 @@
                                                     <div class="text-muted small mb-2">@even.SubTitle</div>
                                                 }
                                             </div>
-                                            <div class="col-12 col-md-4 d-flex flex-row flex-wrap align-items-center gap-1">
-                                                <a href="@even.Url" target="_blank" class="btn btn-custom w-100">Ver Invitación</a>
-                                                <a href="/events/details/@even.Code" class="btn btn-custom w-100">Invitados</a>
-                                                @if (even.HasAlbum)
-                                                {
-                                                    <a href="/my-album/@even.Code" class="btn btn-custom w-100">Ver Album</a>
+                                            <div class="col-12 col-md-4">
+                                                <div class="d-flex flex-wrap gap-2">
 
-                                                }
-                                                <a href="/events/@even.Code/minute-by-minute" class="btn btn-custom w-100">Minuto a Minuto</a>
+                                                    @if (even.InvitationInvboxv)
+                                                    {
+                                                        <button class="btn btn-custom flex-fill"
+                                                                style="min-width:180px"
+                                                                @onclick="() => CopiarEventUrl(even.Code)"
+                                                                disabled="@IsCopyURl">
+
+                                                            @if (IsCopyURl)
+                                                            {
+                                                                <span class="spinner-border spinner-border-sm me-1"
+                                                                      role="status"
+                                                                      aria-hidden="true"></span>
+                                                                <span>Copiando...</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span>Formulario Inivitacion</span>
+                                                            }
+                                                        </button>
+
+                                                        <a href="/event/@even.Code/requisitos/respuesta"
+                                                           class="btn btn-custom flex-fill"
+                                                           style="min-width:180px">
+                                                            Datos Invitación
+                                                        </a>
+                                                    }
+
+                                                    <a href="@even.Url"
+                                                       target="_blank"
+                                                       class="btn btn-custom flex-fill"
+                                                       style="min-width:180px">
+                                                        Ver Invitación
+                                                    </a>
+
+                                                    <a href="/events/details/@even.Code"
+                                                       class="btn btn-custom flex-fill"
+                                                       style="min-width:180px">
+                                                        Invitados
+                                                    </a>
+
+                                                    @if (even.HasAlbum)
+                                                    {
+                                                        <a href="/my-album/@even.Code"
+                                                           class="btn btn-custom flex-fill"
+                                                           style="min-width:180px">
+                                                            Álbum
+                                                        </a>
+                                                    }
+
+                                                    <a href="/events/@even.Code/minute-by-minute"
+                                                       class="btn btn-custom flex-fill"
+                                                       style="min-width:180px">
+                                                        Minuto a Minuto
+                                                    </a>
+
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -99,12 +149,17 @@
                                     <div class="fw-semibold text-dark">@even.Date.ToString("dd/MM/yyyy")</div>
                                 </td>
                                 <td class="text-center">
-                                    <button class="btn btn-sm btn-custom mb-1" @onclick="() => ShowEditModal(even)">
-                                        <i class="bi bi-pencil-fill"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-custom mb-1" @onclick="() => ConfirmDelete(even)">
-                                        <i class="bi bi-trash-fill"></i>
-                                    </button>
+                                    <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
+                                        <button class="btn btn-sm btn-custom" @onclick="() => ShowEditModal(even)">
+                                            <i class="bi bi-pencil-fill"></i>
+                                        </button>
+
+                                        <button class="btn btn-sm btn-custom" @onclick="() => ConfirmDelete(even)">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
+
+                                        
+                                    </div>
                                 </td>
                             </tr>
                         }
@@ -141,6 +196,12 @@
                             <div class="d-flex gap-2 flex-wrap">
                                 <button class="btn btn-sm btn-custom flex-grow-1" @onclick="() => ShowEditModal(even)"><i class="bi bi-pencil-fill"></i> Editar</button>
                                 <button class="btn btn-sm btn-custom flex-grow-1" @onclick="() => ConfirmDelete(even)"><i class="bi bi-trash-fill"></i> Borrar</button>
+                                @if (even.InvitationInvboxv)
+                                {
+                                    <a href="/event/@even.Code/requisitos" class="btn btn-sm btn-custom flex-grow-1"><i class="bi bi-clipboard-check"></i> Requisitos</a>
+                                    <a href="/event/@even.Code/requisitos/respuesta" class="btn btn-sm btn-custom flex-grow-1"><i class="bi bi-eye"></i> Respuestas</a>
+                                    
+                                }
                                 <a href="@even.Url" target="_blank" class="btn btn-sm btn-custom flex-grow-1">Ver Invitación</a>
                                 <a href="/events/details/@even.Code" class="btn btn-sm btn-custom flex-grow-1">Invitados</a>
                                 @if (even.HasAlbum)
@@ -305,6 +366,15 @@
                                                    @bind-Value="NewEvent.OnlyAlbum" />
                                     <label class="form-check-label ms-1">
                                         Solo Álbum
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <div class="form-check">
+                                    <InputCheckbox class="form-check-input"
+                                                   @bind-Value="NewEvent.InvitationInvboxv" />
+                                    <label class="form-check-label ms-1">
+                                        Invitacion Invboxv
                                     </label>
                                 </div>
                             </div>
