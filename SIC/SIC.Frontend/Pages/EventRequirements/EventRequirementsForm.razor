@@ -20,10 +20,16 @@ else if (FormDTO == null || FormDTO.Requirements.Count == 0)
 }
 else
 {
-    <div class="container" style="max-width: 700px;">
+    <div class="container" style="max-width: 700px; padding: 20px;">
         <div class="text-center mb-4">
             <h3 class="fw-bold">@FormDTO.EventName</h3>
-            <p class="text-muted">Por favor completa la información requerida para tu evento.</p>
+            <p class="text-muted mb-2">
+                <strong>📌 Importante:</strong> Toda la información que solicitamos debe enviarse <strong>únicamente por escrito a través de este formulario</strong>. La elaboración de tu invitación comenzará una vez que hayamos recibido toda la información solicitada.
+            </p>
+
+            <p class="text-muted">
+                Si algún dato no aplica o prefieres no incluirlo, escribe <strong>"OMITIR"</strong> en el campo correspondiente. De esta forma sabremos que no se trata de información pendiente y podremos continuar con el proceso sin retrasos. 🤩
+            </p>
         </div>
 
         <EditForm Model="this" OnValidSubmit="SaveAll">
