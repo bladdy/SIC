@@ -71,6 +71,13 @@ else
                                                     <img src="@img.Path" alt="@img.OriginalName"
                                                          class="card-img-top" style="height:150px; object-fit:cover;"
                                                          @onclick="() => OpenLightbox(img)" />
+                                                    <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0"
+                                                            style="transform:translate(50%,-50%);border-radius:50%;"
+                                                            title="Eliminar imagen"
+                                                            @onclick="() => DeleteImage(img)"
+                                                            @onclick:stopPropagation="true">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
                                                 </div>
                                                 <div class="card-body p-2 text-center">
                                                     <small class="text-muted d-block text-truncate" title="@img.OriginalName">@img.OriginalName</small>

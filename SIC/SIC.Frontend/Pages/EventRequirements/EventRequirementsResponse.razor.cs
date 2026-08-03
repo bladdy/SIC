@@ -118,4 +118,40 @@ public partial class EventRequirementsResponse
         IsLightboxVisible = false;
         SelectedImage = null;
     }
+
+    private async Task DeleteImage(EventRequirementImage img)
+    {
+        var result = await sweetAlertService.FireAsync(new SweetAlertOptions
+        {
+            Title = "¿Eliminar imagen?",
+            Text = $"Se eliminará \"{img.OriginalName}\". Esta acción no se puede deshacer.",
+            Icon = SweetAlertIcon.Warning,
+            ShowCancelButton = true,
+            ConfirmButtonText = "Sí, eliminar",
+            CancelButtonText = "Cancelar"
+        });
+
+        if (string.IsNullOrEmpty(result.Value)) return;
+
+        var response = await repository.DeleteAsync<EventRequirementImage>($"api/EventRequirementImages/{img.Id}");
+        if (response.Error)
+        {
+            var message = await response.GetErrorMessageAsync() ?? "No se pudo eliminar la imagen.";
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        foreach (var reqId in ImagesByRequirement.Keys.ToList())
+        {
+            var list = ImagesByRequirement[reqId];
+            if (list.Remove(img))
+            {
+                if (list.Count == 0) ImagesByRequirement.Remove(reqId);
+                break;
+            }
+        }
+
+        StateHasChanged();
+        await sweetAlertService.FireAsync("Eliminada", "Imagen eliminada correctamente.", SweetAlertIcon.Success);
+    }
 }

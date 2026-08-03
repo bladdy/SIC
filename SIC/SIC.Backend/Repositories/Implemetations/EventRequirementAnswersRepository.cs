@@ -3,6 +3,7 @@ using SIC.Backend.Data;
 using SIC.Backend.Repositories.Interfaces;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
+using SIC.Shared.Enums;
 using SIC.Shared.Response;
 
 namespace SIC.Backend.Repositories.Implemetations;
@@ -77,6 +78,51 @@ public class EventRequirementAnswersRepository : GenericRepository<EventRequirem
 
     public async Task<ActionResponse<SaveFormResponseDTO>> SaveFormAsync(int eventId, List<EventRequirementAnswerDTO> answers, List<EventRequirementImageDTO> images)
     {
+        var ev = await _context.Events.FirstOrDefaultAsync(e => e.Id == eventId);
+        if (ev?.EventTypeId == null)
+        {
+            return new ActionResponse<SaveFormResponseDTO>
+            {
+                Message = "El evento no tiene tipo asignado."
+            };
+        }
+
+        var configs = await _context.EventTypeRequirements
+            .Include(x => x.Requirement)
+            .Where(x => x.EventTypeId == ev.EventTypeId)
+            .ToListAsync();
+
+        var imageCounts = images
+            .GroupBy(i => i.RequirementId)
+            .ToDictionary(g => g.Key, g => g.Count());
+
+        foreach (var config in configs)
+        {
+            if (config.Requirement?.InputType != RequirementInputType.Image) continue;
+
+            var count = imageCounts.GetValueOrDefault(config.RequirementId);
+            var min = config.Requirement.MinImages > 0
+                ? config.Requirement.MinImages
+                : (config.Requirement.IsRequired ? 1 : 0);
+            var max = config.Requirement.MaxImages;
+
+            if (max > 0 && count > max)
+            {
+                return new ActionResponse<SaveFormResponseDTO>
+                {
+                    Message = $"El requisito '{config.Requirement.Name}' solo admite hasta {max} imágenes."
+                };
+            }
+
+            if (count < min)
+            {
+                return new ActionResponse<SaveFormResponseDTO>
+                {
+                    Message = $"El requisito '{config.Requirement.Name}' requiere mínimo {min} imágenes."
+                };
+            }
+        }
+
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {

@@ -91,7 +91,28 @@ else
 
                                     case RequirementInputType.Image:
                                         <div class="@(SubmitAttempted && FailedFields.Contains(req.RequirementId) ? "is-invalid" : "")">
-                                            <InputFile class="form-control" OnChange="e => HandleImageUpload(req.RequirementId, e)" accept="image/*" />
+                                            <InputFile class="form-control"
+                                                       OnChange="e => HandleImageUpload(req.RequirementId, e)"
+                                                       accept="image/*"
+                                                       disabled="@(req.RequirementMaxImages > 0 && GetImageCount(req.RequirementId) >= req.RequirementMaxImages)" />
+                                            @if (req.RequirementMinImages > 0 || req.RequirementMaxImages > 0)
+                                            {
+                                                <small class="text-muted d-block mt-1">
+                                                    @if (req.RequirementMinImages > 0)
+                                                    {
+                                                        <span>Mínimo: @req.RequirementMinImages</span>
+                                                    }
+                                                    @if (req.RequirementMinImages > 0 && req.RequirementMaxImages > 0)
+                                                    {
+                                                        <text> · </text>
+                                                    }
+                                                    @if (req.RequirementMaxImages > 0)
+                                                    {
+                                                        <span>Máximo: @req.RequirementMaxImages</span>
+                                                    }
+                                                    <span> (Subidas: @GetImageCount(req.RequirementId))</span>
+                                                </small>
+                                            }
                                             @if (ImagesByRequirement.TryGetValue(req.RequirementId, out var imgs) && imgs.Count > 0)
                                             {
                                                 <div class="d-flex flex-wrap gap-2 mt-2">
@@ -113,7 +134,7 @@ else
                                 }
                                 @if (SubmitAttempted && FailedFields.Contains(req.RequirementId))
                                 {
-                                    <span class="text-danger small">Este campo es obligatorio.</span>
+                                    <span class="text-danger small">@(FieldErrorMessages.GetValueOrDefault(req.RequirementId) ?? "Este campo es obligatorio.")</span>
                                 }
                             </div>
                         }

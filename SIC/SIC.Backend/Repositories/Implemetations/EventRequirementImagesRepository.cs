@@ -44,4 +44,17 @@ public class EventRequirementImagesRepository : GenericRepository<EventRequireme
             Result = entities
         };
     }
+
+    public async Task<ActionResponse<EventRequirementImage>> GetByIdWithAnswerAsync(int id)
+    {
+        var entity = await _context.EventRequirementImages
+            .Include(x => x.RequirementAnswer)
+            .FirstOrDefaultAsync(x => x.Id == id);
+
+        return new ActionResponse<EventRequirementImage>
+        {
+            Success = true,
+            Result = entity
+        };
+    }
 }

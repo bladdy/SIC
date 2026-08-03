@@ -28,6 +28,7 @@ public partial class EventRequirementsForm
     private Dictionary<int, List<EventRequirementImageDTO>> ImagesByRequirement { get; set; } = new();
     private Dictionary<string, List<EventTypeRequirementDTO>> Sections { get; set; } = new();
     private HashSet<int> FailedFields { get; set; } = new();
+    private Dictionary<int, string> FieldErrorMessages { get; set; } = new();
     private Dictionary<int, List<PendingImage>> PendingImages { get; set; } = new();
 
     private record PendingImage(byte[] Data, string FileName);
@@ -132,6 +133,7 @@ public partial class EventRequirementsForm
     {
         AnswerValues[requirementId] = value;
         FailedFields.Remove(requirementId);
+        FieldErrorMessages.Remove(requirementId);
 
         if (FormDTO == null) return;
 
@@ -156,11 +158,52 @@ public partial class EventRequirementsForm
         return SubmitAttempted && FailedFields.Contains(requirementId) ? "form-control is-invalid" : "form-control";
     }
 
+    private EventTypeRequirementDTO? GetRequirement(int requirementId)
+    {
+        return FormDTO?.Requirements.FirstOrDefault(r => r.RequirementId == requirementId);
+    }
+
+    private int GetImageCount(int requirementId)
+    {
+        return ImagesByRequirement.TryGetValue(requirementId, out var imgs) ? imgs.Count : 0;
+    }
+
     private async Task HandleImageUpload(int requirementId, InputFileChangeEventArgs e)
     {
-        var file = e.File;
-        if (file == null || file.Size == 0) return;
+        var files = e.GetMultipleFiles();
+        if (files.Count == 0) return;
 
+        var req = GetRequirement(requirementId);
+        if (req == null) return;
+
+        var currentCount = GetImageCount(requirementId);
+        var max = req.RequirementMaxImages;
+        if (max > 0 && currentCount >= max)
+        {
+            await sweetAlertService.FireAsync("Límite alcanzado",
+                max == 1
+                    ? "Este campo solo admite 1 imagen."
+                    : $"Este campo solo admite hasta {max} imágenes.",
+                SweetAlertIcon.Warning);
+            return;
+        }
+
+        var remaining = max > 0 ? max - currentCount : files.Count;
+        if (remaining <= 0) return;
+
+        foreach (var file in files.Take(remaining))
+        {
+            if (file == null || file.Size == 0) continue;
+            await AddPendingImage(requirementId, file);
+        }
+
+        FailedFields.Remove(requirementId);
+        FieldErrorMessages.Remove(requirementId);
+        StateHasChanged();
+    }
+
+    private async Task AddPendingImage(int requirementId, IBrowserFile file)
+    {
         using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
         using var memoryStream = new MemoryStream();
         await stream.CopyToAsync(memoryStream);
@@ -183,9 +226,6 @@ public partial class EventRequirementsForm
             Path = previewUrl,
             Order = ImagesByRequirement[requirementId].Count + 1
         });
-
-        FailedFields.Remove(requirementId);
-        StateHasChanged();
     }
 
     private void RemoveImage(int requirementId, EventRequirementImageDTO img)
@@ -204,6 +244,7 @@ public partial class EventRequirementsForm
         if (list.Count == 0) ImagesByRequirement.Remove(requirementId);
 
         FailedFields.Remove(requirementId);
+        FieldErrorMessages.Remove(requirementId);
         StateHasChanged();
     }
 
@@ -213,30 +254,48 @@ public partial class EventRequirementsForm
 
         SubmitAttempted = true;
         FailedFields.Clear();
+        FieldErrorMessages.Clear();
 
         foreach (var req in FormDTO.Requirements)
         {
-            if (req.RequirementIsRequired != true) continue;
-
             if (req.RequirementInputType == RequirementInputType.Image)
             {
-                var hasImages = ImagesByRequirement.TryGetValue(req.RequirementId, out var imgs)
-                    && imgs.Count > 0;
-                if (!hasImages)
+                var count = GetImageCount(req.RequirementId);
+                var min = req.RequirementMinImages > 0
+                    ? req.RequirementMinImages
+                    : (req.RequirementIsRequired == true ? 1 : 0);
+                var max = req.RequirementMaxImages;
+
+                if (max > 0 && count > max)
+                {
                     FailedFields.Add(req.RequirementId);
+                    FieldErrorMessages[req.RequirementId] = max == 1
+                        ? "Este campo solo admite 1 imagen."
+                        : $"Este campo solo admite hasta {max} imágenes.";
+                }
+                else if (count < min)
+                {
+                    FailedFields.Add(req.RequirementId);
+                    FieldErrorMessages[req.RequirementId] = min == 1
+                        ? "Debes subir al menos 1 imagen."
+                        : $"Debes subir al menos {min} imágenes.";
+                }
             }
-            else
+            else if (req.RequirementIsRequired == true)
             {
                 var val = AnswerValues.GetValueOrDefault(req.RequirementId);
                 if (string.IsNullOrWhiteSpace(val))
+                {
                     FailedFields.Add(req.RequirementId);
+                    FieldErrorMessages[req.RequirementId] = "Este campo es obligatorio.";
+                }
             }
         }
 
         if (FailedFields.Count > 0)
         {
             await sweetAlertService.FireAsync("Validación",
-                "Por favor completa todos los campos obligatorios marcados con *.",
+                "Por favor corrige los campos marcados en rojo.",
                 SweetAlertIcon.Warning);
             return;
         }
@@ -260,13 +319,34 @@ public partial class EventRequirementsForm
         content.Add(new StringContent(FormDTO.EventId.ToString()), "eventId");
         content.Add(new StringContent(JsonSerializer.Serialize(allAnswers), Encoding.UTF8, "application/json"), "answers");
 
+        var existingImages = ImagesByRequirement
+            .SelectMany(kv => kv.Value
+                .Where(i => i.Id != 0)
+                .Select(i => new EventRequirementImageDTO
+                {
+                    Id = i.Id,
+                    RequirementId = kv.Key,
+                    RequirementAnswerId = i.RequirementAnswerId,
+                    FileName = i.FileName,
+                    OriginalName = i.OriginalName,
+                    Path = i.Path,
+                    Order = i.Order
+                }))
+            .ToList();
+        content.Add(new StringContent(JsonSerializer.Serialize(existingImages), Encoding.UTF8, "application/json"), "existingImages");
+
         foreach (var (reqId, files) in PendingImages)
         {
-            foreach (var pending in files)
+            if (!ImagesByRequirement.TryGetValue(reqId, out var imgs)) continue;
+            var pendingIndex = 0;
+            foreach (var img in imgs.Where(i => i.Id == 0).OrderBy(i => i.Order))
             {
+                if (pendingIndex >= files.Count) break;
+                var pending = files[pendingIndex];
                 var fileContent = new StreamContent(new MemoryStream(pending.Data));
                 fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-                content.Add(fileContent, $"images_{reqId}", pending.FileName);
+                content.Add(fileContent, $"images_{reqId}_{img.Order}", pending.FileName);
+                pendingIndex++;
             }
         }
 
@@ -283,20 +363,9 @@ public partial class EventRequirementsForm
 
         if (response.Response != null)
         {
-            foreach (var imgDto in response.Response.Images)
-            {
-                if (ImagesByRequirement.TryGetValue(imgDto.RequirementId, out var imgs))
-                {
-                    var temp = imgs.FirstOrDefault(i => i.Order == imgDto.Order && i.Id == 0);
-                    if (temp != null)
-                    {
-                        temp.Id = imgDto.Id;
-                        temp.RequirementAnswerId = imgDto.RequirementAnswerId;
-                        temp.FileName = imgDto.FileName;
-                        temp.Path = imgDto.Path;
-                    }
-                }
-            }
+            ImagesByRequirement = response.Response.Images
+                .GroupBy(i => i.RequirementId)
+                .ToDictionary(g => g.Key, g => g.ToList());
             PendingImages.Clear();
         }
 

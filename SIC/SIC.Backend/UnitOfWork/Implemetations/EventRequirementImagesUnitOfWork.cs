@@ -18,4 +18,5 @@ public class EventRequirementImagesUnitOfWork : GenericUnitOfWork<EventRequireme
 
     public async Task<ActionResponse<IEnumerable<EventRequirementImage>>> GetByAnswerIdAsync(int answerId) => await _repository.GetByAnswerIdAsync(answerId);
     public async Task<ActionResponse<IEnumerable<EventRequirementImage>>> GetByEventIdAsync(int eventId) => await _repository.GetByEventIdAsync(eventId);
+    public async Task<ActionResponse<EventRequirementImage>> GetByIdWithAnswerAsync(int id) => await _repository.GetByIdWithAnswerAsync(id);
 }

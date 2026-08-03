@@ -19,7 +19,7 @@ namespace SIC.Frontend.Pages.Events
         [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
         [Inject] private HttpClient Http { get; set; } = default!;
 
-        private bool IsCopyURl = false;
+        private string? CopyingEventCode;
         private List<Event>? Events;
         private List<EventType>? EventTypes;
         private List<User> AllUsers = new();
@@ -251,12 +251,12 @@ namespace SIC.Frontend.Pages.Events
 
         private async Task CopiarEventUrl(string Code)
         {
-            IsCopyURl = true;
+            CopyingEventCode = Code;
             var url = $"{NavigationManager.BaseUri}event/{Code}/requisitos";
 
             await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", url);
             await Task.Delay(1500);
-            IsCopyURl = false;
+            CopyingEventCode = null;
         }
 
         // Guardar evento (crear o editar)

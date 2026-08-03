@@ -85,9 +85,9 @@
                                                         <button class="btn btn-custom flex-fill"
                                                                 style="min-width:180px"
                                                                 @onclick="() => CopiarEventUrl(even.Code)"
-                                                                disabled="@IsCopyURl">
+                                                                disabled="@(CopyingEventCode == even.Code)">
 
-                                                            @if (IsCopyURl)
+                                                            @if (CopyingEventCode == even.Code)
                                                             {
                                                                 <span class="spinner-border spinner-border-sm me-1"
                                                                       role="status"

@@ -9,4 +9,5 @@ public interface IEventRequirementImagesRepository : IGenericRepository<EventReq
 {
     Task<ActionResponse<IEnumerable<EventRequirementImage>>> GetByAnswerIdAsync(int answerId);
     Task<ActionResponse<IEnumerable<EventRequirementImage>>> GetByEventIdAsync(int eventId);
+    Task<ActionResponse<EventRequirementImage>> GetByIdWithAnswerAsync(int id);
 }

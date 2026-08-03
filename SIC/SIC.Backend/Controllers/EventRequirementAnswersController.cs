@@ -61,17 +61,23 @@ public class EventRequirementAnswersController : GenericController<EventRequirem
         var filesByReq = new Dictionary<int, List<(IFormFile File, int Order)>>();
         foreach (var file in Request.Form.Files)
         {
-            var match = Regex.Match(file.Name, @"^images_(\d+)$");
+            var match = Regex.Match(file.Name, @"^images_(\d+)_(\d+)$");
             if (match.Success)
             {
                 var reqId = int.Parse(match.Groups[1].Value);
+                var order = int.Parse(match.Groups[2].Value);
                 if (!filesByReq.ContainsKey(reqId))
                     filesByReq[reqId] = new List<(IFormFile, int)>();
-                filesByReq[reqId].Add((file, filesByReq[reqId].Count + 1));
+                filesByReq[reqId].Add((file, order));
             }
         }
 
-        var imageDtos = new List<EventRequirementImageDTO>();
+        var existingImagesJson = Request.Form["existingImages"].FirstOrDefault();
+        var existingImages = string.IsNullOrEmpty(existingImagesJson)
+            ? new List<EventRequirementImageDTO>()
+            : JsonSerializer.Deserialize<List<EventRequirementImageDTO>>(existingImagesJson) ?? new List<EventRequirementImageDTO>();
+
+        var imageDtos = new List<EventRequirementImageDTO>(existingImages);
         foreach (var (reqId, fileEntries) in filesByReq)
         {
             foreach (var (file, order) in fileEntries)

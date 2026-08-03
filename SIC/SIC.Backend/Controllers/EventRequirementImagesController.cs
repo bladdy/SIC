@@ -68,4 +68,34 @@ public class EventRequirementImagesController : GenericController<EventRequireme
 
         return Ok(response.Result);
     }
+
+    [HttpDelete("{id}")]
+    public override async Task<IActionResult> Delete(int id)
+    {
+        var getResponse = await _unitOfWork.GetByIdWithAnswerAsync(id);
+        if (!getResponse.Success)
+            return BadRequest(getResponse.Message);
+        if (getResponse.Result == null)
+            return NotFound("Imagen no encontrada.");
+
+        var image = getResponse.Result;
+        if (image.RequirementAnswer != null)
+        {
+            var folder = $"event-requirements/{image.RequirementAnswer.EventId}";
+            try
+            {
+                await _ftpService.DeleteFileAsync(folder, image.FileName);
+            }
+            catch
+            {
+                // Si el archivo FTP no se puede borrar, continuamos con el borrado en BD.
+            }
+        }
+
+        var response = await _unitOfWork.DeleteAsync(id);
+        if (!response.Success)
+            return BadRequest(response.Message);
+
+        return Ok(response.Result);
+    }
 }
