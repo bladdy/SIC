@@ -20,6 +20,54 @@ namespace SIC.Frontend.Pages.Whatsapp
         [Inject] private NavigationManager NavigationManager { get; set; } = default!;
         [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
 
+        private static readonly HashSet<string> TemplateImages = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "recordatorio_registro_de_asistentes",
+            "cierre_listas_de_asistencia",
+            "confirmacion_de_acceso_con_mesa",
+            "confirmacion_de_acceso_general",
+            "registro_de_asistentes",
+            "save_the_date"
+        };
+
+        private string? SelectedImageUrl;
+        private string? SelectedImageName;
+
+        private string? GetTemplateImageUrl(string? templateName)
+        {
+            if (string.IsNullOrWhiteSpace(templateName)) return null;
+
+            var name = templateName.Trim().ToLower();
+            if (TemplateImages.Contains(name))
+                return $"{NavigationManager.BaseUri}template-img/{name}.png";
+
+            var match = TemplateImages.FirstOrDefault(img => name.StartsWith(img));
+            return match == null
+                ? null
+                : $"{NavigationManager.BaseUri}template-img/{match}.png";
+        }
+
+        private async Task OpenTemplateImage(TemplateDatum template)
+        {
+            var url = GetTemplateImageUrl(template.Name);
+            if (url == null)
+            {
+                await SweetAlertService.FireAsync("Sin imagen",
+                    $"No hay imagen disponible para la plantilla '{template.Name}'.",
+                    SweetAlertIcon.Info);
+                return;
+            }
+
+            SelectedImageUrl = url;
+            SelectedImageName = template.Name;
+        }
+
+        private void CloseTemplateImage()
+        {
+            SelectedImageUrl = null;
+            SelectedImageName = null;
+        }
+
         protected override async Task OnInitializedAsync()
         {
             await LoadAllTemplates();
@@ -50,10 +98,10 @@ namespace SIC.Frontend.Pages.Whatsapp
             var confirm = await SweetAlertService.FireAsync(new SweetAlertOptions
             {
                 Title = "Generar plantillas",
-                Text = "Se crearán las 5 plantillas en segundo plano. El proceso puede tardar aproximadamente 5 minutos.",
+                Text = "Se crearï¿½n las 5 plantillas en segundo plano. El proceso puede tardar aproximadamente 5 minutos.",
                 Icon = SweetAlertIcon.Question,
                 ShowCancelButton = true,
-                ConfirmButtonText = "Sí, generar",
+                ConfirmButtonText = "Sï¿½, generar",
                 CancelButtonText = "Cancelar"
             });
 
