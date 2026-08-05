@@ -1,5 +1,6 @@
 ﻿using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
+using SIC.Shared.Enums;
 using SIC.Shared.Response;
 
 namespace SIC.Backend.Repositories.Interfaces;
@@ -19,4 +20,6 @@ public interface IEventsRepository
     Task<ActionResponse<Event>> AddFullAsync(Event events);
 
     Task<ActionResponse<Event>> UpdateFullAsync(Event events);
+
+    Task<ActionResponse<Event>> SetRequirementFormStatusAsync(int eventId, Status status);
 }

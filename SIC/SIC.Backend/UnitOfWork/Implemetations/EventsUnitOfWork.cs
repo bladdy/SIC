@@ -4,6 +4,7 @@ using SIC.Backend.Repositories.Interfaces;
 using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
+using SIC.Shared.Enums;
 using SIC.Shared.Response;
 
 namespace SIC.Backend.UnitOfWork.Implemetations;
@@ -30,4 +31,6 @@ public class EventsUnitOfWork : GenericUnitOfWork<Event>, IEventsUnitOfWork
     public override async Task<ActionResponse<IEnumerable<Event>>> GetAsync(PaginationDTO pagination) => await _eventstRepository.GetAsync(pagination);
 
     public override async Task<ActionResponse<int>> GetTotalRecordAsync(PaginationDTO pagination) => await _eventstRepository.GetTotalRecordAsync(pagination);
+
+    public async Task<ActionResponse<Event>> SetRequirementFormStatusAsync(int eventId, Status status) => await _eventstRepository.SetRequirementFormStatusAsync(eventId, status);
 }

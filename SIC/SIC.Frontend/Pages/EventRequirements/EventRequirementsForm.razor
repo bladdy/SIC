@@ -57,35 +57,41 @@ else
                                     case RequirementInputType.Text:
                                         <input type="text" class="@GetInputClass(req.RequirementId)" placeholder="@req.RequirementPlaceholder"
                                                value="@answer?.Value"
+                                               disabled="@IsFieldLocked(req.RequirementId)"
                                                @onchange="e => SetAnswer(req.RequirementId, e.Value?.ToString())" />
                                         break;
 
                                     case RequirementInputType.MultilineText:
                                         <textarea class="@GetInputClass(req.RequirementId)" rows="3" placeholder="@req.RequirementPlaceholder"
+                                                  disabled="@IsFieldLocked(req.RequirementId)"
                                                   @onchange="e => SetAnswer(req.RequirementId, e.Value?.ToString())">@answer?.Value</textarea>
                                         break;
 
                                     case RequirementInputType.Number:
                                         <input type="number" class="@GetInputClass(req.RequirementId)" placeholder="@req.RequirementPlaceholder"
                                                value="@answer?.Value"
+                                               disabled="@IsFieldLocked(req.RequirementId)"
                                                @onchange="e => SetAnswer(req.RequirementId, e.Value?.ToString())" />
                                         break;
 
                                     case RequirementInputType.Date:
                                         <input type="date" class="@GetInputClass(req.RequirementId)"
                                                value="@answer?.Value"
+                                               disabled="@IsFieldLocked(req.RequirementId)"
                                                @onchange="e => SetAnswer(req.RequirementId, e.Value?.ToString())" />
                                         break;
 
                                     case RequirementInputType.Time:
                                         <input type="time" class="@GetInputClass(req.RequirementId)"
                                                value="@answer?.Value"
+                                               disabled="@IsFieldLocked(req.RequirementId)"
                                                @onchange="e => SetAnswer(req.RequirementId, e.Value?.ToString())" />
                                         break;
 
                                     case RequirementInputType.Url:
                                         <input type="url" class="@GetInputClass(req.RequirementId)" placeholder="@req.RequirementPlaceholder"
                                                value="@answer?.Value"
+                                               disabled="@IsFieldLocked(req.RequirementId)"
                                                @onchange="e => SetAnswer(req.RequirementId, e.Value?.ToString())" />
                                         break;
 
@@ -94,7 +100,7 @@ else
                                             <InputFile class="form-control"
                                                        OnChange="e => HandleImageUpload(req.RequirementId, e)"
                                                        accept="image/*"
-                                                       disabled="@(req.RequirementMaxImages > 0 && GetImageCount(req.RequirementId) >= req.RequirementMaxImages)" />
+                                                       disabled="@(IsFieldLocked(req.RequirementId) || (req.RequirementMaxImages > 0 && GetImageCount(req.RequirementId) >= req.RequirementMaxImages))" />
                                             @if (req.RequirementMinImages > 0 || req.RequirementMaxImages > 0)
                                             {
                                                 <small class="text-muted d-block mt-1">
@@ -120,11 +126,14 @@ else
                                                     {
                                                         <div class="position-relative">
                                                             <img src="@img.Path" alt="@img.OriginalName" style="max-height:100px; border-radius:8px;" class="border" />
-                                                            <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0"
-                                                                    style="transform:translate(50%,-50%);border-radius:50%;"
-                                                                    @onclick="() => RemoveImage(req.RequirementId, img)">
-                                                                <i class="bi bi-x"></i>
-                                                            </button>
+                                                            @if (!IsFieldLocked(req.RequirementId))
+                                                            {
+                                                                <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0"
+                                                                        style="transform:translate(50%,-50%);border-radius:50%;"
+                                                                        @onclick="() => RemoveImage(req.RequirementId, img)">
+                                                                    <i class="bi bi-x"></i>
+                                                                </button>
+                                                            }
                                                         </div>
                                                     }
                                                 </div>

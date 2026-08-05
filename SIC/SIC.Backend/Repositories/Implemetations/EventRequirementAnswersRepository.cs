@@ -173,6 +173,13 @@ public class EventRequirementAnswersRepository : GenericRepository<EventRequirem
             }
             await _context.SaveChangesAsync();
 
+            ev.RequirementFormStatus = Status.Completed;
+            if (ev.RequirementFormCompletedAt == null)
+                ev.RequirementFormCompletedAt = DateTime.UtcNow;
+            ev.RequirementFormModifiedAt = DateTime.UtcNow;
+            _context.Events.Update(ev);
+            await _context.SaveChangesAsync();
+
             await transaction.CommitAsync();
 
             var answerMap = savedAnswers.ToDictionary(a => a.Id, a => a.RequirementId);

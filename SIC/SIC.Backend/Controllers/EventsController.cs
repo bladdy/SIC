@@ -4,6 +4,7 @@ using SIC.Backend.Services;
 using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
+using SIC.Shared.Enums;
 using SIC.Shared.Response;
 using System.Text.Json;
 
@@ -97,6 +98,17 @@ public class EventsController : GenericController<Event>
             return Ok(action.Result);
         }
         return NotFound(action.Message);
+    }
+
+    [HttpPost("requirement-status/{id}/{status}")]
+    public async Task<IActionResult> SetRequirementFormStatusAsync(int id, Status status)
+    {
+        var action = await _eventsUnitOfWork.SetRequirementFormStatusAsync(id, status);
+        if (action.Success)
+        {
+            return Ok(action.Result);
+        }
+        return BadRequest(action.Message);
     }
 
     [HttpPost("upload-frontpage/{code}")]

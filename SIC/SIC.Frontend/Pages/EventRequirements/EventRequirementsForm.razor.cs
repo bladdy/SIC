@@ -30,6 +30,7 @@ public partial class EventRequirementsForm
     private HashSet<int> FailedFields { get; set; } = new();
     private Dictionary<int, string> FieldErrorMessages { get; set; } = new();
     private Dictionary<int, List<PendingImage>> PendingImages { get; set; } = new();
+    private HashSet<int> LockedRequirementIds { get; set; } = new();
 
     private record PendingImage(byte[] Data, string FileName);
 
@@ -121,6 +122,18 @@ public partial class EventRequirementsForm
             .GroupBy(r => r.RequirementSection ?? "General")
             .ToDictionary(g => g.Key, g => g.ToList());
 
+        LockedRequirementIds = typeReqs
+            .Where(r =>
+            {
+                if (r.RequirementInputType == RequirementInputType.Image)
+                    return ImagesByRequirement.TryGetValue(r.RequirementId, out var imgs) && imgs.Count > 0;
+
+                var value = existingAnswers.FirstOrDefault(a => a.RequirementId == r.RequirementId)?.Value;
+                return !string.IsNullOrWhiteSpace(value);
+            })
+            .Select(r => r.RequirementId)
+            .ToHashSet();
+
         Loading = false;
     }
 
@@ -166,6 +179,11 @@ public partial class EventRequirementsForm
     private int GetImageCount(int requirementId)
     {
         return ImagesByRequirement.TryGetValue(requirementId, out var imgs) ? imgs.Count : 0;
+    }
+
+    private bool IsFieldLocked(int requirementId)
+    {
+        return LockedRequirementIds.Contains(requirementId);
     }
 
     private async Task HandleImageUpload(int requirementId, InputFileChangeEventArgs e)
@@ -367,6 +385,15 @@ public partial class EventRequirementsForm
                 .GroupBy(i => i.RequirementId)
                 .ToDictionary(g => g.Key, g => g.ToList());
             PendingImages.Clear();
+        }
+
+        foreach (var req in FormDTO.Requirements)
+        {
+            var hasContent = req.RequirementInputType == RequirementInputType.Image
+                ? GetImageCount(req.RequirementId) > 0
+                : !string.IsNullOrWhiteSpace(AnswerValues.GetValueOrDefault(req.RequirementId));
+
+            if (hasContent) LockedRequirementIds.Add(req.RequirementId);
         }
 
         await sweetAlertService.Mixin(new SweetAlertOptions

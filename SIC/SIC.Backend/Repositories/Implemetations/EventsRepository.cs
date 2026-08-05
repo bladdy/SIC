@@ -4,6 +4,7 @@ using SIC.Backend.Helpers;
 using SIC.Backend.Repositories.Interfaces;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
+using SIC.Shared.Enums;
 using SIC.Shared.Response;
 
 namespace SIC.Backend.Repositories.Implemetations;
@@ -154,6 +155,32 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
                 Message = exception.Message
             };
         }
+    }
+
+    public async Task<ActionResponse<Event>> SetRequirementFormStatusAsync(int eventId, Status status)
+    {
+        var ev = await _context.Events.FirstOrDefaultAsync(e => e.Id == eventId);
+        if (ev == null)
+        {
+            return new ActionResponse<Event>
+            {
+                Success = false,
+                Message = "El evento no existe."
+            };
+        }
+
+        ev.RequirementFormStatus = status;
+        if (status == Status.Completed && ev.RequirementFormCompletedAt == null)
+            ev.RequirementFormCompletedAt = DateTime.UtcNow;
+        ev.RequirementFormModifiedAt = DateTime.UtcNow;
+        _context.Update(ev);
+        await _context.SaveChangesAsync();
+
+        return new ActionResponse<Event>
+        {
+            Success = true,
+            Result = ev
+        };
     }
 
     public override async Task<ActionResponse<int>> GetTotalRecordAsync(PaginationDTO pagination)
