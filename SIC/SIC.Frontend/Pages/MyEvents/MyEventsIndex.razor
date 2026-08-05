@@ -158,13 +158,14 @@
                                                             Álbum
                                                         </a>
                                                     }
-
-                                                    <a href="/events/@even.Code/minute-by-minute"
-                                                       class="btn btn-custom flex-fill"
-                                                       style="min-width:180px">
-                                                        Minuto a Minuto
-                                                    </a>
-
+                                                    @if (_userRol == "WeddingPlanner")
+                                                    {
+                                                        <a href="/events/@even.Code/minute-by-minute"
+                                                            class="btn btn-custom flex-fill"
+                                                            style="min-width:180px">
+                                                            Minuto a Minuto
+                                                        </a>
+                                                    }
                                                 </div>
                                             </div>
                                         </div>
