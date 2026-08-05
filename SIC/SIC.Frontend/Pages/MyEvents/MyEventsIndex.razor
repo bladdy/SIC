@@ -107,22 +107,65 @@
                                                     <div class="text-muted small mb-2">@even.SubTitle</div>
                                                 }
                                             </div>
-                                            <div class="col-12 col-md-4 d-flex flex-row flex-wrap align-items-center gap-1">
-                                                @if (@even.OnlyAlbum == false)
-                                                {
-                                                    <a href="@even.Url" target="_blank" class="btn btn-custom w-100">Ver Invitación</a>
-                                                    <a href="/my-events/details/@even.Code" class="btn btn-custom w-100">Invitados</a>
-                                                    
-                                                }
-                                                @if (even.HasAlbum)
-                                                {
-                                                    <a href="/my-album/@even.Code" class="btn btn-custom w-100">Ver Album</a>
-                                                }
-                                                @if (_userRol == "WeddingPlanner")
-                                                {
-                                                    <a href="/events/@even.Code/minute-by-minute" class="btn btn-custom w-100">Minuto a Minuto</a>
-                                    
-                                                }
+                                            <div class="col-12 col-md-4">
+                                                <div class="d-flex flex-wrap gap-2">
+
+                                                    @if (even.InvitationInvboxv)
+                                                    {
+                                                        <button class="btn btn-custom flex-fill"
+                                                                style="min-width:180px"
+                                                                @onclick="() => CopiarEventUrl(even.Code)"
+                                                                disabled="@(CopyingEventCode == even.Code)">
+
+                                                            @if (CopyingEventCode == even.Code)
+                                                            {
+                                                                <span class="spinner-border spinner-border-sm me-1"
+                                                                      role="status"
+                                                                      aria-hidden="true"></span>
+                                                                <span>Copiando...</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span>Formulario Inivitacion</span>
+                                                            }
+                                                        </button>
+
+                                                        <a href="/event/@even.Code/requisitos/respuesta"
+                                                           class="btn btn-custom flex-fill d-none"
+                                                           style="min-width:180px">
+                                                            Datos Invitación
+                                                        </a>
+                                                    }
+
+                                                    <a href="@even.Url"
+                                                       target="_blank"
+                                                       class="btn btn-custom flex-fill"
+                                                       style="min-width:180px">
+                                                        Ver Invitación
+                                                    </a>
+
+                                                    <a href="/events/details/@even.Code"
+                                                       class="btn btn-custom flex-fill"
+                                                       style="min-width:180px">
+                                                        Invitados
+                                                    </a>
+
+                                                    @if (even.HasAlbum)
+                                                    {
+                                                        <a href="/my-album/@even.Code"
+                                                           class="btn btn-custom flex-fill"
+                                                           style="min-width:180px">
+                                                            Álbum
+                                                        </a>
+                                                    }
+
+                                                    <a href="/events/@even.Code/minute-by-minute"
+                                                       class="btn btn-custom flex-fill"
+                                                       style="min-width:180px">
+                                                        Minuto a Minuto
+                                                    </a>
+
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -182,11 +225,30 @@
                                 @if (_userRol == "WeddingPlanner")
                                 {
                                     <button class="btn btn-sm btn-custom flex-grow-1" @onclick="() => ShowEditModal(even)"><i class="bi bi-pencil-fill"></i> Editar</button>
+                                    @if (even.InvitationInvboxv)
+                                    {
+                                        <button class="btn btn-custom flex-fill"
+                                                style="min-width:180px"
+                                                @onclick="() => CopiarEventUrl(even.Code)"
+                                                disabled="@(CopyingEventCode == even.Code)">
+
+                                            @if (CopyingEventCode == even.Code)
+                                            {
+                                                <span class="spinner-border spinner-border-sm me-1"
+                                                      role="status"
+                                                      aria-hidden="true"></span>
+                                                <span>Copiando...</span>
+                                            }
+                                            else
+                                            {
+                                                <span>Formulario Inivitacion</span>
+                                            }
+                                        </button>
+                                        <a href="/event/@even.Code/requisitos/respuesta" class="btn btn-sm btn-custom flex-grow-1 d-none"><i class="bi bi-eye"></i> Respuestas</a>
+
+                                    }   
                                 }
                                 <button class="btn btn-sm btn-custom flex-grow-1 d-none" @onclick="() => ConfirmDelete(even)"><i class="bi bi-trash-fill"></i> Borrar</button>
-                                @if (even.HasAlbum)
-                                {
-                                }
                                 @if (@even.OnlyAlbum == false)
                                 {
                                     <a href="@even.Url" target="_blank" class="btn btn-sm btn-custom flex-grow-1">Ver Invitación</a>
@@ -316,6 +378,15 @@
                             <div class="col-auto">
                                 <label class="form-label">Teléfono Planner</label>
                                 <InputText class="form-control" placeholder="Numero celular..." @bind-Value="NewEvent.PlannerPhone" />
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="form-check">
+                                <InputCheckbox class="form-check-input"
+                                               @bind-Value="NewEvent.InvitationInvboxv" />
+                                <label class="form-check-label ms-1">
+                                    Invitacion Invboxv
+                                </label>
                             </div>
                         </div>
 

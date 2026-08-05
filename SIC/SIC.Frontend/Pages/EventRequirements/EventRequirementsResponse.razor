@@ -13,7 +13,29 @@
             <small class="text-muted">@EventName (Código: @EventCode)</small>
         }
     </div>
+    @if (EventData != null)
+    {
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <span class="badge @(EventData.RequirementFormStatus == Status.Completed ? "bg-success" : "bg-secondary") px-3 py-2"
+                  style="font-size:0.85em;">
+                @EventData.RequirementFormStatus.GetDescription()
+            </span>
+            <button class="btn @(EventData.RequirementFormStatus == Status.Completed ? "btn-outline-warning" : "btn-outline-success")"
+                    @onclick="ToggleRequirementStatus">
+                @(EventData.RequirementFormStatus == Status.Completed ? "Marcar como Pendiente" : "Marcar como Completado")
+            </button>
+        </div>
+    }
 </div>
+
+@if (EventData != null)
+{
+    <div class="alert alert-light border d-flex flex-wrap gap-4 mb-3 small text-muted">
+        <div><strong>Estado:</strong> @EventData.RequirementFormStatus.GetDescription()</div>
+        <div><strong>Completado:</strong> @(EventData.RequirementFormCompletedAt?.ToString("dd/MM/yyyy HH:mm") ?? "—")</div>
+        <div><strong>Modificado:</strong> @(EventData.RequirementFormModifiedAt?.ToString("dd/MM/yyyy HH:mm") ?? "—")</div>
+    </div>
+}
 
 @if (Loading)
 {

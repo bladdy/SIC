@@ -198,7 +198,23 @@
                                 <button class="btn btn-sm btn-custom flex-grow-1" @onclick="() => ConfirmDelete(even)"><i class="bi bi-trash-fill"></i> Borrar</button>
                                 @if (even.InvitationInvboxv)
                                 {
-                                    <a href="/event/@even.Code/requisitos" class="btn btn-sm btn-custom flex-grow-1"><i class="bi bi-clipboard-check"></i> Requisitos</a>
+                                    <button class="btn btn-custom flex-fill"
+                                            style="min-width:180px"
+                                            @onclick="() => CopiarEventUrl(even.Code)"
+                                            disabled="@(CopyingEventCode == even.Code)">
+
+                                        @if (CopyingEventCode == even.Code)
+                                        {
+                                            <span class="spinner-border spinner-border-sm me-1"
+                                                  role="status"
+                                                  aria-hidden="true"></span>
+                                            <span>Copiando...</span>
+                                        }
+                                        else
+                                        {
+                                            <span>Formulario Inivitacion</span>
+                                        }
+                                    </button>
                                     <a href="/event/@even.Code/requisitos/respuesta" class="btn btn-sm btn-custom flex-grow-1"><i class="bi bi-eye"></i> Respuestas</a>
                                     
                                 }

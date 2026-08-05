@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components;
 using SIC.Frontend.Repositories;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
+using SIC.Shared.Enums;
 
 namespace SIC.Frontend.Pages.EventRequirements;
 
@@ -19,6 +20,7 @@ public partial class EventRequirementsResponse
     private bool HasError = false;
     private string? ErrorMessage;
     private string? EventName;
+    private Event? EventData;
 
     private Dictionary<string, List<EventTypeRequirementDTO>>? Sections;
     private Dictionary<int, EventRequirementAnswer> AnswersByRequirement = new();
@@ -49,6 +51,7 @@ public partial class EventRequirementsResponse
 
         var ev = eventResp.Response;
         EventName = ev.Name;
+        EventData = ev;
 
         if (ev.EventTypeId == null)
         {
@@ -153,5 +156,43 @@ public partial class EventRequirementsResponse
 
         StateHasChanged();
         await sweetAlertService.FireAsync("Eliminada", "Imagen eliminada correctamente.", SweetAlertIcon.Success);
+    }
+
+    private async Task ToggleRequirementStatus()
+    {
+        if (EventData == null) return;
+
+        var target = EventData.RequirementFormStatus == Status.Completed ? Status.Pending : Status.Completed;
+        var actionText = target == Status.Completed ? "completado" : "pendiente";
+
+        var result = await sweetAlertService.FireAsync(new SweetAlertOptions
+        {
+            Title = "¿Cambiar estado?",
+            Text = $"El formulario de requisitos pasará a estado \"{actionText}\".",
+            Icon = SweetAlertIcon.Warning,
+            ShowCancelButton = true,
+            ConfirmButtonText = "Sí, cambiar",
+            CancelButtonText = "Cancelar"
+        });
+
+        if (string.IsNullOrEmpty(result.Value)) return;
+
+        var response = await repository.PostAsync<object>($"api/Events/requirement-status/{EventData.Id}/{(target == Status.Completed ? "Completed" : "Pending")}");
+        if (response.Error)
+        {
+            var message = await response.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message ?? "No se pudo cambiar el estado.", SweetAlertIcon.Error);
+            return;
+        }
+
+        var refresh = await repository.GetAsync<Event>($"api/Events/byCode/{EventCode}");
+        if (!refresh.Error && refresh.Response != null)
+        {
+            EventData = refresh.Response;
+            EventName = refresh.Response.Name;
+        }
+
+        StateHasChanged();
+        await sweetAlertService.FireAsync("Actualizado", $"El formulario ahora está \"{actionText}\".", SweetAlertIcon.Success);
     }
 }
