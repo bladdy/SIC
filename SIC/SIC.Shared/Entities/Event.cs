@@ -78,15 +78,6 @@ public class Event : IEntityWithName
     [Display(Name = "Estado")]
     public Status Status { get; set; }
 
-    [Display(Name = "Estado del Formulario de Requisitos")]
-    public Status RequirementFormStatus { get; set; } = Status.Pending;
-
-    [Display(Name = "Fecha de Completado del Formulario")]
-    public DateTime? RequirementFormCompletedAt { get; set; }
-
-    [Display(Name = "Fecha de Modificación del Formulario")]
-    public DateTime? RequirementFormModifiedAt { get; set; }
-
     [Display(Name = "Cantidad de invitados")]
     public int Guests => Invitations?.SelectMany(i => i.Guests).Count() ?? 0;
 

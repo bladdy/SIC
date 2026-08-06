@@ -104,4 +104,33 @@ public class EventRequirementAnswersController : GenericController<EventRequirem
 
         return Ok(response.Result);
     }
+
+    [HttpDelete("clear-field/{eventId}/{requirementId}")]
+    public async Task<IActionResult> ClearFieldAsync(int eventId, int requirementId)
+    {
+        var getResponse = await _unitOfWork.GetByEventAndRequirementAsync(eventId, requirementId);
+        if (!getResponse.Success)
+            return BadRequest(getResponse.Message);
+
+        if (getResponse.Result != null)
+        {
+            foreach (var img in getResponse.Result.Images)
+            {
+                try
+                {
+                    await _ftpService.DeleteFileAsync($"event-requirements/{eventId}", img.FileName);
+                }
+                catch
+                {
+                    // Si el archivo FTP no se puede borrar, continuamos con el borrado en BD.
+                }
+            }
+        }
+
+        var response = await _unitOfWork.ClearFieldAsync(eventId, requirementId);
+        if (!response.Success)
+            return BadRequest(response.Message);
+
+        return Ok(response.Result);
+    }
 }

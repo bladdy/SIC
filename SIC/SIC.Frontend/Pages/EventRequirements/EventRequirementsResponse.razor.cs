@@ -110,6 +110,14 @@ public partial class EventRequirementsResponse
             : null;
     }
 
+    private bool HasContent(EventTypeRequirementDTO req)
+    {
+        if (req.RequirementInputType == RequirementInputType.Image)
+            return GetImages(req.RequirementId) is { Count: > 0 };
+
+        return !string.IsNullOrWhiteSpace(GetAnswer(req.RequirementId));
+    }
+
     private void OpenLightbox(EventRequirementImage image)
     {
         SelectedImage = image;
@@ -158,41 +166,34 @@ public partial class EventRequirementsResponse
         await sweetAlertService.FireAsync("Eliminada", "Imagen eliminada correctamente.", SweetAlertIcon.Success);
     }
 
-    private async Task ToggleRequirementStatus()
+    private async Task ClearField(int requirementId)
     {
         if (EventData == null) return;
 
-        var target = EventData.RequirementFormStatus == Status.Completed ? Status.Pending : Status.Completed;
-        var actionText = target == Status.Completed ? "completado" : "pendiente";
-
         var result = await sweetAlertService.FireAsync(new SweetAlertOptions
         {
-            Title = "¿Cambiar estado?",
-            Text = $"El formulario de requisitos pasará a estado \"{actionText}\".",
+            Title = "¿Limpiar campo?",
+            Text = "Se borrará la respuesta de este campo. Si tiene imágenes, también se eliminarán del servidor. El cliente podrá volver a llenarlo.",
             Icon = SweetAlertIcon.Warning,
             ShowCancelButton = true,
-            ConfirmButtonText = "Sí, cambiar",
+            ConfirmButtonText = "Sí, limpiar",
             CancelButtonText = "Cancelar"
         });
 
         if (string.IsNullOrEmpty(result.Value)) return;
 
-        var response = await repository.PostAsync<object>($"api/Events/requirement-status/{EventData.Id}/{(target == Status.Completed ? "Completed" : "Pending")}");
+        var response = await repository.DeleteAsync<object>($"api/EventRequirementAnswers/clear-field/{EventData.Id}/{requirementId}");
         if (response.Error)
         {
-            var message = await response.GetErrorMessageAsync();
-            await sweetAlertService.FireAsync("Error", message ?? "No se pudo cambiar el estado.", SweetAlertIcon.Error);
+            var message = await response.GetErrorMessageAsync() ?? "No se pudo limpiar el campo.";
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
             return;
         }
 
-        var refresh = await repository.GetAsync<Event>($"api/Events/byCode/{EventCode}");
-        if (!refresh.Error && refresh.Response != null)
-        {
-            EventData = refresh.Response;
-            EventName = refresh.Response.Name;
-        }
+        AnswersByRequirement.Remove(requirementId);
+        ImagesByRequirement.Remove(requirementId);
 
         StateHasChanged();
-        await sweetAlertService.FireAsync("Actualizado", $"El formulario ahora está \"{actionText}\".", SweetAlertIcon.Success);
+        await sweetAlertService.FireAsync("Limpiado", "El campo quedó vacío. El cliente podrá volver a llenarlo.", SweetAlertIcon.Success);
     }
 }

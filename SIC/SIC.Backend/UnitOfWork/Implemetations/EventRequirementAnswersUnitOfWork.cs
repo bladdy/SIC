@@ -19,4 +19,6 @@ public class EventRequirementAnswersUnitOfWork : GenericUnitOfWork<EventRequirem
     public async Task<ActionResponse<IEnumerable<EventRequirementAnswer>>> GetByEventIdAsync(int eventId) => await _repository.GetByEventIdAsync(eventId);
     public async Task<ActionResponse<bool>> SaveAllAsync(int eventId, List<EventRequirementAnswerDTO> answers) => await _repository.SaveAllAsync(eventId, answers);
     public async Task<ActionResponse<SaveFormResponseDTO>> SaveFormAsync(int eventId, List<EventRequirementAnswerDTO> answers, List<EventRequirementImageDTO> images) => await _repository.SaveFormAsync(eventId, answers, images);
+    public async Task<ActionResponse<EventRequirementAnswer>> GetByEventAndRequirementAsync(int eventId, int requirementId) => await _repository.GetByEventAndRequirementAsync(eventId, requirementId);
+    public async Task<ActionResponse<bool>> ClearFieldAsync(int eventId, int requirementId) => await _repository.ClearFieldAsync(eventId, requirementId);
 }

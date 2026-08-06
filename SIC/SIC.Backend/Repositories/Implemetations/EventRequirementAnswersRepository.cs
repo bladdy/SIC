@@ -76,6 +76,61 @@ public class EventRequirementAnswersRepository : GenericRepository<EventRequirem
         }
     }
 
+    public async Task<ActionResponse<EventRequirementAnswer>> GetByEventAndRequirementAsync(int eventId, int requirementId)
+    {
+        var entity = await _context.EventRequirementAnswers
+            .Include(x => x.Images)
+            .FirstOrDefaultAsync(x => x.EventId == eventId && x.RequirementId == requirementId);
+
+        return new ActionResponse<EventRequirementAnswer>
+        {
+            Success = true,
+            Result = entity
+        };
+    }
+
+    public async Task<ActionResponse<bool>> ClearFieldAsync(int eventId, int requirementId)
+    {
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            var answer = await _context.EventRequirementAnswers
+                .Include(x => x.Images)
+                .FirstOrDefaultAsync(x => x.EventId == eventId && x.RequirementId == requirementId);
+
+            if (answer == null)
+            {
+                return new ActionResponse<bool>
+                {
+                    Success = true,
+                    Result = true
+                };
+            }
+
+            _context.EventRequirementImages.RemoveRange(answer.Images);
+            await _context.SaveChangesAsync();
+
+            _context.EventRequirementAnswers.Remove(answer);
+            await _context.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+
+            return new ActionResponse<bool>
+            {
+                Success = true,
+                Result = true
+            };
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            return new ActionResponse<bool>
+            {
+                Message = ex.Message
+            };
+        }
+    }
+
     public async Task<ActionResponse<SaveFormResponseDTO>> SaveFormAsync(int eventId, List<EventRequirementAnswerDTO> answers, List<EventRequirementImageDTO> images)
     {
         var ev = await _context.Events.FirstOrDefaultAsync(e => e.Id == eventId);
@@ -171,13 +226,6 @@ public class EventRequirementAnswersRepository : GenericRepository<EventRequirem
                 _context.EventRequirementImages.Add(entity);
                 savedImages.Add(entity);
             }
-            await _context.SaveChangesAsync();
-
-            ev.RequirementFormStatus = Status.Completed;
-            if (ev.RequirementFormCompletedAt == null)
-                ev.RequirementFormCompletedAt = DateTime.UtcNow;
-            ev.RequirementFormModifiedAt = DateTime.UtcNow;
-            _context.Events.Update(ev);
             await _context.SaveChangesAsync();
 
             await transaction.CommitAsync();

@@ -13,29 +13,7 @@
             <small class="text-muted">@EventName (Código: @EventCode)</small>
         }
     </div>
-    @if (EventData != null)
-    {
-        <div class="d-flex align-items-center gap-2 flex-wrap">
-            <span class="badge @(EventData.RequirementFormStatus == Status.Completed ? "bg-success" : "bg-secondary") px-3 py-2"
-                  style="font-size:0.85em;">
-                @EventData.RequirementFormStatus.GetDescription()
-            </span>
-            <button class="btn @(EventData.RequirementFormStatus == Status.Completed ? "btn-outline-warning" : "btn-outline-success")"
-                    @onclick="ToggleRequirementStatus">
-                @(EventData.RequirementFormStatus == Status.Completed ? "Marcar como Pendiente" : "Marcar como Completado")
-            </button>
-        </div>
-    }
 </div>
-
-@if (EventData != null)
-{
-    <div class="alert alert-light border d-flex flex-wrap gap-4 mb-3 small text-muted">
-        <div><strong>Estado:</strong> @EventData.RequirementFormStatus.GetDescription()</div>
-        <div><strong>Completado:</strong> @(EventData.RequirementFormCompletedAt?.ToString("dd/MM/yyyy HH:mm") ?? "—")</div>
-        <div><strong>Modificado:</strong> @(EventData.RequirementFormModifiedAt?.ToString("dd/MM/yyyy HH:mm") ?? "—")</div>
-    </div>
-}
 
 @if (Loading)
 {
@@ -71,12 +49,19 @@ else
                     var images = GetImages(req.RequirementId);
 
                     <div class="mb-3 pb-3 border-bottom">
-                        <div class="d-flex align-items-center gap-2 mb-1">
+                        <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
                             <span class="fw-semibold">@req.RequirementName</span>
                             <span class="badge bg-info" style="font-size:0.65em;">@req.RequirementInputType?.GetDescription()</span>
                             @if (req.RequirementIsRequired == true)
                             {
                                 <span class="badge bg-danger" style="font-size:0.65em;">Obligatorio</span>
+                            }
+                            @if (HasContent(req))
+                            {
+                                <button class="btn btn-sm btn-outline-danger ms-auto" @onclick="() => ClearField(req.RequirementId)"
+                                        title="Limpiar campo para que el cliente pueda volver a llenarlo">
+                                    <i class="bi bi-eraser"></i> Limpiar campo
+                                </button>
                             }
                         </div>
 
