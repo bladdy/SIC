@@ -39,12 +39,12 @@ namespace SIC.Frontend.Pages.Whatsapp
 
             var name = templateName.Trim().ToLower();
             if (TemplateImages.Contains(name))
-                return $"{NavigationManager.BaseUri}template-img/{name}.png";
+                return $"{NavigationManager.BaseUri}template-img/{name}.jpg";
 
             var match = TemplateImages.FirstOrDefault(img => name.StartsWith(img));
             return match == null
                 ? null
-                : $"{NavigationManager.BaseUri}template-img/{match}.png";
+                : $"{NavigationManager.BaseUri}template-img/{match}.jpg";
         }
 
         private async Task OpenTemplateImage(TemplateDatum template)
