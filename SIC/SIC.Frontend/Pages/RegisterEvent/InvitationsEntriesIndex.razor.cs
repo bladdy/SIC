@@ -146,6 +146,7 @@ public partial class InvitationsEntriesIndex
     {
         IsEditMode = false;
         IsModalVisible = true;
+        Invitation = null;
         await StartScannerAsync();
     }
 
@@ -215,6 +216,7 @@ public partial class InvitationsEntriesIndex
             return;
         }
         Invitation = responseHttp?.Response!;
+        NewInvitationEntry = Invitation?.InvitationEntry ?? new InvitationEntry();
     }
 
     private async Task UpdateInvitationEntry()
@@ -246,10 +248,17 @@ public partial class InvitationsEntriesIndex
 
     private async Task SaveInvitationEntry()
     {
-        NewInvitationEntry.Code = Invitation!.Code;
-        NewInvitationEntry.QrCode = qrResult;
-        NewInvitationEntry.InvitationId = Invitation!.Id;
-        var responseHttp = await Repository.PostAsync<InvitationEntry>("api/InvitationEntry/full", NewInvitationEntry);
+        InvitationEntry invitationEntry = new()
+        {
+            Code = Invitation!.Code,
+            QrCode = qrResult,
+            InvitationId = Invitation!.Id,
+            AdultsEntered = NewInvitationEntry.AdultsEntered,
+            YouthsEntered = NewInvitationEntry.YouthsEntered,
+            ChildrenEntered = NewInvitationEntry.ChildrenEntered,
+            EntryDateTime = NewInvitationEntry.EntryDateTime
+        };
+        var responseHttp = await Repository.PostAsync<InvitationEntry>("api/InvitationEntry/full", invitationEntry);
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();

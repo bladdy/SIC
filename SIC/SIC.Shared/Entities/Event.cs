@@ -79,7 +79,7 @@ public class Event : IEntityWithName
     public Status Status { get; set; }
 
     [Display(Name = "Cantidad de invitados")]
-    public int Guests => Invitations?.SelectMany(i => i.Guests).Count() ?? 0;
+    public int Guests => Invitations?.Where(i => i != null && i.Guests != null).SelectMany(i => i.Guests).Count() ?? 0;
 
     public Message? Message { get; set; }
 
@@ -90,47 +90,47 @@ public class Event : IEntityWithName
     public string? UserId { get; set; }
 
     // 🔹 Invitaciones Totales
-    public int InvitationsNumbers => Invitations?.SelectMany(i => i.Guests).Count() ?? 0;
+    public int InvitationsNumbers => Invitations?.Where(i => i != null && i.Guests != null).SelectMany(i => i.Guests).Count() ?? 0;
 
     // 🔹 Invitaciones Confirmadas
-    public int Confirmations => Invitations?.SelectMany(i => i.Guests).Count(g => g.Status == Status.Attend) ?? 0;
+    public int Confirmations => Invitations?.Where(i => i != null && i.Guests != null).SelectMany(i => i.Guests).Count(g => g.Status == Status.Attend) ?? 0;
 
     // 🔹 Invitaciones Pendientes
-    public int Pending => Invitations?.Count(i => i.Status == Status.Pending) ?? 0;
+    public int Pending => Invitations?.Count(i => i != null && i.Status == Status.Pending) ?? 0;
 
     // 🔹 Total Adultos invitados
-    public int NumberAdults => Invitations?.SelectMany(i => i.Guests).Count(g => g.GuestType == GuestType.Adult) ?? 0;
+    public int NumberAdults => Invitations?.Where(i => i != null && i.Guests != null).SelectMany(i => i.Guests).Count(g => g.GuestType == GuestType.Adult) ?? 0;
 
     // 🔹 Total Jovenes invitados
-    public int NumberYouths => Invitations?.SelectMany(i => i.Guests).Count(g => g.GuestType == GuestType.Youth) ?? 0;
+    public int NumberYouths => Invitations?.Where(i => i != null && i.Guests != null).SelectMany(i => i.Guests).Count(g => g.GuestType == GuestType.Youth) ?? 0;
 
     // 🔹 Total Niños invitados
-    public int NumberChildren => Invitations?.SelectMany(i => i.Guests).Count(g => g.GuestType == GuestType.Children) ?? 0;
+    public int NumberChildren => Invitations?.Where(i => i != null && i.Guests != null).SelectMany(i => i.Guests).Count(g => g.GuestType == GuestType.Children) ?? 0;
 
     // 🔹 Adultos confirmados
-    public int NumberAdultsConfirmed => Invitations?.SelectMany(i => i.Guests).Count(g => g.Status == Status.Attend && g.GuestType == GuestType.Adult) ?? 0;
+    public int NumberAdultsConfirmed => Invitations?.Where(i => i != null && i.Guests != null).SelectMany(i => i.Guests).Count(g => g.Status == Status.Attend && g.GuestType == GuestType.Adult) ?? 0;
 
     // 🔹 Jovenes confirmados
-    public int NumberYouthsConfirmed => Invitations?.SelectMany(i => i.Guests).Count(g => g.Status == Status.Attend && g.GuestType == GuestType.Youth) ?? 0;
+    public int NumberYouthsConfirmed => Invitations?.Where(i => i != null && i.Guests != null).SelectMany(i => i.Guests).Count(g => g.Status == Status.Attend && g.GuestType == GuestType.Youth) ?? 0;
 
     // 🔹 Niños confirmados
-    public int NumberChildrenConfirmed => Invitations?.SelectMany(i => i.Guests).Count(g => g.Status == Status.Attend && g.GuestType == GuestType.Children) ?? 0;
+    public int NumberChildrenConfirmed => Invitations?.Where(i => i != null && i.Guests != null).SelectMany(i => i.Guests).Count(g => g.Status == Status.Attend && g.GuestType == GuestType.Children) ?? 0;
 
     // 🔹 Adultos pendientes
-    public int NumberAdultsPending => Invitations?.SelectMany(i => i.Guests).Count(g => g.Status == Status.Pending && g.GuestType == GuestType.Adult) ?? 0;
+    public int NumberAdultsPending => Invitations?.Where(i => i != null && i.Guests != null).SelectMany(i => i.Guests).Count(g => g.Status == Status.Pending && g.GuestType == GuestType.Adult) ?? 0;
 
     // 🔹 Niños pendientes
-    public int NumberChildrenPending => Invitations?.SelectMany(i => i.Guests).Count(g => g.Status == Status.Pending && g.GuestType == GuestType.Children) ?? 0;
+    public int NumberChildrenPending => Invitations?.Where(i => i != null && i.Guests != null).SelectMany(i => i.Guests).Count(g => g.Status == Status.Pending && g.GuestType == GuestType.Children) ?? 0;
 
     // 🔹 Jovenes pendientes
-    public int NumberYouthPending => Invitations?.SelectMany(i => i.Guests).Count(g => g.Status == Status.Pending && g.GuestType == GuestType.Youth) ?? 0;
+    public int NumberYouthPending => Invitations?.Where(i => i != null && i.Guests != null).SelectMany(i => i.Guests).Count(g => g.Status == Status.Pending && g.GuestType == GuestType.Youth) ?? 0;
 
     // 🔹 Niños No asistirán
-    public int NumberChildrenNotAttend => Invitations?.SelectMany(i => i.Guests).Count(g => g.Status == Status.NotAttend && g.GuestType == GuestType.Children) ?? 0;
+    public int NumberChildrenNotAttend => Invitations?.Where(i => i != null && i.Guests != null).SelectMany(i => i.Guests).Count(g => g.Status == Status.NotAttend && g.GuestType == GuestType.Children) ?? 0;
 
     // 🔹 Jovenes No asistirán
-    public int NumberYouthNotAttend => Invitations?.SelectMany(i => i.Guests).Count(g => g.Status == Status.NotAttend && g.GuestType == GuestType.Youth) ?? 0;
+    public int NumberYouthNotAttend => Invitations?.Where(i => i != null && i.Guests != null).SelectMany(i => i.Guests).Count(g => g.Status == Status.NotAttend && g.GuestType == GuestType.Youth) ?? 0;
 
     // 🔹 Adultos No asistiran
-    public int NumberAdultsNotAttend => Invitations?.SelectMany(i => i.Guests).Count(g => g.Status == Status.NotAttend && g.GuestType == GuestType.Adult) ?? 0;
+    public int NumberAdultsNotAttend => Invitations?.Where(i => i != null && i.Guests != null).SelectMany(i => i.Guests).Count(g => g.Status == Status.NotAttend && g.GuestType == GuestType.Adult) ?? 0;
 }

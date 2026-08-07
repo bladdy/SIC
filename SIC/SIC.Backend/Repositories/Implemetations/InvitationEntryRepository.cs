@@ -24,33 +24,102 @@ namespace SIC.Backend.Repositories.Implemetations
         {
             try
             {
-                var existingInvitation = _context.Invitations.Include(e => e.Event)
-                    .FirstOrDefault(i => i.Code == invitation.Code);
+                // Buscar la invitación principal
+                var existingInvitation = await _context.Invitations
+                    .Include(e => e.Event)
+                    .FirstOrDefaultAsync(i => i.Code == invitation.Code);
+
                 if (existingInvitation == null)
                 {
                     return new ActionResponse<InvitationEntry>
                     {
                         Success = false,
-                        Message = "La invitacion no existe."
+                        Message = "La invitación no existe."
                     };
                 }
-                invitation.Invitation = existingInvitation!;
-                invitation.Event = existingInvitation?.Event!;
-                invitation.EventId = existingInvitation!.Event!.Id;
-                _context.Add(invitation);
+
+                // Buscar si ya existe el InvitationEntry
+                var existingEntry = await _context.InvitationEntries
+                    .FirstOrDefaultAsync(x => x.Code == invitation.Code);
+
+                if (existingEntry != null)
+                {
+                    // Obtener las propiedades que forman parte de la clave primaria
+                    var primaryKeyProperties = _context.Model
+                        .FindEntityType(typeof(InvitationEntry))!
+                        .FindPrimaryKey()!
+                        .Properties;
+
+                    // Actualizar únicamente propiedades que NO sean parte de la clave
+                    foreach (var property in _context.Entry(existingEntry).Properties)
+                    {
+                        if (primaryKeyProperties.Any(x => x.Name == property.Metadata.Name))
+                        {
+                            continue;
+                        }
+
+                        // Evitar actualizar propiedades de navegación/FK
+                        // que serán manejadas explícitamente abajo
+                        if (property.Metadata.Name == nameof(InvitationEntry.InvitationId) ||
+                            property.Metadata.Name == nameof(InvitationEntry.EventId))
+                        {
+                            continue;
+                        }
+
+                        property.CurrentValue = _context
+                            .Entry(invitation)
+                            .Property(property.Metadata.Name)
+                            .CurrentValue;
+                    }
+
+                    // Mantener las relaciones correctas
+                    existingEntry.Invitation = existingInvitation;
+                    existingEntry.Event = existingInvitation.Event!;
+
+                    // Solo asignamos EventId si NO forma parte de la clave
+                    var eventIdProperty = _context.Entry(existingEntry)
+                        .Property(nameof(InvitationEntry.EventId));
+
+                    if (!primaryKeyProperties.Any(x => x.Name == nameof(InvitationEntry.EventId)))
+                    {
+                        eventIdProperty.CurrentValue = existingInvitation.Event!.Id;
+                    }
+
+                    await _context.SaveChangesAsync();
+
+                    return new ActionResponse<InvitationEntry>
+                    {
+                        Success = true,
+                        Result = existingEntry,
+                        Message = "La invitación fue actualizada correctamente."
+                    };
+                }
+
+                // ==========================================
+                // CREAR NUEVO
+                // ==========================================
+
+                invitation.Invitation = existingInvitation;
+                invitation.Event = existingInvitation.Event!;
+                invitation.EventId = existingInvitation.Event!.Id;
+
+                await _context.InvitationEntries.AddAsync(invitation);
                 await _context.SaveChangesAsync();
+
                 return new ActionResponse<InvitationEntry>
                 {
                     Success = true,
-                    Result = invitation
+                    Result = invitation,
+                    Message = "La invitación fue creada correctamente."
                 };
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException exception)
             {
                 return new ActionResponse<InvitationEntry>
                 {
                     Success = false,
-                    Message = "Ya existe un registro con este QR."
+                    Message = exception.InnerException?.Message
+                               ?? exception.Message
                 };
             }
             catch (Exception exception)
@@ -61,26 +130,6 @@ namespace SIC.Backend.Repositories.Implemetations
                     Message = exception.Message
                 };
             }
-        }
-
-        public async Task<ActionResponse<InvitationEntry>> GetByCodeAsync(string code)
-        {
-            var invitationEntry = await _context.InvitationEntries
-            .Include(i => i.Invitation)
-            .FirstOrDefaultAsync(x => x.Code!.Contains(code));
-            if (invitationEntry == null)
-            {
-                return new ActionResponse<InvitationEntry>
-                {
-                    Success = true,
-                    Message = "Evento no existe."
-                };
-            }
-            return new ActionResponse<InvitationEntry>
-            {
-                Success = true,
-                Result = invitationEntry
-            };
         }
 
         public async Task<ActionResponse<InvitationEntry>> UpdateFullAsync(InvitationEntry invitation)
@@ -126,9 +175,30 @@ namespace SIC.Backend.Repositories.Implemetations
             }
         }
 
+        public async Task<ActionResponse<InvitationEntry>> GetByCodeAsync(string code)
+        {
+            var invitationEntry = await _context.InvitationEntries
+            .Include(i => i.Invitation)
+            .FirstOrDefaultAsync(x => x.Code!.Contains(code));
+            if (invitationEntry == null)
+            {
+                return new ActionResponse<InvitationEntry>
+                {
+                    Success = true,
+                    Message = "Evento no existe."
+                };
+            }
+            return new ActionResponse<InvitationEntry>
+            {
+                Success = true,
+                Result = invitationEntry
+            };
+        }
+
         public override async Task<ActionResponse<IEnumerable<InvitationEntry>>> GetAsync(PaginationDTO pagination)
         {
-            var queryable = _context.InvitationEntries.Include(i => i.Invitation).Include(e => e.Event).AsQueryable();
+            var queryable = _context.InvitationEntries.Include(i => i.Invitation)
+                .ThenInclude(t => t.TablesEvents).Include(e => e.Event).AsQueryable();
 
             queryable = queryable.Where(x => x.Event!.Code!.ToLower().Contains(pagination!.Code!.ToLower()));
 

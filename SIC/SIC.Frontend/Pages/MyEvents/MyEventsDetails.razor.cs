@@ -369,7 +369,7 @@ public partial class MyEventsDetails
         );
         isSavingInvitation = false;
         await LoadEvent();
-        var invitationsTask = LoadInvitations();
+        var invitationsTask = LoadInvitations(currentPage);
         var tablesTask = LoadTablesEventsAsync();
         await Task.WhenAll(invitationsTask, tablesTask);
     }
@@ -665,7 +665,7 @@ public partial class MyEventsDetails
                         ConfirmButtonText = "Aceptar"
                     });
                     CloseModalExcel();
-                    await LoadInvitations();
+                    await LoadInvitations(currentPage);
                 }
                 else
                 {

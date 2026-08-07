@@ -24,7 +24,7 @@ namespace SIC.Backend.Repositories.Implemetations
 
         public async Task<ActionResponse<Invitation>> GetByCodeAsync(string code)
         {
-            var invitations = await _context.Invitations.Include(e => e.Event).ThenInclude(e => e!.EventType).Include(g => g.Guests).
+            var invitations = await _context.Invitations.Include(ie => ie.InvitationEntry).Include(e => e.Event).ThenInclude(e => e!.EventType).Include(g => g.Guests).
                 Include(t => t.TablesEvents).
                 FirstOrDefaultAsync(x => x.Code == code);
             if (invitations == null)
@@ -273,9 +273,14 @@ namespace SIC.Backend.Repositories.Implemetations
 
         public async Task<ActionResponse<IEnumerable<Invitation>>> GetAllAsync(string code)
         {
-            var invitations = await _context.Invitations.Include(e => e.Event)
-                .ThenInclude(e => e!.EventType).Include(g => g.Guests).Include(t => t.TablesEvents)
-                .Where(x => x.Event!.Code == code && x.Status == Status.Attend && x.TablesEvents == null)
+            var invitations = await _context.Invitations
+                .Include(i => i.Event)
+                    .ThenInclude(e => e!.EventType)
+                .Include(i => i.Guests)
+                .Include(i => i.TablesEvents)
+                .Where(i =>
+                    i.Event!.Code == code &&
+                    i.Status == Status.Attend)
                 .ToListAsync();
             if (invitations == null)
             {
