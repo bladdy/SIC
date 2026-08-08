@@ -326,7 +326,7 @@ namespace SIC.Backend.Services
             var document = new Document(PageSize.A4, 40, 40, 40, 40);
             PdfWriter.GetInstance(document, ms);
             document.Open();
-
+            invitaciones = [.. invitaciones.OrderBy(i => i.Name)];
             // ==============================
             // 🎨 COLORES
             // ==============================
@@ -337,13 +337,13 @@ namespace SIC.Backend.Services
             // 🔠 FUENTES
             // ==============================
             var fontTitle = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16);
-            var fontHeader = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 11, BaseColor.White);
-            var fontCell = FontFactory.GetFont(FontFactory.HELVETICA, 11);
+            var fontHeader = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10, BaseColor.White);
+            var fontCell = FontFactory.GetFont(FontFactory.HELVETICA, 10);
             var fontFotter = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 11);
             // ==============================
             // 📝 TÍTULO
             // ==============================
-            var title = new Paragraph($"LISTA DE INVITADOS: {invitaciones.FirstOrDefault()!.Event!.Name}", fontTitle)
+            var title = new Paragraph($"LISTA DE INVITADOS CONFIRMADOS: {invitaciones.FirstOrDefault()!.Event!.Name}", fontTitle)
             {
                 Alignment = Element.ALIGN_CENTER,
                 SpacingAfter = 10
@@ -352,18 +352,18 @@ namespace SIC.Backend.Services
             document.Add(new Paragraph($"Fecha generación: {DateTime.Now:dd/MM/yyyy HH:mm}")
             {
                 Alignment = Element.ALIGN_RIGHT,
-                SpacingAfter = 15
+                SpacingAfter = 8
             });
 
             // ==============================
             // 📋 TABLA
             // ==============================
-            var table = new PdfPTable(5)
+            var table = new PdfPTable(6)
             {
                 WidthPercentage = 100
             };
 
-            table.SetWidths(new float[] { 4, 2, 2, 2, 2 });
+            table.SetWidths(new float[] { 4, 1, 1, 1, 1, 1 });
 
             void AddHeader(string text)
             {
@@ -371,7 +371,7 @@ namespace SIC.Backend.Services
                 {
                     BackgroundColor = headerColor,
                     HorizontalAlignment = Element.ALIGN_CENTER,
-                    Padding = 6,
+                    Padding = 2,
                     BorderColor = borderColor
                 };
 
@@ -379,10 +379,11 @@ namespace SIC.Backend.Services
             }
 
             AddHeader("Nombre");
-            AddHeader("Adultos Confirmados");
-            AddHeader("Jovenes Confirmados");
-            AddHeader("Niños Confirmados");
-            AddHeader("Control de Asistencia");
+            AddHeader("Adul.");
+            AddHeader("Jov.");
+            AddHeader("Niñ.");
+            AddHeader("Mesa");
+            AddHeader("Ok");
 
             // ==============================
             // 👥 FILAS
@@ -390,9 +391,18 @@ namespace SIC.Backend.Services
             foreach (var item in invitaciones)
             {
                 table.AddCell(new PdfPCell(new Phrase(item.Name ?? "", fontCell)) { Padding = 5 });
-                table.AddCell(new PdfPCell(new Phrase(item.NumberConfirmedAdults.ToString() ?? "", fontCell)) { Padding = 5 });
-                table.AddCell(new PdfPCell(new Phrase(item.NumberConfirmedYouths.ToString() ?? "", fontCell)) { Padding = 5 });
-                table.AddCell(new PdfPCell(new Phrase(item.NumberConfirmedChildren.ToString() ?? "", fontCell)) { Padding = 5 });
+                table.AddCell(new PdfPCell(new Phrase(item.NumberConfirmedAdults.ToString() ?? "", fontCell)) { Padding = 5, HorizontalAlignment = Element.ALIGN_CENTER });
+                table.AddCell(new PdfPCell(new Phrase(item.NumberConfirmedYouths.ToString() ?? "", fontCell)) { Padding = 5, HorizontalAlignment = Element.ALIGN_CENTER });
+                table.AddCell(new PdfPCell(new Phrase(item.NumberConfirmedChildren.ToString() ?? "", fontCell)) { Padding = 5, HorizontalAlignment = Element.ALIGN_CENTER });
+                table.AddCell(
+                    new PdfPCell(
+                        new Phrase(item.TablesEvents?.Name?.ToString() ?? "", fontCell)
+                    )
+                    {
+                        Padding = 5,
+                        HorizontalAlignment = Element.ALIGN_CENTER
+                    }
+                );
                 table.AddCell(new PdfPCell(new Phrase("", fontCell)) { Padding = 5 });
             }
 
@@ -402,10 +412,11 @@ namespace SIC.Backend.Services
             int totales = totalAdultos + totalJovenes + totalNiños;
 
             table.AddCell(new PdfPCell(new Phrase("Total" ?? "", fontFotter)) { Padding = 5, BackgroundColor = footerColor });
-            table.AddCell(new PdfPCell(new Phrase(totalAdultos.ToString() ?? "", fontFotter)) { Padding = 5, BackgroundColor = footerColor });
-            table.AddCell(new PdfPCell(new Phrase(totalJovenes.ToString() ?? "", fontFotter)) { Padding = 5, BackgroundColor = footerColor });
-            table.AddCell(new PdfPCell(new Phrase(totalNiños.ToString() ?? "", fontFotter)) { Padding = 5, BackgroundColor = footerColor });
-            table.AddCell(new PdfPCell(new Phrase(totales.ToString(), fontFotter)) { Padding = 5, BackgroundColor = footerColor });
+            table.AddCell(new PdfPCell(new Phrase(totalAdultos.ToString() ?? "", fontFotter)) { Padding = 5, BackgroundColor = footerColor, HorizontalAlignment = Element.ALIGN_CENTER });
+            table.AddCell(new PdfPCell(new Phrase(totalJovenes.ToString() ?? "", fontFotter)) { Padding = 5, BackgroundColor = footerColor, HorizontalAlignment = Element.ALIGN_CENTER });
+            table.AddCell(new PdfPCell(new Phrase(totalNiños.ToString() ?? "", fontFotter)) { Padding = 5, BackgroundColor = footerColor, HorizontalAlignment = Element.ALIGN_CENTER });
+            table.AddCell(new PdfPCell(new Phrase("", fontFotter)) { Padding = 5, BackgroundColor = footerColor });
+            table.AddCell(new PdfPCell(new Phrase(totales.ToString(), fontFotter)) { Padding = 5, BackgroundColor = footerColor, HorizontalAlignment = Element.ALIGN_CENTER });
 
             document.Add(table);
 
