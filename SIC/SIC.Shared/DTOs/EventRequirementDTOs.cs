@@ -94,6 +94,7 @@ public class EventRequirementFormDTO
     public int EventId { get; set; }
     public int EventTypeId { get; set; }
     public string? EventName { get; set; }
+    public string? EventTypeName { get; set; }
     public List<EventTypeRequirementDTO> Requirements { get; set; } = new();
     public List<EventRequirementAnswerDTO> Answers { get; set; } = new();
     public List<EventRequirementImageDTO> Images { get; set; } = new();

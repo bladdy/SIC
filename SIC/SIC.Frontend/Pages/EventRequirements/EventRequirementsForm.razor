@@ -23,6 +23,7 @@ else
     <div class="container" style="max-width: 700px; padding: 20px;">
         <div class="text-center mb-4">
             <h3 class="fw-bold">@FormDTO.EventName</h3>
+            <h5 class="fw-bold">@FormDTO.EventTypeName</h5>
             <p class="text-muted mb-2">
                 <strong>📌 Importante:</strong> Toda la información que solicitamos debe enviarse <strong>únicamente por escrito a través de este formulario</strong>. La elaboración de tu invitación comenzará una vez que hayamos recibido toda la información solicitada.
             </p>
@@ -100,7 +101,7 @@ else
                                             <InputFile class="form-control"
                                                        OnChange="e => HandleImageUpload(req.RequirementId, e)"
                                                        accept="image/*"
-                                                       disabled="@(IsFieldLocked(req.RequirementId) || (req.RequirementMaxImages > 0 && GetImageCount(req.RequirementId) >= req.RequirementMaxImages))" />
+                                                       disabled="@(req.RequirementMaxImages > 0 && GetImageCount(req.RequirementId) >= req.RequirementMaxImages)" />
                                             @if (req.RequirementMinImages > 0 || req.RequirementMaxImages > 0)
                                             {
                                                 <small class="text-muted d-block mt-1">
@@ -126,14 +127,7 @@ else
                                                     {
                                                         <div class="position-relative">
                                                             <img src="@img.Path" alt="@img.OriginalName" style="max-height:100px; border-radius:8px;" class="border" />
-                                                            @if (!IsFieldLocked(req.RequirementId))
-                                                            {
-                                                                <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0"
-                                                                        style="transform:translate(50%,-50%);border-radius:50%;"
-                                                                        @onclick="() => RemoveImage(req.RequirementId, img)">
-                                                                    <i class="bi bi-x"></i>
-                                                                </button>
-                                                            }
+                                                            
                                                         </div>
                                                     }
                                                 </div>

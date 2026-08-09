@@ -87,6 +87,7 @@ public partial class EventRequirementsForm
             EventId = ev.Id,
             EventTypeId = ev.EventTypeId.Value,
             EventName = ev.Name,
+            EventTypeName = ev.EventType?.Name,
             Requirements = typeReqs,
             Answers = existingAnswers.Select(a => new EventRequirementAnswerDTO
             {
@@ -126,7 +127,7 @@ public partial class EventRequirementsForm
             .Where(r =>
             {
                 if (r.RequirementInputType == RequirementInputType.Image)
-                    return ImagesByRequirement.TryGetValue(r.RequirementId, out var imgs) && imgs.Count > 0;
+                    return false;
 
                 var value = existingAnswers.FirstOrDefault(a => a.RequirementId == r.RequirementId)?.Value;
                 return !string.IsNullOrWhiteSpace(value);
@@ -389,17 +390,20 @@ public partial class EventRequirementsForm
 
         foreach (var req in FormDTO.Requirements)
         {
-            var hasContent = req.RequirementInputType == RequirementInputType.Image
-                ? GetImageCount(req.RequirementId) > 0
-                : !string.IsNullOrWhiteSpace(AnswerValues.GetValueOrDefault(req.RequirementId));
+            if (req.RequirementInputType == RequirementInputType.Image)
+                continue;
 
+            var hasContent = !string.IsNullOrWhiteSpace(AnswerValues.GetValueOrDefault(req.RequirementId));
             if (hasContent) LockedRequirementIds.Add(req.RequirementId);
         }
 
         await sweetAlertService.Mixin(new SweetAlertOptions
         {
-            Toast = true, Position = SweetAlertPosition.TopEnd,
-            ShowConfirmButton = false, Timer = 3000, TimerProgressBar = true
+            Toast = true,
+            Position = SweetAlertPosition.TopEnd,
+            ShowConfirmButton = false,
+            Timer = 3000,
+            TimerProgressBar = true
         }).FireAsync("Guardado", "Tu información ha sido guardada exitosamente.", SweetAlertIcon.Success);
 
         Saving = false;
