@@ -54,6 +54,9 @@ public class Invitation
     [Display(Name = "Comentarios")]
     public string? Comments { get; set; }
 
+    [Display(Name = "Link Personalizado")]
+    public string? LinkPersonalizado { get; set; }
+
     public int TotalInvitados => (NumberAdults + NumberYouths + NumberChildren);
     public DateTime SentDate { get; set; }
     public DateTime? ConfirmationDate { get; set; }

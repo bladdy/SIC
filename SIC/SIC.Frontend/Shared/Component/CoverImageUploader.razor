@@ -1,0 +1,36 @@
+@using CurrieTechnologies.Razor.SweetAlert2
+@using SIC.Shared.DTOs
+
+<div class="mb-3">
+    <label class="form-label">@Label</label>
+    <div class="input-group mb-2">
+        <input type="text" class="form-control" value="@Value"
+               placeholder="Ej. https://mi-invitacion.com.."
+               @oninput="OnTextChanged" />
+        @if (HasImage)
+        {
+            <button type="button" class="btn btn-outline-secondary" title="Quitar imagen" @onclick="Clear">
+                X
+            </button>
+        }
+    </div>
+    <InputFile class="form-control" accept="image/*" OnChange="HandleFileSelected" disabled="@Uploading" />
+    <small class="text-muted d-block mt-1">O sube una imagen desde tu equipo (se guardará en el servidor al guardar).</small>
+    @if (Uploading)
+    {
+        <div class="mt-2 text-muted">Subiendo imagen...</div>
+    }
+    @if (!string.IsNullOrEmpty(PendingPreview))
+    {
+        <div class="mt-2">
+            <img src="@PendingPreview" alt="Miniatura" style="max-height:120px; border-radius:8px;" class="border" />
+            <small class="d-block text-primary mt-1">Imagen nueva pendiente de guardar.</small>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(Value))
+    {
+        <div class="mt-2">
+            <img src="@Value" alt="Miniatura" style="max-height:120px; border-radius:8px;" class="border" />
+        </div>
+    }
+</div>

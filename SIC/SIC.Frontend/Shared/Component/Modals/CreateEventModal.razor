@@ -80,10 +80,7 @@
                             <InputText class="form-control" @bind-Value="NewEvent.Url" placeholder="Ej. https://mi-invitacion.com.." />
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Miniatura Invitacion</label>
-                            <InputText class="form-control" @bind-Value="NewEvent.CoverImageUrl" placeholder="Ej. https://mi-invitacion.com.." />
-                        </div>
+                        <CoverImageUploader @ref="CoverUploader" @bind-Value="NewEvent.CoverImageUrl" />
                         
                         <div class="mb-3 d-none">
                             <label class="form-label">Planner</label>
@@ -174,6 +171,18 @@
 
     private Event NewEvent = new();
     private string filterText = string.Empty;
+    private CoverImageUploader CoverUploader = default!;
+    private bool _wasShown;
+
+    protected override void OnParametersSet()
+    {
+        if (Show && !_wasShown)
+        {
+            NewEvent = new Event();
+            filterText = string.Empty;
+        }
+        _wasShown = Show;
+    }
 
     private IEnumerable<User> FilteredUsers =>
                 string.IsNullOrWhiteSpace(filterText)
@@ -213,6 +222,13 @@
         
         NewEvent.Host = HostUser.FullName;
         NewEvent.HostPhone = HostUser.PhoneNumber!;
+        if (CoverUploader.HasPendingImage)
+        {
+            var url = await CoverUploader.UploadPendingImageAsync();
+            if (string.IsNullOrEmpty(url))
+                return;
+            NewEvent.CoverImageUrl = url;
+        }
         var response = await Repository.PostAsync("api/Events/full", NewEvent);
         if (response.Error)
         {

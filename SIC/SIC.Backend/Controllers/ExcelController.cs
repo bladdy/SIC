@@ -81,6 +81,7 @@ namespace SIC.Backend.Controllers
 
                         Table = row.Cell(12).GetString(),
                         Comments = row.Cell(13).GetString(),
+                        LinkPersonalizado = row.Cell(14).GetString(),
                         SentDate = DateTime.Now,
 
                         Guests = new List<InvitationGuest>()
@@ -190,6 +191,7 @@ namespace SIC.Backend.Controllers
                         existing.NumberConfirmedChildren = inv.NumberConfirmedChildren;
                         existing.Table = inv.Table;
                         existing.Comments = inv.Comments;
+                        existing.LinkPersonalizado = inv.LinkPersonalizado;
                         existing.SentDate = inv.SentDate;
 
                         // 🔒 NO tocar estado ni invitados si ya existe
@@ -273,10 +275,11 @@ namespace SIC.Backend.Controllers
             worksheet.Cell(1, 11).Value = "Estado";
             worksheet.Cell(1, 12).Value = "Mesa";
             worksheet.Cell(1, 13).Value = "Comentarios";
+            worksheet.Cell(1, 14).Value = "Link Personalizado";
             /*worksheet.Cell(1, 12).Value = "Fecha Envío";
             worksheet.Cell(1, 13).Value = "Fecha Confirmación";*/
 
-            var headerRange = worksheet.Range(1, 1, 1, 13);
+            var headerRange = worksheet.Range(1, 1, 1, 14);
             headerRange.Style.Font.Bold = true;
             headerRange.Style.Fill.BackgroundColor = XLColor.LightGray;
             headerRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
@@ -300,6 +303,7 @@ namespace SIC.Backend.Controllers
                 worksheet.Cell(row, 11).Value = invitation.Status.GetDescription();
                 worksheet.Cell(row, 12).Value = invitation.Table;
                 worksheet.Cell(row, 13).Value = invitation.Comments;
+                worksheet.Cell(row, 14).Value = invitation.LinkPersonalizado;
                 /*worksheet.Cell(row, 12).Value = invitation.SentDate.ToString("dd/MM/yyyy HH:mm");
                 worksheet.Cell(row, 13).Value = invitation.ConfirmationDate?.ToString("dd/MM/yyyy HH:mm") ?? "—";*/
 

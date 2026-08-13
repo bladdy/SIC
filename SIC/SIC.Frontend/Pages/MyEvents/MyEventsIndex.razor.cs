@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using SIC.Frontend.Repositories;
+using SIC.Frontend.Shared.Component;
 using SIC.Shared.Entities;
 using System.Net;
 using System.Security.Claims;
@@ -36,6 +37,8 @@ public partial class MyEventsIndex
     private Event NewEvent = new();
     private bool IsModalVisible = false;
     private bool IsEditMode = false;
+
+    private CoverImageUploader CoverUploader = default!;
 
     private bool IsDateReadOnly => IsEditMode && NewEvent.Date.Date <= DateTime.Today.Date;
     private DateTime MinAllowedDate { get; set; } = new DateTime(2023, 1, 1); // Sets January 1, 2023 as the minimum
@@ -267,6 +270,14 @@ public partial class MyEventsIndex
     {
         HttpResponseWrapper<object>? responseHttp;
         bool isPost = false;
+
+        if (CoverUploader.HasPendingImage)
+        {
+            var url = await CoverUploader.UploadPendingImageAsync();
+            if (string.IsNullOrEmpty(url))
+                return;
+            NewEvent.CoverImageUrl = url;
+        }
 
         if (IsEditMode)
         {

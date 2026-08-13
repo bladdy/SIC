@@ -1074,6 +1074,11 @@ else
                             <ValidationMessage For="@(() => NewInvitation.PhoneNumber)" />
                         </div>
                         <div class="mb-3">
+                            <label class="form-label">Link Personalizado</label>
+                            <InputText class="form-control" @bind-Value="NewInvitation.LinkPersonalizado" placeholder="Ej. https://mi-enlace-personalizado.com" />
+                            <ValidationMessage For="@(() => NewInvitation.LinkPersonalizado)" />
+                        </div>
+                        <div class="mb-3">
                             <div class="d-flex flex-row align-items-center gap-2 mb-3">
                                 <label class="form-label fw-bold">Invitados</label>
                                 <button type="button" class="btn btn-custom rounded-circle p-2" @onclick="AddGuest">

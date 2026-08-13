@@ -327,10 +327,7 @@
                             <label class="form-label">URL Invitacion</label>
                             <InputText class="form-control" @bind-Value="NewEvent.Url" placeholder="Ej. https://mi-invitacion.com.." />
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Miniatura Invitacion</label>
-                            <InputText class="form-control" @bind-Value="NewEvent.CoverImageUrl" placeholder="Ej. https://mi-invitacion.com.." />
-                        </div>
+                        <CoverImageUploader @ref="CoverUploader" @bind-Value="NewEvent.CoverImageUrl" />
                         <div class="mb-3 d-none">
                             <label class="form-label">Ubicación</label>
                             <InputText class="form-control" @bind-Value="NewEvent.Ubication" placeholder="Ej. https://www.google.com/maps/....." />

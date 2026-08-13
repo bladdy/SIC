@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using SIC.Frontend.Repositories;
+using SIC.Frontend.Shared.Component;
 using SIC.Shared.Entities;
 using System.Net;
 
@@ -27,6 +28,8 @@ namespace SIC.Frontend.Pages.Events
         private Event NewEvent = new();
         private bool IsModalVisible = false;
         private bool IsEditMode = false;
+
+        private CoverImageUploader CoverUploader = default!;
 
         private int currentPage = 1;
         private int totalPages;
@@ -283,6 +286,13 @@ namespace SIC.Frontend.Pages.Events
             }
             NewEvent.Host = HostUser.FullName;
             NewEvent.HostPhone = HostUser.PhoneNumber!;
+            if (CoverUploader.HasPendingImage)
+            {
+                var url = await CoverUploader.UploadPendingImageAsync();
+                if (string.IsNullOrEmpty(url))
+                    return;
+                NewEvent.CoverImageUrl = url;
+            }
             HttpResponseWrapper<object>? response;
             if (IsEditMode)
                 response = await repository.PutAsync("api/Events/full", NewEvent);

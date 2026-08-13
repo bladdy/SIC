@@ -236,6 +236,7 @@ public partial class MyEventsDetails
             Guests = invitation.Guests,
             Table = invitation.Table,
             Comments = invitation.Comments,
+            LinkPersonalizado = invitation.LinkPersonalizado,
             CountryCode = invitation.CountryCode,
             SentDate = invitation.SentDate,
             ConfirmationDate = invitation.ConfirmationDate,

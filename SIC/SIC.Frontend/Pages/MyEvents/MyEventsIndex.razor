@@ -340,10 +340,7 @@
                             <label class="form-label">URL Invitación</label>
                             <InputText class="form-control" @bind-Value="NewEvent.Url" placeholder="Ej. https://mi-invitacion.com.." />
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Miniatura (Foto de Portada)</label>
-                            <InputText class="form-control" @bind-Value="NewEvent.CoverImageUrl" placeholder="Ej. https://mi-invitacion.com.." />
-                        </div>
+                        <CoverImageUploader @ref="CoverUploader" @bind-Value="NewEvent.CoverImageUrl" />
                         <div class="mb-3 row">
                             <div class="col">
                                 <label class="form-label">Fecha Limite Para Confirmar Evento</label>

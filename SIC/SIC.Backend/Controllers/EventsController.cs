@@ -135,6 +135,23 @@ public class EventsController : GenericController<Event>
         return NotFound(action.Message);
     }
 
+    [HttpPost("upload-thumbnail")]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> UploadThumbnailAsync(IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest("No se envió ningún archivo.");
+
+        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+
+        using var stream = file.OpenReadStream();
+        var url = await _ftp.UploadRawImageAsync(stream, "FrontPages", fileName);
+        if (string.IsNullOrWhiteSpace(url))
+            return BadRequest("Error al subir la imagen.");
+
+        return Ok(new { url });
+    }
+
     [HttpGet("qr/download/{code}")]
     public async Task<IActionResult> DownloadQRCodeAsync(string code)
     {

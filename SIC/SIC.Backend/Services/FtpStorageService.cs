@@ -93,6 +93,29 @@ public class FtpStorageService
         return BuildFileUrl(folder, webpFileName);
     }
 
+    public async Task<string> UploadRawImageAsync(
+        Stream fileStream,
+        string folder,
+        string fileName)
+    {
+        using var client = CreateClient();
+
+        var directory = $"/{folder}";
+
+        EnsureDirectory(client, directory);
+
+        var remotePath = $"{directory}/{fileName}";
+
+        await UploadFileStreamAsync(
+            client,
+            fileStream,
+            remotePath);
+
+        return BuildFileUrl(
+            folder,
+            fileName);
+    }
+
     public async Task<string> UploadVideoAsync(
         Stream fileStream,
         string folder,

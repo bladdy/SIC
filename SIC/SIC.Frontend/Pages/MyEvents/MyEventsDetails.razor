@@ -971,7 +971,7 @@ else
                         }
                         else
                         {
-                            
+
                             @if (EventDetail.User.UserWhatsAppConfigs != null)
                             {
                                 <button class="btn accion accion-2" style="background-color:#25d366; color:white;"
@@ -1020,7 +1020,7 @@ else
                     </div>
                     @if (EventDetail.User.UserWhatsAppConfigs != null)
                     {
-                        
+
                         <div class="row m-2">
 
                             @{
@@ -1051,8 +1051,8 @@ else
                                         <!-- SVG 4 -->
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circle-number-4"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 8v3a1 1 0 0 0 1 1h3" /><path d="M14 8v8" /></svg>
                                     </div>
-                                     <div class="step-circle @(sentTemplates.Contains(5) ? "active-step" : "inactive-step")">
-                                                                <!-- SVG 5 -->
+                                    <div class="step-circle @(sentTemplates.Contains(5) ? "active-step" : "inactive-step")">
+                                        <!-- SVG 5 -->
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circle-number-5"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 15a1 1 0 0 0 1 1h2a1 1 0 0 0 1 -1v-2a1 1 0 0 0 -1 -1h-3v-4h4" /></svg>
                                     </div>
                                 </div>
@@ -1171,8 +1171,8 @@ else
 
                                 <!-- Country Code Select -->
                                 <InputSelect class="form-select"
-                                             style="max-width: 190px;"
-                                             @bind-Value="NewInvitation.CountryCode">
+                                style="max-width: 190px;"
+                                @bind-Value="NewInvitation.CountryCode">
                                     <option value="">Selecciona un País</option>
                                     <option value="+52">MX +52</option>
                                     <option value="+1">US +1</option>
@@ -1181,14 +1181,23 @@ else
 
                                 <!-- Phone Number -->
                                 <InputText class="form-control"
-                                           @bind-Value="NewInvitation.PhoneNumber"
-                                           placeholder="Número de WhatsApp" />
+                                @bind-Value="NewInvitation.PhoneNumber"
+                                placeholder="Número de WhatsApp" />
 
                             </div>
 
                             <ValidationMessage For="@(() => NewInvitation.CountryCode)" />
                             <ValidationMessage For="@(() => NewInvitation.PhoneNumber)" />
                         </div>
+                        @if (!(EventDetail?.InvitationInvboxv == true || !string.IsNullOrWhiteSpace(EventDetail.Url)))
+                        {
+                            <div class="mb-3">
+                                <label class="form-label">Link Personalizado</label>
+                                <InputText class="form-control" @bind-Value="NewInvitation.LinkPersonalizado" placeholder="Ej. https://mi-enlace-personalizado.com" />
+                                <ValidationMessage For="@(() => NewInvitation.LinkPersonalizado)" />
+                            </div>
+                            
+                        }
                         <div class="mb-3">
                             <div class="d-flex flex-row align-items-center gap-2 mb-3">
                                 <label class="form-label fw-bold">Invitados</label>
