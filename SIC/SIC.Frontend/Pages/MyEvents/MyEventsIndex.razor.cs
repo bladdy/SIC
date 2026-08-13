@@ -235,6 +235,7 @@ public partial class MyEventsIndex
             OnlyAlbum = evnt.OnlyAlbum,
             PlannerPhone = evnt.PlannerPhone,
             EventType = evnt.EventType,
+            DeadLine = evnt.DeadLine,
             Status = evnt.Status
         };
 
