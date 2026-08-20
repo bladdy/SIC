@@ -156,9 +156,6 @@ public class EventRequirementAnswersRepository : GenericRepository<EventRequirem
             if (config.Requirement?.InputType != RequirementInputType.Image) continue;
 
             var count = imageCounts.GetValueOrDefault(config.RequirementId);
-            var min = config.Requirement.MinImages > 0
-                ? config.Requirement.MinImages
-                : (config.Requirement.IsRequired ? 1 : 0);
             var max = config.Requirement.MaxImages;
 
             if (max > 0 && count > max)
@@ -166,14 +163,6 @@ public class EventRequirementAnswersRepository : GenericRepository<EventRequirem
                 return new ActionResponse<SaveFormResponseDTO>
                 {
                     Message = $"El requisito '{config.Requirement.Name}' solo admite hasta {max} imágenes."
-                };
-            }
-
-            if (count < min)
-            {
-                return new ActionResponse<SaveFormResponseDTO>
-                {
-                    Message = $"El requisito '{config.Requirement.Name}' requiere mínimo {min} imágenes."
                 };
             }
         }
