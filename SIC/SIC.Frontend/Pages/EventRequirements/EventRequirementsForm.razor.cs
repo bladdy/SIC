@@ -280,9 +280,6 @@ public partial class EventRequirementsForm
             if (req.RequirementInputType == RequirementInputType.Image)
             {
                 var count = GetImageCount(req.RequirementId);
-                var min = req.RequirementMinImages > 0
-                    ? req.RequirementMinImages
-                    : (req.RequirementIsRequired == true ? 1 : 0);
                 var max = req.RequirementMaxImages;
 
                 if (max > 0 && count > max)
@@ -291,13 +288,6 @@ public partial class EventRequirementsForm
                     FieldErrorMessages[req.RequirementId] = max == 1
                         ? "Este campo solo admite 1 imagen."
                         : $"Este campo solo admite hasta {max} imágenes.";
-                }
-                else if (count < min)
-                {
-                    FailedFields.Add(req.RequirementId);
-                    FieldErrorMessages[req.RequirementId] = min == 1
-                        ? "Debes subir al menos 1 imagen."
-                        : $"Debes subir al menos {min} imágenes.";
                 }
             }
             else if (req.RequirementIsRequired == true)

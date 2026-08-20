@@ -102,17 +102,9 @@ else
                                                        OnChange="e => HandleImageUpload(req.RequirementId, e)"
                                                        accept="image/*"
                                                        disabled="@(req.RequirementMaxImages > 0 && GetImageCount(req.RequirementId) >= req.RequirementMaxImages)" />
-                                            @if (req.RequirementMinImages > 0 || req.RequirementMaxImages > 0)
+                                            @if (req.RequirementMaxImages > 0)
                                             {
                                                 <small class="text-muted d-block mt-1">
-                                                    @if (req.RequirementMinImages > 0)
-                                                    {
-                                                        <span>Mínimo: @req.RequirementMinImages</span>
-                                                    }
-                                                    @if (req.RequirementMinImages > 0 && req.RequirementMaxImages > 0)
-                                                    {
-                                                        <text> · </text>
-                                                    }
                                                     @if (req.RequirementMaxImages > 0)
                                                     {
                                                         <span>Máximo: @req.RequirementMaxImages</span>
