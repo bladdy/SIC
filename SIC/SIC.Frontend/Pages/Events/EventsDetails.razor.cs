@@ -925,4 +925,25 @@ public partial class EventsDetails
         Status.NotAttend => "danger",
         _ => "secondary"
     };
+
+    private string GetEffectiveTableName(InvitationGuest guest)
+    {
+        if (guest.TablesEventsId.HasValue)
+        {
+            var table = Tables.FirstOrDefault(t => t.Id == guest.TablesEventsId);
+            return table != null ? $"Mesa individual: {table.Name}" : "Mesa no encontrada";
+        }
+        if (NewInvitation.TablesEventsId.HasValue)
+        {
+            var table = Tables.FirstOrDefault(t => t.Id == NewInvitation.TablesEventsId);
+            return table != null ? $"Heredada: {table.Name}" : "Sin mesa";
+        }
+        return "Sin mesa";
+    }
+
+    private void OnGuestTableChanged(InvitationGuest guest, int? tableId)
+    {
+        guest.TablesEventsId = tableId;
+        StateHasChanged();
+    }
 }

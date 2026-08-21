@@ -144,7 +144,7 @@ namespace SIC.Backend.Controllers
                     Hora = evento.Result.Time.ToString(@"hh\:mm"),
                     Lugar = evento.Result.Url,
                     CantidadPersonas = invitacion.NumberAdults + invitacion.NumberChildren,
-                    MesaAsignada = invitacion.Table ?? "Sin asignar",
+                    MesaAsignada = invitacion.TablesEvents?.Name ?? invitacion.Table ?? "Sin asignar",
                     CodigoQr = invitacion.Code ?? $"INV-{invitacion.Id}-{evento.Result.Id}"
                 };
 

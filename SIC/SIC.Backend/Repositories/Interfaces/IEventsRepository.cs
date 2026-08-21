@@ -8,6 +8,8 @@ public interface IEventsRepository
 {
     Task<ActionResponse<Event>> GetByCodeAsync(string code);
 
+    Task<ActionResponse<EventInfoDto>> GetInfoByCodeAsync(string code);
+
     Task<ActionResponse<IEnumerable<Event>>> GetAsync();
 
     Task<ActionResponse<IEnumerable<Event>>> GetByUserIdAsync(string userId);

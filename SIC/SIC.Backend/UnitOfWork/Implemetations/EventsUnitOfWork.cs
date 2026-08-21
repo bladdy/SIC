@@ -19,6 +19,8 @@ public class EventsUnitOfWork : GenericUnitOfWork<Event>, IEventsUnitOfWork
 
     public async Task<ActionResponse<Event>> GetByCodeAsync(string code) => await _eventstRepository.GetByCodeAsync(code);
 
+    public async Task<ActionResponse<EventInfoDto>> GetInfoByCodeAsync(string code) => await _eventstRepository.GetInfoByCodeAsync(code);
+
     public override async Task<ActionResponse<IEnumerable<Event>>> GetAsync() => await _eventstRepository.GetAsync();
 
     public async Task<ActionResponse<Event>> AddFullAsync(Event events) => await _eventstRepository.AddFullAsync(events);

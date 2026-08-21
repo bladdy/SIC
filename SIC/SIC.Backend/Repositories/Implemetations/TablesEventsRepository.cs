@@ -36,7 +36,6 @@ namespace SIC.Backend.Repositories.Implemetations
                 Event = events,
                 Number = tablesEvents.Count,
                 Name = createOrEditTablesDto.Name,
-                Invitation = new List<Invitation>(),
                 Description = createOrEditTablesDto.Description,
                 Seats = createOrEditTablesDto.Seats,
                 OccupiedSeats = 0
@@ -52,7 +51,11 @@ namespace SIC.Backend.Repositories.Implemetations
 
         public async Task<ActionResponse<TablesEvents>> UpdateFullAsync(CreateOrEditTablesDto createOrEditTablesDto)
         {
-            var updateTable = await _context.TablesEvents.Include(e => e.Event).Include(i => i.Invitation).FirstOrDefaultAsync(x => x.Id == createOrEditTablesDto.Id);
+            var updateTable = await _context.TablesEvents
+                .Include(e => e.Event)
+                .Include(i => i.Invitations)
+                    .ThenInclude(g => g.Guests)
+                .FirstOrDefaultAsync(x => x.Id == createOrEditTablesDto.Id);
 
             if (updateTable == null)
             {
@@ -79,7 +82,7 @@ namespace SIC.Backend.Repositories.Implemetations
         public async Task<ActionResponse<TablesEvents>> AssignTablesAsync(AssignTablesDto tablesDto)
         {
             var table = await _context.TablesEvents
-                .Include(t => t.Invitation)
+                .Include(t => t.Invitations)
                 .FirstOrDefaultAsync(t => t.Id == tablesDto.TableId);
 
             if (table == null)
@@ -104,8 +107,7 @@ namespace SIC.Backend.Repositories.Implemetations
                 };
             }
 
-            // Validar que no esté asignada ya
-            if (table.Invitation.Any(i => i.Id == invitation.Id))
+            if (table.Invitations.Any(i => i.Id == invitation.Id))
             {
                 return new ActionResponse<TablesEvents>
                 {
@@ -137,15 +139,13 @@ namespace SIC.Backend.Repositories.Implemetations
                 };
             }
 
-            // Asignar invitación a la mesa
-            table.Invitation.Add(invitation);
-
-            // Actualizar ocupación
-            table.OccupiedSeats = occupiedSeats;
+            table.Invitations.Add(invitation);
 
             _context.TablesEvents.Update(table);
 
             await _context.SaveChangesAsync();
+
+            await RecalculateOccupancyAsync(invitation.EventId);
 
             return new ActionResponse<TablesEvents>
             {
@@ -186,18 +186,6 @@ namespace SIC.Backend.Repositories.Implemetations
                 };
             }
 
-            var existingTables = await _context.TablesEvents
-                .AnyAsync(t => t.EventId == generateTablesDto.EventoId);
-            /*
-            if (existingTables)
-            {
-                return new ActionResponse<GenerateTablesDto>
-                {
-                    Success = false,
-                    Message = "Ya existen mesas generadas para este evento."
-                };
-            }*/
-
             var tables = new List<TablesEvents>();
 
             for (int i = 1; i <= generateTablesDto.NumbersTables; i++)
@@ -209,8 +197,7 @@ namespace SIC.Backend.Repositories.Implemetations
                     Name = $"{i}",
                     Description = $"{i}",
                     Seats = generateTablesDto.NumberOfSeats,
-                    OccupiedSeats = 0,
-                    Invitation = new List<Invitation>()
+                    OccupiedSeats = 0
                 });
             }
 
@@ -227,7 +214,16 @@ namespace SIC.Backend.Repositories.Implemetations
 
         public async Task<ActionResponse<IEnumerable<TablesEvents>>> GetAsync(int id)
         {
-            var entities = await _context.TablesEvents.Include(e => e.Event).Include(i => i.Invitation).ThenInclude(g => g.Guests).Where(e => e.EventId == id).AsNoTracking().ToListAsync();
+            var entities = await _context.TablesEvents
+                .Include(e => e.Event)
+                .Include(i => i.Invitations)
+                    .ThenInclude(g => g.Guests)
+                        .ThenInclude(g => g.TablesEvents)
+                .Include(t => t.Guests)
+                    .ThenInclude(g => g.Invitation)
+                .Where(e => e.EventId == id)
+                .AsNoTracking()
+                .ToListAsync();
 
             return new ActionResponse<IEnumerable<TablesEvents>>
             {
@@ -239,7 +235,7 @@ namespace SIC.Backend.Repositories.Implemetations
         public override async Task<ActionResponse<int>> GetTotalRecordAsync(PaginationDTO pagination)
         {
             var queryable = _context.TablesEvents
-                .Include(t => t.Invitation)
+                .Include(t => t.Invitations)
                     .ThenInclude(i => i.Guests)
                 .AsQueryable();
 
@@ -250,10 +246,10 @@ namespace SIC.Backend.Repositories.Implemetations
                 queryable = queryable.Where(t =>
                     t.Name.ToLower().Contains(filter)
 
-                    || t.Invitation.Any(i =>
+                    || t.Invitations.Any(i =>
                         i.Name.ToLower().Contains(filter))
 
-                    || t.Invitation.Any(i =>
+                    || t.Invitations.Any(i =>
                         i.Guests.Any(g =>
                             g.GuestName!.ToLower().Contains(filter)))
                 );
@@ -270,7 +266,7 @@ namespace SIC.Backend.Repositories.Implemetations
         public override async Task<ActionResponse<IEnumerable<TablesEvents>>> GetAsync(PaginationDTO pagination)
         {
             var queryable = _context.TablesEvents
-                .Include(t => t.Invitation)
+                .Include(t => t.Invitations)
                     .ThenInclude(i => i.Guests)
                 .AsQueryable();
 
@@ -281,10 +277,10 @@ namespace SIC.Backend.Repositories.Implemetations
                 queryable = queryable.Where(t =>
                     t.Name.ToLower().Contains(filter)
 
-                    || t.Invitation.Any(i =>
+                    || t.Invitations.Any(i =>
                         i.Name.ToLower().Contains(filter))
 
-                    || t.Invitation.Any(i =>
+                    || t.Invitations.Any(i =>
                         i.Guests.Any(g =>
                             g.GuestName!.ToLower().Contains(filter)))
                 );
@@ -302,8 +298,12 @@ namespace SIC.Backend.Repositories.Implemetations
         public override async Task<ActionResponse<IEnumerable<TablesEvents>>> GetAsync()
         {
             var queryable = await _context.TablesEvents
-                .Include(t => t.Invitation)
-                    .ThenInclude(i => i.Guests).ToListAsync();
+                .Include(t => t.Invitations)
+                    .ThenInclude(i => i.Guests)
+                        .ThenInclude(g => g.TablesEvents)
+                .Include(t => t.Guests)
+                    .ThenInclude(g => g.Invitation)
+                .ToListAsync();
             return new ActionResponse<IEnumerable<TablesEvents>>
             {
                 Success = true,
@@ -329,25 +329,14 @@ namespace SIC.Backend.Repositories.Implemetations
                     };
                 }
 
-                var table = invitation.TablesEvents;
-
-                var confirmedGuests = invitation.Guests?
-                    .Count(g => g.Status == Status.Attend) ?? 0;
-
-                if (table != null)
-                {
-                    table.OccupiedSeats -= confirmedGuests;
-
-                    if (table.OccupiedSeats < 0)
-                    {
-                        table.OccupiedSeats = 0;
-                    }
-                }
+                var eventId = invitation.EventId;
 
                 invitation.TablesEvents = null;
                 invitation.TablesEventsId = null;
 
                 await _context.SaveChangesAsync();
+
+                await RecalculateOccupancyAsync(eventId);
 
                 return new ActionResponse<bool>
                 {
@@ -368,7 +357,8 @@ namespace SIC.Backend.Repositories.Implemetations
         public async Task<ActionResponse<bool>> DeleteTablesAsync(int id)
         {
             var table = await _context.TablesEvents
-                .Include(t => t.Invitation)
+                .Include(t => t.Invitations)
+                .Include(t => t.Guests)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
             if (table == null)
@@ -380,10 +370,14 @@ namespace SIC.Backend.Repositories.Implemetations
                 };
             }
 
-            // Desasignar invitaciones de la mesa
-            foreach (var invitation in table.Invitation)
+            foreach (var invitation in table.Invitations)
             {
                 invitation.TablesEventsId = null;
+            }
+
+            foreach (var guest in table.Guests)
+            {
+                guest.TablesEventsId = null;
             }
 
             _context.TablesEvents.Remove(table);
@@ -399,13 +393,337 @@ namespace SIC.Backend.Repositories.Implemetations
 
         public async Task<ActionResponse<IEnumerable<TablesEvents>>> GetTablesByCodeAsync(string code)
         {
-            var entities = await _context.TablesEvents.Include(e => e.Event).Include(i => i.Invitation).ThenInclude(g => g.Guests).Where(e => e.Event!.Code == code).AsNoTracking().ToListAsync();
+            var entities = await _context.TablesEvents
+                .Include(i => i.Invitations)
+                    .ThenInclude(g => g.Guests)
+                .Include(t => t.Guests)
+                    .ThenInclude(g => g.Invitation)
+                .Where(e => e.Event!.Code == code)
+                .AsNoTracking()
+                .ToListAsync();
 
             return new ActionResponse<IEnumerable<TablesEvents>>
             {
                 Success = true,
                 Result = entities
             };
+        }
+
+        public async Task<ActionResponse<AssignBulkResultDto>> AssignTablesBulkAsync(List<AssignTablesDto> dtos)
+        {
+            try
+            {
+                if (dtos == null || dtos.Count == 0)
+                {
+                    return new ActionResponse<AssignBulkResultDto>
+                    {
+                        Success = false,
+                        Message = "No hay invitaciones seleccionadas."
+                    };
+                }
+
+                var tableId = dtos.First().TableId;
+
+                var table = await _context.TablesEvents
+                    .Include(t => t.Invitations)
+                    .FirstOrDefaultAsync(t => t.Id == tableId);
+
+                if (table == null)
+                {
+                    return new ActionResponse<AssignBulkResultDto>
+                    {
+                        Success = false,
+                        Message = "La mesa no existe."
+                    };
+                }
+
+                var invitationIds = dtos.Select(d => d.InvitationId).Distinct().ToList();
+                var invitations = await _context.Invitations
+                    .Include(i => i.Guests)
+                    .Where(i => invitationIds.Contains(i.Id))
+                    .ToListAsync();
+
+                var result = new AssignBulkResultDto();
+                var pending = new List<Invitation>();
+
+                foreach (var invitationId in invitationIds)
+                {
+                    var invitation = invitations.FirstOrDefault(i => i.Id == invitationId);
+                    if (invitation == null)
+                    {
+                        result.Skipped.Add($"La invitación {invitationId} no existe.");
+                        continue;
+                    }
+                    if (table.Invitations.Any(i => i.Id == invitation.Id))
+                    {
+                        result.Skipped.Add($"'{invitation.Name}' ya está asignada a esta mesa.");
+                        continue;
+                    }
+                    if (invitation.Guests.Count(g => g.Status == Status.Attend) == 0)
+                    {
+                        result.Skipped.Add($"'{invitation.Name}' aun no ha confirmado asistencia.");
+                        continue;
+                    }
+                    pending.Add(invitation);
+                }
+
+                var totalGuests = pending.Sum(i => i.Guests.Count(g => g.Status == Status.Attend));
+                var available = table.Seats - table.OccupiedSeats;
+                if (totalGuests > available)
+                {
+                    return new ActionResponse<AssignBulkResultDto>
+                    {
+                        Success = false,
+                        Message = $"La mesa tiene {table.Seats} lugares y solo quedan {available} disponibles (se requieren {totalGuests})."
+                    };
+                }
+
+                foreach (var invitation in pending)
+                {
+                    table.Invitations.Add(invitation);
+                    result.Assigned++;
+                }
+
+                await _context.SaveChangesAsync();
+                await RecalculateOccupancyAsync(table.EventId);
+
+                return new ActionResponse<AssignBulkResultDto>
+                {
+                    Success = true,
+                    Result = result
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ActionResponse<AssignBulkResultDto>
+                {
+                    Success = false,
+                    Message = ex.Message
+                };
+            }
+        }
+
+        public async Task<ActionResponse<AssignBulkResultDto>> AssignGuestTableBulkAsync(List<AssignGuestTableDto> dtos)
+        {
+            try
+            {
+                if (dtos == null || dtos.Count == 0)
+                {
+                    return new ActionResponse<AssignBulkResultDto>
+                    {
+                        Success = false,
+                        Message = "No hay invitados seleccionados."
+                    };
+                }
+
+                var tableId = dtos.First().TablesEventsId;
+                if (!tableId.HasValue)
+                {
+                    return new ActionResponse<AssignBulkResultDto>
+                    {
+                        Success = false,
+                        Message = "La mesa no es válida."
+                    };
+                }
+
+                var table = await _context.TablesEvents
+                    .FirstOrDefaultAsync(t => t.Id == tableId.Value);
+
+                if (table == null)
+                {
+                    return new ActionResponse<AssignBulkResultDto>
+                    {
+                        Success = false,
+                        Message = "La mesa no existe."
+                    };
+                }
+
+                var guestIds = dtos.Select(d => d.GuestId).Distinct().ToList();
+                var guests = await _context.InvitationGuest
+                    .Include(g => g.Invitation)
+                    .Where(g => guestIds.Contains(g.Id))
+                    .ToListAsync();
+
+                var result = new AssignBulkResultDto();
+
+                foreach (var guest in guests)
+                {
+                    if (guest.Invitation == null || guest.Invitation.EventId != table.EventId)
+                    {
+                        result.Skipped.Add($"'{guest.GuestName}' no pertenece a este evento.");
+                        continue;
+                    }
+                    guest.TablesEventsId = table.Id;
+                    result.Assigned++;
+                }
+
+                await _context.SaveChangesAsync();
+                await RecalculateOccupancyAsync(table.EventId);
+
+                return new ActionResponse<AssignBulkResultDto>
+                {
+                    Success = true,
+                    Result = result
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ActionResponse<AssignBulkResultDto>
+                {
+                    Success = false,
+                    Message = ex.Message
+                };
+            }
+        }
+
+        public async Task<ActionResponse<InvitationGuest>> AssignGuestTableAsync(AssignGuestTableDto dto)
+        {
+            try
+            {
+                var guest = await _context.InvitationGuest
+                    .Include(g => g.Invitation)
+                    .FirstOrDefaultAsync(g => g.Id == dto.GuestId);
+
+                if (guest == null)
+                {
+                    return new ActionResponse<InvitationGuest>
+                    {
+                        Success = false,
+                        Message = "El invitado no existe."
+                    };
+                }
+
+                if (dto.TablesEventsId.HasValue)
+                {
+                    var table = await _context.TablesEvents
+                        .FirstOrDefaultAsync(t => t.Id == dto.TablesEventsId.Value);
+
+                    if (table == null)
+                    {
+                        return new ActionResponse<InvitationGuest>
+                        {
+                            Success = false,
+                            Message = "La mesa no existe."
+                        };
+                    }
+
+                    if (table.EventId != guest.Invitation!.EventId)
+                    {
+                        return new ActionResponse<InvitationGuest>
+                        {
+                            Success = false,
+                            Message = "La mesa no pertenece al mismo evento que la invitación."
+                        };
+                    }
+                }
+
+                guest.TablesEventsId = dto.TablesEventsId;
+
+                await _context.SaveChangesAsync();
+
+                await RecalculateOccupancyAsync(guest.Invitation!.EventId);
+
+                return new ActionResponse<InvitationGuest>
+                {
+                    Success = true,
+                    Result = guest
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ActionResponse<InvitationGuest>
+                {
+                    Success = false,
+                    Message = ex.Message
+                };
+            }
+        }
+
+        public async Task<ActionResponse<bool>> UnassignGuestFromTableAsync(int guestId)
+        {
+            try
+            {
+                var guest = await _context.InvitationGuest
+                    .Include(g => g.Invitation)
+                    .FirstOrDefaultAsync(g => g.Id == guestId);
+
+                if (guest == null)
+                {
+                    return new ActionResponse<bool>
+                    {
+                        Success = false,
+                        Message = "El invitado no existe."
+                    };
+                }
+
+                if (!guest.TablesEventsId.HasValue)
+                {
+                    return new ActionResponse<bool>
+                    {
+                        Success = false,
+                        Message = "El invitado no tiene mesa individual."
+                    };
+                }
+
+                var eventId = guest.Invitation!.EventId;
+                guest.TablesEventsId = null;
+                await _context.SaveChangesAsync();
+                await RecalculateOccupancyAsync(eventId);
+
+                return new ActionResponse<bool>
+                {
+                    Success = true,
+                    Result = true
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ActionResponse<bool>
+                {
+                    Success = false,
+                    Message = ex.Message
+                };
+            }
+        }
+
+        public async Task RecalculateOccupancyAsync(int eventId)
+        {
+            var tables = await _context.TablesEvents
+                .Where(t => t.EventId == eventId)
+                .ToListAsync();
+
+            if (tables.Count == 0) return;
+
+            var inheritedCounts = await _context.InvitationGuest
+                .Where(g => g.Status == Status.Attend
+                         && g.TablesEventsId == null
+                         && g.Invitation!.EventId == eventId
+                         && g.Invitation!.TablesEventsId != null)
+                .GroupBy(g => g.Invitation!.TablesEventsId!.Value)
+                .Select(grp => new { TableId = grp.Key, Count = grp.Count() })
+                .ToListAsync();
+
+            var directCounts = await _context.InvitationGuest
+                .Where(g => g.TablesEventsId != null
+                         && g.Invitation!.EventId == eventId
+                         && g.Status == Status.Attend)
+                .GroupBy(g => g.TablesEventsId)
+                .Select(g => new { TableId = g.Key, Count = g.Count() })
+                .ToListAsync();
+
+            var inheritedDict = inheritedCounts.ToDictionary(x => x.TableId, x => x.Count);
+            var directDict = directCounts
+                .Where(x => x.TableId.HasValue)
+                .ToDictionary(x => x.TableId!.Value, x => x.Count);
+
+            foreach (var table in tables)
+            {
+                table.OccupiedSeats =
+                    (inheritedDict.TryGetValue(table.Id, out var inherited) ? inherited : 0) +
+                    (directDict.TryGetValue(table.Id, out var direct) ? direct : 0);
+            }
+
+            await _context.SaveChangesAsync();
         }
     }
 }

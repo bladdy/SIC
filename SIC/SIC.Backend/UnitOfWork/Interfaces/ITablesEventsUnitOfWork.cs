@@ -27,5 +27,15 @@ namespace SIC.Backend.UnitOfWork.Interfaces
         Task<ActionResponse<bool>> DeleteInvitatonFromTablesAsync(int id);
 
         Task<ActionResponse<IEnumerable<TablesEvents>>> GetTablesByCodeAsync(string code);
+
+        Task<ActionResponse<InvitationGuest>> AssignGuestTableAsync(AssignGuestTableDto dto);
+
+        Task<ActionResponse<AssignBulkResultDto>> AssignTablesBulkAsync(List<AssignTablesDto> dtos);
+
+        Task<ActionResponse<AssignBulkResultDto>> AssignGuestTableBulkAsync(List<AssignGuestTableDto> dtos);
+
+        Task<ActionResponse<bool>> UnassignGuestFromTableAsync(int guestId);
+
+        Task RecalculateOccupancyAsync(int eventId);
     }
 }

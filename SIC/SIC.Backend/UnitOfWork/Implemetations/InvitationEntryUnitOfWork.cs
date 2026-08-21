@@ -24,5 +24,7 @@ public class InvitationEntryUnitOfWork : GenericUnitOfWork<InvitationEntry>, IIn
 
     public override async Task<ActionResponse<IEnumerable<InvitationEntry>>> GetAsync(PaginationDTO pagination) => await _invitationEntryRepository.GetAsync(pagination);
 
+    public async Task<ActionResponse<IEnumerable<InvitationEntry>>> GetAllByEventAsync(string eventCode) => await _invitationEntryRepository.GetAllByEventAsync(eventCode);
+
     public override async Task<ActionResponse<int>> GetTotalRecordAsync(PaginationDTO pagination) => await _invitationEntryRepository.GetTotalRecordAsync(pagination);
 }

@@ -170,6 +170,13 @@ public class InvitationsController : GenericController<Invitation>
             if (invitacion == null)
                 return NotFound(new { success = false, message = "Invitación no encontrada." });
 
+            Console.WriteLine($"[Boleta] invitacion.TablesEventsId={invitacion.TablesEventsId}, TablesEvents?.Name={invitacion.TablesEvents?.Name}");
+            Console.WriteLine($"[Boleta] Guests count={invitacion.Guests?.Count}");
+            foreach (var g in invitacion.Guests ?? Enumerable.Empty<SIC.Shared.Entities.InvitationGuest>())
+            {
+                Console.WriteLine($"[Boleta] Guest '{g.GuestName}' TablesEventsId={g.TablesEventsId}, TablesEvents?.Name={g.TablesEvents?.Name}");
+            }
+
             var dto = new BoletaInvitacionDto
             {
                 NombreInvitado = invitacion.Name,
@@ -184,8 +191,19 @@ public class InvitationsController : GenericController<Invitation>
                 Niños = invitacion.NumberConfirmedChildren,
                 Jovenes = invitacion.NumberConfirmedYouths,
                 Adultos = invitacion.NumberConfirmedAdults,
-                MesaAsignada = invitacion.TablesEvents?.Name ?? "Sin asignar",
-                CodigoQr = invitacion.Code ?? $"INV-{invitacion.Id}-{evento}"
+                MesaAsignada = invitacion.TablesEvents?.Name
+                    ?? invitacion.Guests?.FirstOrDefault(g => g.TablesEventsId.HasValue)?.TablesEvents?.Name
+                    ?? "Sin asignar",
+                CodigoQr = invitacion.Code ?? $"INV-{invitacion.Id}-{evento}",
+                IsIndividualAssignment = invitacion.TablesEventsId == null
+                    && invitacion.Guests.Any(g => g.TablesEventsId.HasValue),
+                GuestsWithMesa = invitacion.TablesEventsId == null
+                    && invitacion.Guests.Any(g => g.TablesEventsId.HasValue)
+                    ? invitacion.Guests
+                        .Where(g => g.Status == Status.Attend)
+                        .Select(g => $"{g.GuestName} ({g.GuestType.GetDescription()}) - Mesa: {g.TablesEvents?.Name ?? "Sin asignar"}")
+                        .ToList()
+                    : []
             };
 
             // 🔹 QR Base64

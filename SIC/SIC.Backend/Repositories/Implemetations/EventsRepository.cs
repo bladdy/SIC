@@ -40,6 +40,28 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
         };
     }
 
+    public async Task<ActionResponse<EventInfoDto>> GetInfoByCodeAsync(string code)
+    {
+        var eventInfo = await _context.Events
+            .AsNoTracking()
+            .Where(x => x.Code == code)
+            .Select(x => new EventInfoDto { Id = x.Id, Name = x.Name })
+            .FirstOrDefaultAsync();
+        if (eventInfo == null)
+        {
+            return new ActionResponse<EventInfoDto>
+            {
+                Success = false,
+                Message = "Evento no existe."
+            };
+        }
+        return new ActionResponse<EventInfoDto>
+        {
+            Success = true,
+            Result = eventInfo
+        };
+    }
+
     public async Task<ActionResponse<IEnumerable<Event>>> GetByUserIdAsync(string userId)
     {
         var events = await _context.Events.Include(i => i.Invitations)

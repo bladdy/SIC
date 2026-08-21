@@ -51,5 +51,27 @@ namespace SIC.Frontend.Pages.Tables.ClientsTablesStatus
             }
             Tables = result.Response ?? new List<TablesEvents>();
         }
+
+        private string GetTableStatusClass(TablesEvents table)
+        {
+            if (table.Seats == 0) return "bg-secondary";
+            double percentage = (double)table.OccupiedSeats / table.Seats;
+            if (percentage > 1.0) return "bg-danger";
+            if (percentage >= 0.9) return "bg-warning text-dark";
+            if (percentage >= 0.5) return "bg-info";
+            if (percentage > 0) return "bg-primary";
+            return "bg-success";
+        }
+
+        private string GetTableStatusLabel(TablesEvents table)
+        {
+            if (table.Seats == 0) return "Sin lugares";
+            double percentage = (double)table.OccupiedSeats / table.Seats;
+            if (percentage > 1.0) return "Sobre capacidad";
+            if (percentage >= 0.9) return "Casi llena";
+            if (percentage >= 0.5) return "Disponible";
+            if (percentage > 0) return "En uso";
+            return "Libre";
+        }
     }
 }

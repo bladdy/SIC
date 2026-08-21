@@ -1350,6 +1350,21 @@ else
                                             </InputSelect>
                                         </div>
 
+                                        <div class="mb-2">
+                                            <label class="form-label small fw-semibold">Mesa individual</label>
+                                            <InputSelect class="form-select form-select-sm"
+                                                         Value="guest.TablesEventsId"
+                                                         ValueChanged="@((int? __value) => OnGuestTableChanged(guest, __value))"
+                                                         ValueExpression="@(() => guest.TablesEventsId)">
+                                                <option value="">-- Usar mesa de la invitación --</option>
+                                                @foreach (var table in Tables)
+                                                {
+                                                    <option value="@table.Id">@table.Name - Disponibles: @(table.Seats - table.OccupiedSeats)</option>
+                                                }
+                                            </InputSelect>
+                                            <small class="text-muted">@GetEffectiveTableName(guest)</small>
+                                        </div>
+
                                         <div>
                                             <button type="button" class="btn btn-danger rounded-circle p-2"
                                                     @onclick="() => RemoveGuest(guest)">

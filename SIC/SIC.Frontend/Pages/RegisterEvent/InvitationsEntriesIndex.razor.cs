@@ -1,13 +1,10 @@
 ﻿using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
-using SIC.Frontend.Pages.Events;
+using SIC.Frontend.Helpers;
 using SIC.Frontend.Repositories;
-using SIC.Frontend.Shared;
 using SIC.Shared.Entities;
 using System.Net;
-using System.Security.Claims;
 
 namespace SIC.Frontend.Pages.RegisterEvent;
 
@@ -35,6 +32,7 @@ public partial class InvitationsEntriesIndex
     private DotNetObjectReference<object>? objRef;
     private bool isScannerRunning = false;
     private string? qrResult;
+    private bool isGeneratingPdf = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -133,6 +131,27 @@ public partial class InvitationsEntriesIndex
     {
         Filter = string.Empty;
         await ApplyFilterAsync();
+    }
+
+    private async Task GeneratePdfAsync()
+    {
+        isGeneratingPdf = true;
+        try
+        {
+            var content = await Repository.GetFileAsync($"api/InvitationEntry/generatedpdf?evento={Code}");
+            if (content != null && content.Length > 0)
+            {
+                await JS.DownloadFileAsync($"registro-invitados-{Code}.pdf", content, "application/pdf");
+            }
+            else
+            {
+                await SweetAlertService.FireAsync("Error", "No hay invitados registrados para generar el PDF.", SweetAlertIcon.Error);
+            }
+        }
+        finally
+        {
+            isGeneratingPdf = false;
+        }
     }
 
     private void ShowEditModal(InvitationEntry invitationEntry)

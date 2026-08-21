@@ -16,5 +16,7 @@
         public string CodigoQr { get; set; } = string.Empty;
         public string CoverImageBytes { get; set; } = string.Empty;
         public List<string> Guests { get; set; } = [];
+        public bool IsIndividualAssignment { get; set; }
+        public List<string> GuestsWithMesa { get; set; } = [];
     }
 }

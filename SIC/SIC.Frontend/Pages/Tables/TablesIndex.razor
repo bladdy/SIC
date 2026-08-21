@@ -17,14 +17,10 @@ else
     <div class="container-fluid p-0 p-md-4">
 
     <div class="col-6 col-sm-3 col-md-2 text-start">
-    @{
-        var firstTable = Tables.FirstOrDefault();
-    }
-
-    @if (firstTable?.Event != null)
-    {
-        <h3>@firstTable.Event.Name</h3>
-    }
+        @if (!string.IsNullOrWhiteSpace(eventName))
+        {
+            <h3>@eventName</h3>
+        }
     </div>
 
     <!-- Encabezado -->
@@ -75,6 +71,17 @@ else
 
         <div class="col-12 col-sm-3 col-md-2 text-center text-sm-end">
             <div class="d-flex gap-1 justify-content-end justify-content-sm-end">
+                <button class="btn btn-sm btn-custom" @onclick="GeneratePdfAsync" disabled="@isGeneratingPdf">
+                    @if (isGeneratingPdf)
+                    {
+                        <span class="spinner-border spinner-border-sm" role="status"></span>
+                    }
+                    else
+                    {
+                        <i class="bi bi-file-earmark-pdf"></i>
+                    }
+                    <span class="">PDF</span>
+                </button>
                 <button class="btn btn-sm btn-custom" @onclick="() => ShowModaCrearMesa()">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -157,7 +164,7 @@ else
 
                         <div class="mt-1" style="max-height: 300px; overflow-y: auto;">
 
-                            @foreach (var invitacion in mesa.Invitation)
+                            @foreach (var invitacion in mesa.Invitations)
                             {
                                 <div class="card mb-1">
                                     <div class="card-body p-2 p-sm-3">
@@ -188,12 +195,27 @@ else
 
                                         @if (invitacion.Guests?.Any() == true)
                                         {
-                                            <ul class="mb-0 small">
-                                                @foreach (var guest in invitacion.Guests.Where(g => g.Status == Status.Attend))
-                                                {
-                                                    <li>@guest.GuestName</li>
-                                                }
-                                            </ul>
+                                            @foreach (var guest in invitacion.Guests.Where(g => g.Status == Status.Attend && (g.TablesEventsId == null || g.TablesEventsId == mesa.Id)))
+                                            {
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small>@guest.GuestName</small>
+                                                    @if (guest.TablesEventsId.HasValue)
+                                                    {
+                                                        <div class="d-flex align-items-center gap-1">
+                                                            <small class="badge bg-info text-white" style="font-size:0.6rem;">Individual</small>
+                                                            <button class="btn btn-sm btn-outline-danger rounded-circle"
+                                                                    style="width:22px;height:22px;padding:0;font-size:0.6rem;"
+                                                                    @onclick="() => UnassignGuest(guest)">
+                                                                <i class="bi bi-x"></i>
+                                                            </button>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <small class="badge bg-secondary" style="font-size:0.6rem;">Invitacion</small>
+                                                    }
+                                                </div>
+                                            }
                                         }
                                         else
                                         {
@@ -204,6 +226,44 @@ else
 
                                     </div>
                                 </div>
+                            }
+
+                            @{
+                                var directGuestsByInvitation = mesa.Guests?
+                                    .Where(g => g.TablesEventsId == mesa.Id && g.Status == Status.Attend && g.Invitation != null && !mesa.Invitations.Any(i => i.Id == g.InvitationId))
+                                    .GroupBy(g => g.InvitationId)
+                                    .ToList();
+                            }
+                            @if (directGuestsByInvitation?.Any() == true)
+                            {
+                                @foreach (var group in directGuestsByInvitation)
+                                {
+                                    var firstGuest = group.First();
+                                    <div class="card mb-1">
+                                        <div class="card-body p-2 p-sm-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <h6 class="fw-bold mb-0 small">
+                                                    @firstGuest.Invitation!.Name
+                                                </h6>
+                                            </div>
+
+                                            @foreach (var guest in group)
+                                            {
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small>@guest.GuestName</small>
+                                                    <div class="d-flex align-items-center gap-1">
+                                                        <small class="badge bg-info text-white" style="font-size:0.6rem;">Individual</small>
+                                                        <button class="btn btn-sm btn-outline-danger rounded-circle"
+                                                                style="width:22px;height:22px;padding:0;font-size:0.6rem;"
+                                                                @onclick="() => UnassignGuest(guest)">
+                                                            <i class="bi bi-x"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                }
                             }
 
                         </div>
@@ -290,60 +350,120 @@ else
     </div>
     
 }
-@if (modaAsignarMesa)
+@if (modaAsignarMesa && Table != null)
 {
     <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
-        <div class="modal-dialog modal-sm modal-dialog-centered">
-            <EditForm Model="@AssignTablesDto" OnValidSubmit="@AssignTable">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">
-                            Asignar Mesa
-                        </h5>
-                        <button type="button" class="btn-close" @onclick="CloseModaAsignarMesa"></button>
-                    </div>
-                    <div class="modal-body">
-                            <!-- Asignar Invitacion Error: REVISAR-->
-                        <div class="mb-3">
-                            <label class="form-label">Asignar a Mesa</label>
-                            <input type="text" class="form-control mb-2"
-                                    placeholder="Filtrar Invitacion..."
-                                    @bind="filterText"
-                                    @bind:event="oninput" />
-                            <select class="form-select" @bind="AssignTablesDto.InvitationId">
-                                <option value="">-- Selecciona una Invitacion --</option>
-                                @foreach (var inv in FilteredInvitation)
-                                {
-                                    <option value="@inv.Id">
-                                        @($"{inv.Name} - Confirmados: {inv.Guests?.Count(g => g.Status == Status.Attend) ?? 0}")
-                                    </option>
-                                }
-                            </select>
-                        </div>
-                        <div class="mb-3 d-none">
-                            <label>Mesa</label>
-                            <InputSelect class="form-select" @bind-Value="AssignTablesDto.TableId">
-                                <option value="0">-- Selecciona la Mesa --</option>
-                                @foreach (var table in Tables)
-                                {
-                                    <option value="@table.Id">@table.Name</option>
-                                }
-                            </InputSelect>
-                            <ValidationMessage For="@(() => AssignTablesDto.TableId)" />
-                        </div>
-                        
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-custom">Asignar</button>
-                        <button type="button" class="btn btn-secondary" @onclick="CloseModaAsignarMesa">
-                            Cerrar
-                        </button>
-                    </div>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Asignar a mesa: @Table.Name</h5>
+                    <button type="button" class="btn-close" @onclick="CloseModaAsignarMesa"></button>
                 </div>
-            </EditForm>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs mb-3">
+                        <li class="nav-item">
+                            <button class="nav-link @(asignacionModo == "herencia" ? "active" : "")"
+                                    @onclick='() => asignacionModo = "herencia"'>Invitacion</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link @(asignacionModo == "individual" ? "active" : "")"
+                                    @onclick='() => asignacionModo = "individual"'>Individual</button>
+                        </li>
+                    </ul>
+
+                    @if (asignacionModo == "herencia")
+                    {
+                        <div class="mb-2 d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                Disponibles: @(Table.Seats - Table.OccupiedSeats) lugares
+                            </small>
+                            <small class="text-muted">Seleccionados: @selectedInvitationIds.Count</small>
+                        </div>
+                        <input type="text" class="form-control mb-2"
+                                placeholder="Filtrar invitacion..."
+                                @bind="filterText"
+                                @bind:event="oninput" />
+                        <div style="max-height: 300px; overflow-y: auto;">
+                            @foreach (var inv in FilteredInvitation)
+                            {
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"
+                                            checked="@(selectedInvitationIds.Contains(inv.Id))"
+                                            @onchange="() => ToggleInvitationSelection(inv.Id)" />
+                                    <label class="form-check-label">
+                                        @inv.Name
+                                        <small class="text-muted">
+                                            - Confirmados: @(inv.Guests?.Count(g => g.Status == Status.Attend) ?? 0)
+                                        </small>
+                                    </label>
+                                </div>
+                            }
+                            @if (!FilteredInvitation.Any())
+                            {
+                                <small class="text-muted d-block text-center py-2">No hay invitaciones disponibles</small>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="mb-2 d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                Disponibles: @(Table.Seats - Table.OccupiedSeats) lugares
+                            </small>
+                            <small class="text-muted">Seleccionados: @selectedGuestIds.Count</small>
+                        </div>
+                        <input type="text" class="form-control mb-2"
+                                placeholder="Filtrar invitado..."
+                                @bind="filterGuestText"
+                                @bind:event="oninput" />
+                        <div style="max-height: 300px; overflow-y: auto;">
+                            @{
+                                var groupedGuests = FilteredGuestsForAssignment
+                                    .GroupBy(g => g.InvitationId)
+                                    .Select(g => new
+                                    {
+                                        InvitationName = invitationsById.TryGetValue(g.Key, out var inv) ? inv.Name : "Sin invitacion",
+                                        Guests = g
+                                    })
+                                    .OrderBy(g => g.InvitationName);
+                            }
+                            @foreach (var group in groupedGuests)
+                            {
+                                <div class="card mb-2">
+                                    <div class="card-body p-2">
+                                        <h6 class="fw-bold mb-2 small">@group.InvitationName</h6>
+                                        @foreach (var guest in group.Guests)
+                                        {
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                        checked="@(selectedGuestIds.Contains(guest.Id))"
+                                                        @onchange="() => ToggleGuestSelection(guest.Id)" />
+                                                <label class="form-check-label">
+                                                    @guest.GuestName
+                                                </label>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                            @if (!groupedGuests.Any())
+                            {
+                                <small class="text-muted d-block text-center py-2">No hay invitados disponibles</small>
+                            }
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-custom" disabled="@(asignacionModo == "herencia" ? selectedInvitationIds.Count == 0 : selectedGuestIds.Count == 0)" @onclick="AssignTable">
+                        Asignar@(asignacionModo == "herencia"
+                            ? (selectedInvitationIds.Count > 0 ? $" ({selectedInvitationIds.Count})" : "")
+                            : (selectedGuestIds.Count > 0 ? $" ({selectedGuestIds.Count})" : ""))
+                    </button>
+                    <button class="btn btn-secondary" @onclick="CloseModaAsignarMesa">Cerrar</button>
+                </div>
+            </div>
         </div>
     </div>
-
 }
 @if (modaGenerarMesa)
 {

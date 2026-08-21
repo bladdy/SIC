@@ -197,8 +197,10 @@ namespace SIC.Backend.Repositories.Implemetations
 
         public override async Task<ActionResponse<IEnumerable<InvitationEntry>>> GetAsync(PaginationDTO pagination)
         {
-            var queryable = _context.InvitationEntries.Include(i => i.Invitation)
-                .ThenInclude(t => t.TablesEvents).Include(e => e.Event).AsQueryable();
+            var queryable = _context.InvitationEntries
+                .Include(i => i.Invitation).ThenInclude(t => t.TablesEvents)
+                .Include(i => i.Invitation).ThenInclude(i => i!.Guests).ThenInclude(g => g.TablesEvents)
+                .Include(e => e.Event).AsQueryable();
 
             queryable = queryable.Where(x => x.Event!.Code!.ToLower().Contains(pagination!.Code!.ToLower()));
 
@@ -244,6 +246,24 @@ namespace SIC.Backend.Repositories.Implemetations
                 Success = true,
                 Result = await queryable
                     .Paginate(pagination)
+                    .ToListAsync()
+            };
+        }
+
+        public async Task<ActionResponse<IEnumerable<InvitationEntry>>> GetAllByEventAsync(string eventCode)
+        {
+            var queryable = _context.InvitationEntries
+                .Include(i => i.Invitation).ThenInclude(t => t.TablesEvents)
+                .Include(i => i.Invitation).ThenInclude(i => i!.Guests).ThenInclude(g => g.TablesEvents)
+                .Include(e => e.Event).AsQueryable();
+
+            queryable = queryable.Where(x => x.Event!.Code!.ToLower().Contains(eventCode.ToLower()));
+
+            return new ActionResponse<IEnumerable<InvitationEntry>>
+            {
+                Success = true,
+                Result = await queryable
+                    .OrderBy(x => x.Invitation!.Name)
                     .ToListAsync()
             };
         }

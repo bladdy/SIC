@@ -111,14 +111,41 @@ namespace SIC.Backend.Services
                 "Event.UrlConfirmation" => code,
                 "Event.DateLimitFormatted" => FechaHelper.FormatearFechaLargaEspanol((DateTime)ev.DeadLine!),
                 "Invitation.ReservedSeats" => (invitation.NumberAdults + invitation.NumberYouths + invitation.NumberChildren).ToString(),
-                "Event.Table" =>
-                    !string.IsNullOrWhiteSpace(invitation.TablesEvents?.Name)
-                        ? invitation.TablesEvents.Name
-                        : !string.IsNullOrWhiteSpace(invitation.Table)
-                            ? invitation.Table
-                            : "Sin asignar",
+                "Event.Table" => GetTableValue(invitation),
                 "Event.AnotherSupplier" => ev.Url ?? "N/A",
                 _ => ""
+            };
+        }
+
+        private static string GetTableValue(Invitation invitation)
+        {
+            var isIndividual = invitation.TablesEventsId == null
+                && invitation.Guests?.Any(g => g.TablesEventsId.HasValue) == true;
+
+            if (isIndividual)
+            {
+                var mesas = invitation.Guests!
+                    .Where(g => g.TablesEventsId.HasValue)
+                    .Select(g => g.TablesEvents?.Name ?? "Sin asignar")
+                    .ToList();
+
+                return FormatListWithY(mesas);
+            }
+
+            return !string.IsNullOrWhiteSpace(invitation.TablesEvents?.Name)
+                ? invitation.TablesEvents.Name
+                : !string.IsNullOrWhiteSpace(invitation.Table)
+                    ? invitation.Table
+                    : "Sin asignar";
+        }
+
+        private static string FormatListWithY(List<string> items)
+        {
+            return items.Count switch
+            {
+                0 => "Sin asignar",
+                1 => items[0],
+                _ => $"{string.Join(", ", items.Take(items.Count - 1))} y {items.Last()}"
             };
         }
     }

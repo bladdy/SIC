@@ -95,6 +95,12 @@ public class DataContext : IdentityDbContext<User>
         modelBuilder.Entity<EventRequirementAnswer>()
             .HasIndex(x => new { x.EventId, x.RequirementId })
             .IsUnique();
+
+        modelBuilder.Entity<InvitationGuest>()
+            .HasOne(g => g.TablesEvents)
+            .WithMany(t => t.Guests)
+            .HasForeignKey(g => g.TablesEventsId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 
     private void DisableCascadingDelete(ModelBuilder modelBuilder)

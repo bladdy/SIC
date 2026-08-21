@@ -24,9 +24,12 @@ namespace SIC.Backend.Repositories.Implemetations
 
         public async Task<ActionResponse<Invitation>> GetByCodeAsync(string code)
         {
-            var invitations = await _context.Invitations.Include(ie => ie.InvitationEntry).Include(e => e.Event).ThenInclude(e => e!.EventType).Include(g => g.Guests).
-                Include(t => t.TablesEvents).
-                FirstOrDefaultAsync(x => x.Code == code);
+            var invitations = await _context.Invitations
+                .Include(ie => ie.InvitationEntry)
+                .Include(e => e.Event).ThenInclude(e => e!.EventType)
+                .Include(g => g.Guests).ThenInclude(g => g.TablesEvents)
+                .Include(t => t.TablesEvents)
+                .FirstOrDefaultAsync(x => x.Code == code);
             if (invitations == null)
             {
                 return new ActionResponse<Invitation>
@@ -107,6 +110,12 @@ namespace SIC.Backend.Repositories.Implemetations
                 invitation.Event = Event;
                 _context.Add(invitation);
                 await _context.SaveChangesAsync();
+
+                if (invitation.TablesEventsId.HasValue)
+                {
+                    await RecalculateOccupancyAsync(invitation.EventId);
+                }
+
                 return new ActionResponse<Invitation>
                 {
                     Success = true,
@@ -149,11 +158,6 @@ namespace SIC.Backend.Repositories.Implemetations
                     };
                 }
 
-                // Guardar estado anterior para actualizar ocupación de mesas
-                var oldTableId = currentInvitation.TablesEventsId;
-
-                var oldOccupiedSeats = currentInvitation.Guests.Count(g => g.Status == Status.Attend);
-
                 // 2. Actualizar propiedades simples
                 _context.Entry(currentInvitation).CurrentValues.SetValues(invitation);
 
@@ -186,66 +190,10 @@ namespace SIC.Backend.Repositories.Implemetations
                     }
                 }
 
-                // Calcular nueva ocupación
-                var newOccupiedSeats =
-                     incomingGuests.Count(g => g.Status == Status.Attend);
-
-                var newTableId = invitation.TablesEventsId;
-
-                // 4. Actualizar ocupación de mesas
-                if (oldTableId == newTableId)
-                {
-                    // Sigue en la misma mesa
-                    if (newTableId.HasValue)
-                    {
-                        var table = await _context.TablesEvents
-                            .FirstOrDefaultAsync(t => t.Id == newTableId.Value);
-
-                        if (table != null)
-                        {
-                            table.OccupiedSeats += (newOccupiedSeats - oldOccupiedSeats);
-
-                            if (table.OccupiedSeats < 0)
-                            {
-                                table.OccupiedSeats = 0;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    // Restar de la mesa anterior
-                    if (oldTableId.HasValue)
-                    {
-                        var oldTable = await _context.TablesEvents
-                            .FirstOrDefaultAsync(t => t.Id == oldTableId.Value);
-
-                        if (oldTable != null)
-                        {
-                            oldTable.OccupiedSeats -= oldOccupiedSeats;
-
-                            if (oldTable.OccupiedSeats < 0)
-                            {
-                                oldTable.OccupiedSeats = 0;
-                            }
-                        }
-                    }
-
-                    // Sumar a la nueva mesa
-                    if (newTableId.HasValue)
-                    {
-                        var newTable = await _context.TablesEvents
-                            .FirstOrDefaultAsync(t => t.Id == newTableId.Value);
-
-                        if (newTable != null)
-                        {
-                            newTable.OccupiedSeats += newOccupiedSeats;
-                        }
-                    }
-                }
-
                 // 5. Guardar cambios
                 await _context.SaveChangesAsync();
+
+                await RecalculateOccupancyAsync(invitation.EventId);
 
                 return new ActionResponse<Invitation>
                 {
@@ -275,7 +223,6 @@ namespace SIC.Backend.Repositories.Implemetations
         {
             var invitations = await _context.Invitations
                 .Include(i => i.Event)
-                    .ThenInclude(e => e!.EventType)
                 .Include(i => i.Guests)
                 .Include(i => i.TablesEvents)
                 .Where(i =>
@@ -485,6 +432,32 @@ namespace SIC.Backend.Repositories.Implemetations
                     Message = exception.Message
                 };
             }
+        }
+
+        private async Task RecalculateOccupancyAsync(int eventId)
+        {
+            var tables = await _context.TablesEvents
+                .Where(t => t.EventId == eventId)
+                .ToListAsync();
+
+            foreach (var table in tables)
+            {
+                var invitationGuests = await _context.Invitations
+                    .Where(i => i.TablesEventsId == table.Id && i.EventId == eventId)
+                    .SelectMany(i => i.Guests)
+                    .CountAsync(g => g.Status == Status.Attend && g.TablesEventsId == null);
+
+                var directGuests = await _context.InvitationGuest
+                    .Include(g => g.Invitation)
+                    .Where(g => g.TablesEventsId == table.Id
+                             && g.Invitation!.EventId == eventId
+                             && g.Status == Status.Attend)
+                    .CountAsync();
+
+                table.OccupiedSeats = invitationGuests + directGuests;
+            }
+
+            await _context.SaveChangesAsync();
         }
     }
 }

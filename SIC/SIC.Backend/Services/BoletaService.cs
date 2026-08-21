@@ -3,6 +3,7 @@ using iTextSharp.text.pdf;
 using QRCoder;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
+using SIC.Shared.Enums;
 using SIC.Shared.Helpers;
 
 namespace SIC.Backend.Services
@@ -196,14 +197,26 @@ namespace SIC.Backend.Services
             AddCentered("LISTA DE INVITADOS", fontMuted, 0);
             AddCentered(data.NombreInvitado, fontTitle, 5);
 
-            foreach (var item in data.Guests)
+            if (data.IsIndividualAssignment && data.GuestsWithMesa.Count > 0)
             {
-                AddCentered(item, fontMuted, 0);
+                foreach (var item in data.GuestsWithMesa)
+                {
+                    AddCentered(item, fontMuted, 0);
+                }
+            }
+            else
+            {
+                foreach (var item in data.Guests)
+                {
+                    AddCentered(item, fontMuted, 0);
+                }
+
+                // ==============================
+                // 📄 TEXTO INFORMATIVO
+                // ==============================
+                AddCentered($"MESA: {data.MesaAsignada}", fontTitle, 5);
             }
 
-            // ==============================
-            // 📄 TEXTO INFORMATIVO
-            // ==============================
             var infoText = new Paragraph(
                 "Este código QR es tu acceso al evento.\nDescárgalo y preséntalo en la entrada.\nEste QR solo se escanea con nuestra App.",
                 fontSmall)
@@ -211,7 +224,6 @@ namespace SIC.Backend.Services
                 Alignment = Element.ALIGN_CENTER,
                 SpacingBefore = 10
             };
-            AddCentered($"MESA: {data.MesaAsignada}", fontTitle, 5);
             cardCell.AddElement(infoText);
 
             cardTable.AddCell(cardCell);
@@ -343,7 +355,7 @@ namespace SIC.Backend.Services
             // ==============================
             // 📝 TÍTULO
             // ==============================
-            var title = new Paragraph($"LISTA DE INVITADOS CONFIRMADOS: {invitaciones.FirstOrDefault()!.Event!.Name}", fontTitle)
+            var title = new Paragraph($"LISTA DE INVITADOS CONFIRMADOS: {invitaciones.FirstOrDefault()?.Event?.Name}", fontTitle)
             {
                 Alignment = Element.ALIGN_CENTER,
                 SpacingAfter = 10
@@ -396,7 +408,11 @@ namespace SIC.Backend.Services
                 table.AddCell(new PdfPCell(new Phrase(item.NumberConfirmedChildren.ToString() ?? "", fontCell)) { Padding = 5, HorizontalAlignment = Element.ALIGN_CENTER });
                 table.AddCell(
                     new PdfPCell(
-                        new Phrase(item.TablesEvents?.Name?.ToString() ?? "", fontCell)
+                        new Phrase(
+                            item.TablesEvents?.Name
+                            ?? item.Guests?.FirstOrDefault(g => g.TablesEventsId.HasValue)?.TablesEvents?.Name
+                            ?? "",
+                            fontCell)
                     )
                     {
                         Padding = 5,
@@ -423,6 +439,262 @@ namespace SIC.Backend.Services
             document.Close();
 
             return await Task.FromResult(ms.ToArray());
+        }
+
+        public byte[] GenerarRegistroEntradasPdf(List<InvitationEntry> entries)
+        {
+            using var ms = new MemoryStream();
+
+            var document = new Document(PageSize.A4, 40, 40, 40, 40);
+            PdfWriter.GetInstance(document, ms);
+            document.Open();
+            entries = [.. entries.OrderBy(e => e.Invitation!.Name)];
+            // ==============================
+            // 🎨 COLORES
+            // ==============================
+            var borderColor = new BaseColor(222, 226, 230);
+            var headerColor = new BaseColor(33, 37, 41);
+            var footerColor = new BaseColor(211, 211, 211);
+            // ==============================
+            // 🔠 FUENTES
+            // ==============================
+            var fontTitle = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16);
+            var fontHeader = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 9, BaseColor.White);
+            var fontCell = FontFactory.GetFont(FontFactory.HELVETICA, 10);
+            var fontFooter = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 11);
+            // ==============================
+            // 📝 TÍTULO
+            // ==============================
+            var title = new Paragraph($"REGISTRO DE INVITADOS: {entries.FirstOrDefault()?.Event?.Name}", fontTitle)
+            {
+                Alignment = Element.ALIGN_CENTER,
+                SpacingAfter = 10
+            };
+            document.Add(title);
+            document.Add(new Paragraph($"Fecha generación: {DateTime.Now:dd/MM/yyyy HH:mm}")
+            {
+                Alignment = Element.ALIGN_RIGHT,
+                SpacingAfter = 8
+            });
+
+            // ==============================
+            // 📋 TABLA
+            // ==============================
+            var table = new PdfPTable(8)
+            {
+                WidthPercentage = 100
+            };
+
+            table.SetWidths(new float[] { 4, 1, 1, 1, 1, 1, 1, 2 });
+
+            void AddHeader(string text)
+            {
+                var cell = new PdfPCell(new Phrase(text, fontHeader))
+                {
+                    BackgroundColor = headerColor,
+                    HorizontalAlignment = Element.ALIGN_CENTER,
+                    Padding = 2,
+                    BorderColor = borderColor
+                };
+
+                table.AddCell(cell);
+            }
+
+            AddHeader("Nombre");
+            AddHeader("Conf. Adul.");
+            AddHeader("Conf. Jov.");
+            AddHeader("Conf. Niñ.");
+            AddHeader("Asist. Adul.");
+            AddHeader("Asist. Jov.");
+            AddHeader("Asist. Niñ.");
+            AddHeader("Mesa");
+
+            // ==============================
+            // 👥 FILAS
+            // ==============================
+            foreach (var item in entries)
+            {
+                var invitation = item.Invitation;
+
+                string mesas;
+                if (invitation?.Guests?.Any(g => g.TablesEventsId.HasValue) == true)
+                {
+                    mesas = string.Join("\n", invitation.Guests
+                        .Where(g => g.Status == Status.Attend)
+                        .Select(g => $"{g.GuestName}: {g.TablesEvents?.Name ?? "Sin asignar"}"));
+                }
+                else
+                {
+                    mesas = invitation?.TablesEvents?.Name ?? "Sin asignar";
+                }
+
+                table.AddCell(new PdfPCell(new Phrase(invitation?.Name ?? "", fontCell)) { Padding = 5 });
+                table.AddCell(new PdfPCell(new Phrase(invitation?.NumberConfirmedAdults.ToString() ?? "0", fontCell)) { Padding = 5, HorizontalAlignment = Element.ALIGN_CENTER });
+                table.AddCell(new PdfPCell(new Phrase(invitation?.NumberConfirmedYouths.ToString() ?? "0", fontCell)) { Padding = 5, HorizontalAlignment = Element.ALIGN_CENTER });
+                table.AddCell(new PdfPCell(new Phrase(invitation?.NumberConfirmedChildren.ToString() ?? "0", fontCell)) { Padding = 5, HorizontalAlignment = Element.ALIGN_CENTER });
+                table.AddCell(new PdfPCell(new Phrase(item.AdultsEntered.ToString(), fontCell)) { Padding = 5, HorizontalAlignment = Element.ALIGN_CENTER });
+                table.AddCell(new PdfPCell(new Phrase(item.YouthsEntered.ToString(), fontCell)) { Padding = 5, HorizontalAlignment = Element.ALIGN_CENTER });
+                table.AddCell(new PdfPCell(new Phrase(item.ChildrenEntered.ToString(), fontCell)) { Padding = 5, HorizontalAlignment = Element.ALIGN_CENTER });
+                table.AddCell(new PdfPCell(new Phrase(mesas, fontCell)) { Padding = 5, HorizontalAlignment = Element.ALIGN_CENTER });
+            }
+
+            int totalConfAdultos = entries.Sum(x => x.Invitation?.NumberConfirmedAdults ?? 0);
+            int totalConfJovenes = entries.Sum(x => x.Invitation?.NumberConfirmedYouths ?? 0);
+            int totalConfNiños = entries.Sum(x => x.Invitation?.NumberConfirmedChildren ?? 0);
+            int totalAsistAdultos = entries.Sum(x => x.AdultsEntered);
+            int totalAsistJovenes = entries.Sum(x => x.YouthsEntered);
+            int totalAsistNiños = entries.Sum(x => x.ChildrenEntered);
+            int totalRegistrados = totalAsistAdultos + totalAsistJovenes + totalAsistNiños;
+
+            table.AddCell(new PdfPCell(new Phrase("Total", fontFooter)) { Padding = 5, BackgroundColor = footerColor });
+            table.AddCell(new PdfPCell(new Phrase(totalConfAdultos.ToString(), fontFooter)) { Padding = 5, BackgroundColor = footerColor, HorizontalAlignment = Element.ALIGN_CENTER });
+            table.AddCell(new PdfPCell(new Phrase(totalConfJovenes.ToString(), fontFooter)) { Padding = 5, BackgroundColor = footerColor, HorizontalAlignment = Element.ALIGN_CENTER });
+            table.AddCell(new PdfPCell(new Phrase(totalConfNiños.ToString(), fontFooter)) { Padding = 5, BackgroundColor = footerColor, HorizontalAlignment = Element.ALIGN_CENTER });
+            table.AddCell(new PdfPCell(new Phrase(totalAsistAdultos.ToString(), fontFooter)) { Padding = 5, BackgroundColor = footerColor, HorizontalAlignment = Element.ALIGN_CENTER });
+            table.AddCell(new PdfPCell(new Phrase(totalAsistJovenes.ToString(), fontFooter)) { Padding = 5, BackgroundColor = footerColor, HorizontalAlignment = Element.ALIGN_CENTER });
+            table.AddCell(new PdfPCell(new Phrase(totalAsistNiños.ToString(), fontFooter)) { Padding = 5, BackgroundColor = footerColor, HorizontalAlignment = Element.ALIGN_CENTER });
+            table.AddCell(new PdfPCell(new Phrase($"Registrados: {totalRegistrados}", fontFooter)) { Padding = 5, BackgroundColor = footerColor, HorizontalAlignment = Element.ALIGN_CENTER });
+
+            document.Add(table);
+
+            document.Close();
+
+            return ms.ToArray();
+        }
+
+        public byte[] GenerarMesasPdf(string evento, List<TablesEvents> mesas)
+        {
+            using var ms = new MemoryStream();
+
+            var document = new Document(PageSize.A4, 40, 40, 40, 40);
+            PdfWriter.GetInstance(document, ms);
+            document.Open();
+            mesas = [.. mesas.OrderBy(m => m.Number)];
+            // ==============================
+            // 🎨 COLORES
+            // ==============================
+            var borderColor = new BaseColor(60, 106, 121);
+            var headerColor = new BaseColor(33, 37, 41);
+            // ==============================
+            // 🔠 FUENTES
+            // ==============================
+            var fontTitle = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16);
+            var fontMesaHeader = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12, BaseColor.White);
+            var fontMesaInfo = FontFactory.GetFont(FontFactory.HELVETICA, 9, new BaseColor(222, 226, 230));
+            var fontInvitacion = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10);
+            var fontGuest = FontFactory.GetFont(FontFactory.HELVETICA, 9);
+            var fontSmall = FontFactory.GetFont(FontFactory.HELVETICA, 8, BaseColor.Gray);
+            // ==============================
+            // 📝 TÍTULO
+            // ==============================
+            var title = new Paragraph($"DISTRIBUCIÓN DE MESAS: {evento}", fontTitle)
+            {
+                Alignment = Element.ALIGN_CENTER,
+                SpacingAfter = 10
+            };
+            document.Add(title);
+            document.Add(new Paragraph($"Fecha generación: {DateTime.Now:dd/MM/yyyy HH:mm}")
+            {
+                Alignment = Element.ALIGN_RIGHT,
+                SpacingAfter = 12
+            });
+
+            // ==============================
+            // 🪑 UN BLOQUE POR MESA (como las tarjetas del HTML)
+            // ==============================
+            foreach (var mesa in mesas)
+            {
+                var mesaTable = new PdfPTable(1)
+                {
+                    WidthPercentage = 100,
+                    SpacingAfter = 15
+                };
+
+                // Encabezado de la mesa
+                var headerCell = new PdfPCell
+                {
+                    BackgroundColor = headerColor,
+                    BorderColor = borderColor,
+                    Padding = 6
+                };
+                headerCell.AddElement(new Paragraph($"Mesa: {mesa.Name}", fontMesaHeader));
+                if (!string.IsNullOrWhiteSpace(mesa.Description))
+                {
+                    headerCell.AddElement(new Paragraph(mesa.Description, fontMesaInfo));
+                }
+                headerCell.AddElement(new Paragraph($"Lugares: {mesa.Seats}   |   Disponibles: {mesa.Seats - mesa.OccupiedSeats}", fontMesaInfo));
+                mesaTable.AddCell(headerCell);
+
+                // Cuerpo: invitaciones asignadas + invitados individuales agrupados por invitación
+                var bodyCell = new PdfPCell
+                {
+                    BorderColor = borderColor,
+                    Padding = 6
+                };
+
+                bool hasContent = false;
+
+                foreach (var invitacion in mesa.Invitations.OrderBy(i => i.Name))
+                {
+                    hasContent = true;
+
+                    var guests = invitacion.Guests?
+                        .Where(g => g.Status == Status.Attend && (g.TablesEventsId == null || g.TablesEventsId == mesa.Id))
+                        .OrderBy(g => g.GuestName)
+                        .ToList() ?? [];
+
+                    bodyCell.AddElement(new Paragraph(invitacion.Name ?? "", fontInvitacion));
+
+                    if (guests.Count == 0)
+                    {
+                        bodyCell.AddElement(new Paragraph("Sin invitados confirmados", fontSmall));
+                    }
+                    else
+                    {
+                        foreach (var guest in guests)
+                        {
+                            var tag = guest.TablesEventsId.HasValue ? "(Individual)" : "(Invitación)";
+                            bodyCell.AddElement(new Paragraph($"• {guest.GuestName}   {tag}", fontGuest));
+                        }
+                    }
+
+                    bodyCell.AddElement(new Paragraph(" ", fontSmall));
+                }
+
+                var directGroups = mesa.Guests?
+                    .Where(g => g.TablesEventsId == mesa.Id && g.Status == Status.Attend && g.Invitation != null && !mesa.Invitations.Any(i => i.Id == g.InvitationId))
+                    .GroupBy(g => g.InvitationId)
+                    .ToList();
+
+                if (directGroups != null)
+                {
+                    foreach (var group in directGroups)
+                    {
+                        hasContent = true;
+
+                        bodyCell.AddElement(new Paragraph(group.First().Invitation!.Name ?? "", fontInvitacion));
+
+                        foreach (var guest in group.OrderBy(g => g.GuestName))
+                        {
+                            bodyCell.AddElement(new Paragraph($"• {guest.GuestName}   (Individual)", fontGuest));
+                        }
+
+                        bodyCell.AddElement(new Paragraph(" ", fontSmall));
+                    }
+                }
+
+                if (!hasContent)
+                {
+                    bodyCell.AddElement(new Paragraph("Sin invitados confirmados", fontSmall));
+                }
+
+                mesaTable.AddCell(bodyCell);
+                document.Add(mesaTable);
+            }
+
+            document.Close();
+
+            return ms.ToArray();
         }
     }
 }

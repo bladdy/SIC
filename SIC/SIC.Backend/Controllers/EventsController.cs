@@ -77,6 +77,17 @@ public class EventsController : GenericController<Event>
         return NotFound();
     }
 
+    [HttpGet("infobycode/{code}")]
+    public async Task<IActionResult> GetInfoByCodeAsync(string code)
+    {
+        var response = await _eventsUnitOfWork.GetInfoByCodeAsync(code);
+        if (response.Success)
+        {
+            return Ok(response.Result);
+        }
+        return NotFound();
+    }
+
     [HttpPost("full")]
     public async Task<IActionResult> PostFullAsync(Event events)
     {//chequear un error al crear evento

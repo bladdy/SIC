@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SIC.Backend.Services;
 using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
@@ -10,10 +11,37 @@ namespace SIC.Backend.Controllers;
 public class TablesController : GenericController<TablesEvents>
 {
     private readonly ITablesEventsUnitOfWork _tablesEventsUnit;
+    private readonly BoletaService _boletaService;
 
-    public TablesController(IGenericUnitOfWork<TablesEvents> unitOfWork, ITablesEventsUnitOfWork tablesEventsUnit) : base(unitOfWork)
+    public TablesController(IGenericUnitOfWork<TablesEvents> unitOfWork, ITablesEventsUnitOfWork tablesEventsUnit, BoletaService boletaService) : base(unitOfWork)
     {
         _tablesEventsUnit = tablesEventsUnit;
+        _boletaService = boletaService;
+    }
+
+    [HttpGet("generatedpdf")]
+    public async Task<IActionResult> GetMesasPdf(string code, string evento)
+    {
+        try
+        {
+            var response = await _tablesEventsUnit.GetTablesByCodeAsync(code);
+            var mesas = response.Result?.ToList();
+
+            if (mesas == null || !mesas.Any())
+                return NotFound("No hay mesas.");
+
+            var pdfBytes = _boletaService.GenerarMesasPdf(evento, mesas);
+
+            return File(
+                pdfBytes,
+                "application/pdf",
+                $"mesas-{code}.pdf"
+            );
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpGet("{id}")]
@@ -119,6 +147,50 @@ public class TablesController : GenericController<TablesEvents>
     public async Task<IActionResult> DeleteInvitatonFromTablesAsync(int id)
     {
         var action = await _tablesEventsUnit.DeleteInvitatonFromTablesAsync(id);
+        if (action.Success)
+        {
+            return Ok(action.Result);
+        }
+        return BadRequest(action.Message);
+    }
+
+    [HttpPost("AssignGuest")]
+    public async Task<IActionResult> AssignGuestTableAsync(AssignGuestTableDto dto)
+    {
+        var action = await _tablesEventsUnit.AssignGuestTableAsync(dto);
+        if (action.Success)
+        {
+            return Ok(action.Result);
+        }
+        return BadRequest(action.Message);
+    }
+
+    [HttpPost("AssignBulk")]
+    public async Task<IActionResult> AssignTablesBulkAsync(List<AssignTablesDto> dtos)
+    {
+        var action = await _tablesEventsUnit.AssignTablesBulkAsync(dtos);
+        if (action.Success)
+        {
+            return Ok(action.Result);
+        }
+        return BadRequest(action.Message);
+    }
+
+    [HttpPost("AssignGuestBulk")]
+    public async Task<IActionResult> AssignGuestTableBulkAsync(List<AssignGuestTableDto> dtos)
+    {
+        var action = await _tablesEventsUnit.AssignGuestTableBulkAsync(dtos);
+        if (action.Success)
+        {
+            return Ok(action.Result);
+        }
+        return BadRequest(action.Message);
+    }
+
+    [HttpDelete("UnassignGuest/{guestId}")]
+    public async Task<IActionResult> UnassignGuestFromTableAsync(int guestId)
+    {
+        var action = await _tablesEventsUnit.UnassignGuestFromTableAsync(guestId);
         if (action.Success)
         {
             return Ok(action.Result);

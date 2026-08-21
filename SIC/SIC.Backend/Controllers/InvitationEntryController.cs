@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SIC.Backend.Services;
 using SIC.Backend.UnitOfWork.Implemetations;
 using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.DTOs;
@@ -12,11 +13,13 @@ public class InvitationEntryController : GenericController<InvitationEntry>
 {
     private readonly IGenericUnitOfWork<InvitationEntry> _genericUnit;
     private readonly IInvitationEntryUnitOfWork _invitationEntryUnitOfWork;
+    private readonly BoletaService _boletaService;
 
-    public InvitationEntryController(IGenericUnitOfWork<InvitationEntry> genericUnit, IInvitationEntryUnitOfWork invitationEntryUnitOfWork) : base(genericUnit)
+    public InvitationEntryController(IGenericUnitOfWork<InvitationEntry> genericUnit, IInvitationEntryUnitOfWork invitationEntryUnitOfWork, BoletaService boletaService) : base(genericUnit)
     {
         _genericUnit = genericUnit;
         _invitationEntryUnitOfWork = invitationEntryUnitOfWork;
+        _boletaService = boletaService;
     }
 
     [HttpGet("paginated")]
@@ -50,6 +53,31 @@ public class InvitationEntryController : GenericController<InvitationEntry>
             return Ok(response.Result);
         }
         return NotFound();
+    }
+
+    [HttpGet("generatedpdf")]
+    public async Task<IActionResult> GetEntriesPdf(string evento)
+    {
+        try
+        {
+            var response = await _invitationEntryUnitOfWork.GetAllByEventAsync(evento);
+            var entries = response.Result?.ToList();
+
+            if (entries == null || !entries.Any())
+                return NotFound("No hay invitados registrados.");
+
+            var pdfBytes = _boletaService.GenerarRegistroEntradasPdf(entries);
+
+            return File(
+                pdfBytes,
+                "application/pdf",
+                $"registro-invitados-{evento}.pdf"
+            );
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpPost("full")]

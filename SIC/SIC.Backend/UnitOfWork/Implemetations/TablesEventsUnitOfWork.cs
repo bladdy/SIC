@@ -8,7 +8,6 @@ namespace SIC.Backend.UnitOfWork.Implemetations
 {
     public class TablesEventsUnitOfWork : GenericUnitOfWork<TablesEvents>, ITablesEventsUnitOfWork
     {
-        //TablesEventsRepository ITablesEventsRepository
         private readonly ITablesEventsRepository _tablesEventsRepository;
 
         public TablesEventsUnitOfWork(ITablesEventsRepository tablesEventsRepository, IGenericRepository<TablesEvents> repository) : base(repository)
@@ -38,5 +37,15 @@ namespace SIC.Backend.UnitOfWork.Implemetations
         public async Task<ActionResponse<bool>> DeleteInvitatonFromTablesAsync(int id) => await _tablesEventsRepository.DeleteInvitatonFromTablesAsync(id);
 
         public async Task<ActionResponse<IEnumerable<TablesEvents>>> GetTablesByCodeAsync(string code) => await _tablesEventsRepository.GetTablesByCodeAsync(code);
+
+        public async Task<ActionResponse<InvitationGuest>> AssignGuestTableAsync(AssignGuestTableDto dto) => await _tablesEventsRepository.AssignGuestTableAsync(dto);
+
+        public async Task<ActionResponse<AssignBulkResultDto>> AssignTablesBulkAsync(List<AssignTablesDto> dtos) => await _tablesEventsRepository.AssignTablesBulkAsync(dtos);
+
+        public async Task<ActionResponse<AssignBulkResultDto>> AssignGuestTableBulkAsync(List<AssignGuestTableDto> dtos) => await _tablesEventsRepository.AssignGuestTableBulkAsync(dtos);
+
+        public async Task<ActionResponse<bool>> UnassignGuestFromTableAsync(int guestId) => await _tablesEventsRepository.UnassignGuestFromTableAsync(guestId);
+
+        public async Task RecalculateOccupancyAsync(int eventId) => await _tablesEventsRepository.RecalculateOccupancyAsync(eventId);
     }
 }

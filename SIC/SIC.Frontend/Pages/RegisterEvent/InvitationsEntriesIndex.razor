@@ -7,6 +7,17 @@
     <button class="btn btn-custom" @onclick="ShowCreateModal">
         Registrar Invitación (Escanear QR)
     </button>
+    <button class="btn btn-custom mx-1" @onclick="GeneratePdfAsync" disabled="@isGeneratingPdf">
+        @if (isGeneratingPdf)
+        {
+            <span class="spinner-border spinner-border-sm" role="status"></span>
+        }
+        else
+        {
+            <i class="bi bi-file-earmark-pdf"></i>
+        }
+        Generar PDF
+    </button>
 </div>
 @if (InvitationEntries is null)
 {
@@ -76,11 +87,23 @@ else
                                 </div>
                             </td>
 
-                            <!-- ======== COLUMNA 2: ESTADO ======== -->
-                            <td class="text-center">
-                                <span class="px-3 py-2 fs-6 badge bg-secondary">
-                                    @invitation.Invitation?.TablesEvents?.Name
-                                </span>
+                            <!-- ======== COLUMNA 2: MESA ======== -->
+                            <td class="text-center" style="white-space: normal;">
+                                @if (invitation.Invitation?.Guests?.Any(g => g.TablesEventsId.HasValue) == true)
+                                {
+                                    @foreach (var guest in invitation.Invitation.Guests.Where(g => g.Status == Status.Attend))
+                                    {
+                                        <div class="small">
+                                            <strong>@guest.GuestName:</strong> <span class="px-3 py-2 fs-6 badge bg-secondary">@(guest.TablesEvents?.Name ?? "Sin asignar")</span>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="px-3 py-2 fs-6 badge bg-secondary">
+                                        @(invitation.Invitation?.TablesEvents?.Name ?? "Sin asignar")
+                                    </span>
+                                }
                             </td>
 
                             <!-- ======== COLUMNA 3: ACCIONES VACÍA PARA ALINEAR ======== -->
@@ -112,9 +135,21 @@ else
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <h5 class="card-title mb-0">@invitation.Invitation?.Name</h5>
-                            <span class="badge bg-secondary">
-                                @invitation.Invitation?.TablesEvents?.Name
-                            </span>
+                            @if (invitation.Invitation?.Guests?.Any(g => g.TablesEventsId.HasValue) == true)
+                            {
+                                @foreach (var guest in invitation.Invitation.Guests.Where(g => g.Status == Status.Attend))
+                                {
+                                    <span class="badge bg-secondary me-1">
+                                        @guest.GuestName: @(guest.TablesEvents?.Name ?? "Sin asignar")
+                                    </span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">
+                                    @(invitation.Invitation?.TablesEvents?.Name ?? "Sin asignar")
+                                </span>
+                            }
                         </div>
                         <p class="mb-1"><strong>Código:</strong> @invitation.Code</p>
                         <p class="mb-1"><strong>Móvil:</strong> @invitation.Invitation?.PhoneNumber</p>
@@ -125,7 +160,7 @@ else
                     </div>
                 </div>
             }
-            
+
         }
         else
         {
@@ -137,8 +172,8 @@ else
 
     <div class="d-flex justify-content-center my-3">
         <Pagination CurrentPage="currentPage"
-                    TotalPages="totalPages"
-                    SelectedPage="SelectedPageAsync" />
+        TotalPages="totalPages"
+        SelectedPage="SelectedPageAsync" />
 
     </div>
 }
@@ -174,10 +209,14 @@ else
                                     </p>
                                 </div>
                                 <div class="col-12">
-                                    <p class="d-flex justify-content-between align-items-center px-3 py-1">
-                                        <strong>Mesa:</strong>
-                                        <span>@Invitation?.TablesEvents?.Name</span>
-                                    </p>
+
+                                    <div class="col-12 ">
+                                        <p class="d-flex justify-content-between align-items-center px-3 py-1 ">
+                                            <strong>Nombres:</strong>
+                                            <span>@EditedInvitationEntry.Invitation?.Name</span>
+                                        </p>
+                                    </div>
+
                                 </div>
 
                             </div>
@@ -207,13 +246,27 @@ else
                                 </div>
                             </div>
                             <div class="col-12 d-flex flex-column">
-                                <!-- Nombres -->
-                                <div class="col-12 ">
-                                    <p class="d-flex justify-content-between align-items-center px-3 py-1 ">
-                                        <strong>Nombres:</strong>
-                                        <span>@EditedInvitationEntry.Invitation?.Name</span>
+                                @if (EditedInvitationEntry.Invitation?.Guests?.Any(g => g.TablesEventsId.HasValue) == true)
+                                {
+                                    <div class="d-flex justify-content-center align-items-center px-3 py-1">
+
+                                        <strong>Mesas:</strong>
+                                    </div>
+                                    @foreach (var guest in EditedInvitationEntry.Invitation.Guests.Where(g => g.Status == Status.Attend))
+                                    {
+                                        <p class="d-flex justify-content-between align-items-center px-3 py-1">
+                                            <strong>@guest.GuestName (@guest.GuestType.GetDescription()):</strong>
+                                            <span>@(guest.TablesEvents?.Name ?? "Sin asignar")</span>
+                                        </p>
+                                    }
+                                }
+                                else
+                                {
+                                    <p class="d-flex justify-content-between align-items-center px-3 py-1">
+                                        <strong>Mesa:</strong>
+                                        <span>@(Invitation?.TablesEvents?.Name ?? "Sin asignar")</span>
                                     </p>
-                                </div>
+                                }
                             </div>
 
                         </div>
@@ -283,10 +336,11 @@ else
                                             <span>@Invitation?.Event?.Name</span>
                                         </p>
                                     </div>
-                                    <div class="col-12">
-                                        <p class="d-flex justify-content-between align-items-center px-3 py-1">
-                                            <strong>Mesa:</strong>
-                                            <span>@Invitation?.TablesEvents?.Name</span>
+                                    <!-- Nombres -->
+                                    <div class="col-12 ">
+                                        <p class="d-flex justify-content-between align-items-center px-3 py-1 ">
+                                            <strong>Nombres:</strong>
+                                            <span>@Invitation?.Name</span>
                                         </p>
                                     </div>
 
@@ -317,13 +371,32 @@ else
                                     </div>
                                 </div>
                                 <div class="col-12 d-flex flex-column">
-                                    <!-- Nombres -->
-                                    <div class="col-12 ">
-                                        <p class="d-flex justify-content-between align-items-center px-3 py-1 ">
-                                            <strong>Nombres:</strong>
-                                            <span>@Invitation?.Name</span>
-                                        </p>
-                                    </div>
+
+                                    @if (Invitation?.Guests?.Any(g => g.TablesEventsId.HasValue) == true)
+                                    {
+                                        <div class="d-flex justify-content-center align-items-center px-3 py-1">
+
+                                            <strong>Mesas:</strong>
+                                        </div>
+                                        @foreach (var guest in Invitation.Guests.Where(g => g.Status == Status.Attend))
+                                        {
+                                            <div class="col-12">
+                                                <p class="d-flex justify-content-between align-items-center px-3 py-1">
+                                                    <strong>@guest.GuestName (@guest.GuestType.GetDescription()):</strong>
+                                                    <span>@(guest.TablesEvents?.Name ?? "Sin asignar")</span>
+                                                </p>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="col-12">
+                                            <p class="d-flex justify-content-between align-items-center px-3 py-1">
+                                                <strong>Mesa:</strong>
+                                                <span>@(Invitation?.TablesEvents?.Name ?? "Sin asignar")</span>
+                                            </p>
+                                        </div>
+                                    }
                                 </div>
 
                             </div>

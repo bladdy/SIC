@@ -1,5 +1,7 @@
 using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+using SIC.Frontend.Helpers;
 using SIC.Frontend.Repositories;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
@@ -17,6 +19,11 @@ namespace SIC.Frontend.Pages.Tables
 
         private List<TablesEvents>? Tables { get; set; }
         private string filterText = string.Empty;
+        private string filterGuestText = string.Empty;
+        private string asignacionModo = "herencia";
+        private HashSet<int> selectedGuestIds = new();
+        private HashSet<int> selectedInvitationIds = new();
+        private List<InvitationGuest> allEventGuests = new();
 
         private CreateOrEditTablesDto createOrEditTablesDto = new();
         private AssignTablesDto AssignTablesDto = new();
@@ -30,25 +37,41 @@ namespace SIC.Frontend.Pages.Tables
         [Inject] private IRepository Repository { get; set; } = default!;
         [Inject] private NavigationManager NavigationManager { get; set; } = default!;
         [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
+        [Inject] private IJSRuntime JS { get; set; } = default!;
+
+        private bool isGeneratingPdf = false;
 
         private IEnumerable<Invitation> FilteredInvitation =>
             Invitations
+                .Where(i => i.Status == Status.Attend && i.TablesEvents == null)
+                .Where(i => i.Guests?.Any(g => g.Status == Status.Attend && !g.TablesEventsId.HasValue) == true)
                 .Where(i => string.IsNullOrWhiteSpace(filterText) ||
-                            i.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase) &&
-                            i.Status == Status.Attend && i.TablesEvents == null
-                )
-                .Take(10);
+                            i.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(i => i.Name);
+
+        private IEnumerable<InvitationGuest> FilteredGuestsForAssignment =>
+            allEventGuests
+                .Where(g => g.Status == Status.Attend)
+                .Where(g => !g.TablesEventsId.HasValue &&
+                            !(invitationsById.TryGetValue(g.InvitationId, out var inv) && inv.TablesEventsId != null))
+                .Where(g => string.IsNullOrWhiteSpace(filterGuestText) ||
+                            g.GuestName.Contains(filterGuestText, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(g => g.GuestName);
 
         private int totalTables;
         private int totalSeats;
         private int occupiedSeats;
         private int availableSeats;
+        private int eventId;
+        private string eventName = string.Empty;
+        private Dictionary<int, Invitation> invitationsById = new();
 
         protected override async Task OnInitializedAsync()
         {
             var tablesTask = LoadTablesEventsAsync();
             var invitationsTask = LoadInvitationsAsync();
-            await Task.WhenAll(tablesTask, invitationsTask);
+            var eventInfoTask = LoadEventInfoAsync();
+            await Task.WhenAll(tablesTask, invitationsTask, eventInfoTask);
             ComputeStats();
         }
 
@@ -58,6 +81,24 @@ namespace SIC.Frontend.Pages.Tables
             totalSeats = Tables?.Sum(s => s.Seats) ?? 0;
             occupiedSeats = Tables?.Sum(s => s.OccupiedSeats) ?? 0;
             availableSeats = totalSeats - occupiedSeats;
+        }
+
+        private async Task ReloadDataAsync()
+        {
+            var tablesTask = LoadTablesEventsAsync();
+            var invitationsTask = LoadInvitationsAsync();
+            await Task.WhenAll(tablesTask, invitationsTask);
+            ComputeStats();
+        }
+
+        private async Task LoadEventInfoAsync()
+        {
+            var result = await Repository.GetAsync<EventInfoDto>($"api/Events/infobycode/{Code}");
+            if (!result.Error && result.Response != null)
+            {
+                eventId = result.Response.Id;
+                eventName = result.Response.Name;
+            }
         }
 
         private async Task LoadInvitationsAsync()
@@ -70,6 +111,7 @@ namespace SIC.Frontend.Pages.Tables
                 return;
             }
             Invitations = result.Response ?? new List<Invitation>();
+            invitationsById = Invitations.ToDictionary(i => i.Id);
         }
 
         private async Task LoadTablesEventsAsync()
@@ -89,9 +131,31 @@ namespace SIC.Frontend.Pages.Tables
             currentPage = page;
         }
 
+        private async Task GeneratePdfAsync()
+        {
+            isGeneratingPdf = true;
+            try
+            {
+                var nombre = string.IsNullOrWhiteSpace(eventName) ? Code : eventName;
+                var content = await Repository.GetFileAsync($"api/Tables/generatedpdf?code={Code}&evento={Uri.EscapeDataString(nombre ?? "")}");
+                if (content != null && content.Length > 0)
+                {
+                    await JS.DownloadFileAsync($"mesas-{nombre}.pdf", content, "application/pdf");
+                }
+                else
+                {
+                    await SweetAlertService.FireAsync("Error", "No hay mesas para generar el PDF.", SweetAlertIcon.Error);
+                }
+            }
+            finally
+            {
+                isGeneratingPdf = false;
+            }
+        }
+
         private async Task ConfirmDelete(TablesEvents table)
         {
-            if (table.Invitation.Any())
+            if (table.Invitations.Any())
             {
                 var message = $"No se puede eliminar la mesa:{table.Name}. Porque aun tiene registros, primero elimine los invitados de la mesa.";
                 await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
@@ -143,72 +207,135 @@ namespace SIC.Frontend.Pages.Tables
             {
                 await SweetAlertService.FireAsync("Eliminado", "Eliminiado invitados de esta mesa correctamente.", SweetAlertIcon.Success);
 
-                var tablesTask = LoadTablesEventsAsync();
-                var invitationsTask = LoadInvitationsAsync();
-                await Task.WhenAll(tablesTask, invitationsTask);
-                ComputeStats();
+                await ReloadDataAsync();
             }
         }
 
-        private async Task ShowModaEditaMesa(TablesEvents updateTableEvent)
+        private async Task UnassignGuest(InvitationGuest guest)
         {
-            modaCrearOrEditaMesa = !modaCrearOrEditaMesa;
-            createOrEditTablesDto.Seats = updateTableEvent.Seats;
-            createOrEditTablesDto.Name = updateTableEvent.Name;
-            createOrEditTablesDto.Description = updateTableEvent.Description;
-            createOrEditTablesDto.EventoId = updateTableEvent.EventId;
-            createOrEditTablesDto.Id = updateTableEvent.Id;
+            var result = await SweetAlertService.FireAsync(new SweetAlertOptions
+            {
+                Title = "Desasignar mesa",
+                Text = $"Quitar mesa individual a '{guest.GuestName}'? Usara la mesa de su invitacion.",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true
+            });
 
-            IsEditMode = true;
+            if (!string.IsNullOrEmpty(result.Value))
+            {
+                var response = await Repository.DeleteAsync<bool>($"api/Tables/UnassignGuest/{guest.Id}");
+                if (response.Error)
+                {
+                    var message = await response.GetErrorMessageAsync();
+                    await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                    return;
+                }
+                await SweetAlertService.FireAsync("Exito", "Mesa individual removida.", SweetAlertIcon.Success);
+                await ReloadDataAsync();
+            }
         }
 
-        private async Task ShowModaCrearMesa()
+        private void ShowModaEditaMesa(TablesEvents updateTableEvent)
         {
-            modaCrearOrEditaMesa = !modaCrearOrEditaMesa;
+            createOrEditTablesDto = new CreateOrEditTablesDto
+            {
+                Id = updateTableEvent.Id,
+                EventoId = updateTableEvent.EventId,
+                Name = updateTableEvent.Name,
+                Description = updateTableEvent.Description,
+                Seats = updateTableEvent.Seats
+            };
+
+            IsEditMode = true;
+            modaCrearOrEditaMesa = true;
+        }
+
+        private void ShowModaCrearMesa()
+        {
+            createOrEditTablesDto = new CreateOrEditTablesDto();
             IsEditMode = false;
+            modaCrearOrEditaMesa = true;
         }
 
         private void CloseModaCrearOrEditaMesa()
         {
-            modaCrearOrEditaMesa = !modaCrearOrEditaMesa;
+            modaCrearOrEditaMesa = false;
         }
 
         private async Task ModaAsignarMes(TablesEvents tables)
         {
-            modaAsignarMesa = !modaAsignarMesa;
+            Table = tables;
+            modaAsignarMesa = true;
+            asignacionModo = "herencia";
+            filterText = string.Empty;
+            filterGuestText = string.Empty;
+            selectedGuestIds.Clear();
+            selectedInvitationIds.Clear();
             AssignTablesDto.TableId = tables.Id;
+            AssignTablesDto.InvitationId = 0;
+            allEventGuests = Invitations
+                .SelectMany(i => i.Guests ?? Enumerable.Empty<InvitationGuest>())
+                .ToList();
         }
 
         private void CloseModaAsignarMesa()
         {
-            modaAsignarMesa = !modaAsignarMesa;
+            modaAsignarMesa = false;
+            asignacionModo = "herencia";
+            filterText = string.Empty;
+            filterGuestText = string.Empty;
+            selectedGuestIds.Clear();
+            selectedInvitationIds.Clear();
+            Table = null;
         }
 
-        private async Task ModaGenerarMesa()
+        private void ToggleGuestSelection(int guestId)
         {
-            modaGenerarMesa = !modaGenerarMesa;
+            if (!selectedGuestIds.Remove(guestId))
+            {
+                selectedGuestIds.Add(guestId);
+            }
+        }
+
+        private void ToggleInvitationSelection(int invitationId)
+        {
+            if (!selectedInvitationIds.Remove(invitationId))
+            {
+                selectedInvitationIds.Add(invitationId);
+            }
+        }
+
+        private void ModaGenerarMesa()
+        {
+            GenerateTablesDto = new GenerateTablesDto();
+            modaGenerarMesa = true;
         }
 
         private void CloseModaGenerarMesa()
         {
-            modaGenerarMesa = !modaGenerarMesa;
+            modaGenerarMesa = false;
         }
 
         private async Task GenerarMesa()
         {
-            HttpResponseWrapper<object>? responseHttp;
-            GenerateTablesDto.EventoId = Invitations.FirstOrDefault()!.EventId;
-            responseHttp = await Repository.PostAsync("api/Tables/Generate", GenerateTablesDto);
+            if (eventId == 0)
+            {
+                await SweetAlertService.FireAsync("Error", "No se pudo determinar el evento.", SweetAlertIcon.Error);
+                return;
+            }
+
+            GenerateTablesDto.EventoId = eventId;
+            var responseHttp = await Repository.PostAsync("api/Tables/Generate", GenerateTablesDto);
             if (responseHttp.Error)
             {
-                var message = await responseHttp.GetErrorMessageAsync() ?? $"No se pudo crear la mesa:{createOrEditTablesDto.Name}.";
+                var message = await responseHttp.GetErrorMessageAsync() ?? "No se pudieron generar las mesas.";
                 await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
                 return;
             }
 
-            CloseModaGenerarMesa();
+            modaGenerarMesa = false;
+            GenerateTablesDto = new();
 
-            // Luego mostrar la notificaci�n
             var toast = SweetAlertService.Mixin(new SweetAlertOptions
             {
                 Toast = true,
@@ -217,44 +344,35 @@ namespace SIC.Frontend.Pages.Tables
                 Timer = 3000,
                 TimerProgressBar = true,
             });
-            await toast.FireAsync(
-                "�xito",
-                IsEditMode ? "Mesa actualizada con �xito." : "Mesa creada con �xito.",
-                SweetAlertIcon.Success
-            );
-            GenerateTablesDto = new();
-            var tablesTask = LoadTablesEventsAsync();
-            var invitationsTask = LoadInvitationsAsync();
-            await Task.WhenAll(tablesTask, invitationsTask);
-            ComputeStats();
+            await toast.FireAsync("Éxito", "Mesas generadas con éxito.", SweetAlertIcon.Success);
+
+            await ReloadDataAsync();
         }
 
         private async Task SaveMesa()
         {
-            HttpResponseWrapper<object>? responseHttp;
-            createOrEditTablesDto.EventoId = Invitations.FirstOrDefault()!.EventId;
+            if (eventId == 0)
+            {
+                await SweetAlertService.FireAsync("Error", "No se pudo determinar el evento.", SweetAlertIcon.Error);
+                return;
+            }
 
-            if (IsEditMode)
-            {
-                // PUT -> Editar
-                responseHttp = await Repository.PutAsync("api/Tables/full", createOrEditTablesDto);
-            }
-            else
-            {
-                // POST -> Crear
-                responseHttp = await Repository.PostAsync("api/Tables/full", createOrEditTablesDto);
-            }
+            createOrEditTablesDto.EventoId = eventId;
+
+            var responseHttp = IsEditMode
+                ? await Repository.PutAsync("api/Tables/full", createOrEditTablesDto)
+                : await Repository.PostAsync("api/Tables/full", createOrEditTablesDto);
 
             if (responseHttp.Error)
             {
-                var message = await responseHttp.GetErrorMessageAsync() ?? $"No se pudo crear la mesa:{createOrEditTablesDto.Name}.";
+                var message = await responseHttp.GetErrorMessageAsync() ?? $"No se pudo guardar la mesa:{createOrEditTablesDto.Name}.";
                 await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
                 return;
             }
 
-            CloseModaCrearOrEditaMesa();
+            modaCrearOrEditaMesa = false;
+            createOrEditTablesDto = new();
 
-            // Luego mostrar la notificaci�n
             var toast = SweetAlertService.Mixin(new SweetAlertOptions
             {
                 Toast = true,
@@ -264,50 +382,159 @@ namespace SIC.Frontend.Pages.Tables
                 TimerProgressBar = true,
             });
             await toast.FireAsync(
-                "�xito",
-                IsEditMode ? "Mesa actualizada con �xito." : "Mesa creada con �xito.",
+                "Éxito",
+                IsEditMode ? "Mesa actualizada con éxito." : "Mesa creada con éxito.",
                 SweetAlertIcon.Success
             );
-            createOrEditTablesDto = new();
-            var tablesTask = LoadTablesEventsAsync();
-            var invitationsTask = LoadInvitationsAsync();
-            await Task.WhenAll(tablesTask, invitationsTask);
-            ComputeStats();
+
+            await ReloadDataAsync();
+        }
+
+        private string GetTableStatusClass(TablesEvents table)
+        {
+            if (table.Seats == 0) return "bg-secondary";
+            double percentage = (double)table.OccupiedSeats / table.Seats;
+            if (percentage > 1.0) return "bg-danger";
+            if (percentage >= 0.9) return "bg-warning text-dark";
+            if (percentage >= 0.5) return "bg-info";
+            if (percentage > 0) return "bg-primary";
+            return "bg-success";
+        }
+
+        private string GetTableStatusLabel(TablesEvents table)
+        {
+            if (table.Seats == 0) return "Sin lugares";
+            double percentage = (double)table.OccupiedSeats / table.Seats;
+            if (percentage > 1.0) return "Sobre capacidad";
+            if (percentage >= 0.9) return "Casi llena";
+            if (percentage >= 0.5) return "Disponible";
+            if (percentage > 0) return "En uso";
+            return "Libre";
+        }
+
+        private int GetEffectiveGuestCount(TablesEvents table)
+        {
+            int count = 0;
+            foreach (var inv in table.Invitations)
+            {
+                count += inv.Guests?.Count(g => g.Status == SIC.Shared.Enums.Status.Attend) ?? 0;
+            }
+            count += table.Guests?.Count(g => g.Status == SIC.Shared.Enums.Status.Attend) ?? 0;
+            return count;
         }
 
         private async Task AssignTable()
         {
-            //Validar que la mesa no tenga
-            HttpResponseWrapper<object>? responseHttp;
-            // POST -> Crear
-            responseHttp = await Repository.PostAsync<AssignTablesDto>("api/Tables/Assign", AssignTablesDto);
-            if (responseHttp.Error)
+            if (asignacionModo == "individual")
             {
-                var message = await responseHttp.GetErrorMessageAsync() ?? "No se pudo asignar la mesa.";
-                await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
-                return;
-            }
-            //Cerrar el modal
-            CloseModaAsignarMesa();
+                var available = Table!.Seats - Table.OccupiedSeats;
+                if (selectedGuestIds.Count > available)
+                {
+                    await SweetAlertService.FireAsync("Error",
+                        $"No hay suficientes lugares. Disponibles: {available}, seleccionados: {selectedGuestIds.Count}.",
+                        SweetAlertIcon.Error);
+                    return;
+                }
 
-            // Luego mostrar la notificaci�n
-            var toast = SweetAlertService.Mixin(new SweetAlertOptions
+                var dtos = selectedGuestIds
+                    .Select(guestId => new AssignGuestTableDto { GuestId = guestId, TablesEventsId = Table.Id })
+                    .ToList();
+
+                var response = await Repository.PostAsync<List<AssignGuestTableDto>, AssignBulkResultDto>(
+                    "api/Tables/AssignGuestBulk", dtos);
+
+                modaAsignarMesa = false;
+
+                if (response.Error)
+                {
+                    var message = await response.GetErrorMessageAsync();
+                    await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                }
+                else
+                {
+                    var assigned = response.Response?.Assigned ?? 0;
+                    var skipped = response.Response?.Skipped ?? new List<string>();
+                    if (skipped.Count > 0)
+                    {
+                        await SweetAlertService.FireAsync("Advertencia",
+                            $"Asignados: {assigned}. Omitidos: {string.Join(", ", skipped)}.",
+                            SweetAlertIcon.Warning);
+                    }
+                    else
+                    {
+                        var toast = SweetAlertService.Mixin(new SweetAlertOptions
+                        {
+                            Toast = true,
+                            Position = SweetAlertPosition.TopEnd,
+                            ShowConfirmButton = false,
+                            Timer = 3000,
+                            TimerProgressBar = true,
+                        });
+                        await toast.FireAsync("Exito",
+                            $"Se asignaron {assigned} invitado(s) correctamente.",
+                            SweetAlertIcon.Success);
+                    }
+                }
+            }
+            else
             {
-                Toast = true,
-                Position = SweetAlertPosition.TopEnd,
-                ShowConfirmButton = false,
-                Timer = 3000,
-                TimerProgressBar = true,
-            });
-            await toast.FireAsync(
-                "�xito", "Se ha asignado la mesa correctamente.",
-                SweetAlertIcon.Success
-            );
+                var totalGuests = selectedInvitationIds.Sum(invId =>
+                    invitationsById.TryGetValue(invId, out var inv)
+                        ? inv.Guests?.Count(g => g.Status == Status.Attend) ?? 0
+                        : 0);
+
+                var available = Table!.Seats - Table.OccupiedSeats;
+                if (totalGuests > available)
+                {
+                    await SweetAlertService.FireAsync("Error",
+                        $"No hay suficientes lugares. Disponibles: {available}, total invitados de las seleccionadas: {totalGuests}.",
+                        SweetAlertIcon.Error);
+                    return;
+                }
+
+                var dtos = selectedInvitationIds
+                    .Select(invId => new AssignTablesDto { InvitationId = invId, TableId = Table.Id })
+                    .ToList();
+
+                var response = await Repository.PostAsync<List<AssignTablesDto>, AssignBulkResultDto>(
+                    "api/Tables/AssignBulk", dtos);
+
+                modaAsignarMesa = false;
+
+                if (response.Error)
+                {
+                    var message = await response.GetErrorMessageAsync();
+                    await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                }
+                else
+                {
+                    var assigned = response.Response?.Assigned ?? 0;
+                    var skipped = response.Response?.Skipped ?? new List<string>();
+                    if (skipped.Count > 0)
+                    {
+                        await SweetAlertService.FireAsync("Advertencia",
+                            $"Asignadas: {assigned}. Omitidas: {string.Join(", ", skipped)}.",
+                            SweetAlertIcon.Warning);
+                    }
+                    else
+                    {
+                        var toast = SweetAlertService.Mixin(new SweetAlertOptions
+                        {
+                            Toast = true,
+                            Position = SweetAlertPosition.TopEnd,
+                            ShowConfirmButton = false,
+                            Timer = 3000,
+                            TimerProgressBar = true,
+                        });
+                        await toast.FireAsync("Exito",
+                            $"Se asignaron {assigned} invitacion(es) correctamente.",
+                            SweetAlertIcon.Success);
+                    }
+                }
+            }
+
             AssignTablesDto = new();
-            var tablesTask = LoadTablesEventsAsync();
-            var invitationsTask = LoadInvitationsAsync();
-            await Task.WhenAll(tablesTask, invitationsTask);
-            ComputeStats();
+            await ReloadDataAsync();
         }
     }
 }

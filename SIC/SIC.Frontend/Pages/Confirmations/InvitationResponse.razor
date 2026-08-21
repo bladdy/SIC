@@ -183,16 +183,24 @@
                                     <div class="row text-center fw-bold text-capitalize text-muted">
                                         <div class="col">
                                             @(guest.GuestName ?? $"Invitado {contador}") (@(guest.GuestType.GetDescription()))
+                                            @if (guest.TablesEventsId.HasValue)
+                                            {
+                                                <span> — Mesa: @guest.TablesEvents?.Name</span>
+                                            }
                                         </div>
                                     </div>
 
                                 }
                             }
-                            @if (Invitacion?.TablesEvents != null)
+                            @if (Invitacion?.Guests?.Any(g => g.TablesEventsId.HasValue) != true)
                             {
-                                <h6 class="fw-bold text-uppercase mt-3 text-black">
-                                    Mesa: @Invitacion.TablesEvents?.Name
-                                </h6>
+                                var mesaNombre = Invitacion?.TablesEvents?.Name;
+                                @if (!string.IsNullOrEmpty(mesaNombre))
+                                {
+                                    <h6 class="fw-bold text-uppercase mt-3 text-black">
+                                        Mesa: @mesaNombre
+                                    </h6>
+                                }
                             }
                             <p class="fw-semibold text-muted small mt-3">
                             Este código QR es tu acceso al evento.

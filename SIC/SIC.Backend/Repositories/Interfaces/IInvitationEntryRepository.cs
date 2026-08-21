@@ -10,6 +10,8 @@ public interface IInvitationEntryRepository
 
     Task<ActionResponse<IEnumerable<InvitationEntry>>> GetAsync(PaginationDTO pagination);
 
+    Task<ActionResponse<IEnumerable<InvitationEntry>>> GetAllByEventAsync(string eventCode);
+
     Task<ActionResponse<int>> GetTotalRecordAsync(PaginationDTO pagination);
 
     Task<ActionResponse<InvitationEntry>> AddFullAsync(InvitationEntry invitation);

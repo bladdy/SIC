@@ -29,4 +29,14 @@ namespace SIC.Shared.DTOs
         public int InvitationId { get; set; }
         public int TableId { get; set; }
     }
+    public class AssignGuestTableDto
+    {
+        public int GuestId { get; set; }
+        public int? TablesEventsId { get; set; }
+    }
+    public class AssignBulkResultDto
+    {
+        public int Assigned { get; set; }
+        public List<string> Skipped { get; set; } = [];
+    }
 }
