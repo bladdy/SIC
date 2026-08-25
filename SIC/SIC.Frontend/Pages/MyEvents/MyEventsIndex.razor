@@ -340,6 +340,17 @@
                             <label class="form-label">URL Invitación</label>
                             <InputText class="form-control" @bind-Value="NewEvent.Url" placeholder="Ej. https://mi-invitacion.com.." />
                         </div>
+                        <div class="col-auto">
+                            <div class="form-check">
+                                <InputCheckbox class="form-check-input"
+                                               @bind-Value="NewEvent.InvitationInvboxv" />
+                                <label class="form-check-label ms-1">
+                                    Invitacion Invboxv
+                                </label>
+
+                            </div>
+                            <small class="text-muted d-block mt-1">Seleccione esta opción únicamente si la invitación será diseñada por INVBOXV.</small>
+                        </div>
                         <CoverImageUploader @ref="CoverUploader" @bind-Value="NewEvent.CoverImageUrl" />
                         <div class="mb-3 row">
                             <div class="col">
@@ -378,15 +389,7 @@
                                 <InputText class="form-control" placeholder="Numero celular..." @bind-Value="NewEvent.PlannerPhone" />
                             </div>
                         </div>
-                        <div class="col-auto">
-                            <div class="form-check">
-                                <InputCheckbox class="form-check-input"
-                                               @bind-Value="NewEvent.InvitationInvboxv" />
-                                <label class="form-check-label ms-1">
-                                    Invitacion Invboxv
-                                </label>
-                            </div>
-                        </div>
+                        
 
                         <div class="mb-3 d-none">
                             <label class="form-label">Estado</label>
