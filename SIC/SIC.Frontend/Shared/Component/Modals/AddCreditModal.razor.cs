@@ -1,15 +1,18 @@
+using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using SIC.Frontend.Repositories;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using SIC.Shared.Enums;
-using System.Net.Http.Json;
 
 namespace SIC.Frontend.Shared.Component.Modals
 {
     public partial class AddCreditModal
     {
         [Inject] private IJSRuntime JS { get; set; } = default!;
+        [Inject] private IRepository Repository { get; set; } = default!;
+        [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
         [Parameter] public EventCallback OnCreditsAdded { get; set; }
         [Parameter] public UserCreditDTO? SelectedUser { get; set; }
 
@@ -47,13 +50,21 @@ namespace SIC.Frontend.Shared.Component.Modals
         {
             try
             {
-                var result = await Http.GetFromJsonAsync<List<User>>($"api/Accounts/all?PageSize={200}");
-                if (result != null)
-                    Planners = result.Where(u => u.UserType == UserType.WeddingPlanner).ToList();
+                var responseHttp = await Repository.GetAsync<List<User>>("api/Accounts/all?PageSize=200");
+                if (responseHttp.Error)
+                {
+                    var message = await responseHttp.GetErrorMessageAsync() ?? "No se pudieron cargar los planners.";
+                    await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                    return;
+                }
+
+                Planners = responseHttp.Response?
+                    .Where(u => u.UserType == UserType.WeddingPlanner)
+                    .ToList() ?? new List<User>();
             }
             catch
             {
-                // Manejo de error
+                await SweetAlertService.FireAsync("Error", "No se pudieron cargar los planners.", SweetAlertIcon.Error);
             }
             finally
             {
@@ -73,22 +84,26 @@ namespace SIC.Frontend.Shared.Component.Modals
 
             isSaving = true;
 
-            var response = await Http.PostAsJsonAsync("api/UserCredits/add", model);
+            var responseHttp = await Repository.PostAsync<AddCreditsRequest>("api/UserCredits/add", model);
 
             isSaving = false;
 
-            if (response.IsSuccessStatusCode)
+            if (responseHttp.Error)
             {
-                await JS.InvokeVoidAsync("bootstrapModal.hide", "addCreditModal");
+                var message = await responseHttp.GetErrorMessageAsync() ?? "No se pudieron agregar los créditos.";
+                await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
+            }
 
-                if (OnCreditsAdded.HasDelegate)
-                    await OnCreditsAdded.InvokeAsync();
+            await JS.InvokeVoidAsync("bootstrapModal.hide", "addCreditModal");
 
-                // Limpiar si no es un usuario preseleccionado
-                if (!isPreselectedUser)
-                {
-                    ResetForm();
-                }
+            if (OnCreditsAdded.HasDelegate)
+                await OnCreditsAdded.InvokeAsync();
+
+            // Limpiar si no es un usuario preseleccionado
+            if (!isPreselectedUser)
+            {
+                ResetForm();
             }
         }
 

@@ -602,6 +602,11 @@ namespace SIC.Backend.Services
             // ==============================
             // 🪑 UN BLOQUE POR MESA (como las tarjetas del HTML)
             // ==============================
+            var layout = new PdfPTable(2)
+            {
+                WidthPercentage = 100
+            };
+
             foreach (var mesa in mesas)
             {
                 var mesaTable = new PdfPTable(1)
@@ -689,8 +694,25 @@ namespace SIC.Backend.Services
                 }
 
                 mesaTable.AddCell(bodyCell);
-                document.Add(mesaTable);
+
+                layout.AddCell(new PdfPCell(mesaTable)
+                {
+                    Border = Rectangle.NO_BORDER,
+                    PaddingLeft = 3,
+                    PaddingRight = 3,
+                    PaddingBottom = 10
+                });
             }
+
+            if (mesas.Count % 2 == 1)
+            {
+                layout.AddCell(new PdfPCell
+                {
+                    Border = Rectangle.NO_BORDER
+                });
+            }
+
+            document.Add(layout);
 
             document.Close();
 

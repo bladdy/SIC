@@ -400,6 +400,7 @@ namespace SIC.Backend.Repositories.Implemetations
                     .ThenInclude(g => g.Invitation)
                 .Where(e => e.Event!.Code == code)
                 .AsNoTracking()
+                .AsSplitQuery()
                 .ToListAsync();
 
             return new ActionResponse<IEnumerable<TablesEvents>>

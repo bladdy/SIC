@@ -71,7 +71,7 @@ else
 
         <div class="col-12 col-sm-3 col-md-2 text-center text-sm-end">
             <div class="d-flex gap-1 justify-content-end justify-content-sm-end">
-                <button class="btn btn-sm btn-custom" @onclick="GeneratePdfAsync" disabled="@isGeneratingPdf">
+                <button class="btn btn-sm btn-custom" @onclick="GeneratePdfAsync" disabled="@(isGeneratingPdf || IsBusy)">
                     @if (isGeneratingPdf)
                     {
                         <span class="spinner-border spinner-border-sm" role="status"></span>
@@ -82,7 +82,7 @@ else
                     }
                     <span class="">PDF</span>
                 </button>
-                <button class="btn btn-sm btn-custom" @onclick="() => ShowModaCrearMesa()">
+                <button class="btn btn-sm btn-custom" @onclick="() => ShowModaCrearMesa()" disabled="@IsBusy">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                         <path d="M9 12h6" />
@@ -91,7 +91,7 @@ else
                     </svg>
                     <span class="">Mesa</span>
                 </button>
-                <button class="btn btn-sm btn-custom" @onclick="() => ModaGenerarMesa()">
+                <button class="btn btn-sm btn-custom" @onclick="() => ModaGenerarMesa()" disabled="@IsBusy">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                         <path d="M7 5.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667l0 -8.666" />
@@ -107,6 +107,7 @@ else
     </div>
 
     <!-- Tarjetas -->
+    <div class="position-relative">
     <div class="row g-4">
 
         @foreach (var mesa in Tables)
@@ -293,6 +294,20 @@ else
             </div>
         }
 
+    </div>
+
+    @if (IsBusy)
+    {
+        <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+             style="background: rgba(255,255,255,0.7); z-index: 1050; border-radius: 15px;">
+            <div class="text-center">
+                <div class="spinner-border text-custom mb-2" role="status" style="width: 3rem; height: 3rem;">
+                    <span class="visually-hidden">Actualizando...</span>
+                </div>
+                <div class="text-muted">@busyMessage</div>
+            </div>
+        </div>
+    }
     </div>
 
     <!-- Paginación -->

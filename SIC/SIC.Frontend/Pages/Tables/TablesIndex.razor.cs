@@ -34,6 +34,11 @@ namespace SIC.Frontend.Pages.Tables
         private bool modaGenerarMesa = false;
         private bool IsEditMode = false;
 
+        private bool isReloading = false;
+        private bool isSavingAssignment = false;
+        private string busyMessage = string.Empty;
+        private bool IsBusy => isReloading || isSavingAssignment;
+
         [Inject] private IRepository Repository { get; set; } = default!;
         [Inject] private NavigationManager NavigationManager { get; set; } = default!;
         [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
@@ -43,7 +48,7 @@ namespace SIC.Frontend.Pages.Tables
 
         private IEnumerable<Invitation> FilteredInvitation =>
             Invitations
-                .Where(i => i.Status == Status.Attend && i.TablesEvents == null)
+                .Where(i => i.Status == Status.Attend && i.TablesEventsId == null)
                 .Where(i => i.Guests?.Any(g => g.Status == Status.Attend && !g.TablesEventsId.HasValue) == true)
                 .Where(i => string.IsNullOrWhiteSpace(filterText) ||
                             i.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase))
@@ -85,10 +90,20 @@ namespace SIC.Frontend.Pages.Tables
 
         private async Task ReloadDataAsync()
         {
-            var tablesTask = LoadTablesEventsAsync();
-            var invitationsTask = LoadInvitationsAsync();
-            await Task.WhenAll(tablesTask, invitationsTask);
-            ComputeStats();
+            isReloading = true;
+            busyMessage = "Actualizando mesas...";
+            StateHasChanged();
+            try
+            {
+                var tablesTask = LoadTablesEventsAsync();
+                var invitationsTask = LoadInvitationsAsync();
+                await Task.WhenAll(tablesTask, invitationsTask);
+                ComputeStats();
+            }
+            finally
+            {
+                isReloading = false;
+            }
         }
 
         private async Task LoadEventInfoAsync()
@@ -440,40 +455,50 @@ namespace SIC.Frontend.Pages.Tables
                     .Select(guestId => new AssignGuestTableDto { GuestId = guestId, TablesEventsId = Table.Id })
                     .ToList();
 
-                var response = await Repository.PostAsync<List<AssignGuestTableDto>, AssignBulkResultDto>(
-                    "api/Tables/AssignGuestBulk", dtos);
-
                 modaAsignarMesa = false;
+                isSavingAssignment = true;
+                busyMessage = "Guardando asignación...";
+                StateHasChanged();
 
-                if (response.Error)
+                try
                 {
-                    var message = await response.GetErrorMessageAsync();
-                    await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
-                }
-                else
-                {
-                    var assigned = response.Response?.Assigned ?? 0;
-                    var skipped = response.Response?.Skipped ?? new List<string>();
-                    if (skipped.Count > 0)
+                    var response = await Repository.PostAsync<List<AssignGuestTableDto>, AssignBulkResultDto>(
+                        "api/Tables/AssignGuestBulk", dtos);
+
+                    if (response.Error)
                     {
-                        await SweetAlertService.FireAsync("Advertencia",
-                            $"Asignados: {assigned}. Omitidos: {string.Join(", ", skipped)}.",
-                            SweetAlertIcon.Warning);
+                        var message = await response.GetErrorMessageAsync();
+                        await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
                     }
                     else
                     {
-                        var toast = SweetAlertService.Mixin(new SweetAlertOptions
+                        var assigned = response.Response?.Assigned ?? 0;
+                        var skipped = response.Response?.Skipped ?? new List<string>();
+                        if (skipped.Count > 0)
                         {
-                            Toast = true,
-                            Position = SweetAlertPosition.TopEnd,
-                            ShowConfirmButton = false,
-                            Timer = 3000,
-                            TimerProgressBar = true,
-                        });
-                        await toast.FireAsync("Exito",
-                            $"Se asignaron {assigned} invitado(s) correctamente.",
-                            SweetAlertIcon.Success);
+                            await SweetAlertService.FireAsync("Advertencia",
+                                $"Asignados: {assigned}. Omitidos: {string.Join(", ", skipped)}.",
+                                SweetAlertIcon.Warning);
+                        }
+                        else
+                        {
+                            var toast = SweetAlertService.Mixin(new SweetAlertOptions
+                            {
+                                Toast = true,
+                                Position = SweetAlertPosition.TopEnd,
+                                ShowConfirmButton = false,
+                                Timer = 3000,
+                                TimerProgressBar = true,
+                            });
+                            await toast.FireAsync("Exito",
+                                $"Se asignaron {assigned} invitado(s) correctamente.",
+                                SweetAlertIcon.Success);
+                        }
                     }
+                }
+                finally
+                {
+                    isSavingAssignment = false;
                 }
             }
             else
@@ -496,40 +521,50 @@ namespace SIC.Frontend.Pages.Tables
                     .Select(invId => new AssignTablesDto { InvitationId = invId, TableId = Table.Id })
                     .ToList();
 
-                var response = await Repository.PostAsync<List<AssignTablesDto>, AssignBulkResultDto>(
-                    "api/Tables/AssignBulk", dtos);
-
                 modaAsignarMesa = false;
+                isSavingAssignment = true;
+                busyMessage = "Guardando asignación...";
+                StateHasChanged();
 
-                if (response.Error)
+                try
                 {
-                    var message = await response.GetErrorMessageAsync();
-                    await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
-                }
-                else
-                {
-                    var assigned = response.Response?.Assigned ?? 0;
-                    var skipped = response.Response?.Skipped ?? new List<string>();
-                    if (skipped.Count > 0)
+                    var response = await Repository.PostAsync<List<AssignTablesDto>, AssignBulkResultDto>(
+                        "api/Tables/AssignBulk", dtos);
+
+                    if (response.Error)
                     {
-                        await SweetAlertService.FireAsync("Advertencia",
-                            $"Asignadas: {assigned}. Omitidas: {string.Join(", ", skipped)}.",
-                            SweetAlertIcon.Warning);
+                        var message = await response.GetErrorMessageAsync();
+                        await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
                     }
                     else
                     {
-                        var toast = SweetAlertService.Mixin(new SweetAlertOptions
+                        var assigned = response.Response?.Assigned ?? 0;
+                        var skipped = response.Response?.Skipped ?? new List<string>();
+                        if (skipped.Count > 0)
                         {
-                            Toast = true,
-                            Position = SweetAlertPosition.TopEnd,
-                            ShowConfirmButton = false,
-                            Timer = 3000,
-                            TimerProgressBar = true,
-                        });
-                        await toast.FireAsync("Exito",
-                            $"Se asignaron {assigned} invitacion(es) correctamente.",
-                            SweetAlertIcon.Success);
+                            await SweetAlertService.FireAsync("Advertencia",
+                                $"Asignadas: {assigned}. Omitidas: {string.Join(", ", skipped)}.",
+                                SweetAlertIcon.Warning);
+                        }
+                        else
+                        {
+                            var toast = SweetAlertService.Mixin(new SweetAlertOptions
+                            {
+                                Toast = true,
+                                Position = SweetAlertPosition.TopEnd,
+                                ShowConfirmButton = false,
+                                Timer = 3000,
+                                TimerProgressBar = true,
+                            });
+                            await toast.FireAsync("Exito",
+                                $"Se asignaron {assigned} invitacion(es) correctamente.",
+                                SweetAlertIcon.Success);
+                        }
                     }
+                }
+                finally
+                {
+                    isSavingAssignment = false;
                 }
             }
 

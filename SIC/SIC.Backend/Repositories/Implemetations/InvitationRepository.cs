@@ -222,12 +222,11 @@ namespace SIC.Backend.Repositories.Implemetations
         public async Task<ActionResponse<IEnumerable<Invitation>>> GetAllAsync(string code)
         {
             var invitations = await _context.Invitations
-                .Include(i => i.Event)
                 .Include(i => i.Guests)
-                .Include(i => i.TablesEvents)
                 .Where(i =>
                     i.Event!.Code == code &&
                     i.Status == Status.Attend)
+                .AsSplitQuery()
                 .ToListAsync();
             if (invitations == null)
             {
