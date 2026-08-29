@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using SIC.Backend.Repositories.Interfaces;
 using SIC.Backend.UnitOfWork.Interfaces;
@@ -89,6 +91,24 @@ namespace SIC.Backend.Controllers
                 return Ok(BuildToken(user));
             }
             return BadRequest("Email o Contraseña incorrectos.");
+        }
+
+        [HttpPost("ChangePassword")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> ChangePasswordAsync([FromBody] ChangePasswordDTO model)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            var response = await _userUnitOfWork.ChangePasswordAsync(userId, model.CurrentPassword, model.NewPassword);
+            if (response.Success)
+            {
+                return Ok();
+            }
+            return BadRequest(response.Message);
         }
 
         private TokenDTO? BuildToken(User user)

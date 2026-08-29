@@ -57,10 +57,9 @@ namespace SIC.Frontend.Pages.Tables.ClientsTablesStatus
             if (table.Seats == 0) return "bg-secondary";
             double percentage = (double)table.OccupiedSeats / table.Seats;
             if (percentage > 1.0) return "bg-danger";
-            if (percentage >= 0.9) return "bg-warning text-dark";
-            if (percentage >= 0.5) return "bg-info";
-            if (percentage > 0) return "bg-primary";
-            return "bg-success";
+            if (percentage >= 1.0) return "bg-success";
+            if (percentage >= 0.8) return "bg-warning text-dark";
+            return "bg-secondary";
         }
 
         private string GetTableStatusLabel(TablesEvents table)
@@ -68,10 +67,9 @@ namespace SIC.Frontend.Pages.Tables.ClientsTablesStatus
             if (table.Seats == 0) return "Sin lugares";
             double percentage = (double)table.OccupiedSeats / table.Seats;
             if (percentage > 1.0) return "Sobre capacidad";
-            if (percentage >= 0.9) return "Casi llena";
-            if (percentage >= 0.5) return "Disponible";
-            if (percentage > 0) return "En uso";
-            return "Libre";
+            if (percentage >= 1.0) return "Llena";
+            if (percentage >= 0.8) return "Casi llena";
+            return "Disponible";
         }
     }
 }

@@ -43,8 +43,8 @@ public class MbMTasksController : GenericController<MbMTask>
         task.Title = dto.Title;
         task.IsCompleted = dto.IsCompleted;
         task.AssignedTo = dto.AssignedTo;
-        task.DueDate = dto.DueDate;
-        task.Priority = dto.Priority;
+        task.ResponsiblePhone = dto.ResponsiblePhone;
+        task.Motivo = dto.Motivo;
 
         var updateResponse = await _unitOfWork.UpdateAsync(task);
         if (!updateResponse.Success)
@@ -64,9 +64,9 @@ public class MbMTasksController : GenericController<MbMTask>
             Title = dto.Title,
             IsCompleted = dto.IsCompleted,
             AssignedTo = dto.AssignedTo,
-            DueDate = dto.DueDate,
-            Priority = dto.Priority,
-            MbMActivityId = activityId
+            ResponsiblePhone = dto.ResponsiblePhone,
+            MbMActivityId = activityId,
+            Motivo = dto.Motivo
         };
 
         var response = await _unitOfWork.AddAsync(task);

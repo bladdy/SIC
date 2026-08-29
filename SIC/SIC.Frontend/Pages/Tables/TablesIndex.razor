@@ -150,17 +150,34 @@ else
                             <h3 class="fw-bold mt-2" style="font-size: 1.8rem;">
                                 Mesa: @mesa.Name
                             </h3>
-                            <button class="btn btn-sm btn-custom rounded-circle me-1 btn-circle" @onclick="() => ModaAsignarMes(mesa)">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" 
-                                viewBox="0 0 24 24" fill="none" stroke="currentColor" 
-                                stroke-width="1.5" stroke-linecap="round" 
-                                stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-square-plus">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                    <path d="M9 12h6" />
-                                    <path d="M12 9v6" />
-                                    <path d="M3 5a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-14" />
-                                </svg>
-                            </button>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge @GetTableStatusClass(mesa)">@GetTableStatusLabel(mesa)</span>
+                                <button class="btn btn-sm btn-custom rounded-circle me-1 btn-circle" @onclick="() => ModaAsignarMes(mesa)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" 
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                                    stroke-width="1.5" stroke-linecap="round" 
+                                    stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-square-plus">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <path d="M9 12h6" />
+                                        <path d="M12 9v6" />
+                                        <path d="M3 5a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-14" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Progress bar -->
+                        <div class="mb-3 mt-2">
+                            <div class="d-flex justify-content-between mb-1">
+                                <small class="fw-semibold">@mesa.OccupiedSeats / @mesa.Seats lugares</small>
+                                <small class="text-muted">@(mesa.Seats > 0 ? (int)((double)mesa.OccupiedSeats / mesa.Seats * 100) : 0)%</small>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar @GetTableStatusClass(mesa)"
+                                     style="width: @(mesa.Seats > 0 ? Math.Min((double)mesa.OccupiedSeats / mesa.Seats * 100, 100) : 0)%">
+                                </div>
+                            </div>
+                            <small class="text-muted">@(mesa.Seats - mesa.OccupiedSeats) lugares disponibles</small>
                         </div>
 
                         <div class="mt-1" style="max-height: 300px; overflow-y: auto;">
@@ -266,24 +283,6 @@ else
                                     </div>
                                 }
                             }
-
-                        </div>
-
-                    </div>
-
-                    <div class="card-footer border-0">
-
-                        <div class="d-flex justify-content-between">
-
-                            <span>
-                                Lugares:
-                                <strong>@mesa.Seats</strong>
-                            </span>
-
-                            <span>
-                                Disponibles:
-                                <strong> @(@mesa.Seats - @mesa.OccupiedSeats)</strong>
-                            </span>
 
                         </div>
 

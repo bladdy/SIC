@@ -53,61 +53,6 @@
     margin-top: 2px;
 }
 
-.minute-header-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-/* ============ BUTTONS ============ */
-.minute-btn-primary {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    height: 40px;
-    padding: 0 16px;
-    background: #367B82;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background 0.15s ease;
-}
-
-.minute-btn-primary:hover {
-    background: #2c6368;
-}
-
-.minute-btn-primary i {
-    font-size: 1rem;
-}
-
-.minute-btn-ghost {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    height: 40px;
-    padding: 0 16px;
-    background: #fff;
-    color: #65727B;
-    border: 1px solid #E5E7EB;
-    border-radius: 6px;
-    font-weight: 500;
-    font-size: 14px;
-    opacity: 0.7;
-}
-
-.minute-btn-ghost i {
-    font-size: 1rem;
-}
-
-.minute-btn-ghost[disabled]:hover {
-    opacity: 0.7;
-}
-
 /* ============ SUMMARY ============ */
 .minute-summary {
     display: grid;
@@ -161,93 +106,6 @@
     font-size: 12px;
     color: #7A858E;
     font-weight: 500;
-}
-
-/* ============ TOOLBAR ============ */
-.minute-toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 14px;
-    flex-wrap: wrap;
-    margin-bottom: 16px;
-}
-
-.minute-search {
-    position: relative;
-    width: 300px;
-    max-width: 100%;
-}
-
-.minute-search-icon {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #9AA5AD;
-    font-size: 1rem;
-    pointer-events: none;
-}
-
-.minute-search-input {
-    width: 100%;
-    height: 42px;
-    padding: 0 12px 0 38px;
-    border: 1px solid #D9DEE3;
-    border-radius: 6px;
-    background: #fff;
-    font-size: 14px;
-    color: #26343C;
-    outline: none;
-    transition: border-color 0.15s ease;
-}
-
-.minute-search-input:focus {
-    border-color: #367B82;
-}
-
-.minute-filters {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.minute-select {
-    height: 42px;
-    min-width: 130px;
-    padding: 0 34px 0 12px;
-    border: 1px solid #D9DEE3;
-    border-radius: 6px;
-    background: #fff;
-    color: #26343C;
-    font-size: 14px;
-    outline: none;
-    cursor: pointer;
-}
-
-.minute-select:focus {
-    border-color: #367B82;
-}
-
-.minute-clear {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    height: 42px;
-    padding: 0 12px;
-    background: #fff;
-    border: 1px solid #E5E7EB;
-    border-radius: 6px;
-    color: #65727B;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.15s ease;
-}
-
-.minute-clear:hover {
-    background: #F1F3F5;
 }
 
 /* ============ TABLE HEADER ============ */
@@ -315,10 +173,6 @@
     margin-top: 6px;
 }
 
-.minute-activity-secondary .minute-btn-task {
-    margin-left: auto;
-}
-
 .minute-activity-time {
     display: inline-flex;
     align-items: center;
@@ -357,30 +211,6 @@
 
 .minute-activity-location i {
     font-size: 0.9rem;
-}
-
-.minute-btn-task {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    height: 28px;
-    padding: 0 10px;
-    background: #fff;
-    color: #367B82;
-    border: 1px solid #367B82;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    white-space: nowrap;
-    flex-shrink: 0;
-    transition: background 0.15s ease;
-}
-
-.minute-btn-task:hover {
-    background: #EAF4F5;
-    color: #2c6368;
-    border-color: #2c6368;
 }
 
 .minute-activity-provider {
@@ -423,12 +253,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
-}
-
-.minute-activity-provider-more {
-    font-size: 12px;
-    color: #7A858E;
-    font-weight: 500;
 }
 
 .minute-unassigned {
@@ -493,65 +317,6 @@
     color: #C0392B;
 }
 
-/* ============ DROPDOWN MENU ============ */
-.minute-dropdown {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-}
-
-.minute-dropdown-btn {
-    background: none;
-    border: none;
-    color: #7A858E;
-    font-size: 1rem;
-    line-height: 1;
-    padding: 3px 5px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background 0.15s ease, color 0.15s ease;
-}
-
-.minute-dropdown-btn:hover {
-    background: #F1F3F5;
-    color: #26343C;
-}
-
-.minute-dropdown-btn:active,
-.minute-dropdown-btn:focus {
-    background: #E5E7EB;
-    color: #26343C;
-}
-
-.minute-dropdown ::deep .dropdown-menu {
-    font-size: 13px;
-    min-width: 150px;
-    border: 1px solid #E5E7EB;
-    border-radius: 8px;
-    box-shadow: 0 6px 20px rgba(38, 52, 60, 0.12);
-    padding: 6px;
-}
-
-.minute-dropdown ::deep .dropdown-item {
-    border-radius: 5px;
-    padding: 7px 10px;
-    color: #26343C;
-}
-
-.minute-dropdown ::deep .dropdown-item:hover {
-    background: #F1F3F5;
-}
-
-.minute-dropdown ::deep .dropdown-item:active {
-    background: #367B82;
-    color: #fff;
-}
-
-.minute-dropdown ::deep .dropdown-divider {
-    border-color: #ECEFF1;
-    margin: 6px 0;
-}
-
 /* ============ TASKS ============ */
 .minute-tasks {
     border-top: 1px solid #ECEFF1;
@@ -588,7 +353,6 @@
     width: 16px;
     height: 16px;
     accent-color: #23945F;
-    cursor: pointer;
     flex-shrink: 0;
 }
 
@@ -635,37 +399,6 @@
     color: #23945F;
 }
 
-.minute-task-motivo {
-    grid-column: 1 / -1;
-    display: flex;
-    align-items: baseline;
-    gap: 6px;
-    font-size: 12px;
-    color: #707A82;
-    border-top: 1px solid #E7EBEF;
-    margin-top: 4px;
-    padding-top: 6px;
-    padding-left: 25px;
-    min-width: 0;
-}
-
-.minute-task-motivo-label {
-    font-weight: 600;
-    color: #367B82;
-    flex-shrink: 0;
-}
-
-.minute-task.is-completed .minute-task-motivo,
-.minute-task.is-completed .minute-task-motivo-label {
-    color: #9AA5AD;
-}
-
-.minute-task-motivo-content {
-    min-width: 0;
-    line-height: 1.4;
-    overflow-wrap: anywhere;
-}
-
 /* ============ NOTES ============ */
 .minute-notes {
     border-top: 1px solid #ECEFF1;
@@ -704,67 +437,6 @@
     margin: 14px 0 0;
 }
 
-/* ============ CREATE STATE ============ */
-.minute-create-card {
-    background: #fff;
-    border: 1px solid #E5E7EB;
-    border-radius: 10px;
-    padding: 48px 24px;
-    text-align: center;
-}
-
-.minute-create-icon {
-    width: 64px;
-    height: 64px;
-    border-radius: 16px;
-    background: #EDE8F1;
-    color: #367B82;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.8rem;
-    margin: 0 auto;
-}
-
-.minute-create-title {
-    margin: 18px 0 6px;
-    font-size: 18px;
-    font-weight: 700;
-    color: #26343C;
-}
-
-.minute-create-subtitle {
-    margin: 0 0 22px;
-    color: #7A858E;
-    font-size: 14px;
-}
-
-.minute-create-form {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    align-items: center;
-    max-width: 480px;
-    margin: 0 auto;
-    flex-wrap: wrap;
-}
-
-.minute-create-input {
-    flex: 1;
-    min-width: 220px;
-    height: 42px;
-    padding: 0 14px;
-    border: 1px solid #D9DEE3;
-    border-radius: 6px;
-    font-size: 14px;
-    color: #26343C;
-    outline: none;
-}
-
-.minute-create-input:focus {
-    border-color: #367B82;
-}
-
 /* ============ FOOTER ============ */
 .minute-footer {
     text-align: center;
@@ -793,16 +465,6 @@
         align-items: flex-start;
     }
 
-    .minute-header-actions {
-        width: 100%;
-    }
-
-    .minute-btn-primary,
-    .minute-btn-ghost {
-        flex: 1;
-        justify-content: center;
-    }
-
     .minute-summary {
         grid-template-columns: repeat(2, 1fr);
         gap: 10px;
@@ -810,30 +472,6 @@
 
     .minute-summary-card:last-child {
         grid-column: span 2;
-    }
-
-    .minute-toolbar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .minute-search {
-        width: 100%;
-    }
-
-    .minute-filters {
-        display: flex;
-        justify-content: space-between;
-    }
-
-    .minute-filters .minute-select {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .minute-clear {
-        flex: 1;
-        justify-content: center;
     }
 
     .minute-table-header {
@@ -882,16 +520,5 @@
 
     .minute-summary-card:last-child {
         grid-column: span 1;
-    }
-
-    .minute-filters {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .minute-filters .minute-select,
-    .minute-clear {
-        width: 100%;
-        flex: none;
     }
 }

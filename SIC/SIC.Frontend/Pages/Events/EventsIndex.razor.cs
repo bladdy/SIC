@@ -59,7 +59,7 @@ namespace SIC.Frontend.Pages.Events
         //  Cargar todos los usuarios disponibles
         private async Task LoadUsersAsync()
         {
-            var result = await repository.GetAsync<List<User>>("api/Accounts/all?PageSize=100");
+            var result = await repository.GetAsync<List<User>>("api/Accounts/all?PageSize=1000");
             if (result != null)
             {
                 // Excluir Admin y WeddingPlanner

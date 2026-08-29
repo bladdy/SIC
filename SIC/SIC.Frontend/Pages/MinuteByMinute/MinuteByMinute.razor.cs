@@ -1,5 +1,7 @@
 using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+using SIC.Frontend.Helpers;
 using SIC.Frontend.Repositories;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
@@ -11,6 +13,8 @@ public partial class MinuteByMinute
 {
     [Inject] private IRepository repository { get; set; } = default!;
     [Inject] private SweetAlertService sweetAlertService { get; set; } = default!;
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
 
     [Parameter] public string? EventId { get; set; }
 
@@ -19,17 +23,16 @@ public partial class MinuteByMinute
 
     private MinuteByMinuteContainer? MbMContainer;
     private List<MbMActivity> Activities = new();
+
     private List<MbMActivity> FilteredActivities => Activities
         .Where(a =>
             (string.IsNullOrWhiteSpace(FilterText) || a.Title.Contains(FilterText, StringComparison.OrdinalIgnoreCase) || (a.Description != null && a.Description.Contains(FilterText, StringComparison.OrdinalIgnoreCase)))
-            && (FilterStatus == "" || a.Status.ToString() == FilterStatus)
-            && (FilterPriority == "" || a.Priority.ToString() == FilterPriority))
+            && (FilterStatus == "" || a.Status.ToString() == FilterStatus))
         .OrderBy(a => a.StartTime)
         .ToList();
 
     private string FilterText = "";
     private string FilterStatus = "";
-    private string FilterPriority = "";
 
     private int TotalActivities => Activities.Count;
     private int CompletedCount => Activities.Count(a => a.Status == ActivityStatus.Completada);
@@ -55,19 +58,55 @@ public partial class MinuteByMinute
     private object? ConfirmTarget;
 
     private bool IsLoading = true;
-    private bool ShowCreateMbM;
-    private string NewMbMTitle = "";
     private int NumericEventId;
+    private bool isGeneratingPdf;
+    private bool isCopyingUrl;
 
     protected override async Task OnInitializedAsync()
     {
         await LoadMbMAsync();
     }
 
+    private async Task CopiarMinutoUrl()
+    {
+        isCopyingUrl = true;
+        var url = $"{NavigationManager.BaseUri}status-minute-by-minute/{EventId}";
+        await JS.CopyToClipboard(url);
+        await sweetAlertService.FireAsync(
+            new SweetAlertOptions
+            {
+                Title = "Enlace copiado",
+                Text = "Comparte este enlace para mostrar las actividades y tareas del Minuto a Minuto.",
+                Icon = SweetAlertIcon.Success
+            });
+        isCopyingUrl = false;
+    }
+
+    private async Task GeneratePdfAsync()
+    {
+        isGeneratingPdf = true;
+        try
+        {
+            var nombre = string.IsNullOrWhiteSpace(EventName) ? "Minuto a Minuto" : EventName;
+            var content = await repository.GetFileAsync($"api/MinuteByMinute/generatedpdf?eventId={EventId}&evento={Uri.EscapeDataString(nombre)}");
+            if (content != null && content.Length > 0)
+            {
+                await JS.DownloadFileAsync($"minuto-a-minuto-{EventId}.pdf", content, "application/pdf");
+            }
+            else
+            {
+                await sweetAlertService.FireAsync("Error", "No hay actividades para generar el PDF.", SweetAlertIcon.Error);
+            }
+        }
+        finally
+        {
+            isGeneratingPdf = false;
+        }
+    }
+
     private async Task LoadMbMAsync()
     {
         IsLoading = true;
-        ShowCreateMbM = false;
         StateHasChanged();
 
         if (!string.IsNullOrWhiteSpace(EventId))
@@ -92,7 +131,9 @@ public partial class MinuteByMinute
                     EventName = eventResponse.Response.Name;
                 }
 
-                ShowCreateMbM = true;
+                await AutoCreateMbMAsync();
+                await LoadMbMAsync();
+                return;
             }
         }
 
@@ -100,26 +141,13 @@ public partial class MinuteByMinute
         StateHasChanged();
     }
 
-    private async Task CreateMbMAsync()
+    private async Task AutoCreateMbMAsync()
     {
-        if (string.IsNullOrWhiteSpace(NewMbMTitle))
+        var dto = new MinuteByMinuteDTO
         {
-            await sweetAlertService.FireAsync("Error", "El título es obligatorio.", SweetAlertIcon.Error);
-            return;
-        }
-
-        var dto = new MinuteByMinuteDTO { Title = NewMbMTitle.Trim() };
-        var response = await repository.PostAsync<MinuteByMinuteDTO, MinuteByMinuteContainer>($"api/MinuteByMinute/byEventId/{NumericEventId}", dto);
-        if (response.Error)
-        {
-            var message = await response.GetErrorMessageAsync() ?? "Error al crear el Minuto a Minuto.";
-            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
-            return;
-        }
-
-        NewMbMTitle = "";
-        await sweetAlertService.FireAsync("Éxito", "Minuto a Minuto creado correctamente.", SweetAlertIcon.Success);
-        await LoadMbMAsync();
+            Title = string.IsNullOrWhiteSpace(EventName) ? "Minuto a Minuto" : EventName.Trim()
+        };
+        await repository.PostAsync<MinuteByMinuteDTO, MinuteByMinuteContainer>($"api/MinuteByMinute/byEventId/{NumericEventId}", dto);
     }
 
     private void OpenCreateActivityModal()
@@ -136,10 +164,11 @@ public partial class MinuteByMinute
             Id = activity.Id,
             Title = activity.Title,
             Description = activity.Description,
+            Responsible = activity.Responsible,
+            ResponsibleRole = activity.ResponsibleRole,
+            ResponsiblePhone = activity.ResponsiblePhone,
             StartTime = activity.StartTime,
-            EndTime = activity.EndTime,
             Status = activity.Status,
-            Priority = activity.Priority,
             Location = activity.Location,
             Notes = activity.Notes
         };
@@ -159,10 +188,11 @@ public partial class MinuteByMinute
             {
                 Title = EditingActivity.Title,
                 Description = EditingActivity.Description,
+                Responsible = EditingActivity.Responsible,
+                ResponsibleRole = EditingActivity.ResponsibleRole,
+                ResponsiblePhone = EditingActivity.ResponsiblePhone,
                 StartTime = EditingActivity.StartTime,
-                EndTime = EditingActivity.EndTime,
                 Status = EditingActivity.Status,
-                Priority = EditingActivity.Priority,
                 Location = EditingActivity.Location,
                 Notes = EditingActivity.Notes
             };
@@ -180,10 +210,11 @@ public partial class MinuteByMinute
             {
                 Title = EditingActivity.Title,
                 Description = EditingActivity.Description,
+                Responsible = EditingActivity.Responsible,
+                ResponsibleRole = EditingActivity.ResponsibleRole,
+                ResponsiblePhone = EditingActivity.ResponsiblePhone,
                 StartTime = EditingActivity.StartTime,
-                EndTime = EditingActivity.EndTime,
                 Status = EditingActivity.Status,
-                Priority = EditingActivity.Priority,
                 Location = EditingActivity.Location,
                 Notes = EditingActivity.Notes
             };
@@ -325,7 +356,7 @@ public partial class MinuteByMinute
     {
         TaskTargetActivity = activity;
         EditingTask = task != null
-            ? new MbMTask { Id = task.Id, Title = task.Title, IsCompleted = task.IsCompleted, AssignedTo = task.AssignedTo, DueDate = task.DueDate, Priority = task.Priority }
+            ? new MbMTask { Id = task.Id, Title = task.Title, IsCompleted = task.IsCompleted, AssignedTo = task.AssignedTo, ResponsiblePhone = task.ResponsiblePhone, Motivo = task.Motivo }
             : new MbMTask();
         IsTaskModalVisible = true;
     }
@@ -343,8 +374,8 @@ public partial class MinuteByMinute
                 Title = EditingTask.Title,
                 IsCompleted = EditingTask.IsCompleted,
                 AssignedTo = EditingTask.AssignedTo,
-                DueDate = EditingTask.DueDate,
-                Priority = EditingTask.Priority
+                ResponsiblePhone = EditingTask.ResponsiblePhone,
+                Motivo = EditingTask.Motivo
             };
             var response = await repository.PutAsync($"api/MbMTasks/{EditingTask.Id}", dto);
             if (response.Error)
@@ -361,8 +392,8 @@ public partial class MinuteByMinute
                 Title = EditingTask.Title,
                 IsCompleted = EditingTask.IsCompleted,
                 AssignedTo = EditingTask.AssignedTo,
-                DueDate = EditingTask.DueDate,
-                Priority = EditingTask.Priority
+                ResponsiblePhone = EditingTask.ResponsiblePhone,
+                Motivo = EditingTask.Motivo
             };
             var response = await repository.PostAsync<MbMTaskDTO, MbMTask>($"api/MbMTasks/ByActivityId/{TaskTargetActivity.Id}", dto);
             if (response.Error)
@@ -431,27 +462,41 @@ public partial class MinuteByMinute
         _ => "#6c757d"
     };
 
-    private string GetPriorityColor(ActivityPriority priority) => priority switch
-    {
-        ActivityPriority.Alta => "danger",
-        ActivityPriority.Media => "warning",
-        ActivityPriority.Baja => "info",
-        _ => "secondary"
-    };
-
     private void ClearFilters()
     {
         FilterText = "";
         FilterStatus = "";
-        FilterPriority = "";
+    }
+
+    private static string GetResponsibleName(MbMActivity activity)
+    {
+        if (string.IsNullOrWhiteSpace(activity.Responsible)) return "Sin asignar";
+        var open = activity.Responsible.IndexOf('(');
+        return open >= 0 ? activity.Responsible.Substring(0, open).Trim() : activity.Responsible.Trim();
+    }
+
+    private static string GetResponsibleRole(MbMActivity activity)
+    {
+        if (!string.IsNullOrWhiteSpace(activity.ResponsibleRole)) return activity.ResponsibleRole.Trim();
+        if (string.IsNullOrWhiteSpace(activity.Responsible)) return "";
+        var open = activity.Responsible.IndexOf('(');
+        var close = activity.Responsible.LastIndexOf(')');
+        if (open < 0 || close < 0 || close <= open) return "";
+        return activity.Responsible.Substring(open + 1, close - open - 1).Trim();
     }
 
     private void HandleAddTask(MbMActivity activity) => OpenTaskModal(activity);
+
     private void HandleEditTask((MbMActivity Activity, MbMTask Task) args) => OpenTaskModal(args.Activity, args.Task);
+
     private void HandleDeleteTask((MbMActivity Activity, MbMTask Task) args) => ConfirmDeleteTask(args.Activity, args.Task);
+
     private void HandleToggleTask((MbMActivity Activity, MbMTask Task) args) => ToggleTask(args.Activity, args.Task);
+
     private void HandleAddProvider(MbMActivity activity) => OpenProviderModal(activity);
+
     private void HandleEditProvider((MbMActivity Activity, MbMProvider Provider) args) => OpenProviderModal(args.Activity, args.Provider);
+
     private void HandleDeleteProvider((MbMActivity Activity, MbMProvider Provider) args) => ConfirmDeleteProvider(args.Activity, args.Provider);
 }
 

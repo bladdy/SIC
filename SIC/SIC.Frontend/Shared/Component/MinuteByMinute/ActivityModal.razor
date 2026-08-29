@@ -17,39 +17,44 @@
                         <label class="form-label fw-semibold">Titulo *</label>
                         <input class="form-control" @bind="Model.Title" placeholder="Ej. Ceremonia principal" />
                     </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label class="form-label fw-semibold">Responsable</label>
+                            <input class="form-control" @bind="Model.Responsible" placeholder="Ej. Carlos" />
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-semibold">Tipo / Cargo</label>
+                            <input class="form-control" @bind="Model.ResponsibleRole" placeholder="Ej. Coordinador" />
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Número de Responsable</label>
+                        <input class="form-control" @bind="Model.ResponsiblePhone" placeholder="Ej. 866 123 4567" />
+                    </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Descripcion</label>
                         <textarea class="form-control" rows="2" @bind="Model.Description" placeholder="Descripcion de la actividad..."></textarea>
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-6">
-                            <label class="form-label fw-semibold">Hora Inicio *</label>
-                            <input type="datetime-local" class="form-control" @bind="Model.StartTime" />
+                            <label class="form-label fw-semibold">Fecha *</label>
+                            <input type="date" class="form-control" value="@Fecha"
+                                   @onchange="(ChangeEventArgs e) => Fecha = e.Value?.ToString()" />
                         </div>
                         <div class="col-6">
-                            <label class="form-label fw-semibold">Hora Fin</label>
-                            <input type="datetime-local" class="form-control" @bind="Model.EndTime" />
+                            <label class="form-label fw-semibold">Hora *</label>
+                            <input type="time" class="form-control" value="@Hora"
+                                   @onchange="(ChangeEventArgs e) => Hora = e.Value?.ToString()" />
                         </div>
                     </div>
-                    <div class="row g-3 mb-3">
-                        <div class="col-6">
-                            <label class="form-label fw-semibold">Estado</label>
-                            <select class="form-select" @bind="Model.Status">
-                                @foreach (var s in Enum.GetValues<ActivityStatus>())
-                                {
-                                    <option value="@s">@s</option>
-                                }
-                            </select>
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label fw-semibold">Prioridad</label>
-                            <select class="form-select" @bind="Model.Priority">
-                                @foreach (var p in Enum.GetValues<ActivityPriority>())
-                                {
-                                    <option value="@p">@p</option>
-                                }
-                            </select>
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Estado</label>
+                        <select class="form-select" @bind="Model.Status">
+                            @foreach (var s in Enum.GetValues<ActivityStatus>())
+                            {
+                                <option value="@s">@s</option>
+                            }
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Ubicacion</label>
@@ -77,6 +82,30 @@
     [Parameter] public bool IsEdit { get; set; }
     [Parameter] public MbMActivity Model { get; set; } = default!;
     [Parameter] public EventCallback OnSave { get; set; }
+
+    private string Fecha
+    {
+        get => Model.StartTime == default ? "" : Model.StartTime.ToString("yyyy-MM-dd");
+        set
+        {
+            if (DateTime.TryParse(value, out var date))
+            {
+                Model.StartTime = date.Date.Add(Model.StartTime.TimeOfDay);
+            }
+        }
+    }
+
+    private string Hora
+    {
+        get => Model.StartTime == default ? "" : Model.StartTime.ToString("HH:mm");
+        set
+        {
+            if (TimeSpan.TryParse(value, out var time))
+            {
+                Model.StartTime = Model.StartTime.Date.Add(time);
+            }
+        }
+    }
 
     private async Task OnClose()
     {

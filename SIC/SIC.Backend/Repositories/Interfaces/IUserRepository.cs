@@ -28,5 +28,7 @@ namespace SIC.Backend.Repositories.Interfaces
         Task<ActionResponse<IEnumerable<User>>> GetAsync(PaginationDTO pagination);
 
         Task<ActionResponse<int>> GetTotalPagesAsync(PaginationDTO pagination);
+
+        Task<ActionResponse<User>> ChangePasswordAsync(string userId, string currentPassword, string newPassword);
     }
 }

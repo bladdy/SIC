@@ -51,10 +51,11 @@ public class MbMActivitiesController : GenericController<MbMActivity>
         var activity = response.Result;
         activity.Title = dto.Title;
         activity.Description = dto.Description;
+        activity.Responsible = dto.Responsible;
+        activity.ResponsibleRole = dto.ResponsibleRole;
+        activity.ResponsiblePhone = dto.ResponsiblePhone;
         activity.StartTime = dto.StartTime;
-        activity.EndTime = dto.EndTime;
         activity.Status = dto.Status;
-        activity.Priority = dto.Priority;
         activity.Location = dto.Location;
         activity.Notes = dto.Notes;
 
@@ -75,10 +76,11 @@ public class MbMActivitiesController : GenericController<MbMActivity>
         {
             Title = dto.Title,
             Description = dto.Description,
+            Responsible = dto.Responsible,
+            ResponsibleRole = dto.ResponsibleRole,
+            ResponsiblePhone = dto.ResponsiblePhone,
             StartTime = dto.StartTime,
-            EndTime = dto.EndTime,
             Status = dto.Status,
-            Priority = dto.Priority,
             Location = dto.Location,
             Notes = dto.Notes,
             MinuteByMinuteId = minuteByMinuteId

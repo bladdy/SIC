@@ -76,6 +76,7 @@ public class Repository : IRepository
 
     public async Task<HttpResponseWrapper<object>> PostAsync<T>(string url, T model)
     {
+        await AddAuthorizationHeaderAsync();
         var messageJson = JsonSerializer.Serialize(model);
         var messageContent = new StringContent(messageJson, Encoding.UTF8, "application/json");
         var responseHttp = await _httpClient.PostAsync(url, messageContent);
@@ -84,6 +85,7 @@ public class Repository : IRepository
 
     public async Task<HttpResponseWrapper<TActionResponse>> PostAsync<T, TActionResponse>(string url, T model)
     {
+        await AddAuthorizationHeaderAsync();
         var messageJson = JsonSerializer.Serialize(model);
         var messageContent = new StringContent(messageJson, Encoding.UTF8, "application/json");
         var responseHttp = await _httpClient.PostAsync(url, messageContent);
@@ -97,12 +99,14 @@ public class Repository : IRepository
 
     public async Task<HttpResponseWrapper<object>> DeleteAsync<T>(string url)
     {
+        await AddAuthorizationHeaderAsync();
         var responseHttp = await _httpClient.DeleteAsync(url);
         return new HttpResponseWrapper<object>(null, !responseHttp.IsSuccessStatusCode, responseHttp); ;
     }
 
     public async Task<HttpResponseWrapper<object>> PutAsync<T>(string url, T model)
     {
+        await AddAuthorizationHeaderAsync();
         var messageJson = JsonSerializer.Serialize(model);
         var messageContent = new StringContent(messageJson, Encoding.UTF8, "application/json");
         var responseHttp = await _httpClient.PutAsync(url, messageContent);
@@ -111,6 +115,7 @@ public class Repository : IRepository
 
     public async Task<HttpResponseWrapper<TActionResponse>> PutAsync<T, TActionResponse>(string url, T model)
     {
+        await AddAuthorizationHeaderAsync();
         var messageJson = JsonSerializer.Serialize(model);
         var messageContent = new StringContent(messageJson, Encoding.UTF8, "application/json");
         var responseHttp = await _httpClient.PutAsync(url, messageContent);
@@ -141,6 +146,7 @@ public class Repository : IRepository
     public async Task<HttpResponseWrapper<TActionResponse>> UploadFileAsync<T, TActionResponse>(
      string url, Stream fileStream, string fileName)
     {
+        await AddAuthorizationHeaderAsync();
         using var content = new MultipartFormDataContent();
         var fileContent = new StreamContent(fileStream);
         fileContent.Headers.ContentType =
@@ -161,6 +167,7 @@ public class Repository : IRepository
 
     public async Task<HttpResponseWrapper<object>> PostAsync<T>(string url)
     {
+        await AddAuthorizationHeaderAsync();
         var responseHttp = await _httpClient.PostAsync(url, null);
         var response = await UnserializeAnswerAsync<object>(responseHttp);
         return new HttpResponseWrapper<object>(response, !responseHttp.IsSuccessStatusCode, responseHttp); ;
@@ -170,6 +177,7 @@ public class Repository : IRepository
     string url,
     MultipartFormDataContent content)
     {
+        await AddAuthorizationHeaderAsync();
         var response = await _httpClient.PostAsync(url, content);
 
         if (response.IsSuccessStatusCode)

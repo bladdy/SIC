@@ -16,17 +16,23 @@ public class MbMActivity
     [MaxLength(1000, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres.")]
     public string? Description { get; set; }
 
-    [Display(Name = "Hora de Inicio")]
-    public DateTime StartTime { get; set; }
+    [Display(Name = "Responsable")]
+    [MaxLength(200, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres.")]
+    public string? Responsible { get; set; }
 
-    [Display(Name = "Hora de Fin")]
-    public DateTime? EndTime { get; set; }
+    [Display(Name = "Tipo / Cargo")]
+    [MaxLength(200, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres.")]
+    public string? ResponsibleRole { get; set; }
+
+    [Display(Name = "Número de Responsable")]
+    [MaxLength(30, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres.")]
+    public string? ResponsiblePhone { get; set; }
+
+    [Display(Name = "Fecha y Hora")]
+    public DateTime StartTime { get; set; }
 
     [Display(Name = "Estado")]
     public ActivityStatus Status { get; set; } = ActivityStatus.Pendiente;
-
-    [Display(Name = "Prioridad")]
-    public ActivityPriority Priority { get; set; } = ActivityPriority.Media;
 
     [Display(Name = "Ubicación")]
     [MaxLength(200, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres.")]

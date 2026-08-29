@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
+using SIC.Shared.Response;
 
 namespace SIC.Backend.UnitOfWork.Interfaces
 {
@@ -23,5 +24,7 @@ namespace SIC.Backend.UnitOfWork.Interfaces
         Task<SignInResult> LogInAsync(LoginDTO model);
 
         Task LogOutAsync();
+
+        Task<ActionResponse<User>> ChangePasswordAsync(string userId, string currentPassword, string newPassword);
     }
 }

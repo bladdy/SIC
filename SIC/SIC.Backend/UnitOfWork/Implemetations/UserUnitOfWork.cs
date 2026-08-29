@@ -4,6 +4,7 @@ using SIC.Backend.Repositories.Interfaces;
 using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
+using SIC.Shared.Response;
 
 namespace SIC.Backend.UnitOfWork.Implemetations
 {
@@ -33,5 +34,7 @@ namespace SIC.Backend.UnitOfWork.Implemetations
         public async Task<SignInResult> LogInAsync(LoginDTO model) => await _userRepository.LogInAsync(model);
 
         public async Task LogOutAsync() => await _userRepository.LogOutAsync();
+
+        public async Task<ActionResponse<User>> ChangePasswordAsync(string userId, string currentPassword, string newPassword) => await _userRepository.ChangePasswordAsync(userId, currentPassword, newPassword);
     }
 }

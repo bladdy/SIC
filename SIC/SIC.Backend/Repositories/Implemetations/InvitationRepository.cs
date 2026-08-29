@@ -347,23 +347,99 @@ namespace SIC.Backend.Repositories.Implemetations
 
         public async Task<ActionResponse<bool>> DeleteByIdAsync(int id)
         {
-            var invitation = await _context.Invitations.FindAsync(id);
-            if (invitation == null)
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
             {
+                var invitation = await _context.Invitations
+                    .Include(i => i.InvitationEntry)
+                    .Include(i => i.Guests)
+                    .Include(i => i.HistoryMessages)
+                    .Include(i => i.TemplateSents)
+                    .FirstOrDefaultAsync(i => i.Id == id);
+
+                if (invitation == null)
+                {
+                    return new ActionResponse<bool>
+                    {
+                        Success = false,
+                        Message = "La invitación no existe."
+                    };
+                }
+
+                // =========================================================
+                // 1. Quitar relación con TablesEvents
+                // =========================================================
+
+                invitation.TablesEventsId = null;
+                invitation.TablesEvents = null;
+
+                await _context.SaveChangesAsync();
+
+                // =========================================================
+                // 2. Eliminar InvitationEntry
+                // =========================================================
+
+                if (invitation.InvitationEntry != null)
+                {
+                    _context.InvitationEntries.Remove(invitation.InvitationEntry);
+                }
+
+                // =========================================================
+                // 3. Eliminar InvitationGuests
+                // =========================================================
+
+                if (invitation.Guests.Any())
+                {
+                    _context.InvitationGuest.RemoveRange(invitation.Guests);
+                }
+
+                // =========================================================
+                // 4. Eliminar HistoryMessages
+                // =========================================================
+
+                if (invitation.HistoryMessages.Any())
+                {
+                    _context.HistoryMessages.RemoveRange(invitation.HistoryMessages);
+                }
+
+                // =========================================================
+                // 5. Eliminar TemplateSents
+                // =========================================================
+
+                if (invitation.TemplateSents.Any())
+                {
+                    _context.TemplateSents.RemoveRange(invitation.TemplateSents);
+                }
+
+                await _context.SaveChangesAsync();
+
+                // =========================================================
+                // 6. Finalmente eliminar Invitation
+                // =========================================================
+
+                _context.Invitations.Remove(invitation);
+
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+
+                return new ActionResponse<bool>
+                {
+                    Success = true,
+                    Result = true
+                };
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+
                 return new ActionResponse<bool>
                 {
                     Success = false,
-                    Message = "La invitacion no existe."
+                    Message = $"Error al eliminar la invitación: {ex.Message}"
                 };
             }
-            _context.Remove(invitation);
-            await _context.SaveChangesAsync(); // Ensure changes are saved to the database
-
-            return new ActionResponse<bool>
-            {
-                Success = true,
-                Result = true
-            };
         }
 
         public async Task<ActionResponse<ResponseInvitationDTO>> UpdateForConfirmationListFullAsync(ResponseInvitationDTO invitation)

@@ -718,5 +718,275 @@ namespace SIC.Backend.Services
 
             return ms.ToArray();
         }
+
+        public byte[] GenerarMinutoAMinutoPdf(string titulo, string evento,string tipoEvento, List<MbMActivity> activities)
+        {
+            using var ms = new MemoryStream();
+
+            var document = new Document(PageSize.A4, 40, 40, 40, 40);
+            PdfWriter.GetInstance(document, ms);
+            document.Open();
+
+            // ==============================
+            // 🎨 COLORES (acordes al diseño del MinuteByMinute)
+            // ==============================
+            var acento = new BaseColor(54, 123, 130);          // #367B82
+            var borderColor = new BaseColor(229, 231, 235);   // #E5E7EB
+            var badgeBg = new BaseColor(241, 237, 243);       // #F1EDF3
+            var notesBg = new BaseColor(255, 253, 248);       // #FFFDF8
+            var taskBg = new BaseColor(251, 252, 253);        // #FBFCFD
+
+            // ==============================
+            // 🔠 FUENTES
+            // ==============================
+            var fontTitle = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16);
+            var fontSubtitle = FontFactory.GetFont(FontFactory.HELVETICA, 10, BaseColor.Gray);
+            var fontColumnHeader = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10, BaseColor.White);
+            var fontActivityTitle = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12, acento);
+            var fontDateTime = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 11);
+            var fontActivityMeta = FontFactory.GetFont(FontFactory.HELVETICA, 9, BaseColor.Gray);
+            var fontTask = FontFactory.GetFont(FontFactory.HELVETICA, 9.5f);
+            var fontFooter = FontFactory.GetFont(FontFactory.HELVETICA_OBLIQUE, 9, BaseColor.Gray);
+
+            // ==============================
+            // 📝 TÍTULO
+            // ==============================
+            var titleText = string.IsNullOrWhiteSpace(evento) ? titulo : $"{titulo}: {evento}";
+
+            var title = new Paragraph(titleText, fontTitle)
+            {
+                Alignment = Element.ALIGN_CENTER,
+                SpacingAfter = 4
+            };
+            document.Add(title);
+
+            document.Add(new Paragraph(tipoEvento, fontSubtitle)
+            {
+                Alignment = Element.ALIGN_CENTER,
+                SpacingAfter = 14
+            });
+
+            activities = activities
+                .OrderBy(a => a.StartTime)
+                .ToList();
+
+            if (activities.Count == 0)
+            {
+                document.Add(new Paragraph("No hay actividades registradas.", fontTask)
+                {
+                    Alignment = Element.ALIGN_CENTER,
+                    SpacingAfter = 12
+                });
+            }
+
+            // ==============================
+            // 🗂️ TABLA DE COLUMNAS
+            // ==============================
+            var table = new PdfPTable(4)
+            {
+                WidthPercentage = 100,
+                SpacingAfter = 10
+            };
+            table.SetWidths(new float[] { 36f, 26f, 18f, 20f });
+
+            (Font font, BaseColor background) EstadoPill(string estado)
+            {
+                return estado switch
+                {
+                    "Completada" => (FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 9, new BaseColor(35, 148, 95)), new BaseColor(232, 245, 238)),
+                    "EnProgreso" => (FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 9, new BaseColor(185, 119, 14)), new BaseColor(255, 244, 224)),
+                    "Cancelada" => (FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 9, new BaseColor(192, 57, 43)), new BaseColor(253, 235, 233)),
+                    _ => (FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 9, new BaseColor(101, 114, 123)), new BaseColor(236, 238, 240))
+                };
+            }
+
+            void AddColumnHeader(string text)
+            {
+                table.AddCell(new PdfPCell(new Phrase(text, fontColumnHeader))
+                {
+                    BackgroundColor = acento,
+                    BorderColor = borderColor,
+                    Padding = 6
+                });
+            }
+
+            AddColumnHeader("Actividad / Tarea");
+            AddColumnHeader("Proveedor / Responsable");
+            AddColumnHeader("Teléfono");
+            AddColumnHeader("Estado");
+
+            foreach (var activity in activities)
+            {
+                // ----- Celda Actividad / Tarea -----
+                var actCell = new PdfPCell
+                {
+                    BorderColor = borderColor,
+                    Padding = 6
+                };
+
+                var badgeFecha = new Chunk($" {activity.StartTime:dd MMM} ", fontDateTime);
+                badgeFecha.SetBackground(badgeBg);
+                var badgeHora = new Chunk($" {activity.StartTime:hh:mm tt} ", fontDateTime);
+                badgeHora.SetBackground(badgeBg);
+                var lineaMeta = new Paragraph();
+                lineaMeta.Add(badgeFecha);
+                lineaMeta.Add(badgeHora);
+                actCell.AddElement(lineaMeta);
+
+                actCell.AddElement(new Paragraph(activity.Title.ToUpper(), fontActivityTitle));
+
+                if (!string.IsNullOrWhiteSpace(activity.Location))
+                {
+                    actCell.AddElement(new Paragraph(activity.Location, fontActivityMeta));
+                }
+
+                if (!string.IsNullOrWhiteSpace(activity.Description))
+                {
+                    actCell.AddElement(new Paragraph(activity.Description, fontActivityMeta));
+                }
+
+                table.AddCell(actCell);
+
+                // ----- Celda Proveedor / Responsable -----
+                var provCell = new PdfPCell
+                {
+                    BorderColor = borderColor,
+                    Padding = 6
+                };
+                if (!string.IsNullOrWhiteSpace(activity.Responsible) || !string.IsNullOrWhiteSpace(activity.ResponsibleRole))
+                {
+                    if (!string.IsNullOrWhiteSpace(activity.Responsible))
+                    {
+                        provCell.AddElement(new Paragraph(activity.Responsible.Trim(), fontTask));
+                    }
+                    if (!string.IsNullOrWhiteSpace(activity.ResponsibleRole))
+                    {
+                        provCell.AddElement(new Paragraph($"({activity.ResponsibleRole.Trim()})", fontActivityMeta));
+                    }
+                }
+                else
+                {
+                    provCell.AddElement(new Paragraph("Sin asignar", fontTask));
+                }
+                table.AddCell(provCell);
+
+                // ----- Celda Teléfono -----
+                var phoneCell = new PdfPCell
+                {
+                    BorderColor = borderColor,
+                    Padding = 6
+                };
+                phoneCell.AddElement(new Paragraph(string.IsNullOrWhiteSpace(activity.ResponsiblePhone) ? "—" : activity.ResponsiblePhone, fontTask));
+                table.AddCell(phoneCell);
+
+                // ----- Celda Estado (píldora con color) -----
+                var estadoActividad = activity.Status.ToString();
+                var pillActividad = EstadoPill(estadoActividad);
+                var statusChunkActividad = new Chunk($" {estadoActividad} ", pillActividad.font);
+                statusChunkActividad.SetBackground(pillActividad.background);
+                var statusCell = new PdfPCell
+                {
+                    BorderColor = borderColor,
+                    Padding = 6
+                };
+                statusCell.AddElement(new Paragraph(statusChunkActividad));
+                table.AddCell(statusCell);
+
+                // ----- Notas (justo debajo de la actividad, antes de las tareas) -----
+                if (!string.IsNullOrWhiteSpace(activity.Notes))
+                {
+                    var notesCell = new PdfPCell
+                    {
+                        BorderColor = borderColor,
+                        Colspan = 4,
+                        Padding = 6,
+                        BackgroundColor = notesBg
+                    };
+                    var notesPhrase = new Phrase();
+                    notesPhrase.Add(new Chunk("Notas: ", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 9, new BaseColor(38, 52, 60))));
+                    notesPhrase.Add(new Chunk(activity.Notes, FontFactory.GetFont(FontFactory.HELVETICA, 9, BaseColor.Gray)));
+                    notesCell.AddElement(new Paragraph(notesPhrase));
+                    table.AddCell(notesCell);
+                }
+
+                // ----- Tareas (cada tarea en su propia fila + motivo a ancho completo) -----
+                if (activity.Tasks != null)
+                {
+                    foreach (var task in activity.Tasks.OrderBy(t => t.Title))
+                    {
+                        // Col Actividad / Tarea
+                        table.AddCell(new PdfPCell(new Phrase($" - {task.Title}", fontTask))
+                        {
+                            BorderColor = borderColor,
+                            BackgroundColor = taskBg,
+                            Padding = 6
+                        });
+
+                        // Col Proveedor / Responsable
+                        var assigned = string.IsNullOrWhiteSpace(task.AssignedTo) ? "—" : task.AssignedTo.Trim();
+                        table.AddCell(new PdfPCell(new Phrase(assigned, fontTask))
+                        {
+                            BorderColor = borderColor,
+                            BackgroundColor = taskBg,
+                            Padding = 6
+                        });
+
+                        // Col Teléfono
+                        var taskPhone = string.IsNullOrWhiteSpace(task.ResponsiblePhone) ? "—" : task.ResponsiblePhone;
+                        table.AddCell(new PdfPCell(new Phrase(taskPhone, fontTask))
+                        {
+                            BorderColor = borderColor,
+                            BackgroundColor = taskBg,
+                            Padding = 6
+                        });
+
+                        // Col Estado (píldora con color)
+                        var taskStatus = task.IsCompleted ? "Completada" : "Pendiente";
+                        var pillTask = EstadoPill(taskStatus);
+                        var statusChunkTask = new Chunk($" {taskStatus} ", pillTask.font);
+                        statusChunkTask.SetBackground(pillTask.background);
+                        table.AddCell(new PdfPCell(new Phrase(statusChunkTask))
+                        {
+                            BorderColor = borderColor,
+                            BackgroundColor = taskBg,
+                            Padding = 6
+                        });
+
+                        // ----- Motivo (fila completa debajo de la tarea) -----
+                        if (!string.IsNullOrWhiteSpace(task.Motivo))
+                        {
+                            var motivoCell = new PdfPCell
+                            {
+                                BorderColor = borderColor,
+                                Colspan = 4,
+                                Padding = 6,
+                                PaddingLeft = 32,
+                                BackgroundColor = taskBg
+                            };
+                            var motivoPhrase = new Phrase();
+                            motivoPhrase.Add(new Chunk("Notas: ", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 9.5f, new BaseColor(38, 52, 60))));
+                            motivoPhrase.Add(new Chunk(task.Motivo, fontTask));
+                            motivoCell.AddElement(new Paragraph(motivoPhrase));
+                            table.AddCell(motivoCell);
+                        }
+                    }
+                }
+            }
+
+            document.Add(table);
+
+            // ==============================
+            // 🦶 FOOTER
+            // ==============================
+            document.Add(new Paragraph("Gracias por permitirnos ser parte de este día tan especial", fontFooter)
+            {
+                Alignment = Element.ALIGN_CENTER,
+                SpacingBefore = 18
+            });
+
+            document.Close();
+
+            return ms.ToArray();
+        }
     }
 }

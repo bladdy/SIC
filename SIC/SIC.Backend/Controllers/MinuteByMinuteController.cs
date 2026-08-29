@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using SIC.Backend.Services;
 using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
@@ -10,13 +11,45 @@ namespace SIC.Backend.Controllers;
 public class MinuteByMinuteController : GenericController<MinuteByMinute>
 {
     private readonly IMinuteByMinuteUnitOfWork _minuteByMinuteUnitOfWork;
+    private readonly BoletaService _boletaService;
 
     public MinuteByMinuteController(
         IGenericUnitOfWork<MinuteByMinute> unitOfWork,
-        IMinuteByMinuteUnitOfWork minuteByMinuteUnitOfWork)
+        IMinuteByMinuteUnitOfWork minuteByMinuteUnitOfWork,
+        BoletaService boletaService)
         : base(unitOfWork)
     {
         _minuteByMinuteUnitOfWork = minuteByMinuteUnitOfWork;
+        _boletaService = boletaService;
+    }
+
+    [HttpGet("generatedpdf")]
+    public async Task<IActionResult> GetMinutoAMinutoPdf(string eventId, string evento)
+    {
+        try
+        {
+            var response = await _minuteByMinuteUnitOfWork.GetByEventCodeAsync(eventId);
+            var minuteByMinute = response.Result;
+
+            if (minuteByMinute == null || minuteByMinute.Activities == null || !minuteByMinute.Activities.Any())
+                return NotFound("No hay actividades para generar el PDF.");
+
+            var titulo = "Minuto a Minuto";
+            var nombre = string.IsNullOrWhiteSpace(evento) ? minuteByMinute.Event?.Name : evento;
+            var tipoEvento = minuteByMinute.Event?.EventType?.Name;
+
+            var pdfBytes = _boletaService.GenerarMinutoAMinutoPdf(titulo, nombre ?? "", tipoEvento, minuteByMinute.Activities.ToList());
+
+            return File(
+                pdfBytes,
+                "application/pdf",
+                $"minuto-a-minuto-{eventId}.pdf"
+            );
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpGet("byEventId/{eventId}")]

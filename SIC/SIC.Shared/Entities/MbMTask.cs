@@ -1,4 +1,3 @@
-using SIC.Shared.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace SIC.Shared.Entities;
@@ -15,15 +14,17 @@ public class MbMTask
     [Display(Name = "Completada")]
     public bool IsCompleted { get; set; } = false;
 
-    [Display(Name = "Asignado a")]
+    [Display(Name = "Proveedor/Responsable")]
     [MaxLength(200, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres.")]
     public string? AssignedTo { get; set; }
 
-    [Display(Name = "Fecha Límite")]
-    public DateTime? DueDate { get; set; }
+    [Display(Name = "Teléfono")]
+    [MaxLength(30, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres.")]
+    public string? ResponsiblePhone { get; set; }
 
-    [Display(Name = "Prioridad")]
-    public ActivityPriority Priority { get; set; } = ActivityPriority.Media;
+    [Display(Name = "Movito")]
+    [MaxLength(100, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres.")]
+    public string? Motivo { get; set; }
 
     public int MbMActivityId { get; set; }
     public MbMActivity? MbMActivity { get; set; }

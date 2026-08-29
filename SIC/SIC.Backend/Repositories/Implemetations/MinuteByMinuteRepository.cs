@@ -45,6 +45,7 @@ public class MinuteByMinuteRepository : GenericRepository<MinuteByMinute>, IMinu
     {
         var minuteByMinute = await _context.MinuteByMinutes
             .Include(e => e.Event)
+                .ThenInclude(et => et!.EventType)
             .Include(e => e.Activities)
                 .ThenInclude(a => a.Providers)
             .Include(e => e.Activities)

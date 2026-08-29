@@ -1,0 +1,213 @@
+@page "/status-minute-by-minute/{Code}"
+@layout LoginLayout
+
+@using SIC.Shared.Enums
+
+<PageTitle>Minuto a Minuto</PageTitle>
+
+@if (Container is null)
+{
+    <div class="d-flex justify-content-center align-items-center" style="min-height: 60vh;">
+        <div class="text-center">
+            <div class="spinner-border text-custom mb-3" role="status" style="width: 3rem; height: 3rem;">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <div class="text-muted">Cargando Minuto a Minuto...</div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="minute-by-minute">
+
+        <!-- HEADER -->
+        <div class="minute-header">
+            <div class="minute-header-main">
+                <div class="minute-header-icon">
+                    <i class="bi bi-stopwatch"></i>
+                </div>
+                <div>
+                    <h1 class="minute-header-title">Minuto a Minuto</h1>
+                    <span class="minute-header-event">@EventName</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESUMEN -->
+        <div class="minute-summary">
+            <div class="minute-summary-card">
+                <div class="minute-summary-icon">
+                    <i class="bi bi-list-task"></i>
+                </div>
+                <div>
+                    <div class="minute-summary-value">@TotalActivities</div>
+                    <div class="minute-summary-label">Total de Actividades</div>
+                </div>
+            </div>
+            <div class="minute-summary-card">
+                <div class="minute-summary-icon minute-summary-icon-green">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <div>
+                    <div class="minute-summary-value">@CompletedCount</div>
+                    <div class="minute-summary-label">Completadas</div>
+                </div>
+            </div>
+            <div class="minute-summary-card">
+                <div class="minute-summary-icon minute-summary-icon-gray">
+                    <i class="bi bi-clock"></i>
+                </div>
+                <div>
+                    <div class="minute-summary-value">@PendingCount</div>
+                    <div class="minute-summary-label">Pendientes</div>
+                </div>
+            </div>
+        </div>
+
+        @if (Activities.Any())
+        {
+            <!-- CABECERA DE COLUMNAS -->
+            <div class="minute-table-header">
+                <span class="minute-col minute-col-activity">Actividad / Tarea</span>
+                <span class="minute-col minute-col-provider">Proveedor / Responsable</span>
+                <span class="minute-col minute-col-phone">Teléfono</span>
+                <span class="minute-col minute-col-status">Estado</span>
+            </div>
+
+            <!-- ACTIVIDADES -->
+            <div class="minute-list">
+                @foreach (var activity in Activities)
+                {
+                    <div class="minute-activity">
+
+                        <!-- CABECERA DE ACTIVIDAD -->
+                        <div class="minute-activity-header">
+                            <div class="minute-col minute-col-activity">
+                                <div class="minute-activity-row">
+                                    <span class="minute-activity-time">
+                                        <i class="bi bi-calendar"></i>@activity.StartTime.ToString("dd MMM")
+                                    </span>
+                                    <span class="minute-activity-title">@activity.Title</span>
+                                </div>
+                                <div class="minute-activity-row minute-activity-secondary">
+                                    <span class="minute-activity-time">
+                                        <i class="bi bi-clock"></i>
+                                        @activity.StartTime.ToString("HH:mm")
+                                    </span>
+                                    @if (!string.IsNullOrWhiteSpace(activity.Location))
+                                    {
+                                        <span class="minute-activity-location">
+                                            <i class="bi bi-geo-alt"></i>@activity.Location
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+                            <div class="minute-col minute-col-provider">
+                                <div class="minute-activity-provider">
+                                    @if (!string.IsNullOrWhiteSpace(activity.Responsible) || !string.IsNullOrWhiteSpace(activity.ResponsibleRole))
+                                    {
+                                        @if (!string.IsNullOrWhiteSpace(activity.Responsible))
+                                        {
+                                            <div class="minute-activity-provider-item">
+                                                <i class="bi bi-person"></i>@GetResponsibleName(activity)
+                                            </div>
+                                        }
+                                        @if (!string.IsNullOrWhiteSpace(GetResponsibleRole(activity)))
+                                        {
+                                            <div class="minute-activity-provider-role">(@GetResponsibleRole(activity))</div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="minute-activity-provider-item minute-unassigned">
+                                            <i class="bi bi-person"></i>Sin asignar
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="minute-col minute-col-phone">
+                                <div class="minute-activity-phone">
+                                    <div class="minute-activity-phone-item">
+                                        <i class="bi bi-telephone"></i>
+                                        @(string.IsNullOrWhiteSpace(activity.ResponsiblePhone) ? "—" : activity.ResponsiblePhone)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="minute-col minute-col-status">
+                                <span class="minute-activity-status status-@activity.Status.ToString().ToLower()">
+                                    @activity.Status
+                                </span>
+                            </div>
+                        </div>
+                        <!-- NOTAS -->
+                        @if (!string.IsNullOrWhiteSpace(activity.Notes))
+                        {
+                            <div class="minute-notes">
+                                <span class="minute-notes-label">Notas:</span>
+                                <span class="minute-notes-content">@activity.Notes</span>
+                            </div>
+                        }
+                        <!-- TAREAS -->
+                        @if (activity.Tasks != null && activity.Tasks.Any())
+                        {
+                            <div class="minute-tasks">
+                                @foreach (var task in activity.Tasks.OrderBy(t => t.Title))
+                                {
+                                    <div class="minute-task @(task.IsCompleted ? "is-completed" : "")">
+                                        <div class="minute-col minute-col-activity">
+                                            <div class="minute-task-main">
+                                                <input type="checkbox" class="minute-task-checkbox" checked="@task.IsCompleted" disabled />
+                                                <span class="minute-task-name">@task.Title</span>
+                                            </div>
+                                        </div>
+                                        <div class="minute-col minute-col-provider">
+                                            <div class="minute-task-provider">
+                                                <i class="bi bi-person"></i>
+                                                @(string.IsNullOrWhiteSpace(task.AssignedTo) ? "—" : task.AssignedTo)
+                                            </div>
+                                        </div>
+                                        <div class="minute-col minute-col-phone">
+                                            <div class="minute-task-provider">
+                                                <i class="bi bi-telephone"></i>
+                                                @(string.IsNullOrWhiteSpace(task.ResponsiblePhone) ? "—" : task.ResponsiblePhone)
+                                            </div>
+                                        </div>
+                                        <div class="minute-col minute-col-status">
+                                            <span class="minute-task-status @(task.IsCompleted ? "done" : "")">
+                                                @(task.IsCompleted ? "Completada" : "Pendiente")
+                                            </span>
+                                        </div>
+                                        <!-- MOTIVO -->
+                                        @if (!string.IsNullOrWhiteSpace(task.Motivo))
+                                        {
+                                            <div class="minute-task-motivo">
+                                                <span class="minute-task-motivo-label">Nota:</span>
+                                                <span class="minute-task-motivo-content">@task.Motivo</span>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="minute-empty">
+                <i class="bi bi-calendar-x"></i>
+                <p>Aún no hay actividades registradas.</p>
+            </div>
+        }
+
+        <!-- FOOTER -->
+        <div class="minute-footer">
+            <div class="minute-footer-heart">♡</div>
+            <div class="minute-footer-text">Gracias por permitirnos ser parte de este día tan especial</div>
+        </div>
+
+    </div>
+}

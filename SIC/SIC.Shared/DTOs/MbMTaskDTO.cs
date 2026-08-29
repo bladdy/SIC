@@ -1,4 +1,3 @@
-using SIC.Shared.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace SIC.Shared.DTOs;
@@ -13,13 +12,15 @@ public class MbMTaskDTO
     [Display(Name = "Completada")]
     public bool IsCompleted { get; set; } = false;
 
-    [Display(Name = "Asignado a")]
+    [Display(Name = "Proveedor/Responsable")]
     [MaxLength(200)]
     public string? AssignedTo { get; set; }
 
-    [Display(Name = "Fecha Límite")]
-    public DateTime? DueDate { get; set; }
+    [Display(Name = "Teléfono")]
+    [MaxLength(30)]
+    public string? ResponsiblePhone { get; set; }
 
-    [Display(Name = "Prioridad")]
-    public ActivityPriority Priority { get; set; } = ActivityPriority.Media;
+    [Display(Name = "Movito")]
+    [MaxLength(100, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres.")]
+    public string? Motivo { get; set; }
 }

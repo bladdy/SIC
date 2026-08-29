@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SIC.Backend.Data;
 
@@ -11,9 +12,11 @@ using SIC.Backend.Data;
 namespace SIC.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20260828010610_AddActivityResponsibleRole")]
+    partial class AddActivityResponsibleRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -857,10 +860,6 @@ namespace SIC.Backend.Migrations
 
                     b.Property<int>("MbMActivityId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Motivo")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ResponsiblePhone")
                         .HasMaxLength(30)

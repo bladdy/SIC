@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SIC.Backend.Data;
 
@@ -11,9 +12,11 @@ using SIC.Backend.Data;
 namespace SIC.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20260828000505_RemoveTaskDueDatePriority_AddTaskPhone")]
+    partial class RemoveTaskDueDatePriority_AddTaskPhone
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -781,10 +784,6 @@ namespace SIC.Backend.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
-                    b.Property<string>("ResponsibleRole")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
@@ -857,10 +856,6 @@ namespace SIC.Backend.Migrations
 
                     b.Property<int>("MbMActivityId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Motivo")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ResponsiblePhone")
                         .HasMaxLength(30)

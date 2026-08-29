@@ -130,5 +130,34 @@ namespace SIC.Backend.Repositories.Implemetations
             // Actualiza en la base de datos
             return await _userManager.UpdateAsync(existingUser);
         }
+
+        public async Task<ActionResponse<User>> ChangePasswordAsync(string userId, string currentPassword, string newPassword)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return new ActionResponse<User>
+                {
+                    Success = false,
+                    Message = "El usuario no existe."
+                };
+            }
+
+            var result = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+            if (!result.Succeeded)
+            {
+                return new ActionResponse<User>
+                {
+                    Success = false,
+                    Message = string.Join(", ", result.Errors.Select(e => e.Description))
+                };
+            }
+
+            return new ActionResponse<User>
+            {
+                Success = true,
+                Result = user
+            };
+        }
     }
 }
