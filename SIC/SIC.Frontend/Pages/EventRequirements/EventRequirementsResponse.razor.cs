@@ -1,6 +1,8 @@
 using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+using SIC.Frontend.Helpers;
 using SIC.Frontend.Repositories;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
@@ -13,6 +15,7 @@ public partial class EventRequirementsResponse
 {
     [Inject] private IRepository repository { get; set; } = default!;
     [Inject] private SweetAlertService sweetAlertService { get; set; } = default!;
+    [Inject] private IJSRuntime JsRuntime { get; set; } = default!;
 
     [Parameter] public string EventCode { get; set; } = "";
 
@@ -128,6 +131,26 @@ public partial class EventRequirementsResponse
     {
         IsLightboxVisible = false;
         SelectedImage = null;
+    }
+
+    private async Task DownloadImage(EventRequirementImage img)
+    {
+        try
+        {
+            var content = await repository.GetFileAsync($"api/EventRequirementImages/download/{img.Id}");
+            if (content.Length > 0)
+            {
+                await JsRuntime.DownloadFileAsync(img.OriginalName, content);
+            }
+            else
+            {
+                await sweetAlertService.FireAsync("Error", "No se pudo descargar la imagen.", SweetAlertIcon.Error);
+            }
+        }
+        catch (Exception)
+        {
+            await sweetAlertService.FireAsync("Error", "Algo salió mal al descargar la imagen, inténtalo de nuevo.", SweetAlertIcon.Error);
+        }
     }
 
     private async Task DeleteImage(EventRequirementImage img)

@@ -41,7 +41,7 @@ namespace SIC.Frontend.Pages.Album
                         title: Event.Name,
                         description: Event.SubTitle,
                         image: Event.CoverAlbumImageUrl,
-                        canonicalUrl: $"https://invboxv-app.com/upload-photo/{Event.Code}",
+                        canonicalUrl: $"https://invboxv-app.com/my-album/{Event.Code}",
                         keywords: "",
                         ogType: "website"
                     );
@@ -106,11 +106,11 @@ namespace SIC.Frontend.Pages.Album
             ClosePreview();
             var result = await SweetAlertService.FireAsync(new SweetAlertOptions
             {
-                Title = "¿Está seguro?",
-                Text = $"Se eliminara esta foto. Esta acción no se puede deshacer.",
+                Title = "ï¿½Estï¿½ seguro?",
+                Text = $"Se eliminara esta foto. Esta acciï¿½n no se puede deshacer.",
                 Icon = SweetAlertIcon.Warning,
                 ShowCancelButton = true,
-                ConfirmButtonText = "Sí, borrar",
+                ConfirmButtonText = "Sï¿½, borrar",
                 CancelButtonText = "Cancelar"
             });
 
@@ -167,7 +167,7 @@ namespace SIC.Frontend.Pages.Album
                     Timer = 3000,
                     TimerProgressBar = true,
                 });
-                await toast.FireAsync("Error", "Algo salio mal, intentalo de nuevo más tarde.", SweetAlertIcon.Error);
+                await toast.FireAsync("Error", "Algo salio mal, intentalo de nuevo mï¿½s tarde.", SweetAlertIcon.Error);
             }
         }
 
@@ -191,7 +191,7 @@ namespace SIC.Frontend.Pages.Album
                     Timer = 3000,
                     TimerProgressBar = true,
                 });
-                await toast.FireAsync("Error", "Algo salio mal, intentalo de nuevo más tarde.", SweetAlertIcon.Error);
+                await toast.FireAsync("Error", "Algo salio mal, intentalo de nuevo mï¿½s tarde.", SweetAlertIcon.Error);
             }
         }
 

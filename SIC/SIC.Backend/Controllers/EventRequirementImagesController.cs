@@ -40,6 +40,28 @@ public class EventRequirementImagesController : GenericController<EventRequireme
         return Ok(response.Result);
     }
 
+    [HttpGet("download/{id}")]
+    public async Task<IActionResult> DownloadAsync(int id)
+    {
+        var getResponse = await _unitOfWork.GetByIdWithAnswerAsync(id);
+        if (!getResponse.Success)
+            return BadRequest(getResponse.Message);
+        if (getResponse.Result == null)
+            return NotFound("Imagen no encontrada.");
+
+        var image = getResponse.Result;
+        var pathSegments = new Uri(image.Path).AbsolutePath
+            .Split('/', StringSplitOptions.RemoveEmptyEntries);
+        var remoteFileName = pathSegments[^1];
+        var folder = string.Join('/', pathSegments.Take(pathSegments.Length - 1));
+
+        var stream = await _ftpService.DownloadFileAsync(folder, remoteFileName);
+        if (stream == null)
+            return NotFound();
+
+        return File(stream, "image/webp", image.OriginalName);
+    }
+
     [HttpPost("upload/{requirementAnswerId}")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> UploadAsync(int requirementAnswerId, IFormFile file)

@@ -12,7 +12,7 @@ namespace SIC.Shared.Enums
         [Description("Administrador")]
         Admin = 1,
 
-        [Description("Planificador de Bodas")]
+        [Description("Planner")]
         WeddingPlanner = 2,
 
         [Description("Cliente")]

@@ -35,6 +35,39 @@
     <!-- iOS / Android Web App -->
     <meta name="apple-mobile-web-app-title" content="INVBOXV">
     <meta name="theme-color" content="#3C6A79" />
+
+    <script>
+        (function () {
+            var match = location.pathname.match(/\/upload-photo\/([^\/]+)/);
+            if (!match) return;
+            var code = match[1];
+            fetch('api/Events/byCode/' + code)
+                .then(function (r) { return r.ok ? r.json() : null; })
+                .then(function (ev) {
+                    if (!ev) return;
+                    var img = ev.coverAlbumImageUrl || '';
+                    if (!img) return;
+                    if (img.startsWith('/')) img = location.origin + img;
+                    var title = ev.name || '';
+                    var desc = ev.subTitle || '';
+                    var url = location.href;
+                    function setMeta(sel, attr, val) {
+                        var els = document.querySelectorAll(sel);
+                        for (var i = 0; i < els.length; i++) els[i].setAttribute(attr, val);
+                    }
+                    setMeta('meta[property="og:image"]', 'content', img);
+                    setMeta('meta[property="og:url"]', 'content', url);
+                    if (title) setMeta('meta[property="og:title"]', 'content', title);
+                    if (desc) setMeta('meta[property="og:description"]', 'content', desc);
+                    setMeta('meta[name="twitter:image"]', 'content', img);
+                    setMeta('meta[name="twitter:url"]', 'content', url);
+                    if (title) setMeta('meta[name="twitter:title"]', 'content', title);
+                    if (desc) setMeta('meta[name="twitter:description"]', 'content', desc);
+                    if (title) document.title = title;
+                })
+                .catch(function () { });
+        })();
+    </script>
 </head>
 
 <body>

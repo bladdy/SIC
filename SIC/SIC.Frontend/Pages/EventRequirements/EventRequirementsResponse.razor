@@ -88,9 +88,9 @@ else
                                                 </div>
                                                 <div class="card-body p-2 text-center">
                                                     <small class="text-muted d-block text-truncate" title="@img.OriginalName">@img.OriginalName</small>
-                                                    <a href="@img.Path" target="_blank" class="btn btn-sm btn-custom mt-1" title="Descargar">
+                                                    <button type="button" class="btn btn-sm btn-custom mt-1" title="Descargar" @onclick="() => DownloadImage(img)">
                                                         <i class="bi bi-download"></i> Descargar
-                                                    </a>
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -181,9 +181,9 @@ else
                     <img src="@SelectedImage.Path" alt="@SelectedImage.OriginalName" class="img-fluid" style="max-height:80vh;" />
                 </div>
                 <div class="modal-footer border-0 justify-content-center">
-                    <a href="@SelectedImage.Path" target="_blank" class="btn btn-light">
+                    <button type="button" class="btn btn-light" @onclick="() => DownloadImage(SelectedImage!)">
                         <i class="bi bi-download"></i> Descargar
-                    </a>
+                    </button>
                     <button type="button" class="btn btn-secondary" @onclick="CloseLightbox">Cerrar</button>
                 </div>
             </div>

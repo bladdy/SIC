@@ -8,7 +8,9 @@ namespace SIC.Frontend.Shared.Component;
 
 public partial class CoverImageUploader : ComponentBase
 {
-    private const long MaxFileSize = 10 * 1024 * 1024;
+    private const long DefaultMaxFileSize = 10 * 1024 * 1024;
+
+    [Parameter] public long MaxFileSizeInBytes { get; set; } = DefaultMaxFileSize;
 
     [Parameter] public string? Value { get; set; }
 
@@ -97,13 +99,13 @@ public partial class CoverImageUploader : ComponentBase
             return;
         }
 
-        if (file.Size > MaxFileSize)
+        if (file.Size > MaxFileSizeInBytes)
         {
-            await SweetAlertService.FireAsync("Error", "La imagen supera el tamaño máximo de 10 MB.", SweetAlertIcon.Error);
+            await SweetAlertService.FireAsync("Error", $"La imagen supera el tamaño máximo de {MaxFileSizeInBytes / (1024 * 1024)} MB.", SweetAlertIcon.Error);
             return;
         }
 
-        await using var stream = file.OpenReadStream(MaxFileSize);
+        await using var stream = file.OpenReadStream(MaxFileSizeInBytes);
         using var memoryStream = new MemoryStream();
         await stream.CopyToAsync(memoryStream);
 

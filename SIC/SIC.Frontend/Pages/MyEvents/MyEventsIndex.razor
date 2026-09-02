@@ -351,7 +351,7 @@
 
                             </div>
                         </div>
-                        <CoverImageUploader @ref="CoverUploader" @bind-Value="NewEvent.CoverImageUrl" />
+                        <CoverImageUploader @ref="CoverUploader" @bind-Value="NewEvent.CoverImageUrl" MaxFileSizeInBytes="2 * 1024 * 1024" />
                         <div class="mb-3 row">
                             <div class="col">
                                 <label class="form-label">Fecha Limite Para Confirmar Evento</label>
