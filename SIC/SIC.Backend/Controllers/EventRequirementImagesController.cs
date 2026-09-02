@@ -50,16 +50,28 @@ public class EventRequirementImagesController : GenericController<EventRequireme
             return NotFound("Imagen no encontrada.");
 
         var image = getResponse.Result;
-        var pathSegments = new Uri(image.Path).AbsolutePath
-            .Split('/', StringSplitOptions.RemoveEmptyEntries);
-        var remoteFileName = pathSegments[^1];
-        var folder = string.Join('/', pathSegments.Take(pathSegments.Length - 1));
+        var remoteFileName = Path.GetFileName(new Uri(image.Path).AbsolutePath);
+        var folder = $"event-requirements/{image.RequirementAnswer?.EventId ?? 0}";
 
         var stream = await _ftpService.DownloadFileAsync(folder, remoteFileName);
         if (stream == null)
             return NotFound();
 
-        return File(stream, "image/webp", image.OriginalName);
+        return File(stream, GetContentType(remoteFileName), image.OriginalName);
+    }
+
+    private static string GetContentType(string fileName)
+    {
+        var extension = Path.GetExtension(fileName).ToLowerInvariant();
+        return extension switch
+        {
+            ".jpg" or ".jpeg" => "image/jpeg",
+            ".png" => "image/png",
+            ".webp" => "image/webp",
+            ".gif" => "image/gif",
+            ".bmp" => "image/bmp",
+            _ => "application/octet-stream"
+        };
     }
 
     [HttpPost("upload/{requirementAnswerId}")]

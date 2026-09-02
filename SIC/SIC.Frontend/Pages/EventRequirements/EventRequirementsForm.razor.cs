@@ -213,6 +213,15 @@ public partial class EventRequirementsForm
         foreach (var file in files.Take(remaining))
         {
             if (file == null || file.Size == 0) continue;
+
+            if (file.Size > 2 * 1024 * 1024)
+            {
+                await sweetAlertService.FireAsync("Imagen demasiado grande",
+                    $"\"{file.Name}\" supera el límite de 2 MB y no se subió.",
+                    SweetAlertIcon.Warning);
+                continue;
+            }
+
             await AddPendingImage(requirementId, file);
         }
 
@@ -223,7 +232,7 @@ public partial class EventRequirementsForm
 
     private async Task AddPendingImage(int requirementId, IBrowserFile file)
     {
-        using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+        using var stream = file.OpenReadStream(maxAllowedSize: 2 * 1024 * 1024);
         using var memoryStream = new MemoryStream();
         await stream.CopyToAsync(memoryStream);
         var bytes = memoryStream.ToArray();

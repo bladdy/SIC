@@ -82,10 +82,13 @@ public class EventRequirementAnswersController : GenericController<EventRequirem
         {
             foreach (var (file, order) in fileEntries)
             {
+                if (file.Length > 2 * 1024 * 1024)
+                    continue;
+
                 var folder = $"event-requirements/{eventId}";
                 var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
                 using var stream = file.OpenReadStream();
-                var url = await _ftpService.UploadImageAsync(stream, folder, fileName);
+                var url = await _ftpService.UploadRawImageAsync(stream, folder, fileName);
 
                 imageDtos.Add(new EventRequirementImageDTO
                 {
