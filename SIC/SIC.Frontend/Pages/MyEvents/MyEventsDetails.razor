@@ -468,19 +468,19 @@ else
                         }
                     </button>
                     <ul class="dropdown-menu">
-                         @if (Templates != null)
+                        @if (Templates != null)
                         {
                             @if (EventDetail.EventType?.Id == 4)
                             {
                                 @foreach (var template in Templates.Where(x => x.TemplateNumber == 6))
                                 {
                                     <li>
-                                    <button type="button"
-                                    class="dropdown-item"
-                                    @onclick="() => EnviarInvitacionesMasivas(template)">
-                                        @template.DisplayName
-                                    </button>
-                                </li>
+                                        <button type="button"
+                                        class="dropdown-item"
+                                        @onclick="() => EnviarInvitacionesMasivas(template)">
+                                            @template.DisplayName
+                                        </button>
+                                    </li>
                                 }
                             }
                             else
@@ -495,11 +495,11 @@ else
                                         </button>
                                     </li>
                                 }
-                                
+
                             }
                         }
 
-                        
+
                     </ul>
                 </div>
             }
@@ -601,7 +601,7 @@ else
                                                         }
                                                         <div class="steps-container">
 
-                                                             @if (EventDetail.EventType!.Id != 4 )
+                                                            @if (EventDetail.EventType!.Id != 4 )
                                                             {
                                                                 <div class="step-circle @(sentTemplates.Contains(1) ? "active-step" : "inactive-step")">
                                                                     <!-- SVG 1 -->
@@ -684,7 +684,7 @@ else
                                                                     }
                                                                 </button>
                                                                 <ul class="dropdown-menu">
-                                                                   
+
                                                                     @if (Templates != null)
                                                                     {
                                                                         @if (EventDetail.EventType?.Id == 4)
@@ -692,12 +692,12 @@ else
                                                                             @foreach (var template in Templates.Where(x => x.TemplateNumber == 6))
                                                                             {
                                                                                 <li>
-                                                                                <button type="button"
-                                                                                class="dropdown-item"
-                                                                                @onclick="() => EnviarInvitacion(invitation.Code!, template.Name, invitation.Id, template.DisplayName)">
-                                                                                    @template.DisplayName
-                                                                                </button>
-                                                                            </li>
+                                                                                    <button type="button"
+                                                                                    class="dropdown-item"
+                                                                                    @onclick="() => EnviarInvitacion(invitation.Code!, template.Name, invitation.Id, template.DisplayName)">
+                                                                                        @template.DisplayName
+                                                                                    </button>
+                                                                                </li>
                                                                             }
                                                                         }
                                                                         else
@@ -705,12 +705,12 @@ else
                                                                             @foreach (var template in Templates.Where(x => x.TemplateNumber != 6))
                                                                             {
                                                                                 <li>
-                                                                                <button type="button"
-                                                                                class="dropdown-item"
-                                                                                @onclick="() => EnviarInvitacion(invitation.Code!, template.Name, invitation.Id, template.DisplayName)">
-                                                                                    @template.DisplayName
-                                                                                </button>
-                                                                            </li>
+                                                                                    <button type="button"
+                                                                                    class="dropdown-item"
+                                                                                    @onclick="() => EnviarInvitacion(invitation.Code!, template.Name, invitation.Id, template.DisplayName)">
+                                                                                        @template.DisplayName
+                                                                                    </button>
+                                                                                </li>
                                                                             }
                                                                         }
                                                                     }
@@ -996,8 +996,8 @@ else
                                                     {
                                                         <li>
                                                             <button type="button"
-                                                                    class="dropdown-item"
-                                                                    @onclick="() => EnviarInvitacion(
+                                                            class="dropdown-item"
+                                                            @onclick="() => EnviarInvitacion(
                                                                                                 invitation.Code!,
                                                                                                 template.Name,
                                                                                                 invitation.Id,
@@ -1013,8 +1013,8 @@ else
                                                     {
                                                         <li>
                                                             <button type="button"
-                                                                    class="dropdown-item"
-                                                                    @onclick="() => EnviarInvitacion(
+                                                            class="dropdown-item"
+                                                            @onclick="() => EnviarInvitacion(
                                                                                                 invitation.Code!,
                                                                                                 template.Name,
                                                                                                 invitation.Id,
@@ -1178,29 +1178,34 @@ else
                             <label for="fileInput" class="form-control form-control-sm w-100 text-center" style="cursor:pointer;">
                                 Elige un archivo
                             </label>
-                            <!-- Checkbox con label en la misma línea y centrado vertical -->
-                            <div class="form-check d-flex align-items-center gap-2">
-                                <input class="form-check-input custom" type="checkbox"
-                                id="deleteRegisterCheck"
-                                checked="@DeleteRegister"
-                                @onchange="(e) => DeleteRegister = e.Value is bool value && value" />
-                                <label class="form-check-label mb-0" for="deleteRegisterCheck">
-                                    Eliminar los registros que no estén en el Excel.
-                                </label>
-                            </div>
-                            <!-- Botón de carga -->
-                            <button class="btn btn-sm btn-custom w-100"
-                            @onclick="SubirExcel" disabled="@(!hasFileSelected || isLoadingImport)">
-                                @if (isLoadingImport)
-                                {
-                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                    <span>Cargando...</span>
-                                }
-                                else
-                                {
-                                    <span>Cargar Lista de Invitados</span>
-                                }
-                            </button>
+
+                            @if (hasFileSelected)
+                            {
+                                <!-- Checkbox con label en la misma línea y centrado vertical -->
+                                <div class="form-check d-flex align-items-center gap-2">
+                                    <input class="form-check-input custom" type="checkbox"
+                                    id="deleteRegisterCheck"
+                                    checked="@DeleteRegister"
+                                    @onchange="(e) => DeleteRegister = e.Value is bool value && value" />
+                                    <label class="form-check-label mb-0" for="deleteRegisterCheck">
+                                        Eliminar los registros que no estén en el Excel.
+                                    </label>
+                                </div>
+                                <!-- Botón de carga -->
+                                <button class="btn btn-sm btn-custom w-100"
+                                @onclick="SubirExcel" disabled="@(!hasFileSelected || isLoadingImport)">
+                                    @if (isLoadingImport)
+                                    {
+                                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        <span>Cargando...</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Cargar Lista de Invitados</span>
+                                    }
+                                </button>
+                                
+                            }
                         </div>
                     </div>
 

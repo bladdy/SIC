@@ -1110,29 +1110,32 @@ else
                             <label for="fileInput" class="form-control form-control-sm w-100 text-center" style="cursor:pointer;">
                                 Elige un archivo
                             </label>
-                            <!-- Checkbox con label en la misma línea y centrado vertical -->
-                            <div class="form-check d-flex align-items-center gap-2">
-                                <input class="form-check-input custom" type="checkbox"
-                                       id="deleteRegisterCheck"
-                                       checked="@DeleteRegister"
-                                       @onchange="(e) => DeleteRegister = e.Value is bool value && value" />
-                                <label class="form-check-label mb-0" for="deleteRegisterCheck">
-                                    Eliminar los registros que no estén en el Excel.
-                                </label>
-                            </div>
-                            <!-- Botón de carga -->
-                            <button class="btn btn-sm btn-custom w-100"
-                                    @onclick="SubirExcel" disabled="@(!hasFileSelected || isLoadingImport)">
-                                @if (isLoadingImport)
-                                {
-                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                    <span>Cargando...</span>
-                                }
-                                else
-                                {
-                                    <span>Cargar Lista de Invitados</span>
-                                }
-                            </button>
+                            @if (hasFileSelected)
+                            {
+                                <!-- Checkbox con label en la misma línea y centrado vertical -->
+                                <div class="form-check d-flex align-items-center gap-2">
+                                    <input class="form-check-input custom" type="checkbox"
+                                           id="deleteRegisterCheck"
+                                           checked="@DeleteRegister"
+                                           @onchange="(e) => DeleteRegister = e.Value is bool value && value" />
+                                    <label class="form-check-label mb-0" for="deleteRegisterCheck">
+                                        Eliminar los registros que no estén en el Excel.
+                                    </label>
+                                </div>
+                                <!-- Botón de carga -->
+                                <button class="btn btn-sm btn-custom w-100"
+                                        @onclick="SubirExcel" disabled="@(!hasFileSelected || isLoadingImport)">
+                                    @if (isLoadingImport)
+                                    {
+                                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        <span>Cargando...</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Cargar Lista de Invitados</span>
+                                    }
+                                </button>
+                            }
                         </div>
                     </div>
 
