@@ -78,6 +78,7 @@ builder.Services.AddScoped<WhatsAppService>();
 builder.Services.AddScoped<BoletaService>();
 builder.Services.AddScoped<FtpStorageService>();
 builder.Services.AddScoped<MetaAuthService>();
+builder.Services.AddScoped<IMailHelper, MailHelper>();
 builder.Services.AddScoped<IWhatsAppTemplateBuilderService, WhatsAppTemplateBuilderService>();
 
 builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();

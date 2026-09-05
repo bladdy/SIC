@@ -11,6 +11,8 @@ namespace SIC.Backend.UnitOfWork.Interfaces
 
         Task<User> GetUserByAsync(string id);
 
+        Task<User?> GetUserByPhoneAsync(string phoneNumber);
+
         Task<IdentityResult> AddUserAsync(User user, string password);
 
         Task<IdentityResult> UpdateUserAsync(User user);
@@ -26,5 +28,9 @@ namespace SIC.Backend.UnitOfWork.Interfaces
         Task LogOutAsync();
 
         Task<ActionResponse<User>> ChangePasswordAsync(string userId, string currentPassword, string newPassword);
+
+        Task<ActionResponse<string>> GeneratePasswordResetTokenAsync(User user);
+
+        Task<ActionResponse<bool>> ResetPasswordAsync(User user, string token, string newPassword);
     }
 }

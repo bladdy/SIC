@@ -42,9 +42,10 @@
                             <InputText class="form-control" @bind-Value="user.LastName" />
                         </div>
 
-                        <div class="mb-3 d-none">
+                        <div class="mb-3">
                             <label>Correo electrónico</label>
-                            <InputText class="form-control" @bind-Value="user.Email" />
+                            <InputText type="email" class="form-control" @bind-Value="user.Email" />
+                            <ValidationMessage For="@(() => user.Email)" />
                         </div>
 
                         <div class="mb-3">

@@ -55,6 +55,28 @@ public class EventsController : GenericController<Event>
         return BadRequest();
     }
 
+    [HttpGet("activeResponses")]
+    public async Task<IActionResult> GetActiveResponsesAsync([FromQuery] PaginationDTO pagination)
+    {
+        var response = await _eventsUnitOfWork.GetActiveWithRequirementStatusAsync(pagination);
+        if (response.Success)
+        {
+            return Ok(response.Result);
+        }
+        return NotFound();
+    }
+
+    [HttpGet("activeResponsesTotal")]
+    public async Task<IActionResult> GetActiveResponsesTotalAsync([FromQuery] PaginationDTO pagination)
+    {
+        var action = await _eventsUnitOfWork.GetActiveWithRequirementStatusTotalAsync(pagination);
+        if (action.Success)
+        {
+            return Ok(action.Result);
+        }
+        return BadRequest();
+    }
+
     [HttpGet("byUserId/{userId}")]
     public async Task<IActionResult> GetByUserIdAsync(string userId)
     {

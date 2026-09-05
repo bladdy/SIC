@@ -3,6 +3,7 @@ using SIC.Shared.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
 namespace SIC.Shared.Entities;
@@ -55,6 +56,12 @@ public class Event : IEntityWithName
 
     // 🔹 Álbum de imágenes del evento
     public ICollection<EventImage> Images { get; set; } = new List<EventImage>();
+
+    // 🔹 Respuestas del formulario de requisitos
+    public ICollection<EventRequirementAnswer> RequirementAnswers { get; set; } = new List<EventRequirementAnswer>();
+
+    [NotMapped]
+    public bool FormComplete { get; set; }
 
     // 🔹 Miniatura de la inivitacion
     public string? CoverImageUrl { get; set; }

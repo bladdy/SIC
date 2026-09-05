@@ -4,6 +4,7 @@ using SIC.Backend.Helpers;
 using SIC.Backend.Repositories.Interfaces;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
+using SIC.Shared.Enums;
 using SIC.Shared.Response;
 
 namespace SIC.Backend.Repositories.Implemetations;
@@ -187,6 +188,10 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
         {
             queryable = queryable.Where(x => x.HasAlbum == pagination.HasAlbum);
         }
+        if (pagination.HasResponses)
+        {
+            queryable = queryable.Where(x => x.RequirementAnswers.Any());
+        }
         if (!string.IsNullOrWhiteSpace(pagination.Filter))
         {
             var filter = pagination.Filter.ToLower();
@@ -233,6 +238,10 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
         if (pagination.HasAlbum)
         {
             queryable = queryable.Where(x => x.HasAlbum == pagination.HasAlbum);
+        }
+        if (pagination.HasResponses)
+        {
+            queryable = queryable.Include(r => r.RequirementAnswers).Where(x => x.RequirementAnswers.Any());
         }
         if (!string.IsNullOrWhiteSpace(pagination.Filter))
         {
@@ -299,6 +308,82 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
             Result = await queryable
                 .Paginate(pagination)
                 .ToListAsync()
+        };
+    }
+
+    public async Task<ActionResponse<IEnumerable<Event>>> GetActiveWithRequirementStatusAsync(PaginationDTO pagination)
+    {
+        var queryable = _context.Events
+            .Include(e => e.EventType)
+            .Include(u => u.User)
+            .Include(r => r.RequirementAnswers)
+            .AsNoTracking()
+            .AsQueryable();
+
+        queryable = queryable.Where(x => x.Status == Status.Active);
+
+        if (!string.IsNullOrWhiteSpace(pagination.Filter))
+        {
+            var filter = pagination.Filter.ToLower();
+
+            queryable = queryable.Where(x =>
+                x.Name.ToLower().Contains(filter) ||
+                x.SubTitle.ToLower().Contains(filter) ||
+                x.Host.ToLower().Contains(filter) ||
+                x.Planner!.ToLower().Contains(filter)
+            );
+        }
+
+        var events = await queryable
+            .OrderBy(x => x.Name)
+            .ToListAsync();
+
+        foreach (var even in events)
+        {
+            even.FormComplete = even.RequirementAnswers.Any();
+        }
+
+        var ordered = events
+            .OrderByDescending(x => x.FormComplete)
+            .ThenBy(x => x.Name)
+            .ToList();
+
+        var pageItems = ordered
+            .Skip((pagination.PageNumber - 1) * pagination.PageSize)
+            .Take(pagination.PageSize)
+            .ToList();
+
+        return new ActionResponse<IEnumerable<Event>>
+        {
+            Success = true,
+            Result = pageItems
+        };
+    }
+
+    public async Task<ActionResponse<int>> GetActiveWithRequirementStatusTotalAsync(PaginationDTO pagination)
+    {
+        var queryable = _context.Events.Include(e => e.EventType).AsQueryable();
+
+        queryable = queryable.Where(x => x.Status == Status.Active);
+
+        if (!string.IsNullOrWhiteSpace(pagination.Filter))
+        {
+            var filter = pagination.Filter.ToLower();
+
+            queryable = queryable.Where(x =>
+                x.Name.ToLower().Contains(filter) ||
+                x.SubTitle.ToLower().Contains(filter) ||
+                x.Host.ToLower().Contains(filter) ||
+                x.Planner!.ToLower().Contains(filter)
+            );
+        }
+
+        double count = await queryable.CountAsync();
+        int totalPages = (int)Math.Ceiling(count / pagination.PageSize);
+        return new ActionResponse<int>
+        {
+            Success = true,
+            Result = totalPages
         };
     }
 }

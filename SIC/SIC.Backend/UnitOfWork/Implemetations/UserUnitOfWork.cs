@@ -29,6 +29,8 @@ namespace SIC.Backend.UnitOfWork.Implemetations
 
         public async Task<User> GetUserByAsync(string id) => await _userRepository.GetUserByAsync(id);
 
+        public async Task<User?> GetUserByPhoneAsync(string phoneNumber) => await _userRepository.GetUserByPhoneAsync(phoneNumber);
+
         public async Task<bool> IsUserInRoleAsync(User user, string roleName) => await _userRepository.IsUserInRoleAsync(user, roleName);
 
         public async Task<SignInResult> LogInAsync(LoginDTO model) => await _userRepository.LogInAsync(model);
@@ -36,5 +38,9 @@ namespace SIC.Backend.UnitOfWork.Implemetations
         public async Task LogOutAsync() => await _userRepository.LogOutAsync();
 
         public async Task<ActionResponse<User>> ChangePasswordAsync(string userId, string currentPassword, string newPassword) => await _userRepository.ChangePasswordAsync(userId, currentPassword, newPassword);
+
+        public async Task<ActionResponse<string>> GeneratePasswordResetTokenAsync(User user) => await _userRepository.GeneratePasswordResetTokenAsync(user);
+
+        public async Task<ActionResponse<bool>> ResetPasswordAsync(User user, string token, string newPassword) => await _userRepository.ResetPasswordAsync(user, token, newPassword);
     }
 }

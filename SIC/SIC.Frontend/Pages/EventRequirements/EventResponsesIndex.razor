@@ -1,0 +1,142 @@
+@page "/event-responses"
+
+<PageTitle>Respuestas de Eventos</PageTitle>
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+    <h3 class="mb-0">Respuestas de Eventos</h3>
+</div>
+
+<div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center; gap: 10px;">
+    <input style="width:400px;" type="text" class="form-control" placeholder="Buscar Evento..." @bind="Filter" />
+    <button type="button" class="btn btn-custom" @onclick="ApplyFilterAsync">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-search"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg> Buscar
+    </button>
+    <button type="button" class="btn btn-custom" @onclick="CleanFilterAsync">
+        <i class="bi bi-x-circle" /> Limpiar
+    </button>
+</div>
+
+<!-- Tabla principal -->
+<GenericList MyList="Events">
+    <Body>
+        <div class="table-responsive d-none d-md-block">
+            <table class="table table-hover align-middle mb-0">
+                <thead style="background-color:#3C6A79; color:white;">
+                    <tr class="text-center">
+                        <th class="text-start">Detalle del Evento</th>
+                        <th>Formulario</th>
+                        <th>Fecha</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Events != null && Events.Any())
+                    {
+                        @foreach (var even in Events)
+                        {
+                            <tr class="border-top">
+                                <td style="white-space: normal; vertical-align: top;">
+                                    <div class="container-fluid">
+                                        <div class="row g-3 small text-secondary">
+                                            <div class="col-12 col-md-4 d-flex flex-column">
+                                                <div class="mb-2">
+                                                    <strong>Código:</strong>
+                                                    <a class="text-decoration-none text-primary">@even.Code</a>
+                                                </div>
+                                                <div><strong>Tipo:</strong> @even.EventType!.Name</div>
+                                                <div><strong>@even.User!.UserType.GetDescription():</strong> @even.User!.FullName</div>
+                                            </div>
+                                            <div class="col-12 col-md-4">
+                                                <div class="fw-bold fs-6 text-dark mb-1">@even.Name</div>
+                                                @if (!string.IsNullOrWhiteSpace(even.SubTitle))
+                                                {
+                                                    <div class="text-muted small mb-2">@even.SubTitle</div>
+                                                }
+                                                <div class="fw-bold fs-6 text-dark mb-1">Respuestas (@even.RequirementAnswers.Count)</div>
+                                            </div>
+                                            <div class="col-12 col-md-4 d-flex flex-row flex-wrap align-items-center gap-1">
+                                                <button class="btn btn-custom flex-fill"
+                                                        style="min-width:180px"
+                                                        @onclick="() => CopiarEventUrl(even.Code)"
+                                                        disabled="@(CopyingEventCode == even.Code)">
+
+                                                    @if (CopyingEventCode == even.Code)
+                                                    {
+                                                        <span class="spinner-border spinner-border-sm me-1"
+                                                              role="status"
+                                                              aria-hidden="true"></span>
+                                                        <span>Copiando...</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span>Formulario Inivitacion</span>
+                                                    }
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="px-3 py-2 fs-6 badge @(even.FormComplete ? "bg-success" : "bg-secondary")">
+                                        @(even.FormComplete ? "Formulario completo" : "Formulario Pendiente")
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="fw-semibold text-dark">@even.Date.ToString("dd/MM/yyyy")</div>
+                                </td>
+                                <td class="text-center">
+                                    <a href="/event/@even.Code/requisitos/respuesta" class="btn btn-sm btn-custom mb-1">
+                                        <i class="bi bi-eye-fill"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="4" class="text-center text-muted py-4">No hay eventos con respuestas.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="d-block d-md-none">
+            @if (Events != null && Events.Any())
+            {
+                @foreach (var even in Events)
+                {
+                    <div class="card mb-3 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">@even.Name</h5>
+                            @if (!string.IsNullOrWhiteSpace(even.SubTitle))
+                            {
+                                <p class="card-subtitle text-muted small mb-2">@even.SubTitle</p>
+                            }
+                            <p class="mb-1"><strong>@even.User!.UserType.GetDescription():</strong> @even.User!.FullName</p>
+                            <p class="mb-1"><strong>Código:</strong> @even.Code</p>
+                            <p class="mb-1"><strong>Tipo:</strong> @even.EventType!.Name</p>
+                            <p class="mb-1">
+                                <strong>Formulario:</strong>
+                                <span class="badge @(even.FormComplete ? "bg-success" : "bg-secondary")">
+                                    @(even.FormComplete ? "Formulario completo" : "Formulario Pendiente")
+                                </span>
+                            </p>
+                            <p class="mb-2"><strong>Fecha:</strong> @even.Date.ToString("dd/MM/yyyy")</p>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <a href="/event/@even.Code/requisitos/respuesta" class="btn btn-custom w-100">Respuestas (@even.RequirementAnswers.Count)</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="text-center text-muted py-4">No hay eventos con respuestas.</p>
+            }
+        </div>
+
+    </Body>
+</GenericList>
+
+<!-- Paginación -->
+<div class="d-flex justify-content-center my-3">
+    <Pagination CurrentPage="currentPage" TotalPages="totalPages" SelectedPage="SelectedPageAsync" />
+</div>

@@ -96,6 +96,11 @@ namespace SIC.Backend.Repositories.Implemetations
             return user!;
         }
 
+        public async Task<User?> GetUserByPhoneAsync(string phoneNumber)
+        {
+            return await _context.Users.FirstOrDefaultAsync(x => x.PhoneNumber == phoneNumber);
+        }
+
         public async Task<bool> IsUserInRoleAsync(User user, string roleName)
         {
             return await _userManager.IsInRoleAsync(user, roleName);
@@ -157,6 +162,44 @@ namespace SIC.Backend.Repositories.Implemetations
             {
                 Success = true,
                 Result = user
+            };
+        }
+
+        public async Task<ActionResponse<string>> GeneratePasswordResetTokenAsync(User user)
+        {
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            if (string.IsNullOrEmpty(token))
+            {
+                return new ActionResponse<string>
+                {
+                    Success = false,
+                    Message = "No se pudo generar el token de recuperación."
+                };
+            }
+
+            return new ActionResponse<string>
+            {
+                Success = true,
+                Result = token
+            };
+        }
+
+        public async Task<ActionResponse<bool>> ResetPasswordAsync(User user, string token, string newPassword)
+        {
+            var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+            if (!result.Succeeded)
+            {
+                return new ActionResponse<bool>
+                {
+                    Success = false,
+                    Message = string.Join(", ", result.Errors.Select(e => e.Description))
+                };
+            }
+
+            return new ActionResponse<bool>
+            {
+                Success = true,
+                Result = true
             };
         }
     }

@@ -109,11 +109,11 @@ namespace SIC.Frontend.Pages.Album
         {
             var result = await SweetAlertService.FireAsync(new SweetAlertOptions
             {
-                Title = "�Est� seguro?",
+                Title = "¿Estás seguro?",
                 Text = $"Se eliminara esta foto. Esta acci�n no se puede deshacer.",
                 Icon = SweetAlertIcon.Warning,
                 ShowCancelButton = true,
-                ConfirmButtonText = "S�, borrar",
+                ConfirmButtonText = "Sé, borrar",
                 CancelButtonText = "Cancelar"
             });
 
@@ -282,7 +282,7 @@ namespace SIC.Frontend.Pages.Album
 
                     await toast.FireAsync(
                         "Subir foto",
-                        "La foto fue subida con �xito.",
+                        "La foto fue subida con Éxito.",
                         SweetAlertIcon.Success
                     );
 
@@ -292,7 +292,7 @@ namespace SIC.Frontend.Pages.Album
                 {
                     await SweetAlertService.FireAsync(
                         "Error",
-                        "Ha ocurrido un error, int�ntalo m�s tarde.",
+                        "Ha ocurrido un error, inténtalo m�s tarde.",
                         SweetAlertIcon.Error
                     );
                 }
@@ -301,7 +301,7 @@ namespace SIC.Frontend.Pages.Album
             {
                 await SweetAlertService.FireAsync(
                     "Error",
-                    "Ha ocurrido un error, int�ntalo m�s tarde.",
+                    "Ha ocurrido un error, inténtalo más tarde.",
                     SweetAlertIcon.Error
                 );
             }

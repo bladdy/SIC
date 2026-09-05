@@ -18,6 +18,10 @@ public interface IEventsRepository
 
     Task<ActionResponse<int>> GetTotalRecordAsync(PaginationDTO pagination);
 
+    Task<ActionResponse<IEnumerable<Event>>> GetActiveWithRequirementStatusAsync(PaginationDTO pagination);
+
+    Task<ActionResponse<int>> GetActiveWithRequirementStatusTotalAsync(PaginationDTO pagination);
+
     Task<ActionResponse<Event>> AddFullAsync(Event events);
 
     Task<ActionResponse<Event>> UpdateFullAsync(Event events);

@@ -57,6 +57,13 @@ namespace SIC.Frontend.Pages.Whatsapp
             Model = response.Response ?? new();
         }
 
+        private bool IsFormComplete =>
+            !string.IsNullOrWhiteSpace(Model.BusinessId) &&
+            !string.IsNullOrWhiteSpace(Model.WabaId) &&
+            !string.IsNullOrWhiteSpace(Model.PhoneNumberId) &&
+            !string.IsNullOrWhiteSpace(Model.PhoneNumber) &&
+            !string.IsNullOrWhiteSpace(Model.AccessToken);
+
         private async Task GuardarConfiguracion()
         {
             IsSaving = true;

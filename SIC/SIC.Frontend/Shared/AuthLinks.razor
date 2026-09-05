@@ -3,19 +3,58 @@
 <AuthorizeView>
     <Authorized>
         @{
-            // Obtener el ID del usuario autenticado
-            var userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var userName = context.User.Identity?.Name;
         }
 
-        <div class="d-flex justify-content-center align-items-center gap-3">
-            <p class="m-0 p-0 fw-bold">Hola, @userName</p>
-            <a href="Logout" class="btn btn-custom d-none d-md-block text-decoration-none">Cerrar Sesión</a>
+        <div class="d-none d-md-flex justify-content-center align-items-center gap-3">
+            <div class="dropdown user-dropdown">
+                <button class="btn user-menu-chip d-flex align-items-center gap-2"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                    <span class="user-avatar">@GetInitials(userName)</span>
+                    <span class="user-menu-name">@userName</span>
+                    <i class="bi bi-chevron-down user-menu-caret"></i>
+                </button>
+
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm user-menu-panel">
+                    <AuthorizeView Roles="Admin, WeddingPlanner">
+                        <Authorized Context="RolesContext">
+                            <li>
+                                <a class="dropdown-item" href="/change-password">
+                                    <span class="user-menu-icon"><i class="bi bi-key-fill"></i></span>
+                                    Cambiar Contraseña
+                                </a>
+                            </li>
+                        </Authorized>
+                    </AuthorizeView>
+                    <li><hr class="dropdown-divider user-menu-divider" /></li>
+                    <li>
+                        <a class="dropdown-item user-menu-logout" href="Logout">
+                            <span class="user-menu-icon"><i class="bi bi-box-arrow-right"></i></span>
+                            Cerrar Sesión
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
 
     </Authorized>
 
     <NotAuthorized>
-        <button href="login" class="btn btn-custom">Iniciar Sesión</button>
+        <button href="login" class="btn btn-custom">Iniciar Sesi�n</button>
     </NotAuthorized>
 </AuthorizeView>
+
+@code {
+    private static string GetInitials(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return "?";
+        }
+
+        var parts = name.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return string.Concat(parts.Take(2).Select(p => char.ToUpperInvariant(p[0])));
+    }
+}

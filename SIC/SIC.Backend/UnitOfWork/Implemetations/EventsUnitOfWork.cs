@@ -32,4 +32,8 @@ public class EventsUnitOfWork : GenericUnitOfWork<Event>, IEventsUnitOfWork
     public override async Task<ActionResponse<IEnumerable<Event>>> GetAsync(PaginationDTO pagination) => await _eventstRepository.GetAsync(pagination);
 
     public override async Task<ActionResponse<int>> GetTotalRecordAsync(PaginationDTO pagination) => await _eventstRepository.GetTotalRecordAsync(pagination);
+
+    public async Task<ActionResponse<IEnumerable<Event>>> GetActiveWithRequirementStatusAsync(PaginationDTO pagination) => await _eventstRepository.GetActiveWithRequirementStatusAsync(pagination);
+
+    public async Task<ActionResponse<int>> GetActiveWithRequirementStatusTotalAsync(PaginationDTO pagination) => await _eventstRepository.GetActiveWithRequirementStatusTotalAsync(pagination);
 }

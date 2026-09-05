@@ -4,6 +4,7 @@ using SIC.Frontend.Repositories;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using SIC.Shared.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace SIC.Frontend.Shared.Modals
 {
@@ -41,8 +42,13 @@ namespace SIC.Frontend.Shared.Modals
 
         private async Task HandleValidSubmit()
         {
+            if (string.IsNullOrWhiteSpace(user.Email) || !new EmailAddressAttribute().IsValid(user.Email))
+            {
+                await SweetAlertService.FireAsync("Error", "Debe ingresar un correo electrónico válido.", SweetAlertIcon.Error);
+                return;
+            }
+
             user.UserName = user.PhoneNumber;
-            user.Email = user.PhoneNumber + "@sic.com";
             user.Document = user.PhoneNumber;
             user.Address = user.PhoneNumber;
             var endpoint = IsEditMode ? "api/Accounts/UpdateUser" : "api/Accounts/CreateUser";
@@ -57,7 +63,7 @@ namespace SIC.Frontend.Shared.Modals
                 return;
             }
 
-            await SweetAlertService.FireAsync("�xito", $"Usuario {(IsEditMode ? "actualizado" : "creado")} correctamente.", SweetAlertIcon.Success);
+            await SweetAlertService.FireAsync("�xito", $"Usuario {(IsEditMode ? "actualizado" : "creado")} correctamente.", SweetAlertIcon.Success);
 
             await OnSaved.InvokeAsync();
             await CloseModal();

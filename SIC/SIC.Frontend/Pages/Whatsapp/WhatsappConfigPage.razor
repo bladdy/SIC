@@ -8,7 +8,7 @@
         Conectar WhatsApp API
     </button>
 
-    @if (Model is not null)
+    @if (IsFormComplete)
     {
         <a href="@($"https://business.facebook.com/latest/billing_hub/accounts/?business_id={Model.BusinessId}&placement=BILLING_HUB&payment_method_id&account_type=whatsapp-business-account")"
            target="_blank"
