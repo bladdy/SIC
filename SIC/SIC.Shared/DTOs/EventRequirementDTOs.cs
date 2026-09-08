@@ -67,7 +67,10 @@ public class EventTypeRequirementDTO
     public RequirementInputType? RequirementInputType { get; set; }
     public bool? RequirementIsRequired { get; set; }
     public bool? RequirementIsActive { get; set; }
-    public string? RequirementPlaceholder { get; set; }
+public string? RequirementPlaceholder { get; set; }
+    public string? RequirementDescription { get; set; }
+    public string? RequirementButtonName { get; set; }
+    public string? RequirementButtonUrl { get; set; }
     public int RequirementMinImages { get; set; }
     public int RequirementMaxImages { get; set; }
 }
@@ -121,4 +124,26 @@ public class SaveAnswersDTO
 {
     public int EventId { get; set; }
     public List<EventRequirementAnswerDTO> Answers { get; set; } = new();
+}
+
+public class RequirementImageOptionDTO
+{
+    public int Id { get; set; }
+
+    [Display(Name = "Requisito")]
+    [Required(ErrorMessage = "El campo {0} es obligatorio.")]
+    public int RequirementId { get; set; }
+
+    [Display(Name = "Título")]
+    [Required(ErrorMessage = "El campo {0} es obligatorio.")]
+    [MaxLength(200)]
+    public string Title { get; set; } = null!;
+
+    [Display(Name = "URL de Imagen")]
+    [Required(ErrorMessage = "El campo {0} es obligatorio.")]
+    [MaxLength(500)]
+    public string ImageUrl { get; set; } = null!;
+
+    [Display(Name = "Orden")]
+    public int SortOrder { get; set; }
 }

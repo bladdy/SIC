@@ -34,6 +34,9 @@ public class EventTypeRequirementsRepository : GenericRepository<EventTypeRequir
                 RequirementIsRequired = x.Requirement.IsRequired,
                 RequirementIsActive = x.Requirement.IsActive,
                 RequirementPlaceholder = x.Requirement.Placeholder,
+                RequirementDescription = x.Requirement.Description,
+                RequirementButtonName = x.Requirement.ButtonName,
+                RequirementButtonUrl = x.Requirement.ButtonUrl,
                 RequirementMinImages = x.Requirement.MinImages,
                 RequirementMaxImages = x.Requirement.MaxImages
             })

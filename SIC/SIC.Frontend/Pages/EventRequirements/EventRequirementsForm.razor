@@ -29,7 +29,10 @@ else
             </p>
 
             <p class="text-muted">
-                Si algún dato no aplica o prefieres no incluirlo, escribe <strong>"OMITIR"</strong> en el campo correspondiente. De esta forma sabremos que no se trata de información pendiente y podremos continuar con el proceso sin retrasos. 🤩
+                Si deseas proporcionar el dato, escribe la información correspondiente.
+                Si el dato no aplica o prefieres no incluirlo, escribe <strong>"OMITIR"</strong>.
+                Si aún no tienes la información, pero deseas agregarla más adelante, simplemente
+                <strong>deja el campo en blanco</strong>.
             </p>
         </div>
 
@@ -94,6 +97,62 @@ else
                                                value="@answer?.Value"
                                                disabled="@IsFieldLocked(req.RequirementId)"
                                                @onchange="e => SetAnswer(req.RequirementId, e.Value?.ToString())" />
+                                        break;
+
+                                    case RequirementInputType.ImagenConTitulo:
+                                        var options = GetOptions(req.RequirementId);
+                                        @if (!string.IsNullOrWhiteSpace(req.RequirementDescription))
+                                        {
+                                            <div class="text-muted mb-3">@req.RequirementDescription</div>
+                                        }
+                                        <div class="@((SubmitAttempted && FailedFields.Contains(req.RequirementId)) ? "is-invalid" : "")">
+                                            @if (options.Count > 0)
+                                            {
+                                                <div class="row row-cols-2 row-cols-md-3 g-2">
+                                                    @foreach (var option in options)
+                                                    {
+                                                        var isSelected = IsOptionSelected(req.RequirementId, option);
+                                                        <div class="col">
+                                                            <button type="button"
+                                                                    class="btn btn-outline-secondary w-100 h-100 d-flex flex-column align-items-center gap-1 p-2 @(isSelected ? "btn-selected" : "")"
+                                                                    style="@(isSelected ? "border-color:#3C6A79; background:#eef4f6;" : "")"
+                                                                    disabled="@IsFieldLocked(req.RequirementId)"
+                                                                    @onclick="() => SelectOption(req.RequirementId, option)">
+                                                                <img src="@option.ImageUrl" alt="@option.Title"
+                                                                     style="max-height:90px; max-width:100%; border-radius:6px; object-fit:cover;" class="border" />
+                                                                <span class="small text-center fw-semibold">@option.Title</span>
+                                                                <span class="@(isSelected ? "text-success" : "text-muted")">
+                                                                    @if (isSelected)
+                                                                    {
+                                                                        <i class="bi bi-check-circle-fill"></i>
+                                                                        <small>Seleccionado</small>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <small>Seleccionar</small>
+                                                                    }
+                                                                </span>
+                                                            </button>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            }
+                                        </div>
+                                        break;
+
+                                    case RequirementInputType.Button:
+                                        @if (!string.IsNullOrWhiteSpace(req.RequirementDescription))
+                                        {
+                                            <div class="text-muted mb-3">@req.RequirementDescription</div>
+                                        }
+                                        @if (!string.IsNullOrWhiteSpace(req.RequirementButtonUrl))
+                                        {
+                                            <div class="text-center">
+                                                <a href="@req.RequirementButtonUrl" target="_blank" rel="noopener noreferrer" class="btn btn-custom btn-lg px-5">
+                                                    @((string.IsNullOrWhiteSpace(req.RequirementButtonName) ? "Abrir enlace" : req.RequirementButtonName))
+                                                </a>
+                                            </div>
+                                        }
                                         break;
 
                                     case RequirementInputType.Image:

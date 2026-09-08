@@ -7,6 +7,7 @@ using SIC.Frontend.Repositories;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using SIC.Shared.Enums;
+using System.Text.Json;
 
 namespace SIC.Frontend.Pages.EventRequirements;
 
@@ -31,6 +32,9 @@ public partial class EventRequirementsResponse
 
     private bool IsLightboxVisible = false;
     private EventRequirementImage? SelectedImage;
+
+    private bool IsSelectionLightboxVisible = false;
+    private (string? Title, string? ImageUrl)? SelectedSelection;
 
     protected override async Task OnInitializedAsync()
     {
@@ -104,6 +108,36 @@ public partial class EventRequirementsResponse
         return AnswersByRequirement.TryGetValue(requirementId, out var answer)
             ? answer.Value
             : null;
+    }
+
+    private (string? Title, string? ImageUrl)? GetImageSelection(int requirementId)
+    {
+        var value = GetAnswer(requirementId);
+        if (string.IsNullOrWhiteSpace(value)) return null;
+
+        try
+        {
+            var parsed = JsonSerializer.Deserialize<JsonElement>(value);
+            return (
+                parsed.TryGetProperty("title", out var title) ? title.GetString() : null,
+                parsed.TryGetProperty("imageUrl", out var url) ? url.GetString() : null);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private void OpenSelectionLightbox(string? title, string? imageUrl)
+    {
+        SelectedSelection = (title, imageUrl);
+        IsSelectionLightboxVisible = true;
+    }
+
+    private void CloseSelectionLightbox()
+    {
+        IsSelectionLightboxVisible = false;
+        SelectedSelection = null;
     }
 
     private List<EventRequirementImage>? GetImages(int requirementId)

@@ -113,6 +113,19 @@ else
                                 <span class="text-muted fst-italic">Sin respuesta</span>
                             }
                         }
+                        else if (req.RequirementInputType == RequirementInputType.Button)
+                        {
+                            if (!string.IsNullOrWhiteSpace(req.RequirementButtonUrl))
+                            {
+                                <a href="@req.RequirementButtonUrl" target="_blank" rel="noopener noreferrer" class="btn btn-custom">
+                                    @((string.IsNullOrWhiteSpace(req.RequirementButtonName) ? "Abrir enlace" : req.RequirementButtonName))
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-muted fst-italic">Sin enlace configurado</span>
+                            }
+                        }
                         else if (req.RequirementInputType == RequirementInputType.Date)
                         {
                             if (!string.IsNullOrWhiteSpace(answer) && DateTime.TryParse(answer, out var dateVal))
@@ -137,6 +150,30 @@ else
                             else if (!string.IsNullOrWhiteSpace(answer))
                             {
                                 <span>@answer</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted fst-italic">Sin respuesta</span>
+                            }
+                        }
+                        else if (req.RequirementInputType == RequirementInputType.ImagenConTitulo)
+                        {
+                            var selection = GetImageSelection(req.RequirementId);
+                            if (selection.HasValue && (!string.IsNullOrWhiteSpace(selection.Value.Title) || !string.IsNullOrWhiteSpace(selection.Value.ImageUrl)))
+                            {
+                                <div class="d-flex align-items-center gap-3 flex-wrap">
+                                    @if (!string.IsNullOrWhiteSpace(selection.Value.ImageUrl))
+                                    {
+                                        <img src="@selection.Value.ImageUrl" alt="@selection.Value.Title"
+                                             style="max-width:220px; max-height:160px; border-radius:8px; object-fit:cover; cursor:pointer;"
+                                             class="border shadow-sm"
+                                             @onclick="() => OpenSelectionLightbox(selection.Value.Title, selection.Value.ImageUrl)" />
+                                    }
+                                    <div>
+                                        <small class="text-muted d-block">Imagen seleccionada</small>
+                                        <span class="fs-6 fw-semibold">@selection.Value.Title</span>
+                                    </div>
+                                </div>
                             }
                             else
                             {
@@ -185,6 +222,33 @@ else
                         <i class="bi bi-download"></i> Descargar
                     </button>
                     <button type="button" class="btn btn-secondary" @onclick="CloseLightbox">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (IsSelectionLightboxVisible && SelectedSelection.HasValue)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.8);">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-transparent border-0">
+                <div class="modal-header border-0">
+                    <small class="text-white text-truncate me-2">@SelectedSelection.Value.Title</small>
+                    <button type="button" class="btn-close btn-close-white" @onclick="CloseSelectionLightbox"></button>
+                </div>
+                <div class="modal-body text-center p-0">
+                    <img src="@SelectedSelection.Value.ImageUrl" alt="@SelectedSelection.Value.Title"
+                         class="img-fluid" style="max-height:80vh;" />
+                    @if (!string.IsNullOrWhiteSpace(SelectedSelection.Value.Title))
+                    {
+                        <div class="mt-3">
+                            <span class="text-white fs-5 fw-semibold">@SelectedSelection.Value.Title</span>
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer border-0 justify-content-center">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseSelectionLightbox">Cerrar</button>
                 </div>
             </div>
         </div>

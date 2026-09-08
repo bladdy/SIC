@@ -154,9 +154,100 @@
                             </div>
                         </div>
 
+                        @if (NewRequirement.InputType == RequirementInputType.ImagenConTitulo)
+                        {
+                            <hr />
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label fw-semibold mb-0">
+                                        Opciones de Imagen / Título
+                                        <small class="text-muted d-block fw-normal">El usuario deberá elegir una de las siguientes imágenes.</small>
+                                    </label>
+                                    <button type="button" class="btn btn-sm btn-custom" @onclick="AddImageOption">
+                                        <i class="bi bi-plus-lg"></i> Agregar Opción
+                                    </button>
+                                </div>
+
+                                @if (ImageOptions.Count == 0)
+                                {
+                                    <div class="text-muted border rounded p-3 text-center">
+                                        No hay opciones configuradas. Haz clic en "Agregar Opción".
+                                    </div>
+                                }
+
+                                @for (int i = 0; i < ImageOptions.Count; i++)
+                                {
+                                    var optionIndex = i;
+                                    var previewUrl = ImageOptions[optionIndex].ImageUrl;
+                                    var hasLocalFile = IsOptionImageLocal(optionIndex);
+
+                                    <div class="border rounded p-2 mb-2 d-flex align-items-center gap-3">
+                                        <div class="text-center flex-shrink-0">
+                                            @if (!string.IsNullOrEmpty(previewUrl))
+                                            {
+                                                <img src="@previewUrl" alt="Vista previa" style="max-height:70px; max-width:90px; border-radius:6px;" class="border" />
+                                            }
+                                            else
+                                            {
+                                                <div class="border rounded d-flex align-items-center justify-content-center text-muted"
+                                                     style="height:70px; width:90px;">
+                                                    Sin imagen
+                                                </div>
+                                            }
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <InputFile class="form-control form-control-sm mb-1"
+                                                       accept="image/*"
+                                                       OnChange="e => HandleOptionImageUpload(optionIndex, e)" />
+                                            <input type="text" class="form-control form-control-sm"
+                                                   placeholder="Título de la opción"
+                                                   value="@ImageOptions[optionIndex].Title"
+                                                   @onchange="e => UpdateOptionTitle(optionIndex, e.Value?.ToString())" />
+                                            @if (hasLocalFile)
+                                            {
+                                                <small class="text-muted">Archivo pendiente por subir</small>
+                                            }
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-outline-danger flex-shrink-0"
+                                                @onclick="() => RemoveImageOption(optionIndex)">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                            <hr />
+                        }
+
+                        @if (NewRequirement.InputType == RequirementInputType.Button)
+                        {
+                            <hr />
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Nombre del Botón</label>
+                                        <InputText class="form-control" @bind-Value="NewRequirement.ButtonName" placeholder="Ej. Ver Catálogo" />
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">URL</label>
+                                        <InputText class="form-control" @bind-Value="NewRequirement.ButtonUrl" placeholder="https://..." />
+                                        <small class="text-muted">El botón abrirá este enlace en una pestaña nueva.</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr />
+                        }
+
                         <div class="modal-footer">
-                            <button type="submit" class="btn btn-custom">Guardar</button>
-                            <button type="button" class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
+                            <button type="submit" class="btn btn-custom" disabled="@Saving">
+                                @if (Saving)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                }
+                                Guardar
+                            </button>
+                            <button type="button" class="btn btn-secondary" disabled="@Saving" @onclick="CloseModal">Cancelar</button>
                         </div>
                     </EditForm>
                 </div>

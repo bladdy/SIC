@@ -29,6 +29,14 @@ public class EventRequirement
     [MaxLength(200, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres.")]
     public string? Placeholder { get; set; }
 
+    [Display(Name = "Nombre del Botón")]
+    [MaxLength(200, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres.")]
+    public string? ButtonName { get; set; }
+
+    [Display(Name = "URL del Botón")]
+    [MaxLength(500, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres.")]
+    public string? ButtonUrl { get; set; }
+
     [Display(Name = "Obligatorio")]
     public bool IsRequired { get; set; }
 
@@ -51,4 +59,5 @@ public class EventRequirement
 
     public ICollection<EventTypeRequirement> EventTypeRequirements { get; set; } = new List<EventTypeRequirement>();
     public ICollection<EventRequirementAnswer> Answers { get; set; } = new List<EventRequirementAnswer>();
+    public ICollection<RequirementImageOption> ImageOptions { get; set; } = new List<RequirementImageOption>();
 }

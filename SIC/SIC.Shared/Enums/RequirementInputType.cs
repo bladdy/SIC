@@ -23,5 +23,11 @@ public enum RequirementInputType
     Url,
 
     [Description("Imagen")]
-    Image
+    Image,
+
+    [Description("Imagenes/Titulo")]
+    ImagenConTitulo,
+
+    [Description("Botón / Enlace")]
+    Button
 }

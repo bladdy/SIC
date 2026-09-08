@@ -47,6 +47,7 @@ public class DataContext : IdentityDbContext<User>
     public DbSet<EventTypeRequirement> EventTypeRequirements { get; set; }
     public DbSet<EventRequirementAnswer> EventRequirementAnswers { get; set; }
     public DbSet<EventRequirementImage> EventRequirementImages { get; set; }
+    public DbSet<RequirementImageOption> RequirementImageOptions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -95,6 +96,12 @@ public class DataContext : IdentityDbContext<User>
         modelBuilder.Entity<EventRequirementAnswer>()
             .HasIndex(x => new { x.EventId, x.RequirementId })
             .IsUnique();
+
+        modelBuilder.Entity<RequirementImageOption>()
+            .HasOne(x => x.Requirement)
+            .WithMany(r => r.ImageOptions)
+            .HasForeignKey(x => x.RequirementId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<InvitationGuest>()
             .HasOne(g => g.TablesEvents)

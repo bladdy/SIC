@@ -26,6 +26,7 @@ public partial class EventRequirementsForm
     private EventRequirementFormDTO? FormDTO;
     private Dictionary<int, string?> AnswerValues { get; set; } = new();
     private Dictionary<int, List<EventRequirementImageDTO>> ImagesByRequirement { get; set; } = new();
+    private Dictionary<int, List<RequirementImageOptionDTO>> OptionsByRequirement { get; set; } = new();
     private Dictionary<string, List<EventTypeRequirementDTO>> Sections { get; set; } = new();
     private HashSet<int> FailedFields { get; set; } = new();
     private Dictionary<int, string> FieldErrorMessages { get; set; } = new();
@@ -119,6 +120,35 @@ public partial class EventRequirementsForm
                     })
                     .ToList());
 
+        OptionsByRequirement = new();
+        var optionsReqs = typeReqs
+            .Where(r => r.RequirementInputType == RequirementInputType.ImagenConTitulo)
+            .ToList();
+
+        foreach (var req in optionsReqs)
+        {
+            var optionsResp = await repository.GetAsync<List<RequirementImageOption>>(
+                $"api/RequirementImageOptions/byRequirement/{req.RequirementId}");
+            if (!optionsResp.Error && optionsResp.Response != null)
+            {
+                OptionsByRequirement[req.RequirementId] = optionsResp.Response
+                    .OrderBy(o => o.SortOrder)
+                    .Select(o => new RequirementImageOptionDTO
+                    {
+                        Id = o.Id,
+                        RequirementId = o.RequirementId,
+                        Title = o.Title,
+                        ImageUrl = o.ImageUrl,
+                        SortOrder = o.SortOrder
+                    })
+                    .ToList();
+            }
+            else
+            {
+                OptionsByRequirement[req.RequirementId] = new List<RequirementImageOptionDTO>();
+            }
+        }
+
         Sections = typeReqs
             .GroupBy(r => r.RequirementSection ?? "General")
             .ToDictionary(g => g.Key, g => g.ToList());
@@ -180,6 +210,42 @@ public partial class EventRequirementsForm
     private int GetImageCount(int requirementId)
     {
         return ImagesByRequirement.TryGetValue(requirementId, out var imgs) ? imgs.Count : 0;
+    }
+
+    private void SelectOption(int requirementId, RequirementImageOptionDTO option)
+    {
+        if (IsFieldLocked(requirementId)) return;
+
+        var value = System.Text.Json.JsonSerializer.Serialize(new
+        {
+            title = option.Title,
+            imageUrl = option.ImageUrl
+        });
+
+        SetAnswer(requirementId, value);
+        StateHasChanged();
+    }
+
+    private bool IsOptionSelected(int requirementId, RequirementImageOptionDTO option)
+    {
+        var val = AnswerValues.GetValueOrDefault(requirementId);
+        if (string.IsNullOrWhiteSpace(val)) return false;
+
+        try
+        {
+            var parsed = System.Text.Json.JsonSerializer.Deserialize<System.Text.Json.JsonElement>(val);
+            var title = parsed.GetProperty("title").GetString();
+            return title == option.Title;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private List<RequirementImageOptionDTO> GetOptions(int requirementId)
+    {
+        return OptionsByRequirement.TryGetValue(requirementId, out var opts) ? opts : new List<RequirementImageOptionDTO>();
     }
 
     private bool IsFieldLocked(int requirementId)
@@ -299,6 +365,9 @@ public partial class EventRequirementsForm
                         : $"Este campo solo admite hasta {max} imágenes.";
                 }
             }
+            else if (req.RequirementInputType == RequirementInputType.Button)
+            {
+            }
             else if (req.RequirementIsRequired == true)
             {
                 var val = AnswerValues.GetValueOrDefault(req.RequirementId);
@@ -327,7 +396,7 @@ public partial class EventRequirementsForm
             {
                 EventId = FormDTO.EventId,
                 RequirementId = req.RequirementId,
-                Value = req.RequirementInputType == RequirementInputType.Image
+                Value = req.RequirementInputType is RequirementInputType.Image or RequirementInputType.Button
                     ? ""
                     : AnswerValues.GetValueOrDefault(req.RequirementId)
             });
@@ -389,7 +458,7 @@ public partial class EventRequirementsForm
 
         foreach (var req in FormDTO.Requirements)
         {
-            if (req.RequirementInputType == RequirementInputType.Image)
+            if (req.RequirementInputType is RequirementInputType.Image or RequirementInputType.Button)
                 continue;
 
             var hasContent = !string.IsNullOrWhiteSpace(AnswerValues.GetValueOrDefault(req.RequirementId));
