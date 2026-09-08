@@ -1,6 +1,4 @@
-**/bin/
-**/obj/
-**/Dockerfile
-**/*.user
-**/*.suo
-**/.dockerignore
+**/bin
+**/obj
+.git
+.gitignore

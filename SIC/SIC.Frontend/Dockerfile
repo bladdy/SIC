@@ -2,6 +2,9 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
+# Workload de Blazor WebAssembly (requerido por el SDK .NET 8)
+RUN dotnet workload install wasm-tools
+
 # Copiar proyectos necesarios
 COPY ["SIC.Frontend/SIC.Frontend.csproj", "SIC.Frontend/"]
 COPY ["SIC.Shared/SIC.Shared.csproj", "SIC.Shared/"]
