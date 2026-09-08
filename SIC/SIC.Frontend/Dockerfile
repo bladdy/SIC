@@ -5,6 +5,11 @@ WORKDIR /src
 # Workload de Blazor WebAssembly (requerido por el SDK .NET 8)
 RUN dotnet workload install wasm-tools
 
+# emcc (compilación nativa wasm) requiere python
+RUN apt-get update && apt-get install -y --no-install-recommends python3 && \
+    ln -s /usr/bin/python3 /usr/bin/python && \
+    rm -rf /var/lib/apt/lists/*
+
 # Copiar proyectos necesarios
 COPY ["SIC.Frontend/SIC.Frontend.csproj", "SIC.Frontend/"]
 COPY ["SIC.Shared/SIC.Shared.csproj", "SIC.Shared/"]
