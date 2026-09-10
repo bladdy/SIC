@@ -197,7 +197,7 @@ namespace SIC.Backend.Controllers
                 .Select(t => t!.MetaDefinitionJson!)
                 .ToList();
 
-            if (templateJsons.Count < 5)
+            if (templateJsons.Count < 6)
             {
                 return BadRequest(new
                 {

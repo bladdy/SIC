@@ -98,10 +98,10 @@ namespace SIC.Frontend.Pages.Whatsapp
             var confirm = await SweetAlertService.FireAsync(new SweetAlertOptions
             {
                 Title = "Generar plantillas",
-                Text = "Se crear�n las 5 plantillas en segundo plano. El proceso puede tardar aproximadamente 5 minutos.",
+                Text = "Se crearán las 6 plantillas en segundo plano. El proceso puede tardar aproximadamente 6 minutos.",
                 Icon = SweetAlertIcon.Question,
                 ShowCancelButton = true,
-                ConfirmButtonText = "S�, generar",
+                ConfirmButtonText = "Sí, generar",
                 CancelButtonText = "Cancelar"
             });
 

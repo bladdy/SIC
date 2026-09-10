@@ -470,7 +470,7 @@ else
                     <ul class="dropdown-menu">
                         @if (Templates != null)
                         {
-                            @if (EventDetail.EventType?.Id == 4)
+                            @if (EventDetail.EventType?.Name?.Contains("Save", StringComparison.OrdinalIgnoreCase) == true)
                             {
                                 @foreach (var template in Templates.Where(x => x.TemplateNumber == 6))
                                 {
@@ -601,7 +601,7 @@ else
                                                         }
                                                         <div class="steps-container">
 
-                                                            @if (EventDetail.EventType!.Id != 4 )
+                                                            @if (EventDetail.EventType?.Name?.Contains("Save", StringComparison.OrdinalIgnoreCase) == false)
                                                             {
                                                                 <div class="step-circle @(sentTemplates.Contains(1) ? "active-step" : "inactive-step")">
                                                                     <!-- SVG 1 -->
@@ -687,7 +687,7 @@ else
 
                                                                     @if (Templates != null)
                                                                     {
-                                                                        @if (EventDetail.EventType?.Id == 4)
+                                                                        @if (EventDetail.EventType?.Name?.Contains("Save", StringComparison.OrdinalIgnoreCase) == true)
                                                                         {
                                                                             @foreach (var template in Templates.Where(x => x.TemplateNumber == 6))
                                                                             {
@@ -990,7 +990,7 @@ else
                                         <ul class="dropdown-menu">
                                             @if (Templates != null)
                                             {
-                                                @if (EventDetail.EventType?.Id == 4)
+                                                @if (EventDetail.EventType?.Name?.Contains("Save", StringComparison.OrdinalIgnoreCase) == true)
                                                 {
                                                     @foreach (var template in Templates.Where(x => x.TemplateNumber == 6))
                                                     {
@@ -1104,7 +1104,7 @@ else
                             <div class="steps-wrapper">
                                 <div class="steps-container">
 
-                                    @if (EventDetail.EventType!.Id != 4 )
+                                    @if (EventDetail.EventType?.Name?.Contains("Save", StringComparison.OrdinalIgnoreCase) == false)
                                     {
                                         <div class="step-circle @(sentTemplates.Contains(1) ? "active-step" : "inactive-step")">
                                             <!-- SVG 1 -->
