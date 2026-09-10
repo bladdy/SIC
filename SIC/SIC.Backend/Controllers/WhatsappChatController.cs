@@ -23,14 +23,16 @@ namespace SIC.Backend.Controllers
         private readonly IMessageUnitOfWork _messageUnitOfWork;
         private readonly WhatsAppService _whatsAppService;
         private readonly IWhatsAppConfigUnitOfWork _whatsAppConfigUnitOfWork;
+        private readonly IWhatsAppTemplateUnitOfWork _whatsAppTemplateUnitOfWork;
         private readonly IHubContext<WhatsappChatHub> _hub;
 
         public WhatsappChatController(
-            WhatsAppService whatsAppService, IMessageUnitOfWork messageUnitOfWork, IWhatsAppConfigUnitOfWork whatsAppConfigUnitOfWork, IHubContext<WhatsappChatHub> hub)
+            WhatsAppService whatsAppService, IMessageUnitOfWork messageUnitOfWork, IWhatsAppConfigUnitOfWork whatsAppConfigUnitOfWork, IWhatsAppTemplateUnitOfWork whatsAppTemplateUnitOfWork, IHubContext<WhatsappChatHub> hub)
         {
             _messageUnitOfWork = messageUnitOfWork;
             _whatsAppConfigUnitOfWork = whatsAppConfigUnitOfWork;
             _whatsAppService = whatsAppService;
+            _whatsAppTemplateUnitOfWork = whatsAppTemplateUnitOfWork;
             _hub = hub;
         }
 
@@ -92,6 +94,31 @@ namespace SIC.Backend.Controllers
             var templates = await _whatsAppService.GetTemplatesAsync(userWhatsAppConfig.Result);
 
             return Ok(templates);
+        }
+
+        [HttpDelete("templates/{templateName}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> DeleteTemplate(string templateName)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return BadRequest(new { error = "Usuario no autenticado" });
+
+            var userWhatsAppConfig = await _whatsAppConfigUnitOfWork.GetByUserIdAsync(userId);
+            if (!userWhatsAppConfig.Success || userWhatsAppConfig.Result == null)
+                return BadRequest(new { error = "Este usuario no tiene permisos para eliminar plantillas" });
+
+            var result = await _whatsAppService.DeleteWhatsAppTemplateByNameAsync(
+                userWhatsAppConfig.Result.WabaId,
+                templateName,
+                userWhatsAppConfig.Result.AccessToken);
+
+            if (!result.Success)
+                return BadRequest(new { error = result.Message });
+
+            await _whatsAppTemplateUnitOfWork.DeleteByNameAsync(templateName, userId);
+
+            return Ok(new { message = result.Message });
         }
 
         [HttpPost("send")]

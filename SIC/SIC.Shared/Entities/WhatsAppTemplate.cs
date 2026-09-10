@@ -7,7 +7,8 @@
         public string DisplayName { get; set; } = null!;
         public string Language { get; set; } = "es_ES";
 
-        //Agregar usuario que creó la plantilla
+        public string? UsuarioId { get; set; }
+
         // JSON con la estructura completa
         public string StructureJson { get; set; } = null!;
 

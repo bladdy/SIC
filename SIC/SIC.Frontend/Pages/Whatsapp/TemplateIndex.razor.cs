@@ -68,6 +68,46 @@ namespace SIC.Frontend.Pages.Whatsapp
             SelectedImageName = null;
         }
 
+        private async Task DeleteTemplate(TemplateDatum template)
+        {
+            var confirm = await SweetAlertService.FireAsync(new SweetAlertOptions
+            {
+                Title = "Eliminar plantilla",
+                Text = $"¿Estás seguro de que deseas eliminar la plantilla '{template.Name}'? " +
+                       "Tendrás que esperar 30 días antes de poder reutilizar el mismo nombre para crear una nueva plantilla.",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Sí, eliminar",
+                CancelButtonText = "Cancelar"
+            });
+
+            if (!confirm.IsConfirmed)
+                return;
+
+            var url = $"api/whatsapp/chat/templates/{Uri.EscapeDataString(template.Name!)}";
+
+            var responseHttp = await Repository.DeleteAsync<object>(url);
+
+            if (responseHttp.Error)
+            {
+                var error = await responseHttp.GetErrorMessageAsync() ?? "No se pudo eliminar la plantilla.";
+                await SweetAlertService.FireAsync("Error", error, SweetAlertIcon.Error);
+                return;
+            }
+
+            var httpResponseMessage = responseHttp.HttpResponseMessage;
+            var result = await httpResponseMessage.Content.ReadFromJsonAsync<ApiResponse>();
+
+            await SweetAlertService.FireAsync(new SweetAlertOptions
+            {
+                Title = "Plantilla eliminada",
+                Text = result?.Message ?? $"La plantilla '{template.Name}' fue eliminada correctamente.",
+                Icon = SweetAlertIcon.Success
+            });
+
+            await LoadAllTemplates();
+        }
+
         protected override async Task OnInitializedAsync()
         {
             await LoadAllTemplates();

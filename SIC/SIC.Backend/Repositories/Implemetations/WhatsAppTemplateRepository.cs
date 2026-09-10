@@ -48,13 +48,13 @@ namespace SIC.Backend.Repositories.Implemetations
 
         public async Task<ActionResponse<bool>> CreateTemplates(WhatsAppTemplate entity)
         {
-            bool exists = await _context.WhatsAppTemplates.AnyAsync(t => t.Name == entity.Name);
+            bool exists = await _context.WhatsAppTemplates.AnyAsync(t => t.Name == entity.Name && t.UsuarioId == entity.UsuarioId);
             if (exists)
             {
                 return new ActionResponse<bool>
                 {
                     Success = false,
-                    Message = "Ya existe una plantilla con ese nombre."
+                    Message = "Ya existe una plantilla con ese nombre para tu cuenta."
                 };
             }
             else
@@ -80,10 +80,66 @@ namespace SIC.Backend.Repositories.Implemetations
             };
         }
 
-        public async Task<WhatsAppTemplate?> GetByNameAsync(string name)
+        public async Task<ActionResponse<IEnumerable<WhatsAppTemplate?>>> GetForUserAsync(string? userId)
+        {
+            var entities = await _context.WhatsAppTemplates
+                .Where(t => t.UsuarioId == userId || t.IsSuggested)
+                .OrderBy(o => o.OrderTemplate)
+                .AsNoTracking()
+                .ToListAsync();
+
+            return new ActionResponse<IEnumerable<WhatsAppTemplate?>>
+            {
+                Success = true,
+                Result = entities
+            };
+        }
+
+        public async Task<WhatsAppTemplate?> GetByNameAsync(string name, string? userId)
         {
             return await _context.WhatsAppTemplates
-                .FirstOrDefaultAsync(t => t.Name == name);
+                .FirstOrDefaultAsync(t => t.Name == name && (t.UsuarioId == userId || t.IsSuggested));
+        }
+
+        public async Task<ActionResponse<bool>> DeleteByNameAsync(string name, string userId)
+        {
+            var entity = await _context.WhatsAppTemplates
+                .FirstOrDefaultAsync(t => t.Name == name && t.UsuarioId == userId);
+
+            if (entity == null)
+            {
+                return new ActionResponse<bool>
+                {
+                    Success = true,
+                    Result = true,
+                    Message = $"No se encontró la plantilla '{name}' en la base de datos para este usuario."
+                };
+            }
+
+            _context.WhatsAppTemplates.Remove(entity);
+            await _context.SaveChangesAsync();
+
+            return new ActionResponse<bool>
+            {
+                Success = true,
+                Result = true,
+                Message = $"La plantilla '{name}' fue eliminada correctamente."
+            };
+        }
+
+        public async Task<int> GetNextTemplateNumberAsync(string userId)
+        {
+            var maxOrder = await _context.WhatsAppTemplates
+                .Where(t => t.UsuarioId == userId)
+                .MaxAsync(t => (int?)t.OrderTemplate) ?? 0;
+
+            var maxNumber = await _context.WhatsAppTemplates
+                .Where(t => t.UsuarioId == userId)
+                .MaxAsync(t => (int?)t.TemplateNumber) ?? 0;
+
+            var next = Math.Max(maxOrder, maxNumber) + 1;
+
+            return Math.Max(20, next);
         }
     }
 }

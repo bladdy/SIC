@@ -176,6 +176,12 @@ namespace SIC.Frontend.Pages.Tables
                 await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
                 return;
             }
+            if (table.Guests.Any())
+            {
+                var message = $"No se puede eliminar la mesa:{table.Name}. Porque aun tiene registros, primero elimine los invitados de la mesa.";
+                await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
+            }
 
             var result = await SweetAlertService.FireAsync(new SweetAlertOptions
             {

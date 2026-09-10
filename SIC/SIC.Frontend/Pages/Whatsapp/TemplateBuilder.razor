@@ -31,6 +31,15 @@
             </div>
 
             <div class="mb-3">
+                <label>Nombre para mostrar</label>
+
+                <input class="form-control"
+                placeholder="Ej: S-Save The Date"
+                @bind="Model.DisplayName"
+                @bind:event="oninput" />
+            </div>
+
+            <div class="mb-3">
                 <label>Idioma</label>
 
                 <select class="form-select"
@@ -141,32 +150,52 @@
                                     Selecciona una variable
                                 </option>
 
-                                <option value="GuestName">
+                                <option value="Invitation.Name">
                                     Nombre Invitado
                                 </option>
 
-                                <option value="InvitationCode">
-                                    Codigo de Invitacion
+                                <option value="Invitation.Code">
+                                    Código de Invitación
                                 </option>
 
-                                <option value="EventDate">
-                                    Fecha del Evento
-                                </option>
-
-                                <option value="EventName">
+                                <option value="Event.Name">
                                     Nombre del Evento
                                 </option>
 
-                                <option value="EventTitle">
-                                    Titulo Evento
+                                <option value="Event.SubTitle">
+                                    Subtítulo del Evento
                                 </option>
 
-                                <option value="InvitationUrl">
-                                    Url de la Invitacion
+                                <option value="Event.DateFormatted">
+                                    Fecha del Evento
                                 </option>
 
-                                <option value="Table">
+                                <option value="Event.DateLimitFormatted">
+                                    Fecha Límite de Confirmación
+                                </option>
+
+                                <option value="Event.UrlWithCode">
+                                    Url de la Invitación
+                                </option>
+
+                                <option value="Event.UrlConfirmation">
+                                    Url de Confirmación
+                                </option>
+
+                                <option value="Invitation.ReservedSeats">
+                                    Asientos Reservados
+                                </option>
+
+                                <option value="Event.Table">
                                     Mesa
+                                </option>
+
+                                <option value="Event.AnotherSupplier">
+                                    Otro Proveedor
+                                </option>
+
+                                <option value="Event.CoverImageUrl">
+                                    Imagen de Portada
                                 </option>
 
                             </select>
@@ -449,6 +478,38 @@
                 return;
             }
 
+            if (string.IsNullOrWhiteSpace(Model.DisplayName))
+            {
+                await SweetAlertService.FireAsync(
+                    "Error", 
+                    "Agrega un nombre para mostrar la plantilla.", 
+                    SweetAlertIcon.Error);
+                return;
+            }
+
+            if (Model.BodyExamples.Any())
+            {
+                var hasMissingType = false;
+                var count = Math.Min(Model.BodyExamples.Count, Model.BodyExampleTypes.Count);
+
+                for (int i = 0; i < count; i++)
+                {
+                    if (string.IsNullOrWhiteSpace(Model.BodyExampleTypes[i]))
+                    {
+                        hasMissingType = true;
+                        break;
+                    }
+                }
+
+                if (hasMissingType)
+                {
+                    await SweetAlertService.FireAsync(
+                        "Error", 
+                        "Cada variable insertada debe tener una variable seleccionada en 'Muestras de variables'.", 
+                        SweetAlertIcon.Error);
+                    return;
+                }
+            }
 
             var response = await Http.PostAsJsonAsync(
                 "api/whatsapp/create-templates",

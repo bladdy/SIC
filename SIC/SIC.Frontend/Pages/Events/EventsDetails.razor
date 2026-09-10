@@ -477,9 +477,20 @@ else
                                 {
                                     <li>
                                         <button type="button"
-                                                class="dropdown-item"
-                                                @onclick="() => EnviarInvitacionesMasivas(template.Name)">
-                                            @template.DisplayName
+                                        class="dropdown-item"
+                                        @onclick="() => EnviarInvitacionesMasivas(template.Name)">
+                                            @if (template.TemplateNumber < 20)
+                                            {
+
+                                                <span class="fw-bold">
+                                                    @template.DisplayName
+                                                </span>
+                                            }
+                                            else
+                                            {
+
+                                                @template.DisplayName
+                                            }
                                         </button>
                                     </li>
                                 }
@@ -490,9 +501,23 @@ else
                                 {
                                     <li>
                                         <button type="button"
-                                                class="dropdown-item"
-                                                @onclick="() => EnviarInvitacionesMasivas(template.Name)">
-                                            @template.DisplayName
+                                        class="dropdown-item"
+
+                                        @onclick="() => EnviarInvitacionesMasivas(template.Name)">
+                                            <span class="fw-bold">
+                                                @if (template.TemplateNumber < 20)
+                                                {
+
+                                                    <span class="fw-bold">
+                                                        @template.DisplayName
+                                                    </span>
+                                                }
+                                                else
+                                                {
+
+                                                    @template.DisplayName
+                                                }
+                                            </span>
                                         </button>
                                     </li>
                                 }
@@ -500,7 +525,7 @@ else
                         }
                     </ul>
 
-                    
+
                 </div>
             }
         }
@@ -668,9 +693,9 @@ else
                                                         {
                                                             <div class="dropdown">
                                                                 <button class="btn btn-success dropdown-toggle d-flex align-items-center gap-2"
-                                                                        type="button"
-                                                                        data-bs-toggle="dropdown"
-                                                                        disabled="@(loadingWhatsappId1 == invitation.Id)">
+                                                                type="button"
+                                                                data-bs-toggle="dropdown"
+                                                                disabled="@(loadingWhatsappId1 == invitation.Id)">
                                                                     @if (IsSendingMassive)
                                                                     {
                                                                         <span class="spinner-border spinner-border-sm"></span>
@@ -691,13 +716,24 @@ else
                                                                             {
                                                                                 <li>
                                                                                     <button type="button"
-                                                                                            class="dropdown-item"
-                                                                                            @onclick="() => EnviarInvitacion(
+                                                                                    class="dropdown-item"
+                                                                                    @onclick="() => EnviarInvitacion(
                                                                                                 invitation.Code!,
                                                                                                 template.Name,
                                                                                                 invitation.Id,
                                                                                                 template.DisplayName)">
-                                                                                        @template.DisplayName
+                                                                                        @if (template.TemplateNumber < 20)
+                                                                                        {
+
+                                                                                            <span class="fw-bold">
+                                                                                                @template.DisplayName
+                                                                                            </span>
+                                                                                        }
+                                                                                        else
+                                                                                        {
+
+                                                                                            @template.DisplayName
+                                                                                        }
                                                                                     </button>
                                                                                 </li>
                                                                             }
@@ -708,13 +744,24 @@ else
                                                                             {
                                                                                 <li>
                                                                                     <button type="button"
-                                                                                            class="dropdown-item"
-                                                                                            @onclick="() => EnviarInvitacion(
+                                                                                    class="dropdown-item"
+                                                                                    @onclick="() => EnviarInvitacion(
                                                                                                 invitation.Code!,
                                                                                                 template.Name,
                                                                                                 invitation.Id,
                                                                                                 template.DisplayName)">
+                                                                                        @if (template.TemplateNumber < 20)
+                                                                                        {
+
+                                                                                            <span class="fw-bold">
+                                                                                                @template.DisplayName
+                                                                                            </span>
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            
                                                                                             @template.DisplayName
+                                                                                        }
                                                                                     </button>
                                                                                 </li>
                                                                             }
@@ -943,7 +990,18 @@ else
                                                                                                 template.Name,
                                                                                                 invitation.Id,
                                                                                                 template.DisplayName)">
-                                                                @template.DisplayName
+                                                                    @if (template.TemplateNumber < 20)
+                                                                    {
+
+                                                                        <span class="fw-bold">
+                                                                            @template.DisplayName
+                                                                        </span>
+                                                                    }
+                                                                    else
+                                                                    {
+
+                                                                        @template.DisplayName
+                                                                    }
                                                             </button>
                                                         </li>
                                                     }
@@ -960,7 +1018,18 @@ else
                                                                                                 template.Name,
                                                                                                 invitation.Id,
                                                                                                 template.DisplayName)">
-                                                                @template.DisplayName
+                                                                @if (template.TemplateNumber < 20)
+                                                                {
+
+                                                                    <span class="fw-bold">
+                                                                        @template.DisplayName
+                                                                    </span>
+                                                                }
+                                                                else
+                                                                {
+
+                                                                    @template.DisplayName
+                                                                }
                                                             </button>
                                                         </li>
                                                     }

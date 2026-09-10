@@ -4,6 +4,7 @@
     public class CreateTemplateModel
     {
         public string Name { get; set; } = string.Empty;
+        public string? DisplayName { get; set; }
         public string Language { get; set; } = "es_MX";
         public string Category { get; set; } = "UTILITY"; // MARKETING / UTILITY / AUTHENTICATION / SERVICE
         public HeaderModel? Header { get; set; }

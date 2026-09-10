@@ -393,6 +393,63 @@ namespace SIC.Backend.Services
             }
         }
 
+        public async Task<ActionResponse<bool>> DeleteWhatsAppTemplateByNameAsync(
+            string wabaId,
+            string templateName,
+            string accessToken)
+        {
+            try
+            {
+                var version = "v23.0";
+
+                var url =
+                    $"https://graph.facebook.com/{version}/{wabaId}/message_templates" +
+                    $"?name={Uri.EscapeDataString(templateName)}";
+
+                using var request = new HttpRequestMessage(
+                    HttpMethod.Delete,
+                    url);
+
+                request.Headers.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue(
+                        "Bearer",
+                        accessToken);
+
+                using var response = await _httpClient.SendAsync(request);
+
+                var responseContent =
+                    await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return new ActionResponse<bool>
+                    {
+                        Success = false,
+                        Result = false,
+                        Message = $"Meta no pudo eliminar la plantilla. " +
+                                  $"Status: {(int)response.StatusCode}. " +
+                                  $"Respuesta: {responseContent}"
+                    };
+                }
+
+                return new ActionResponse<bool>
+                {
+                    Success = true,
+                    Result = true,
+                    Message = $"La plantilla '{templateName}' fue eliminada correctamente."
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ActionResponse<bool>
+                {
+                    Success = false,
+                    Result = false,
+                    Message = $"Error al eliminar la plantilla: {ex.Message}"
+                };
+            }
+        }
+
         public async Task<WhatsappTemplates?> GetTemplatesAsync(
             UsuarioWhatsAppConfig? usuarioWhatsApp)
         {
@@ -516,7 +573,7 @@ namespace SIC.Backend.Services
             return true;
         }
 
-        public async Task<bool> CreateWhatsAppTemplateAsync(
+        public async Task<(bool Success, string Error)> CreateWhatsAppTemplateAsync(
             string accessToken,
             string wabaId,
             string requestJson,
@@ -840,13 +897,13 @@ namespace SIC.Backend.Services
                 Console.WriteLine("============== ERROR META ==============");
                 Console.WriteLine(responseBody);
 
-                return false;
+                return (false, responseBody);
             }
 
             Console.WriteLine("============== TEMPLATE CREADO ==============");
             Console.WriteLine(responseBody);
 
-            return true;
+            return (true, "");
         }
 
         public async Task CreateTemplateAsync(

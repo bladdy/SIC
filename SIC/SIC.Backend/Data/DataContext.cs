@@ -59,6 +59,7 @@ public class DataContext : IdentityDbContext<User>
         modelBuilder.Entity<PlanItem>().HasIndex(x => new { x.PlanId, x.ItemId }).IsUnique();
         modelBuilder.Entity<InvitationEntry>().HasIndex(x => x.Code).IsUnique();
         modelBuilder.Entity<MinuteByMinute>().HasIndex(x => x.EventId).IsUnique();
+        modelBuilder.Entity<WhatsAppTemplate>().HasIndex(x => x.UsuarioId);
 
         DisableCascadingDelete(modelBuilder);
 

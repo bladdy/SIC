@@ -112,7 +112,7 @@ namespace SIC.Backend.Services
                 "Event.DateLimitFormatted" => FechaHelper.FormatearFechaLargaEspanol((DateTime)ev.DeadLine!),
                 "Invitation.ReservedSeats" => (invitation.NumberAdults + invitation.NumberYouths + invitation.NumberChildren).ToString(),
                 "Event.Table" => GetTableValue(invitation),
-                "Event.AnotherSupplier" => ev.Url ?? "N/A",
+                //"Event.AnotherSupplier" => ev.Url ?? "N/A",
                 _ => ""
             };
         }

@@ -156,9 +156,14 @@ namespace SIC.Backend.Controllers
         }
 
         [HttpGet("get-templates")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> GetTemplates()
         {
-            var templates = await _templateRepository.GetAllAsync();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId))
+                return BadRequest(new { error = "Usuario no autenticado" });
+
+            var templates = await _templateRepository.GetForUserAsync(userId);
             return Ok(templates.Result);
         }
 
@@ -253,7 +258,7 @@ namespace SIC.Backend.Controllers
 
         [HttpPost("create-templates")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [Authorize(Roles = "Admin,WeddingPlanner,User")]
+        [Authorize(Roles = "Admin,WeddingPlanner")]
         public async Task<IActionResult> CreateTemplate([FromBody] CreateTemplateModel model)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -271,12 +276,72 @@ namespace SIC.Backend.Controllers
             ;*/
             //userWhatsAppConfig.Result.WabaId;
             var request = BuildWhatsappTemplateJson(model);
-            //Este tiene que recibir el model para que la funcion itere sobre los componentes y arme el json dinamicamente, detectando variables {{param}} en el texto del body para crear el example necesario para que WhatsApp acepte la plantilla, y tambien detectando si el header es de tipo texto o media (imagen/video/documento) para armar el json correctamente, y lo mismo con los botones, detectando si son de tipo URL o QUICK_REPLY, y si son URL detectar si la URL es dinámica (tiene {{param}}) para agregar el example necesario, etc.
             var result = await _whatsAppService.CreateWhatsAppTemplateAsync(userWhatsAppConfig.Result.AccessToken, userWhatsAppConfig.Result.WabaId, request, model);
-            //Despues que se envie la plantilla a Meta, si la respuesta es exitosa, guardar en la base de datos la plantilla creada con su nombre, categoría, idioma, contenido, etc. para tener un registro de las plantillas creadas y poder usarlas posteriormente para enviar mensajes dinámicos. Si la respuesta no es exitosa, devolver un mensaje de error con el motivo del error que devuelva WhatsApp.
 
-            //Arreglar el resultado para que devuelva un mensaje de éxito o error dependiendo de la respuesta de WhatsApp, y también guardar en la base de datos la plantilla creada con su nombre, categoría, idioma, contenido, etc. para tener un registro de las plantillas creadas y poder usarlas posteriormente para enviar mensajes dinámicos.
-            return result ? Ok() : StatusCode(500, new { error = "Error al crear plantilla en WhatsApp" });
+            if (!result.Success)
+                return StatusCode(500, new { error = result.Error });
+
+            var nextTemplateNumber = await _templateRepository.GetNextTemplateNumberAsync(userId);
+
+            var template = new WhatsAppTemplate
+            {
+                Name = model.Name,
+                DisplayName = string.IsNullOrWhiteSpace(model.DisplayName) ? model.Name : model.DisplayName,
+                Language = model.Language,
+                UsuarioId = userId,
+                StructureJson = BuildStructureJson(model),
+                OrderTemplate = nextTemplateNumber,
+                Content = model.Components
+                    .FirstOrDefault(c => c.Type.Equals("BODY", StringComparison.OrdinalIgnoreCase))
+                    ?.Text,
+                TemplateNumber = nextTemplateNumber,
+                IsSuggested = false
+            };
+
+            var saveResult = await _templateRepository.CreateTemplates(template);
+
+            if (!saveResult.Success)
+                return Conflict(new { error = saveResult.Message });
+
+            return Ok();
+        }
+
+        private string BuildStructureJson(CreateTemplateModel model)
+        {
+            var structure = new Dictionary<string, object>();
+
+            if (!string.IsNullOrWhiteSpace(model.MediaType))
+            {
+                structure["header"] = new
+                {
+                    type = model.MediaType.ToLowerInvariant(),
+                    source = "Event.CoverImageUrl"
+                };
+            }
+
+            if (model.BodyExampleTypes?.Any() == true)
+            {
+                structure["body"] = model.BodyExampleTypes
+                    .Where(t => !string.IsNullOrWhiteSpace(t))
+                    .Select(t => new { type = "text", source = t })
+                    .ToList();
+            }
+
+            if (model.Buttons?.Any() == true)
+            {
+                var dynamicButtons = model.Buttons
+                    .Where(b => b.Type == "URL" && b.UrlType == "DYNAMIC")
+                    .Select((b, index) => new { type = "url", index, source = "Invitation.Code" })
+                    .ToList();
+
+                if (dynamicButtons.Any())
+                    structure["buttons"] = dynamicButtons;
+            }
+
+            return JsonSerializer.Serialize(structure, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
         }
 
         private string BuildWhatsappTemplateJson(CreateTemplateModel model)
@@ -612,7 +677,7 @@ namespace SIC.Backend.Controllers
                     var ev = invitacion.Result.Event!;
 
                     // 🔥 Obtener plantilla desde BD
-                    var template = await _templateRepository.GetByNameAsync(sendTemplateDTO.TemplateName);
+                    var template = await _templateRepository.GetByNameAsync(sendTemplateDTO.TemplateName, userId);
 
                     if (template == null)
                     {
@@ -630,7 +695,9 @@ namespace SIC.Backend.Controllers
                     );
                     if (components == null)
                         continue;
-                    var fullnumber = string.Concat(invitacion.Result.CountryCode, invitacion.Result.PhoneNumber);// +1
+                    var fullnumber = $"{invitacion.Result.CountryCode}{invitacion.Result.PhoneNumber}";
+
+                    fullnumber = new string(fullnumber.Where(char.IsDigit).ToArray());
 
                     var result = await _whatsAppService.EnviarTemplateDinamicoAsync(
                         accessToken,
