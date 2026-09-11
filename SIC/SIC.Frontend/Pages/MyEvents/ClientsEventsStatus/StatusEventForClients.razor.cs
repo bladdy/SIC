@@ -20,12 +20,9 @@ namespace SIC.Frontend.Pages.MyEvents.ClientsEventsStatus
         private int totalPages;
         public Event? EventDetail { get; set; }
         public List<Invitation>? Invitations { get; set; }
-        public List<WhatsAppTemplate>? Templates { get; set; }
         [Inject] private IRepository Repository { get; set; } = default!;
         [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
         [Inject] private NavigationManager NavigationManager { get; set; } = default!;
-
-        [Inject] private IJSRuntime JsRuntime { get; set; } = default!;
 
         [Parameter, SupplyParameterFromQuery] public string Page { get; set; } = string.Empty;
         [Parameter, SupplyParameterFromQuery] public string Filter { get; set; } = string.Empty;
@@ -41,29 +38,6 @@ namespace SIC.Frontend.Pages.MyEvents.ClientsEventsStatus
             }
             await LoadEvent();
             await LoadInvitations();
-            await LoadTemplates();
-        }
-
-        private async Task LoadTemplates()
-        {
-            var url = $"api/whatsapp/get-templates";
-
-            if (!string.IsNullOrWhiteSpace(Filter))
-            {
-                url += $"&Filter={Filter}";
-            }
-
-            //.GetAsync<List<Invitation>>
-            var responseHttp = await Repository.GetAsync<List<WhatsAppTemplate>>(url);
-            if (responseHttp.Error)
-            {
-                var message = await responseHttp.GetErrorMessageAsync();
-                await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
-                return;
-            }
-
-            // Backend ya devuelve total de páginas, no de registros
-            Templates = responseHttp.Response ?? new List<WhatsAppTemplate>();
         }
 
         private async Task SelectedPageAsync(int page)
