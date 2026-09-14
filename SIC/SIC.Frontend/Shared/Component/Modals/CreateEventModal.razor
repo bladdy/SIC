@@ -247,7 +247,7 @@
     }
     private async Task LoadUsersAsync()
     {
-        var result = await Repository.GetAsync<List<User>>("api/Accounts/all?PageSize=100");
+        var result = await Repository.GetAsync<List<User>>("api/Accounts/all?PageSize=200");
         if (result != null)
         {
             // Excluir Admin y WeddingPlanner
