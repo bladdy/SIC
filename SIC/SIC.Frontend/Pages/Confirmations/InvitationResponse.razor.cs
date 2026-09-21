@@ -27,6 +27,7 @@ namespace SIC.Frontend.Pages.Confirmations
         protected bool MostrarNoInvitacion;
         protected bool MostrarListadoInvitados;
         protected bool MostrarBotonConfirmar;
+        protected bool TieneCuestionario;
 
         private bool? _asistira;
 
@@ -89,6 +90,8 @@ namespace SIC.Frontend.Pages.Confirmations
 
                 Invitacion = response.Response;
 
+                await VerificarCuestionario();
+
                 if (Invitacion.Status == Status.Pending)
                 {
                     MostrarFormulario = true;
@@ -106,6 +109,27 @@ namespace SIC.Frontend.Pages.Confirmations
             {
                 MostrarNoInvitacion = true;
                 CodigoNoEncontrado = code;
+            }
+        }
+
+        private async Task VerificarCuestionario()
+        {
+            try
+            {
+                if (Invitacion?.Event?.Code == null)
+                {
+                    TieneCuestionario = false;
+                    return;
+                }
+
+                var formResp = await repository.GetAsync<EventFormDTO>(
+                    $"api/EventForms/byEventCode/{Invitacion.Event.Code}");
+
+                TieneCuestionario = formResp.Response?.Formulario?.Preguntas?.Count > 0;
+            }
+            catch
+            {
+                TieneCuestionario = false;
             }
         }
 
