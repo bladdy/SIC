@@ -1,4 +1,5 @@
-<div class="card shadow-sm p-3 mb-3" style="border-radius: 10px;">
+<div class="card shadow-sm p-3 mb-3"
+     style="border-radius: 10px; @(IsFailed ? "border-color:#dc3545; border-width:2px;" : "")">
     <label class="form-label fw-semibold mb-2">
         @Pregunta.Titulo
         @if (Pregunta.Obligatoria)
@@ -7,51 +8,97 @@
         }
     </label>
 
-    @switch (Pregunta.Tipo)
+    @if (IsReadOnly)
     {
-        case TipoPregunta.Texto:
-            <input class="form-control" placeholder="Escribe tu respuesta..."
-                   value="@(GetRespuesta())"
-                   @oninput="OnInputChanged" />
-            break;
+        if (Pregunta.Tipo == TipoPregunta.SeleccionMultiple)
+        {
+            var seleccion = ObtenerSeleccion();
+            if (seleccion.Count == 0)
+            {
+                <p class="mb-0 text-muted fst-italic">Sin responder</p>
+            }
+            else
+            {
+                <ul class="mb-0 ps-3">
+                    @foreach (var opcion in seleccion)
+                    {
+                        <li>@opcion</li>
+                    }
+                </ul>
+            }
+        }
+        else
+        {
+            <p class="mb-0 @(string.IsNullOrWhiteSpace(GetRespuesta()) ? "text-muted fst-italic" : "")">
+                @(string.IsNullOrWhiteSpace(GetRespuesta()) ? "Sin responder" : GetRespuesta())
+            </p>
+        }
+    }
+    else
+    {
+        @switch (Pregunta.Tipo)
+        {
+            case TipoPregunta.Texto:
+                <input class="form-control" placeholder="Escribe tu respuesta..."
+                       value="@(GetRespuesta())"
+                       @oninput="OnInputChanged" />
+                break;
 
-        case TipoPregunta.Numero:
-            <input type="number" class="form-control" placeholder="0"
-                   value="@(GetRespuesta())"
-                   @oninput="OnInputChanged" />
-            break;
+            case TipoPregunta.Numero:
+                <input type="number" class="form-control" placeholder="0"
+                       value="@(GetRespuesta())"
+                       @oninput="OnInputChanged" />
+                break;
 
-        case TipoPregunta.SiNo:
-            <select class="form-select"
-                    value="@(GetRespuesta())"
-                    @onchange="OnInputChanged">
-                <option value="">-- Selecciona --</option>
-                <option value="Si">Sí</option>
-                <option value="No">No</option>
-            </select>
-            break;
+            case TipoPregunta.SiNo:
+                <select class="form-select"
+                        value="@(GetRespuesta())"
+                        @onchange="OnInputChanged">
+                    <option value="">-- Selecciona --</option>
+                    <option value="Si">Sí</option>
+                    <option value="No">No</option>
+                </select>
+                break;
 
-        case TipoPregunta.Lista:
-            <select class="form-select"
-                    value="@(GetRespuesta())"
-                    @onchange="OnInputChanged">
-                <option value="">-- Selecciona --</option>
-                @foreach (var opcion in Pregunta.Opciones)
-                {
-                    <option value="@opcion">@opcion</option>
-                }
-            </select>
-            break;
+            case TipoPregunta.Lista:
+                <select class="form-select"
+                        value="@(GetRespuesta())"
+                        @onchange="OnInputChanged">
+                    <option value="">-- Selecciona --</option>
+                    @foreach (var opcion in Pregunta.Opciones)
+                    {
+                        <option value="@opcion">@opcion</option>
+                    }
+                </select>
+                break;
 
-        case TipoPregunta.Fecha:
-            <input type="date" class="form-control"
-                   value="@(GetRespuesta())"
-                   @oninput="OnInputChanged" />
-            break;
+            case TipoPregunta.SeleccionMultiple:
+                <div class="d-flex flex-column gap-2">
+                    @foreach (var (opcion, idx) in Pregunta.Opciones.Select((o, i) => (o, i)))
+                    {
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   id="@($"res-{Pregunta.Id}-{idx}")"
+                                   checked="@(ObtenerSeleccion().Contains(opcion))"
+                                   @onchange="() => AlternarSeleccion(opcion)" />
+                            <label class="form-check-label" for="@($"res-{Pregunta.Id}-{idx}")">
+                                @opcion
+                            </label>
+                        </div>
+                    }
+                    @if (Pregunta.Opciones.Count == 0)
+                    {
+                        <small class="text-muted">Esta pregunta no tiene opciones configuradas.</small>
+                    }
+                </div>
+                break;
 
-        case TipoPregunta.Foto:
-            <InputFile class="form-control" />
-            break;
+            case TipoPregunta.Fecha:
+                <input type="date" class="form-control"
+                       value="@(GetRespuesta())"
+                       @oninput="OnInputChanged" />
+                break;
+        }
     }
 
     @if (Pregunta.Tipo == TipoPregunta.SiNo && Pregunta.Reglas.Any())
@@ -69,11 +116,16 @@
 
                     @foreach (var sub in regla.SubPreguntas)
                     {
-                        <PreguntaResponse Pregunta="sub" Respuestas="Respuestas" />
+                        <PreguntaResponse Pregunta="sub" Respuestas="Respuestas" FailedIds="FailedIds" IsReadOnly="IsReadOnly" />
                     }
                 </div>
             }
         }
+    }
+
+    @if (IsFailed)
+    {
+        <span class="text-danger small mt-2 d-block">Este campo es obligatorio.</span>
     }
 </div>
 
@@ -85,9 +137,45 @@
     [Parameter]
     public Dictionary<Guid, string> Respuestas { get; set; } = new();
 
+    [Parameter]
+    public HashSet<Guid>? FailedIds { get; set; }
+
+    [Parameter]
+    public bool IsReadOnly { get; set; }
+
+    private bool IsFailed => FailedIds != null && FailedIds.Contains(Pregunta.Id);
+
     string GetRespuesta()
     {
         return Respuestas.TryGetValue(Pregunta.Id, out var valor) ? valor : "";
+    }
+
+    HashSet<string> ObtenerSeleccion()
+    {
+        var valor = GetRespuesta();
+        if (string.IsNullOrWhiteSpace(valor) || !valor.TrimStart().StartsWith("["))
+            return new HashSet<string>();
+
+        try
+        {
+            var lista = System.Text.Json.JsonSerializer.Deserialize<List<string>>(valor);
+            return lista is null ? new HashSet<string>() : new HashSet<string>(lista);
+        }
+        catch
+        {
+            return new HashSet<string>();
+        }
+    }
+
+    void AlternarSeleccion(string opcion)
+    {
+        var seleccion = ObtenerSeleccion();
+        if (!seleccion.Add(opcion))
+            seleccion.Remove(opcion);
+
+        Respuestas[Pregunta.Id] = seleccion.Count == 0
+            ? ""
+            : System.Text.Json.JsonSerializer.Serialize(seleccion.ToList());
     }
 
     void SetRespuesta(string valor)

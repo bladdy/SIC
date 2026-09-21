@@ -48,6 +48,8 @@ public class DataContext : IdentityDbContext<User>
     public DbSet<EventRequirementAnswer> EventRequirementAnswers { get; set; }
     public DbSet<EventRequirementImage> EventRequirementImages { get; set; }
     public DbSet<RequirementImageOption> RequirementImageOptions { get; set; }
+    public DbSet<EventForm> EventForms { get; set; }
+    public DbSet<EventFormResponse> EventFormResponses { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -108,6 +110,36 @@ public class DataContext : IdentityDbContext<User>
             .HasOne(g => g.TablesEvents)
             .WithMany(t => t.Guests)
             .HasForeignKey(g => g.TablesEventsId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<EventForm>()
+            .HasIndex(x => x.EventId)
+            .IsUnique();
+
+        modelBuilder.Entity<EventForm>()
+            .HasOne(x => x.Event)
+            .WithOne()
+            .HasForeignKey<EventForm>(x => x.EventId);
+
+        modelBuilder.Entity<EventFormResponse>()
+            .HasIndex(x => new { x.EventId, x.InvitationGuestId })
+            .IsUnique()
+            .HasFilter("[InvitationGuestId] IS NOT NULL");
+
+        modelBuilder.Entity<EventFormResponse>()
+            .HasOne(x => x.Event)
+            .WithMany()
+            .HasForeignKey(x => x.EventId);
+
+        modelBuilder.Entity<EventFormResponse>()
+            .HasOne(x => x.Invitation)
+            .WithMany()
+            .HasForeignKey(x => x.InvitationId);
+
+        modelBuilder.Entity<EventFormResponse>()
+            .HasOne(x => x.InvitationGuest)
+            .WithMany()
+            .HasForeignKey(x => x.InvitationGuestId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 

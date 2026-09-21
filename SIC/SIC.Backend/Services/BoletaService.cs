@@ -988,5 +988,116 @@ namespace SIC.Backend.Services
 
             return ms.ToArray();
         }
+
+        public byte[] GenerarCuestionarioPdf(string evento, List<EventFormResponseDTO> respuestas)
+        {
+            using var ms = new MemoryStream();
+
+            var document = new Document(PageSize.A4, 40, 40, 40, 40);
+            PdfWriter.GetInstance(document, ms);
+            document.Open();
+            respuestas = [.. respuestas.OrderBy(r => r.InvitationId).ThenBy(r => r.GuestName)];
+            // ==============================
+            // 🎨 COLORES
+            // ==============================
+            var borderColor = new BaseColor(222, 226, 230);
+            var headerColor = new BaseColor(60, 106, 121);
+            var footerColor = new BaseColor(211, 211, 211);
+            // ==============================
+            // 🔠 FUENTES
+            // ==============================
+            var fontTitle = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16);
+            var fontHeader = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10, BaseColor.White);
+            var fontInvitation = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10);
+            var fontGuest = FontFactory.GetFont(FontFactory.HELVETICA, 10);
+            var fontAnswer = FontFactory.GetFont(FontFactory.HELVETICA, 9);
+            var fontFooter = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 11);
+            var fontEmpty = FontFactory.GetFont(FontFactory.HELVETICA_OBLIQUE, 9, BaseColor.Gray);
+            // ==============================
+            // 📝 TÍTULO
+            // ==============================
+            var title = new Paragraph($"RESPUESTAS DEL FORMULARIO: {evento}", fontTitle)
+            {
+                Alignment = Element.ALIGN_CENTER,
+                SpacingAfter = 10
+            };
+            document.Add(title);
+            document.Add(new Paragraph($"Fecha generación: {DateTime.Now:dd/MM/yyyy HH:mm}")
+            {
+                Alignment = Element.ALIGN_RIGHT,
+                SpacingAfter = 8
+            });
+
+            // ==============================
+            // 📋 TABLA
+            // ==============================
+            var table = new PdfPTable(3)
+            {
+                WidthPercentage = 100
+            };
+
+            table.SetWidths(new float[] { 3, 2, 6 });
+
+            void AddHeader(string text)
+            {
+                var cell = new PdfPCell(new Phrase(text, fontHeader))
+                {
+                    BackgroundColor = headerColor,
+                    HorizontalAlignment = Element.ALIGN_CENTER,
+                    Padding = 4,
+                    BorderColor = borderColor
+                };
+
+                table.AddCell(cell);
+            }
+
+            AddHeader("Invitación");
+            AddHeader("Invitado");
+            AddHeader("Respuestas");
+
+            // ==============================
+            // 👥 FILAS
+            // ==============================
+            foreach (var response in respuestas)
+            {
+                table.AddCell(new PdfPCell(new Phrase(response.InvitationName ?? $"Invitación #{(response.InvitationId)}", fontInvitation)) { Padding = 4 });
+
+                var guestName = string.IsNullOrWhiteSpace(response.GuestName) ? "—" : response.GuestName;
+                table.AddCell(new PdfPCell(new Phrase(guestName, fontGuest)) { Padding = 4 });
+
+                var answersCell = new PdfPCell
+                {
+                    Padding = 4,
+                    BorderColor = borderColor
+                };
+
+                if (response.Answers == null || response.Answers.Count == 0)
+                {
+                    answersCell.AddElement(new Paragraph("Sin respuestas", fontEmpty));
+                }
+                else
+                {
+                    foreach (var answer in response.Answers)
+                    {
+                        var value = string.IsNullOrWhiteSpace(answer.Value) ? "—" : answer.Value;
+                        answersCell.AddElement(new Paragraph($"• {answer.QuestionTitle}: {value}", fontAnswer));
+                    }
+                }
+
+                table.AddCell(answersCell);
+            }
+
+            int totalRespuestas = respuestas.Count;
+
+            table.AddCell(new PdfPCell(new Phrase("Total", fontFooter)) { Padding = 5, BackgroundColor = footerColor });
+            table.AddCell(new PdfPCell(new Phrase("", fontFooter)) { Padding = 5, BackgroundColor = footerColor });
+            table.AddCell(new PdfPCell(new Phrase($"Respuestas: {totalRespuestas}", fontFooter)) { Padding = 5, BackgroundColor = footerColor });
+
+            document.Add(table);
+
+            document.Close();
+
+            return ms.ToArray();
+        }
     }
 }

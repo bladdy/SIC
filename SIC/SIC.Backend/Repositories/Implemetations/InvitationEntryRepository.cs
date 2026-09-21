@@ -20,6 +20,43 @@ namespace SIC.Backend.Repositories.Implemetations
             _context = context;
         }
 
+        private ActionResponse<InvitationEntry>? ValidateEntryLimits(Invitation invitation, InvitationEntry entry)
+        {
+            if (entry.AdultsEntered < 0 || entry.YouthsEntered < 0 || entry.ChildrenEntered < 0)
+            {
+                return new ActionResponse<InvitationEntry>
+                {
+                    Success = false,
+                    Message = "Las cantidades no pueden ser negativas."
+                };
+            }
+            if (entry.AdultsEntered > invitation.NumberConfirmedAdults)
+            {
+                return new ActionResponse<InvitationEntry>
+                {
+                    Success = false,
+                    Message = $"Adultos asistentes excede el máximo permitido ({invitation.NumberConfirmedAdults})."
+                };
+            }
+            if (entry.YouthsEntered > invitation.NumberConfirmedYouths)
+            {
+                return new ActionResponse<InvitationEntry>
+                {
+                    Success = false,
+                    Message = $"Jóvenes asistentes excede el máximo permitido ({invitation.NumberConfirmedYouths})."
+                };
+            }
+            if (entry.ChildrenEntered > invitation.NumberConfirmedChildren)
+            {
+                return new ActionResponse<InvitationEntry>
+                {
+                    Success = false,
+                    Message = $"Niños asistentes excede el máximo permitido ({invitation.NumberConfirmedChildren})."
+                };
+            }
+            return null;
+        }
+
         public async Task<ActionResponse<InvitationEntry>> AddFullAsync(InvitationEntry invitation)
         {
             try
@@ -36,6 +73,12 @@ namespace SIC.Backend.Repositories.Implemetations
                         Success = false,
                         Message = "La invitación no existe."
                     };
+                }
+
+                var validation = ValidateEntryLimits(existingInvitation, invitation);
+                if (validation != null)
+                {
+                    return validation;
                 }
 
                 // Buscar si ya existe el InvitationEntry
@@ -145,6 +188,11 @@ namespace SIC.Backend.Repositories.Implemetations
                         Success = false,
                         Message = "La invitacion no existe."
                     };
+                }
+                var validation = ValidateEntryLimits(existingInvitation, invitation);
+                if (validation != null)
+                {
+                    return validation;
                 }
                 invitation.Invitation = existingInvitation!;
                 invitation.Event = existingInvitation?.Event!;

@@ -41,3 +41,26 @@ window.scrollToBottom = (element) => {
     if (element)
         element.scrollTop = element.scrollHeight;
 };
+window.clampNumberInput = (el) => {
+    const v = parseFloat(el.value);
+    if (isNaN(v)) return;
+    let min = -Infinity;
+    let max = Infinity;
+    if (el.getAttribute('min') !== null && el.getAttribute('min') !== '') {
+        min = parseFloat(el.min);
+    }
+    if (el.getAttribute('max') !== null && el.getAttribute('max') !== '') {
+        max = parseFloat(el.max);
+    }
+    const clamped = Math.min(Math.max(v, min), max);
+    if (clamped !== v) {
+        el.value = clamped;
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+};
+document.addEventListener('input', (e) => {
+    const el = e.target;
+    if (el && el.type === 'number' && el.hasAttribute('data-maxmin-clamp')) {
+        window.clampNumberInput(el);
+    }
+});

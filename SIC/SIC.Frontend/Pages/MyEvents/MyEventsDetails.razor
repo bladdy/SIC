@@ -425,6 +425,11 @@ else
                             }
                         </button>
                     }
+                    @if (EventDetail.User.UserType == UserType.WeddingPlanner || EventDetail.User.UserType == UserType.Admin)
+                    {
+                        <a href="@($"/event/{EventDetail.Code}/form-builder")" class="btn btn-sm btn-custom">Información adicional</a>
+                        <a href="@($"/event/{EventDetail.Code}/formulario-responses")" class="btn btn-sm btn-custom">Respuestas adicionales</a>
+                    }
                 </div>
             </div>
         </div>
@@ -1470,7 +1475,7 @@ else
                             {
                                 @foreach (var guest in NewInvitation.Guests)
                                 {
-                                    <div class="d-flex align-items-center gap-2 mb-3">
+                                    <div class="d-flex align-items-end gap-2 mb-3">
 
                                         <!-- INPUT con menos prioridad -->
                                         <div style="flex: 1 1 160px;">
@@ -1506,7 +1511,7 @@ else
                                         </div>
 
                                         <div class="mb-2">
-                                            <label class="form-label small fw-semibold">Mesa individual</label>
+                                            <label class="form-label small fw-semibold">Mesa</label>
                                             <InputSelect class="form-select form-select-sm"
                                                          Value="guest.TablesEventsId"
                                                          ValueChanged="@((int? __value) => OnGuestTableChanged(guest, __value))"
@@ -1517,7 +1522,7 @@ else
                                                     <option value="@table.Id">@table.Name - Disponibles: @(table.Seats - table.OccupiedSeats)</option>
                                                 }
                                             </InputSelect>
-                                            <small class="text-muted">@GetEffectiveTableName(guest)</small>
+                                            <small class="text-muted d-none">@GetEffectiveTableName(guest)</small>
                                         </div>
 
                                         <div>
@@ -1566,7 +1571,7 @@ else
                             </div>
 
 
-                            <div class="mb-3">
+                            <div class="mb-3 d-none">
                                 <label>Mesa</label>
                                 <InputSelect class="form-select"
                                              @bind-Value="NewInvitation.TablesEventsId"

@@ -77,6 +77,17 @@ public class InvitationsController : GenericController<Invitation>
         return NotFound();
     }
 
+    [HttpGet("search")]
+    public async Task<IActionResult> SearchAsync(string code, string filter)
+    {
+        var response = await _invitationUnitOfWork.SearchByNameAsync(code, filter);
+        if (response.Success)
+        {
+            return Ok(response.Result);
+        }
+        return NotFound();
+    }
+
     [HttpPost("full")]
     public async Task<IActionResult> PostFullAsync(Invitation invitation)
     {

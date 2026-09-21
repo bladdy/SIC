@@ -1,0 +1,112 @@
+@page "/invitacion/{InvitationCode}/cuestionario"
+@layout LoginLayout
+@using SIC.Shared.Entities
+
+<PageTitle>Responder Cuestionario</PageTitle>
+
+@if (Loading)
+{
+    <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p class="mt-2 text-muted">Cargando cuestionario...</p>
+    </div>
+}
+else if (!CanRespond)
+{
+    <div class="container" style="max-width: 600px; padding: 40px 20px;">
+        <div class="card shadow-sm text-center p-5" style="border-radius: 12px;">
+            <i class="bi bi-info-circle text-muted" style="font-size: 3rem;"></i>
+            <h4 class="fw-bold mt-3">@BlockedMessage</h4>
+            <p class="text-muted">
+                El cuestionario solo está disponible para invitados que confirmaron su asistencia.
+            </p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container" style="max-width: 800px; margin: auto; padding: 30px 0 60px;">
+
+        <div class="text-center mb-4">
+            <h3 class="fw-bold mb-1">@EventName</h3>
+            <p class="fw-bold mb-1">@EventTitle</p>
+            <small class="text-muted">Completa los campos requeridos para cada invitado</small>
+        </div>
+
+        @if (AttendGuests.Count == 0)
+        {
+            @foreach (var pregunta in Formulario.Preguntas)
+            {
+                <PreguntaResponse @key="pregunta.Id"
+                                  Pregunta="pregunta"
+                                  Respuestas="RespuestasPorGuest[0]"
+                                  FailedIds="FailedPorGuest[0]"
+                                  IsReadOnly="GuestResponded(0)" />
+            }
+        }
+        else
+        {
+            @foreach (var (guest, index) in AttendGuests.Select((g, i) => (g, i)))
+            {
+                <div class="card shadow-sm mb-4 overflow-hidden" style="border-radius: 12px;">
+                    <div class="card-header d-flex justify-content-between align-items-center"
+                         style="background-color:#3C6A79; color:white;">
+                        <div>
+                            <span class="fw-bold">
+                                <i class="bi bi-person-circle me-1"></i>
+                                @(guest.GuestName ?? $"Invitado {index + 1}")
+                            </span>
+                            <small class="d-block opacity-75">@guest.GuestType.GetDescription()</small>
+                        </div>
+                        @if (GuestResponded(guest.Id))
+                        {
+                            <span class="badge bg-success">
+                                <i class="bi bi-check-circle me-1"></i>Respondió
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark">
+                                <i class="bi bi-hourglass-split me-1"></i>Pendiente
+                            </span>
+                        }
+                    </div>
+                    <div class="card-body">
+                        @foreach (var pregunta in Formulario.Preguntas)
+                        {
+                            <PreguntaResponse @key="pregunta.Id"
+                                              Pregunta="pregunta"
+                                              Respuestas="RespuestasPorGuest[guest.Id]"
+                                              FailedIds="FailedPorGuest[guest.Id]"
+                                              IsReadOnly="GuestResponded(guest.Id)" />
+                        }
+                    </div>
+                </div>
+            }
+        }
+
+        @if (QuedanPendientes)
+        {
+            <div class="text-end mt-4">
+                <button class="btn btn-custom btn-lg px-5" @onclick="Enviar" disabled="@Sending">
+                    @if (Sending)
+                    {
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                    }
+                    <i class="bi bi-check-lg me-2"></i>Enviar
+                </button>
+            </div>
+        }
+        else
+        {
+            <div class="text-center mt-4">
+                <i class="bi bi-check-circle text-success" style="font-size: 2rem;"></i>
+                <h5 class="fw-bold mt-2 mb-0">Todo el grupo ya respondió el cuestionario</h5>
+                <small class="text-muted">Si necesitas algún cambio, contacta al organizador.</small>
+            </div>
+        }
+
+    </div>
+}

@@ -41,6 +41,7 @@ public enum TipoPregunta
     Numero,
     SiNo,
     Lista,
+    SeleccionMultiple,
     Fecha,
     Foto
 }

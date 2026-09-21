@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SIC.Backend.Data;
 
@@ -11,9 +12,11 @@ using SIC.Backend.Data;
 namespace SIC.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20260917224620_EventForms")]
+    partial class EventForms
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -307,12 +310,6 @@ namespace SIC.Backend.Migrations
                     b.Property<int>("EventId")
                         .HasColumnType("int");
 
-                    b.Property<string>("GuestName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("InvitationGuestId")
-                        .HasColumnType("int");
-
                     b.Property<int>("InvitationId")
                         .HasColumnType("int");
 
@@ -324,13 +321,10 @@ namespace SIC.Backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InvitationGuestId");
-
                     b.HasIndex("InvitationId");
 
-                    b.HasIndex("EventId", "InvitationGuestId")
-                        .IsUnique()
-                        .HasFilter("[InvitationGuestId] IS NOT NULL");
+                    b.HasIndex("EventId", "InvitationId")
+                        .IsUnique();
 
                     b.ToTable("EventFormResponses");
                 });
@@ -1836,11 +1830,6 @@ namespace SIC.Backend.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("SIC.Shared.Entities.InvitationGuest", "InvitationGuest")
-                        .WithMany()
-                        .HasForeignKey("InvitationGuestId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("SIC.Shared.Entities.Invitation", "Invitation")
                         .WithMany()
                         .HasForeignKey("InvitationId")
@@ -1850,8 +1839,6 @@ namespace SIC.Backend.Migrations
                     b.Navigation("Event");
 
                     b.Navigation("Invitation");
-
-                    b.Navigation("InvitationGuest");
                 });
 
             modelBuilder.Entity("SIC.Shared.Entities.EventImage", b =>

@@ -39,5 +39,7 @@ namespace SIC.Backend.UnitOfWork.Implemetations
         public async Task<ActionResponse<ResponseInvitationDTO>> UpdateForConfirmationListFullAsync(ResponseInvitationDTO invitations) => await _invitationstRepository.UpdateForConfirmationListFullAsync(invitations);
 
         public async Task<ActionResponse<IEnumerable<Invitation>>> GetAllAsync(string code) => await _invitationstRepository.GetAllAsync(code);
+
+        public async Task<ActionResponse<IEnumerable<Invitation>>> SearchByNameAsync(string eventCode, string filter) => await _invitationstRepository.SearchByNameAsync(eventCode, filter);
     }
 }

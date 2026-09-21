@@ -270,8 +270,6 @@ public partial class MyEventsIndex
     private async Task SaveEvent()
     {
         HttpResponseWrapper<object>? responseHttp;
-        bool isPost = false;
-
         if (CoverUploader.HasPendingImage)
         {
             var url = await CoverUploader.UploadPendingImageAsync();
@@ -289,9 +287,8 @@ public partial class MyEventsIndex
         {
             // POST -> Crear
             responseHttp = await repository.PostAsync("api/events/full", NewEvent);
-            isPost = true;
         }
-        if ((_userRol == "WeddingPlanner") && isPost && !responseHttp.Error)
+        if ((_userRol == "WeddingPlanner") && !responseHttp.Error && IsEditMode == false)
         {
             HttpResponseWrapper<object>? responseHttps;
             responseHttps = await repository.PostAsync<object>($"api/UserCredits/consume/{_userId}/{NewEvent.Name}");
@@ -316,8 +313,8 @@ public partial class MyEventsIndex
             TimerProgressBar = true,
         });
         await toast.FireAsync(
-            "�xito",
-            IsEditMode ? "Plan actualizado con �xito." : "Plan creado con �xito.",
+            "Exito",
+            IsEditMode ? "Evento actualizado con �xito." : "Evento creado con �xito.",
             SweetAlertIcon.Success
         );
 
@@ -328,8 +325,8 @@ public partial class MyEventsIndex
     {
         var result = await sweetAlertService.FireAsync(new SweetAlertOptions
         {
-            Title = "�Est� seguro?",
-            Text = $"Se eliminar� el evento '{events.Name}'. Esta acci�n no se puede deshacer.",
+            Title = "Estas seguro?",
+            Text = $"Se eliminar el evento '{events.Name}'. Esta acci�n no se puede deshacer.",
             Icon = SweetAlertIcon.Warning,
             ShowCancelButton = true,
             ConfirmButtonText = "S�, borrar",

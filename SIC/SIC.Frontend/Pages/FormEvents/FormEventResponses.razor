@@ -1,0 +1,139 @@
+@page "/event/{EventCode}/formulario-responses"
+@using SIC.Shared.DTOs
+
+<PageTitle>Respuestas del Formulario</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+    <h3 class="mb-0">
+        Respuestas del Formulario
+        @if (!string.IsNullOrWhiteSpace(EventName))
+        {
+            <small class="text-muted fs-6 d-block">@EventName</small>
+        }
+    </h3>
+    <div class="d-flex gap-2 flex-wrap">
+        <button type="button" class="btn btn-outline-secondary" @onclick="Volver">
+            <i class="bi bi-arrow-left"></i> Volver
+        </button>
+        <a href="@($"/event/{EventCode}/form-builder")" class="btn btn-custom">
+            <i class="bi bi-pencil-square"></i> Editar Formulario
+        </a>
+        <button type="button" class="btn btn-custom" @onclick="GeneratePdfAsync" disabled="@GeneratingPdf">
+            @if (GeneratingPdf)
+            {
+                <span class="spinner-border spinner-border-sm me-1"></span>
+            }
+            else
+            {
+                <i class="bi bi-filetype-pdf"></i>
+            }
+            Descargar PDF
+        </button>
+    </div>
+</div>
+
+@if (Loading)
+{
+    <div class="text-center py-4">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+    </div>
+}
+else if (Responses == null || Responses.Count == 0)
+{
+    <div class="text-center text-muted py-5">
+        <h4 class="fw-bold">Sin respuestas todavía</h4>
+        <p>Cuando un invitado confirme y responda el cuestionario, aparecerá aquí.</p>
+    </div>
+}
+else
+{
+    <div class="table-responsive d-none d-md-block">
+        <table class="table table-hover align-middle mb-0">
+            <thead style="background-color:#3C6A79; color:white;">
+                <tr class="text-center">
+                    <th class="text-start">Invitado</th>
+                    <th>Fecha</th>
+                    <th class="text-start">Respuestas</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var response in Responses)
+                {
+                    <tr class="border-top">
+                        <td class="fw-semibold">
+                            @(response.InvitationName ?? $"Invitación #{(response.InvitationId)}")
+                            @if (!string.IsNullOrWhiteSpace(response.GuestName))
+                            {
+                                <small class="d-block text-secondary">@response.GuestName</small>
+                            }
+                        </td>
+                        <td class="text-center">@response.UpdatedAt.ToString("dd/MM/yyyy hh:mm tt")</td>
+                        <td style="white-space: normal; vertical-align: top;">
+                            @if (response.Answers == null || response.Answers.Count == 0)
+                            {
+                                <span class="text-muted">Este invitado no respondió preguntas.</span>
+                            }
+                            else
+                            {
+                                <div class="row g-1 small text-secondary">
+                                    @foreach (var answer in response.Answers)
+                                    {
+                                        <div class="col-12">
+                                            <strong class="text-dark fw-semibold">@answer.QuestionTitle:</strong>
+                                            @FormatearValor(answer.Value)
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-custom" @onclick="() => Resetear(response.Id, response.InvitationName)">
+                                <i class="bi bi-arrow-counterclockwise"></i> Resetear
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-block d-md-none">
+        @foreach (var response in Responses)
+        {
+            <div class="card mb-3 shadow-sm">
+                <div class="card-header" style="background-color:#3C6A79; color:white;">
+                    <strong>@(response.InvitationName ?? $"Invitación #{(response.InvitationId)}")</strong>
+                    @if (!string.IsNullOrWhiteSpace(response.GuestName))
+                    {
+                        <strong class="d-block">@response.GuestName</strong>
+                    }
+                    <small class="d-block">@response.UpdatedAt.ToString("dd/MM/yyyy hh:mm tt")</small>
+                </div>
+                <div class="card-body">
+                    @if (response.Answers == null || response.Answers.Count == 0)
+                    {
+                        <p class="text-muted mb-0">Este invitado no respondió preguntas.</p>
+                    }
+                    else
+                    {
+                        @foreach (var answer in response.Answers)
+                        {
+                            <p class="mb-1 small">
+                                <strong class="fw-semibold text-dark">@answer.QuestionTitle:</strong>
+                                @FormatearValor(answer.Value)
+                            </p>
+                        }
+                    }
+                    <div class="text-end mt-2">
+                        <button class="btn btn-sm btn-custom" @onclick="() => Resetear(response.Id, response.InvitationName)">
+                            <i class="bi bi-arrow-counterclockwise"></i> Resetear
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

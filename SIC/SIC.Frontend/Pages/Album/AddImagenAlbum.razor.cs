@@ -5,6 +5,7 @@ using Microsoft.Extensions.Localization;
 using Microsoft.JSInterop;
 using SIC.Frontend.Repositories;
 using SIC.Frontend.Resources;
+using SIC.Frontend.Services;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
 using System.Net;
@@ -19,6 +20,7 @@ public partial class AddImagenAlbum
     [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
     [Inject] private IJSRuntime JsRuntime { get; set; } = default!;
+    [Inject] private PageMetaService PageMetaService { get; set; } = default!;
 
     private IReadOnlyList<IBrowserFile>? selectedFiles;
     private string ActiveTab = "foto";
@@ -48,6 +50,16 @@ public partial class AddImagenAlbum
     protected override async Task OnInitializedAsync()
     {
         await LoadEvent();
+        if (Event is not null && Event.HasAlbum && !string.IsNullOrEmpty(Event.CoverAlbumImageUrl))
+        {
+            PageMetaService.Set(
+                title: Event.Name,
+                description: Event.SubTitle,
+                image: Event.CoverAlbumImageUrl,
+                canonicalUrl: $"https://invboxv-app.com/upload-photo/{Event.Code}",
+                keywords: "",
+                ogType: "website");
+        }
         if (Event is not null && Event.AlbumPublic)
         {
             await LoadEventImage();

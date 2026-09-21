@@ -159,6 +159,29 @@
 
                         @if (Invitacion?.Status == Status.Attend)
                         {
+                            <div class="mb-3">
+                                <a class="btn btn-custom w-100 fw-bold d-flex align-items-center justify-content-center gap-2"
+                                   href="@($"/invitacion/{Invitacion!.Code}/cuestionario")">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                         width="20"
+                                         height="20"
+                                         viewBox="0 0 24 24"
+                                         fill="none"
+                                         stroke="currentColor"
+                                         stroke-width="2"
+                                         stroke-linecap="round"
+                                         stroke-linejoin="round"
+                                         class="icon icon-tabler icons-tabler-outline icon-tabler-edit">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" />
+                                        <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415" />
+                                        <path d="M16 5l3 3" />
+                                    </svg>
+
+                                    <span>INFORMACIÓN ADICIONAL</span>
+                                </a>
+                            </div>
+
                             @if (!string.IsNullOrEmpty(QrBase64))
                             {
                                 <div class="my-3">
@@ -210,10 +233,11 @@
 
                         @if (!string.IsNullOrEmpty(PdfBase64))
                         {
-                            <a class="btn btn-dark w-100"
+                            <a class="btn btn-dark w-100 fw-bold d-flex align-items-center justify-content-center gap-2"
                                 href="@($"data:application/pdf;base64,{PdfBase64}")"
                                 download="Boleta.pdf">
-                                ⬇ Descargar QR
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-download"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>
+                                 Descargar QR
                             </a>
                         }
 

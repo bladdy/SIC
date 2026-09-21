@@ -4,7 +4,8 @@
     <div class="d-flex justify-content-between align-items-start">
         <input class="form-control border-0 border-bottom border-2 px-0 py-1 fs-6 fw-semibold"
                style="border-bottom-color: #3C6A79 !important; outline: none; transition: .2s; width: 100%;"
-               @bind="Pregunta.Titulo" />
+               value="@Pregunta.Titulo"
+               @oninput="e => Pregunta.Titulo = e.Value?.ToString() ?? string.Empty" />
 
         <button class="btn btn-outline-danger btn-sm rounded-circle d-flex align-items-center justify-content-center"
                 style="width:36px;height:36px;"
@@ -19,7 +20,7 @@
         <div class="col-md-4">
             <label class="form-label fw-semibold">Tipo</label>
             <select class="form-select" @bind="Pregunta.Tipo">
-                @foreach (var tipo in Enum.GetValues<TipoPregunta>())
+                @foreach (var tipo in Enum.GetValues<TipoPregunta>().Where(t => t != TipoPregunta.Foto))
                 {
                     <option value="@tipo">@tipo</option>
                 }
@@ -34,13 +35,47 @@
         </div>
     </div>
 
+    <!-- OPCIONES (Lista / Selección Múltiple) -->
+    @if (Pregunta.Tipo == TipoPregunta.Lista || Pregunta.Tipo == TipoPregunta.SeleccionMultiple)
+    {
+        <div class="mt-4">
+            <label class="form-label fw-semibold">Opciones</label>
+
+            @if (Pregunta.Opciones.Count == 0)
+            {
+                <small class="text-muted d-block mb-2">Agrega al menos una opción.</small>
+            }
+
+            @foreach (var opcion in Pregunta.Opciones)
+            {
+                <div class="input-group mb-2">
+                    <input class="form-control"
+                           value="@opcion"
+                           @oninput="e => ActualizarOpcion(opcion, e.Value?.ToString() ?? string.Empty)" />
+                    <button type="button"
+                            class="btn btn-outline-danger"
+                            title="Quitar opción"
+                            @onclick="() => QuitarOpcion(opcion)">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            }
+
+            <button class="btn btn-custom btn-sm"
+                    style="border: 2px dashed #ced4da; background: transparent; color: #3C6A79; border-radius: 8px;"
+                    @onclick="AgregarOpcion">
+                <i class="bi bi-plus-lg"></i> Agregar Opción
+            </button>
+        </div>
+    }
+
     <!-- REGLAS -->
     @if (Pregunta.Tipo == TipoPregunta.SiNo)
     {
         <div class="mt-4">
             @foreach (var regla in Pregunta.Reglas)
             {
-                <div style="margin-left: 45px; margin-top: 20px; padding-left: 20px; border-left: 3px solid #d9d9d9;">
+                <div @key="regla" style="margin-left: 45px; margin-top: 20px; padding-left: 20px; border-left: 3px solid #d9d9d9;">
                     <div class="fw-semibold mb-3" style="color: #3C6A79; font-size: .9rem;">
                         <i class="bi bi-chevron-down"></i> Cuando responda
                         <strong>@regla.ValorDisparador</strong>
@@ -53,8 +88,8 @@
 
                     @foreach (var sub in regla.SubPreguntas)
                     {
-                        <div class="position-relative">
-                           
+                        <div class="position-relative" @key="sub.Id">
+
                             <PreguntaBuilder Pregunta="sub"
                                              OnDelete="@(() => EliminarSub(regla, sub))" />
                         </div>
@@ -94,18 +129,19 @@
     void AgregarRegla()
     {
         Pregunta.Reglas.Add(new()
-            {
-                ValorDisparador = "Si"
-            });
+        {
+            ValorDisparador = "Si"
+        });
     }
 
     void AgregarSub(ReglaPreguntaModel regla)
     {
         regla.SubPreguntas.Add(new()
-            {
-                Titulo = "Nueva Subpregunta",
-                Tipo = TipoPregunta.Texto
-            });
+        {
+            Id = Guid.NewGuid(),
+            Titulo = "Nueva Subpregunta",
+            Tipo = TipoPregunta.Texto
+        });
     }
 
     void EliminarSub(ReglaPreguntaModel regla, PreguntaModel pregunta)
@@ -113,5 +149,26 @@
         regla.SubPreguntas.Remove(pregunta);
     }
 
-    //MinuteByMinute
+    void AgregarOpcion()
+    {
+        Pregunta.Opciones.Add($"Opción {Pregunta.Opciones.Count + 1}");
+    }
+
+    void ActualizarOpcion(string opcion, string nuevoValor)
+    {
+        var idx = Pregunta.Opciones.IndexOf(opcion);
+        if (idx >= 0)
+            Pregunta.Opciones[idx] = nuevoValor;
+    }
+
+    void QuitarOpcion(string opcion)
+    {
+        Pregunta.Opciones.Remove(opcion);
+    }
+
+    protected override void OnInitialized()
+    {
+        if (Pregunta.Id == Guid.Empty)
+            Pregunta.Id = Guid.NewGuid();
+    }
 }

@@ -28,5 +28,6 @@ namespace SIC.Backend.UnitOfWork.Interfaces
         Task<ActionResponse<InvitationConfirmationDto>> UpdateForConfirmarionFullAsync(InvitationConfirmationDto confirmationDto);
 
         Task<ActionResponse<ResponseInvitationDTO>> UpdateForConfirmationListFullAsync(ResponseInvitationDTO invitations);
+        Task<ActionResponse<IEnumerable<Invitation>>> SearchByNameAsync(string eventCode, string filter);
     }
 }

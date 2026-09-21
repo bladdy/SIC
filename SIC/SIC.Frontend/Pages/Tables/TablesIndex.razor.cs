@@ -20,7 +20,7 @@ namespace SIC.Frontend.Pages.Tables
         private List<TablesEvents>? Tables { get; set; }
         private string filterText = string.Empty;
         private string filterGuestText = string.Empty;
-        private string asignacionModo = "herencia";
+        private string asignacionModo = "individual";
         private HashSet<int> selectedGuestIds = new();
         private HashSet<int> selectedInvitationIds = new();
         private List<InvitationGuest> allEventGuests = new();
@@ -287,7 +287,7 @@ namespace SIC.Frontend.Pages.Tables
         {
             Table = tables;
             modaAsignarMesa = true;
-            asignacionModo = "herencia";
+            asignacionModo = "individual";
             filterText = string.Empty;
             filterGuestText = string.Empty;
             selectedGuestIds.Clear();
@@ -302,7 +302,7 @@ namespace SIC.Frontend.Pages.Tables
         private void CloseModaAsignarMesa()
         {
             modaAsignarMesa = false;
-            asignacionModo = "herencia";
+            asignacionModo = "individual";
             filterText = string.Empty;
             filterGuestText = string.Empty;
             selectedGuestIds.Clear();

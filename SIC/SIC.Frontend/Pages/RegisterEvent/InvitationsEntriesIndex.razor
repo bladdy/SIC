@@ -7,6 +7,9 @@
     <button class="btn btn-custom" @onclick="ShowCreateModal">
         Registrar Invitación (Escanear QR)
     </button>
+    <button class="btn btn-custom mx-1" @onclick="OpenSearchModal">
+        <i class="bi bi-search"></i> Buscar Invitado por Nombre
+    </button>
     <button class="btn btn-custom mx-1" @onclick="GeneratePdfAsync" disabled="@isGeneratingPdf">
         @if (isGeneratingPdf)
         {
@@ -25,9 +28,8 @@
 }
 else
 {
-    ﻿﻿
     <!--<Filter PlaceHolder="Buscar Invitacion..." Callback=@FilterCallBack /> 25d366-->
-    ﻿﻿<div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center;">
+    <div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center;">
         <input style="width:400px;" type="text" class="form-control" placeholder="Buscar Invitacion..." @bind-value="Filter">
         <button type="button" class="btn btn-custom  mx-1" @onclick="ApplyFilterAsync"><i class="bi bi-funnel" /> Filtrar</button>
         <button type="button" class="btn btn-custom " @onclick="CleanFilterAsync"><i class="bi bi-x-circle" /> Limpiar</button>
@@ -39,7 +41,7 @@ else
             <thead style="background-color:#3C6A79; color:white;">
                 <tr class="text-center">
                     <th class="text-start">Detalle del Invitado</th>
-                    <th>Mesa</th>
+                    <th class="text-start">Mesa</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -88,21 +90,21 @@ else
                             </td>
 
                             <!-- ======== COLUMNA 2: MESA ======== -->
-                            <td class="text-center" style="white-space: normal;">
+                            <td style="white-space: normal; vertical-align: top;">
                                 @if (invitation.Invitation?.Guests?.Any(g => g.TablesEventsId.HasValue) == true)
                                 {
                                     @foreach (var guest in invitation.Invitation.Guests.Where(g => g.Status == Status.Attend))
                                     {
-                                        <div class="small">
-                                            <strong>@guest.GuestName:</strong> <span class="px-3 py-2 fs-6 badge bg-secondary">@(guest.TablesEvents?.Name ?? "Sin asignar")</span>
+                                        <div>
+                                            <strong>@guest.GuestName:</strong> @(guest.TablesEvents?.Name ?? "Sin asignar")
                                         </div>
                                     }
                                 }
                                 else
                                 {
-                                    <span class="px-3 py-2 fs-6 badge bg-secondary">
+                                    <div>
                                         @(invitation.Invitation?.TablesEvents?.Name ?? "Sin asignar")
-                                    </span>
+                                    </div>
                                 }
                             </td>
 
@@ -125,7 +127,7 @@ else
         </table>
     </div>
 
-    <!-- ✅ Vista móvil tipo “detalle” -->
+    <!-- Vista móvil tipo "detalle" -->
     <div class="d-block d-md-none">
         @if (InvitationEntries != null && InvitationEntries.Any())
         {
@@ -139,14 +141,14 @@ else
                             {
                                 @foreach (var guest in invitation.Invitation.Guests.Where(g => g.Status == Status.Attend))
                                 {
-                                    <span class="badge bg-secondary me-1">
+                                    <span>
                                         @guest.GuestName: @(guest.TablesEvents?.Name ?? "Sin asignar")
                                     </span>
                                 }
                             }
                             else
                             {
-                                <span class="badge bg-secondary">
+                                <span>
                                     @(invitation.Invitation?.TablesEvents?.Name ?? "Sin asignar")
                                 </span>
                             }
@@ -273,19 +275,19 @@ else
 
                         <div class="mb-3">
                             <label class="form-label">Adultos Asistentes</label>
-                            <InputNumber class="form-control" @bind-Value="EditedInvitationEntry.AdultsEntered" min="0" max="@Invitation?.NumberConfirmedAdults" />
+                            <InputNumber class="form-control" @bind-Value="EditedInvitationEntry.AdultsEntered" min="0" max="@EditedInvitationEntry.Invitation?.NumberConfirmedAdults" data-maxmin-clamp />
                             <ValidationMessage For="@(() => EditedInvitationEntry.AdultsEntered)" />
                             <small class="text-muted">Máximo permitido: @EditedInvitationEntry.Invitation?.NumberConfirmedAdults</small>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Jovenes Asistentes</label>
-                            <InputNumber class="form-control" @bind-Value="EditedInvitationEntry.YouthsEntered" min="0" max="@Invitation?.NumberConfirmedYouths" />
+                            <InputNumber class="form-control" @bind-Value="EditedInvitationEntry.YouthsEntered" min="0" max="@EditedInvitationEntry.Invitation?.NumberConfirmedYouths" data-maxmin-clamp />
                             <ValidationMessage For="@(() => EditedInvitationEntry.YouthsEntered)" />
                             <small class="text-muted">Máximo permitido: @EditedInvitationEntry.Invitation?.NumberConfirmedYouths</small>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Niños Asistentes</label>
-                            <InputNumber class="form-control" @bind-Value="EditedInvitationEntry.ChildrenEntered" min="0" max="@Invitation?.NumberConfirmedChildren" />
+                            <InputNumber class="form-control" @bind-Value="EditedInvitationEntry.ChildrenEntered" min="0" max="@EditedInvitationEntry.Invitation?.NumberConfirmedChildren" data-maxmin-clamp />
                             <ValidationMessage For="@(() => EditedInvitationEntry.ChildrenEntered)" />
                             <small class="text-muted">Máximo permitido: @EditedInvitationEntry.Invitation?.NumberConfirmedChildren</small>
                         </div>
@@ -411,7 +413,8 @@ else
                                     <InputNumber class="form-control"
                                                  @bind-Value="NewInvitationEntry.AdultsEntered"
                                                  min="0"
-                                                 max="@Invitation?.NumberConfirmedAdults" />
+                                                 max="@Invitation?.NumberConfirmedAdults"
+                                                 data-maxmin-clamp />
 
                                     <ValidationMessage For="@(() => NewInvitationEntry.AdultsEntered)" />
 
@@ -426,7 +429,8 @@ else
                                     <InputNumber class="form-control"
                                                  @bind-Value="NewInvitationEntry.YouthsEntered"
                                                  min="0"
-                                                 max="@Invitation?.NumberConfirmedYouths" />
+                                                 max="@Invitation?.NumberConfirmedYouths"
+                                                 data-maxmin-clamp />
 
                                     <ValidationMessage For="@(() => NewInvitationEntry.YouthsEntered)" />
 
@@ -441,7 +445,8 @@ else
                                     <InputNumber class="form-control"
                                                  @bind-Value="NewInvitationEntry.ChildrenEntered"
                                                  min="0"
-                                                 max="@Invitation?.NumberConfirmedChildren" />
+                                                 max="@Invitation?.NumberConfirmedChildren"
+                                                 data-maxmin-clamp />
 
                                     <ValidationMessage For="@(() => NewInvitationEntry.ChildrenEntered)" />
 
@@ -450,7 +455,7 @@ else
                                     </small>
                                 </div>
 
-                                
+
                             </EditForm>
                         }
 
@@ -462,6 +467,81 @@ else
                         Guardar
                     </button>
                     <button type="button" class="btn btn-secondary" @onclick="CloseModal">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@if (IsSearchModalVisible)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Buscar Invitado por Nombre</h5>
+                    <button type="button" class="btn-close" @onclick="CloseSearchModal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex mb-3 gap-2">
+                        <input type="text" class="form-control" placeholder="Escribe el nombre del invitado..."
+                               @bind="SearchFilter" @bind:event="oninput"
+                               @onkeydown="OnSearchKeyDown" />
+                        <button class="btn btn-custom" @onclick="SearchInvitationsAsync">
+                            <i class="bi bi-search"></i> Buscar
+                        </button>
+                    </div>
+
+                    @if (SearchResults is null)
+                    {
+                        <p class="text-muted text-center py-4">Escribe un nombre y presiona Buscar.</p>
+                    }
+                    else if (!SearchResults.Any())
+                    {
+                        <p class="text-muted text-center py-4">No se encontraron invitados.</p>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead style="background-color:#3C6A79; color:white;">
+                                    <tr class="text-center">
+                                        <th class="text-start">Nombre</th>
+                                        <th>Móvil</th>
+                                        <th>Confirmados (A/J/N)</th>
+                                        <th>Estado</th>
+                                        <th>Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var inv in SearchResults)
+                                    {
+                                        <tr class="border-top">
+                                            <td class="text-start">@inv.Name</td>
+                                            <td class="text-center">@inv.PhoneNumber</td>
+                                            <td class="text-center">
+                                                @inv.NumberConfirmedAdults / @inv.NumberConfirmedYouths / @inv.NumberConfirmedChildren
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge @(inv.Status == Status.Attend ? "bg-success" : inv.Status == Status.NotAttend ? "bg-danger" : "bg-secondary")">
+                                                    @inv.Status.GetDescription()
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                <button class="btn btn-custom btn-sm" @onclick="() => SelectInvitation(inv)">
+                                                    Seleccionar
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseSearchModal">
                         Cancelar
                     </button>
                 </div>

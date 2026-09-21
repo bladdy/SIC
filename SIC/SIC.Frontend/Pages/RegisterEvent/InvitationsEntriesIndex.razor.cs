@@ -1,5 +1,6 @@
 ﻿using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using SIC.Frontend.Helpers;
 using SIC.Frontend.Repositories;
@@ -33,6 +34,10 @@ public partial class InvitationsEntriesIndex
     private bool isScannerRunning = false;
     private string? qrResult;
     private bool isGeneratingPdf = false;
+
+    private bool IsSearchModalVisible = false;
+    private string SearchFilter = string.Empty;
+    private List<Invitation>? SearchResults;
 
     protected override async Task OnInitializedAsync()
     {
@@ -287,5 +292,60 @@ public partial class InvitationsEntriesIndex
         await SweetAlertService.FireAsync("Exito", "La entrada de invitacion se ha guardado correctamente.", SweetAlertIcon.Success);
         IsModalVisible = false;
         await LoadInvitationEntries(currentPage);
+    }
+
+    private void OpenSearchModal()
+    {
+        SearchFilter = string.Empty;
+        SearchResults = null;
+        IsSearchModalVisible = true;
+    }
+
+    private void CloseSearchModal()
+    {
+        IsSearchModalVisible = false;
+    }
+
+    private async Task SearchInvitationsAsync()
+    {
+        if (string.IsNullOrWhiteSpace(SearchFilter))
+        {
+            await SweetAlertService.FireAsync("Info", "Escribe un nombre para buscar.", SweetAlertIcon.Info);
+            return;
+        }
+
+        var url = $"api/Invitations/search?code={Uri.EscapeDataString(Code!)}&filter={Uri.EscapeDataString(SearchFilter)}";
+        var responseHttp = await Repository.GetAsync<List<Invitation>>(url);
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        SearchResults = responseHttp.Response ?? new List<Invitation>();
+        if (!SearchResults.Any())
+        {
+            await SweetAlertService.FireAsync("Info", "No se encontraron invitados con ese nombre.", SweetAlertIcon.Info);
+        }
+    }
+
+    private async Task OnSearchKeyDown(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter")
+        {
+            await SearchInvitationsAsync();
+        }
+    }
+
+    private async Task SelectInvitation(Invitation invitation)
+    {
+        IsSearchModalVisible = false;
+        IsModalVisible = true;
+        isScannerRunning = false;
+        qrResult = invitation.Code ?? string.Empty;
+        StateHasChanged();
+        await LoadInvitation(invitation.Code ?? string.Empty);
+        StateHasChanged();
     }
 }

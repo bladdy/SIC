@@ -274,10 +274,10 @@ namespace SIC.Frontend.Pages.Events
             var HostUser = AllUsers.FirstOrDefault(u => u.Id == NewEvent.UserId);
             if (HostUser == null)
             {
-                await SweetAlertService.FireAsync("Error", "El usuario asignado no es v�lido.", SweetAlertIcon.Error);
+                await SweetAlertService.FireAsync("Error", "El usuario asignado no es valido.", SweetAlertIcon.Error);
                 return;
             }
-            if (HostUser.UserCredit != null)
+            if (HostUser.UserCredit != null && !IsEditMode)
             {
                 if ((HostUser.UserType.ToString() == "WeddingPlanner") && (HostUser.UserCredit?.AvailableCredits <= 0))
                 {

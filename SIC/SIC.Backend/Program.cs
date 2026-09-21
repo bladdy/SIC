@@ -164,6 +164,9 @@ builder.Services.AddScoped<IEventRequirementImagesUnitOfWork, EventRequirementIm
 builder.Services.AddScoped<IRequirementImageOptionsRepository, RequirementImageOptionsRepository>();
 builder.Services.AddScoped<IRequirementImageOptionsUnitOfWork, RequirementImageOptionsUnitOfWork>();
 
+builder.Services.AddScoped<IEventFormsRepository, EventFormsRepository>();
+builder.Services.AddScoped<IEventFormsUnitOfWork, EventFormsUnitOfWork>();
+
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
     options.User.RequireUniqueEmail = true;
