@@ -33,7 +33,7 @@ else
 
         <!-- Encabezado -->
         <div class="row align-items-center mb-4 mt-4 g-3">
-            <div class="col-12 col-sm-6 col-md-4">
+            <div class="col-12 col-sm-6 col-md-4 d-none">
                 <div class="input-group">
                     <span class="input-group-text bg-white">
                         <i class="bi bi-search"></i>
@@ -124,14 +124,6 @@ else
                                                 {
                                                     <div class="d-flex justify-content-between align-items-center">
                                                         <small>@guest.GuestName</small>
-                                                        @if (guest.TablesEventsId.HasValue)
-                                                        {
-                                                            <small class="badge bg-info text-white" style="font-size:0.6rem;">Individual</small>
-                                                        }
-                                                        else
-                                                        {
-                                                            <small class="badge bg-secondary" style="font-size:0.6rem;">Invitacion</small>
-                                                        }
                                                     </div>
                                                 }
                                             }
@@ -163,7 +155,6 @@ else
                                                 {
                                                     <div class="d-flex justify-content-between align-items-center">
                                                         <small>@guest.GuestName</small>
-                                                        <small class="badge bg-info text-white" style="font-size:0.6rem;">Individual</small>
                                                     </div>
                                                 }
                                             </div>
