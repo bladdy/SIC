@@ -251,8 +251,8 @@ public class EventFormsRepository : GenericRepository<EventForm>, IEventFormsRep
                     InvitationName = invitation.Name,
                     GuestName = null,
                     AnswersJson = JsonSerializer.Serialize(guestAnswer.Answers ?? new List<FormAnswerDTO>(), JsonOptions),
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
                 });
 
                 continue;
@@ -295,8 +295,8 @@ public class EventFormsRepository : GenericRepository<EventForm>, IEventFormsRep
                 InvitationName = invitation.Name,
                 GuestName = guest.GuestName,
                 AnswersJson = JsonSerializer.Serialize(guestAnswer.Answers ?? new List<FormAnswerDTO>(), JsonOptions),
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
             });
         }
 

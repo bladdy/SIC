@@ -12,10 +12,10 @@
         }
     </h3>
     <div class="d-flex gap-2 flex-wrap">
-        <button type="button" class="btn btn-outline-secondary" @onclick="Volver">
+        <button type="button" class="btn btn-custom" @onclick="Volver">
             <i class="bi bi-arrow-left"></i> Volver
         </button>
-        <a href="@($"/event/{EventCode}/form-builder")" class="btn btn-custom">
+        <a href="@($"/event/{EventCode}/form-builder")" class="btn btn-custom d-none">
             <i class="bi bi-pencil-square"></i> Editar Formulario
         </a>
         <button type="button" class="btn btn-custom" @onclick="GeneratePdfAsync" disabled="@GeneratingPdf">

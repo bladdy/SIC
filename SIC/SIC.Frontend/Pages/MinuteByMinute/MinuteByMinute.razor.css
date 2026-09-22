@@ -91,13 +91,18 @@
     gap: 8px;
     height: 40px;
     padding: 0 16px;
-    background: #fff;
-    color: #65727B;
-    border: 1px solid #E5E7EB;
+    background: #367B82;
+    color: #fff;
+    border: none;
     border-radius: 6px;
-    font-weight: 500;
+    font-weight: 600;
     font-size: 14px;
-    opacity: 0.7;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.minute-btn-ghost:hover {
+    background: #2c6368;
 }
 
 .minute-btn-ghost i {
@@ -804,12 +809,8 @@
     }
 
     .minute-summary {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         gap: 10px;
-    }
-
-    .minute-summary-card:last-child {
-        grid-column: span 2;
     }
 
     .minute-toolbar {
@@ -851,6 +852,11 @@
         border-bottom: 1px solid #ECEFF1;
     }
 
+    .minute-activity-header .minute-col-provider,
+    .minute-activity-header .minute-col-phone {
+        display: none;
+    }
+
     .minute-activity-row {
         flex-wrap: wrap;
         gap: 6px;
@@ -873,15 +879,48 @@
     .minute-task {
         border-bottom: 1px solid #ECEFF1;
     }
+
+    .minute-task {
+        grid-template-columns: 1fr auto;
+        padding: 8px 12px;
+    }
+
+    .minute-task .minute-col-provider,
+    .minute-task .minute-col-phone,
+    .minute-task .minute-task-status {
+        display: none;
+    }
+
+    .minute-task .minute-col-status {
+        justify-content: flex-end;
+    }
 }
 
 @media (max-width: 479.98px) {
     .minute-summary {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
     }
 
-    .minute-summary-card:last-child {
-        grid-column: span 1;
+    .minute-summary-card {
+        text-align: left;
+        gap: 8px;
+        padding: 10px 8px;
+    }
+
+    .minute-summary-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+        border-radius: 8px;
+    }
+
+    .minute-summary-value {
+        font-size: 18px;
+    }
+
+    .minute-summary-label {
+        display: none;
     }
 
     .minute-filters {

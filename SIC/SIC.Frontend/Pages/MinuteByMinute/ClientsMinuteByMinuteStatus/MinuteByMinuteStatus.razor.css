@@ -466,12 +466,8 @@
     }
 
     .minute-summary {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         gap: 10px;
-    }
-
-    .minute-summary-card:last-child {
-        grid-column: span 2;
     }
 
     .minute-table-header {
@@ -515,10 +511,28 @@
 
 @media (max-width: 479.98px) {
     .minute-summary {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
     }
 
-    .minute-summary-card:last-child {
-        grid-column: span 1;
+    .minute-summary-card {
+        text-align: left;
+        gap: 8px;
+        padding: 10px 8px;
+    }
+
+    .minute-summary-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+        border-radius: 8px;
+    }
+
+    .minute-summary-value {
+        font-size: 18px;
+    }
+
+    .minute-summary-label {
+        display: none;
     }
 }
