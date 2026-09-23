@@ -229,24 +229,53 @@ namespace SIC.Backend.Controllers
 
                 var config = configResponse.Result;
 
+                var exitosos = new List<string>();
+                var fallidos = new List<(string Name, string Error)>();
+
                 foreach (var templateJson in templateJsons)
                 {
                     token.ThrowIfCancellationRequested();
 
-                    await templateService.CreateTemplateAsync(config, templateJson);
+                    try
+                    {
+                        var result = await templateService.CreateTemplateAsync(config, templateJson);
+
+                        if (result.Success)
+                        {
+                            exitosos.Add(result.Message ?? "Sin nombre");
+                        }
+                        else
+                        {
+                            fallidos.Add((result.Message ?? "Sin nombre", result.Message!));
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        fallidos.Add(("Desconocido", ex.ToString()));
+                    }
 
                     await Task.Delay(TimeSpan.FromSeconds(30), token);
                 }
 
-                config.TemplatesGenerated = true;
+                // Solo marcar como generadas si absolutamente todas se crearon bien.
+                // Si hubo fallos se deja en false para permitir reintentar luego.
+                var allSucceeded = fallidos.Count == 0 && exitosos.Count > 0;
 
-                await whatsAppConfigUnitOfWork.UpdateFullAsync(config);
+                if (allSucceeded)
+                {
+                    config.TemplatesGenerated = true;
+                    await whatsAppConfigUnitOfWork.UpdateFullAsync(config);
+                }
+
+                var message = allSucceeded
+                    ? $"Las plantillas fueron generadas correctamente ({exitosos.Count} creadas)."
+                    : $"Se crearon {exitosos.Count} plantillas y fallaron {fallidos.Count}: {fallidos[0].Error}";
 
                 await _hub.Clients
                     .Group($"notifications-{notificationUserId}")
                     .SendAsync(
                         "Notification",
-                        "Las plantillas fueron generadas correctamente.",
+                        message,
                         cancellationToken: token);
             });
 

@@ -15,6 +15,8 @@ namespace SIC.Backend.Services
 {
     public class WhatsAppService
     {
+        private const string GraphApiVersion = "v22.0";
+
         private readonly HttpClient _httpClient;
 
         public WhatsAppService()
@@ -906,7 +908,7 @@ namespace SIC.Backend.Services
             return (true, "");
         }
 
-        public async Task CreateTemplateAsync(
+        public async Task<ActionResponse<bool>> CreateTemplateAsync(
                 UsuarioWhatsAppConfig config,
                 object template)
         {
@@ -916,7 +918,18 @@ namespace SIC.Backend.Services
                 _ => System.Text.Json.JsonSerializer.Serialize(template)
             };
 
-            var root = JsonNode.Parse(json)!.AsObject();
+            var root = JsonNode.Parse(json)?.AsObject();
+
+            if (root == null)
+            {
+                return new ActionResponse<bool>
+                {
+                    Success = false,
+                    Message = "El JSON de la plantilla es inválido o está vacío."
+                };
+            }
+
+            var templateName = root["name"]?.ToString();
 
             root = await ReplaceHeaderHandleAsync(
                 root,
@@ -926,16 +939,40 @@ namespace SIC.Backend.Services
             // 🔥 convertir de vuelta a string JSON
             var finalJson = root.ToJsonString();
 
+            Console.WriteLine($"============== ENVIANDO TEMPLATE '{templateName}' ==============");
+            Console.WriteLine(finalJson);
+
             using var client = new HttpClient();
 
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", config.AccessToken);
 
             var response = await client.PostAsync(
-                $"https://graph.facebook.com/v23.0/{config.WabaId}/message_templates",
+                $"https://graph.facebook.com/{GraphApiVersion}/{config.WabaId}/message_templates",
                 new StringContent(finalJson, Encoding.UTF8, "application/json"));
 
-            response.EnsureSuccessStatusCode();
+            var responseBody = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"============== ERROR META '{templateName}' ==============");
+                Console.WriteLine(responseBody);
+
+                return new ActionResponse<bool>
+                {
+                    Success = false,
+                    Message = responseBody
+                };
+            }
+
+            Console.WriteLine($"============== TEMPLATE CREADO '{templateName}' ==============");
+
+            return new ActionResponse<bool>
+            {
+                Success = true,
+                Result = true,
+                Message = templateName
+            };
         }
 
         private async Task<string> UploadTemplateImageAsync(
