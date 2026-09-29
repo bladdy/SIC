@@ -15,11 +15,11 @@
     </div>
 
     <main>
-        <div class="top-row px-4" style="background: white;">
+        <div class="top-row" style="background: white;">
             <AuthLinks/>
         </div>
 
-        <article class="content px-4" >
+        <article class="content">
             @Body
         </article>
     </main>
@@ -60,17 +60,7 @@
         {
 
             Console.WriteLine("Ejecutando notification");
-            await Swal.FireAsync(new SweetAlertOptions
-            {
-                    Toast = true,
-                    Position = SweetAlertPosition.TopEnd,
-                    Icon = SweetAlertIcon.Success,
-                    Title = message,
-                    ShowConfirmButton = true,
-                    ConfirmButtonText = "Cerrar",
-                    Timer = null,
-                    TimerProgressBar = false
-            });
+            await Swal.FireAsync("Nueva notificación", message, SweetAlertIcon.Success);
         });
     }
 

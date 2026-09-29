@@ -1,17 +1,21 @@
 @page "/event-responses"
 
 <PageTitle>Respuestas de Eventos</PageTitle>
-<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
-    <h3 class="mb-0">Respuestas de Eventos</h3>
-</div>
+<PageHeader Icon="bi-inbox"
+            Title="Respuestas de Eventos"
+            Subtitle="Seguimiento de formularios por evento">
+</PageHeader>
 
-<div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center; gap: 10px;">
-    <input style="width:400px;" type="text" class="form-control" placeholder="Buscar Evento..." @bind="Filter" />
+<div class="sic-toolbar">
+    <div class="sic-search">
+        <i class="bi bi-search"></i>
+        <input type="text" class="form-control" placeholder="Buscar Evento..." @bind="Filter" />
+    </div>
     <button type="button" class="btn btn-custom" @onclick="ApplyFilterAsync">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-search"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg> Buscar
+        <i class="bi bi-search"></i> Buscar
     </button>
     <button type="button" class="btn btn-custom" @onclick="CleanFilterAsync">
-        <i class="bi bi-x-circle" /> Limpiar
+        <i class="bi bi-x-circle"></i> Limpiar
     </button>
 </div>
 
@@ -19,8 +23,8 @@
 <GenericList MyList="Events">
     <Body>
         <div class="table-responsive d-none d-md-block">
-            <table class="table table-hover align-middle mb-0">
-                <thead style="background-color:#3C6A79; color:white;">
+            <table class="table sic-table table-hover align-middle mb-0">
+                <thead>
                     <tr class="text-center">
                         <th class="text-start">Detalle del Evento</th>
                         <th>Formulario</th>
@@ -76,7 +80,7 @@
                                     </div>
                                 </td>
                                 <td class="text-center">
-                                    <span class="px-3 py-2 fs-6 badge @(even.FormComplete ? "bg-success" : "bg-secondary")">
+                                    <span class="sic-badge @(even.FormComplete ? "sic-badge-success" : "sic-badge-gray")">
                                         @(even.FormComplete ? "Formulario completo" : "Formulario Pendiente")
                                     </span>
                                 </td>
@@ -103,7 +107,7 @@
             {
                 @foreach (var even in Events)
                 {
-                    <div class="card mb-3 shadow-sm">
+                    <div class="card mb-3">
                         <div class="card-body">
                             <h5 class="card-title fw-bold">@even.Name</h5>
                             @if (!string.IsNullOrWhiteSpace(even.SubTitle))
@@ -115,7 +119,7 @@
                             <p class="mb-1"><strong>Tipo:</strong> @even.EventType!.Name</p>
                             <p class="mb-1">
                                 <strong>Formulario:</strong>
-                                <span class="badge @(even.FormComplete ? "bg-success" : "bg-secondary")">
+                                <span class="sic-badge @(even.FormComplete ? "sic-badge-success" : "sic-badge-gray")">
                                     @(even.FormComplete ? "Formulario completo" : "Formulario Pendiente")
                                 </span>
                             </p>

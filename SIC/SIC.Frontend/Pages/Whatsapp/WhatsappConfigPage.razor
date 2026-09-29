@@ -1,6 +1,11 @@
 ﻿@page "/whatsapp/config"
 @using SIC.Shared.DTOs
 
+<PageHeader Icon="bi-whatsapp"
+            Title="Configuración de WhatsApp"
+            Subtitle="Integra tu WhatsApp Cloud API para recibir y enviar mensajes">
+</PageHeader>
+
 <div class="pb-2 d-flex gap-2">
     <button style="background-color: #25d366; border: 0; border-radius: 4px; color: #fff; cursor: pointer; font-family: Helvetica, Arial, sans-serif; font-size: 16px; font-weight: bold; height: 40px; padding: 0 24px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;"
             @onclick="LoginWhatsApp">

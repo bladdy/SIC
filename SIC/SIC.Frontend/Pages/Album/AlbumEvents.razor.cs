@@ -107,20 +107,27 @@ namespace SIC.Frontend.Pages.Album
 
         private async Task DeleteEvents(string code)
         {
-            var result = await SweetAlertService.FireAsync(new SweetAlertOptions
-            {
-                Title = "¿Estás seguro?",
-                Text = $"Se eliminara esta foto. Esta acci�n no se puede deshacer.",
-                Icon = SweetAlertIcon.Warning,
-                ShowCancelButton = true,
-                ConfirmButtonText = "Sé, borrar",
-                CancelButtonText = "Cancelar"
-            });
+            _pendingCode = code;
+            ConfirmMessage = "Se eliminará esta foto. Esta acción no se puede deshacer.";
+            IsConfirmVisible = true;
+            await Task.CompletedTask;
+        }
 
-            if (!string.IsNullOrEmpty(result.Value))
-            {
-                await DeleteEventImage(code);
-            }
+        private bool IsConfirmVisible;
+        private string ConfirmMessage = "";
+        private string? _pendingCode;
+
+        private async Task OnConfirmVisibleChanged(bool visible)
+        {
+            IsConfirmVisible = visible;
+            if (!visible) _pendingCode = null;
+        }
+
+        private async Task ExecutePendingDelete()
+        {
+            if (_pendingCode == null) return;
+            await DeleteEventImage(_pendingCode);
+            _pendingCode = null;
         }
 
         private async Task DeleteEventImage(string code)
@@ -134,15 +141,7 @@ namespace SIC.Frontend.Pages.Album
                 return;
             }
 
-            var toast = SweetAlertService.Mixin(new SweetAlertOptions
-            {
-                Toast = true,
-                Position = SweetAlertPosition.TopEnd,
-                ShowConfirmButton = false,
-                Timer = 3000,
-                TimerProgressBar = true,
-            });
-            await toast.FireAsync("Eliminado", "El album fue eliminado correctamente.", SweetAlertIcon.Success);
+            await SweetAlertService.FireAsync("Eliminado", "El album fue eliminado correctamente.", SweetAlertIcon.Success);
             await LoadEvents(currentPage);
             StateHasChanged();
         }
@@ -271,16 +270,7 @@ namespace SIC.Frontend.Pages.Album
 
                 if (!responseHttp.Error)
                 {
-                    var toast = SweetAlertService.Mixin(new SweetAlertOptions
-                    {
-                        Toast = true,
-                        Position = SweetAlertPosition.TopEnd,
-                        ShowConfirmButton = false,
-                        Timer = 3000,
-                        TimerProgressBar = true,
-                    });
-
-                    await toast.FireAsync(
+                    await SweetAlertService.FireAsync(
                         "Subir foto",
                         "La foto fue subida con Éxito.",
                         SweetAlertIcon.Success

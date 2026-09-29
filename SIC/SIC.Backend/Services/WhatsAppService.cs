@@ -975,6 +975,27 @@ namespace SIC.Backend.Services
             };
         }
 
+        public static bool IsMetaTemplateNameError(string responseBody)
+        {
+            var nameCodes = new[] { 131000, 131042, 131082, 131086, 132001, 132002 };
+
+            try
+            {
+                var error = JsonNode.Parse(responseBody)?["error"];
+                var code = error?["code"]?.GetValue<int?>();
+                var message = error?["message"]?.ToString();
+
+                if (code != null && nameCodes.Contains(code.Value))
+                    return true;
+
+                return message?.Contains("name", StringComparison.OrdinalIgnoreCase) == true;
+            }
+            catch
+            {
+                return responseBody.Contains("name", StringComparison.OrdinalIgnoreCase);
+            }
+        }
+
         private async Task<string> UploadTemplateImageAsync(
             string accessToken,
             string imageUrl)

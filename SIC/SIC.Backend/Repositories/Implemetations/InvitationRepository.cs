@@ -72,7 +72,7 @@ namespace SIC.Backend.Repositories.Implemetations
         public override async Task<ActionResponse<IEnumerable<Invitation>>> GetAsync(PaginationDTO pagination)
         {
             //ToDo: Agregar el filtro para que filte cada uno de los Guests
-            var queryable = _context.Invitations.Include(t => t.TemplateSents).Include(g => g.Guests).Include(t => t.TablesEvents).AsNoTracking().AsQueryable();
+            var queryable = _context.Invitations.Include(t => t.TemplateSents).Include(g => g.Guests).ThenInclude(t => t.TablesEvents).AsNoTracking().AsQueryable();
             queryable = queryable.Where(x => x.EventId == pagination.Id);
 
             if (!string.IsNullOrWhiteSpace(pagination.Filter))
@@ -202,6 +202,12 @@ namespace SIC.Backend.Repositories.Implemetations
                 foreach (var incoming in incomingGuests)
                 {
                     var existing = dbGuests.FirstOrDefault(g => g.Id == incoming.Id);
+
+                    // Si el invitado no asistirá, no puede conservar una mesa
+                    if (incoming.Status == Status.NotAttend)
+                    {
+                        incoming.TablesEventsId = null;
+                    }
 
                     if (existing == null)
                     {

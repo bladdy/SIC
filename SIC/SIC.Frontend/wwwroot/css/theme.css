@@ -1,0 +1,806 @@
+/* ==========================================================================
+   SIC THEME — basado en el diseño de MinuteByMinute
+   ========================================================================== */
+
+:root {
+    --sic-bg: #F8FAFC;
+    --sic-surface: #ffffff;
+    --sic-primary: #367B82;
+    --sic-primary-dark: #2c6368;
+    --sic-primary-soft: #EDE8F1;
+    --sic-primary-tint: #EAF4F5;
+    --sic-ink: #26343C;
+    --sic-muted: #7A858E;
+    --sic-muted-dark: #65727B;
+    --sic-border: #E5E7EB;
+    --sic-border-strong: #D9DEE3;
+    --sic-border-light: #ECEFF1;
+    --sic-success: #23945F;
+    --sic-success-bg: #E8F5EE;
+    --sic-warning: #B9770E;
+    --sic-warning-bg: #FFF4E0;
+    --sic-danger: #C0392B;
+    --sic-danger-bg: #FDEBE9;
+    --sic-gray: #65727B;
+    --sic-gray-bg: #ECEEF0;
+    --sic-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --sic-shadow: 0 6px 20px rgba(38, 52, 60, 0.12);
+    --sic-radius: 6px;
+    --sic-radius-md: 8px;
+    --sic-radius-lg: 12px;
+}
+
+body {
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    background-color: var(--sic-bg);
+    color: var(--sic-ink);
+}
+
+a {
+    color: var(--sic-primary);
+}
+
+a:hover {
+    color: var(--sic-primary-dark);
+}
+
+/* ============ BOTONES ============ */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-radius: var(--sic-radius);
+    font-weight: 600;
+}
+
+.btn-primary {
+    background-color: var(--sic-primary) !important;
+    border-color: var(--sic-primary) !important;
+    --bs-btn-bg: var(--sic-primary) !important;
+    --bs-btn-border-color: var(--sic-primary) !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: var(--sic-primary-dark) !important;
+    border-color: var(--sic-primary-dark) !important;
+    --bs-btn-hover-bg: var(--sic-primary-dark) !important;
+    --bs-btn-hover-border-color: var(--sic-primary-dark) !important;
+    --bs-btn-active-bg: var(--sic-primary-dark) !important;
+    --bs-btn-active-border-color: var(--sic-primary-dark) !important;
+}
+
+.btn-outline-primary {
+    color: var(--sic-primary);
+    border-color: var(--sic-primary);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--sic-primary);
+    border-color: var(--sic-primary);
+}
+
+.btn-outline-secondary:hover,
+.btn-outline-danger:hover {
+    filter: brightness(0.94);
+}
+
+.btn-info {
+    background-color: var(--sic-primary-tint);
+    color: var(--sic-primary);
+    border-color: #cfdfe2;
+}
+
+.btn-info:hover,
+.btn-info:focus {
+    background-color: #dcecee;
+    color: var(--sic-primary-dark);
+    border-color: #cfdfe2;
+}
+
+.btn-custom {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    vertical-align: middle;
+}
+
+/* ============ TARJETAS ============ */
+.card {
+    border: 1px solid var(--sic-border);
+    border-radius: var(--sic-radius-md);
+    box-shadow: var(--sic-shadow-sm);
+}
+
+.card-header {
+    background: var(--sic-surface);
+    border-bottom: 1px solid var(--sic-border-light);
+    border-radius: var(--sic-radius-md) var(--sic-radius-md) 0 0;
+}
+
+.card-footer {
+    background: var(--sic-surface);
+    border-top: 1px solid var(--sic-border-light);
+}
+
+.shadow-lg,
+.shadow-sm {
+    box-shadow: var(--sic-shadow-sm) !important;
+}
+
+.card.border-0 {
+    box-shadow: var(--sic-shadow-sm);
+}
+
+/* ============ FORMULARIOS ============ */
+.form-control,
+.form-select {
+    border-color: var(--sic-border-strong);
+    border-radius: var(--sic-radius);
+    color: var(--sic-ink);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--sic-primary);
+    box-shadow: 0 0 0 0.18rem rgba(54, 123, 130, 0.18);
+}
+
+.form-label {
+    font-weight: 500;
+    color: var(--sic-ink);
+}
+
+.form-switch .form-check-input:checked {
+    background-color: var(--sic-primary);
+    border-color: var(--sic-primary);
+}
+
+/* ============ MODALES ============ */
+.modal-content {
+    border: none;
+    border-radius: var(--sic-radius-lg);
+    box-shadow: var(--sic-shadow);
+}
+
+.modal-header {
+    background: var(--sic-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--sic-radius-lg) var(--sic-radius-lg) 0 0;
+    padding: 14px 20px;
+}
+
+.modal-header.sic-modal-danger {
+    background: #dc3545;
+}
+
+.modal-header .modal-title {
+    font-weight: 600;
+    color: #fff;
+}
+
+.modal-header .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+    opacity: 1;
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--sic-border-light);
+    padding: 12px 20px;
+}
+
+/* ============ DROPDOWN ============ */
+.dropdown-menu {
+    border: 1px solid var(--sic-border);
+    border-radius: 8px;
+    box-shadow: var(--sic-shadow);
+    padding: 6px;
+    font-size: 13px;
+}
+
+.dropdown-item {
+    border-radius: 5px;
+    padding: 7px 10px;
+    color: var(--sic-ink);
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background: #F1F3F5;
+    color: var(--sic-ink);
+}
+
+.dropdown-item:active {
+    background: var(--sic-primary);
+    color: #fff;
+}
+
+.dropdown-item.text-danger:hover,
+.dropdown-item.text-danger:focus {
+    background: var(--sic-danger-bg);
+}
+
+.dropdown-divider {
+    border-color: var(--sic-border-light);
+    margin: 6px 0;
+}
+
+/* ============ ACCORDION ============ */
+.accordion-button {
+    font-weight: 600;
+    color: var(--sic-ink);
+}
+
+.accordion-button:not(.collapsed) {
+    color: var(--sic-ink);
+    background-color: var(--sic-surface);
+    box-shadow: none;
+}
+
+.accordion-button:focus {
+    box-shadow: none;
+    border-color: var(--sic-border);
+}
+
+.accordion-item {
+    border-color: var(--sic-border-light);
+    border-radius: var(--sic-radius-md);
+}
+
+/* ============ PAGINACIÓN ============ */
+.page-link {
+    color: var(--sic-primary);
+    border-radius: 6px;
+    margin: 0 2px;
+}
+
+.page-item.active .page-link {
+    background-color: var(--sic-primary);
+    border-color: var(--sic-primary);
+}
+
+.page-link:focus {
+    box-shadow: none;
+}
+
+/* ============ PROGRESS ============ */
+.progress {
+    background-color: var(--sic-gray-bg);
+    border-radius: 999px;
+}
+
+.progress-bar {
+    background-color: var(--sic-primary);
+}
+
+/* ============ TABLAS (tema sic) ============ */
+.sic-table thead th {
+    background: var(--sic-primary);
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    padding: 12px 14px;
+    border: 0;
+    white-space: nowrap;
+}
+
+.sic-table thead th:first-child {
+    border-top-left-radius: var(--sic-radius);
+}
+
+.sic-table thead th:last-child {
+    border-top-right-radius: var(--sic-radius);
+}
+
+.sic-table tbody td {
+    padding: 12px 14px;
+    vertical-align: middle;
+    border-color: var(--sic-border-light);
+}
+
+.sic-table tbody tr {
+    transition: background-color 0.12s ease;
+}
+
+.sic-table tbody tr:hover {
+    background-color: #F6F9FA;
+}
+
+.sic-table .table-row-muted {
+    color: var(--sic-muted);
+}
+
+/* ============ CONTENEDOR DE PÁGINA ============ */
+.sic-page {
+    max-width: 1350px;
+    margin: 0 auto;
+    padding: 20px 32px 40px;
+}
+
+@media (max-width: 767.98px) {
+    .sic-page {
+        padding: 16px;
+    }
+}
+
+/* ============ HEADER DE PÁGINA ============ */
+.sic-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.sic-header-main {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.sic-header-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: var(--sic-radius-lg);
+    background: var(--sic-primary-soft);
+    color: var(--sic-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.sic-header-title {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--sic-ink);
+    line-height: 1.2;
+}
+
+.sic-header-subtitle {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--sic-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-top: 2px;
+}
+
+.sic-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 767.98px) {
+    .sic-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .sic-header-actions {
+        width: 100%;
+    }
+
+    .sic-header-actions > .btn,
+    .sic-header-actions > .btn-custom,
+    .sic-header-actions > a {
+        flex: 1;
+    }
+}
+
+/* ============ TOOLBAR ============ */
+.sic-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.sic-toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.sic-search {
+    position: relative;
+    width: 300px;
+    max-width: 100%;
+}
+
+.sic-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--sic-muted);
+    font-size: 1rem;
+    pointer-events: none;
+    z-index: 3;
+}
+
+.sic-search .form-control {
+    padding-left: 38px;
+    height: 42px;
+    border-radius: var(--sic-radius);
+    border-color: var(--sic-border-strong);
+}
+
+.sic-select {
+    height: 42px;
+    min-width: 130px;
+    padding: 0 34px 0 12px;
+    border: 1px solid var(--sic-border-strong);
+    border-radius: var(--sic-radius);
+    background: #fff;
+    color: var(--sic-ink);
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+}
+
+.sic-clear {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 42px;
+    padding: 0 12px;
+    background: #fff;
+    border: 1px solid var(--sic-border);
+    border-radius: var(--sic-radius);
+    color: var(--sic-muted-dark);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.sic-clear:hover {
+    background: #F1F3F5;
+}
+
+@media (max-width: 767.98px) {
+    .sic-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .sic-search {
+        width: 100%;
+    }
+
+    .sic-toolbar-actions .sic-select {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .sic-clear {
+        flex: 1;
+        justify-content: center;
+    }
+}
+
+/* ============ TARJETAS RESUMEN (stats) ============ */
+.sic-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.sic-stat {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #fff;
+    border: 1px solid var(--sic-border);
+    border-radius: var(--sic-radius-md);
+    padding: 16px;
+    box-shadow: var(--sic-shadow-sm);
+}
+
+.sic-stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--sic-primary-soft);
+    color: var(--sic-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.sic-stat-icon-green {
+    background: var(--sic-success-bg);
+    color: var(--sic-success);
+}
+
+.sic-stat-icon-gray {
+    background: var(--sic-gray-bg);
+    color: var(--sic-gray);
+}
+
+.sic-stat-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--sic-ink);
+    line-height: 1.1;
+}
+
+.sic-stat-label {
+    font-size: 12px;
+    color: var(--sic-muted);
+    font-weight: 500;
+}
+
+@media (max-width: 767.98px) {
+    .sic-stats {
+        gap: 10px;
+    }
+}
+
+@media (max-width: 479.98px) {
+    .sic-stats {
+        gap: 6px;
+    }
+
+    .sic-stat {
+        gap: 8px;
+        padding: 10px 8px;
+    }
+
+    .sic-stat-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+        border-radius: 8px;
+    }
+
+    .sic-stat-value {
+        font-size: 18px;
+    }
+
+    .sic-stat-label {
+        display: none;
+    }
+}
+
+/* ============ BADGES (pills de estado) ============ */
+.badge {
+    border-radius: 5px;
+    font-weight: 600;
+    padding: 0.4em 0.65em;
+}
+
+.bg-success {
+    background-color: var(--sic-success) !important;
+}
+
+.bg-danger {
+    background-color: var(--sic-danger) !important;
+}
+
+.bg-warning {
+    background-color: var(--sic-warning) !important;
+}
+
+.bg-secondary {
+    background-color: var(--sic-gray) !important;
+}
+
+.bg-info {
+    background-color: #3B7A93 !important;
+}
+
+.btn-success {
+    background-color: var(--sic-success);
+    border-color: var(--sic-success);
+}
+
+.btn-danger {
+    background-color: var(--sic-danger);
+    border-color: var(--sic-danger);
+}
+
+.btn-warning {
+    background-color: var(--sic-warning);
+    border-color: var(--sic-warning);
+    color: #fff;
+}
+
+.btn-secondary {
+    background-color: var(--sic-gray);
+    border-color: var(--sic-gray);
+}
+
+.btn-success:hover,
+.btn-success:focus,
+.btn-danger:hover,
+.btn-danger:focus,
+.btn-warning:hover,
+.btn-warning:focus,
+.btn-secondary:hover,
+.btn-secondary:focus {
+    filter: brightness(0.93);
+    color: #fff;
+}
+
+.sic-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    padding: 4px 10px;
+    border-radius: 5px;
+    white-space: nowrap;
+}
+
+.sic-badge-success {
+    background: var(--sic-success-bg);
+    color: var(--sic-success);
+}
+
+.sic-badge-warning {
+    background: var(--sic-warning-bg);
+    color: var(--sic-warning);
+}
+
+.sic-badge-danger {
+    background: var(--sic-danger-bg);
+    color: var(--sic-danger);
+}
+
+.sic-badge-gray {
+    background: var(--sic-gray-bg);
+    color: var(--sic-gray);
+}
+
+/* ============ ESTADO VACÍO ============ */
+.sic-empty {
+    text-align: center;
+    padding: 60px 20px;
+    background: #fff;
+    border: 1px solid var(--sic-border);
+    border-radius: var(--sic-radius-md);
+    color: var(--sic-muted);
+}
+
+.sic-empty > i {
+    font-size: 3rem;
+    color: #C8CFD4;
+    display: block;
+}
+
+.sic-empty p {
+    margin: 14px 0 0;
+    color: var(--sic-muted);
+}
+
+/* ============ CARD SIC ============ */
+.sic-card {
+    background: #fff;
+    border: 1px solid var(--sic-border);
+    border-radius: var(--sic-radius-md);
+    box-shadow: var(--sic-shadow-sm);
+}
+
+.sic-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    border-bottom: 1px solid var(--sic-border-light);
+    padding: 12px 16px;
+    font-weight: 600;
+    color: var(--sic-ink);
+}
+
+.sic-card-body {
+    padding: 16px;
+}
+
+/* ============ TARJETAS MÓVILES ============ */
+.sic-mobile-card .card {
+    border: 1px solid var(--sic-border);
+    border-radius: var(--sic-radius-md);
+    box-shadow: var(--sic-shadow-sm);
+}
+
+.sic-mobile-card .card-header {
+    background: #fff;
+    border-bottom: 1px solid var(--sic-border-light);
+    font-weight: 700;
+}
+
+/* ============ ACCIONES / BOTONES DE ÍCONO ============ */
+.sic-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    white-space: nowrap;
+}
+
+.sic-icon-btn {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--sic-radius);
+    color: var(--sic-muted-dark);
+    background: #fff;
+    border: 1px solid var(--sic-border);
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.sic-icon-btn:hover {
+    background: #F1F3F5;
+    color: var(--sic-ink);
+}
+
+.sic-icon-btn-danger:hover {
+    background: var(--sic-danger-bg);
+    color: var(--sic-danger);
+}
+
+/* ============ CHIP ============ */
+.sic-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--sic-muted-dark);
+    background: #F1EDF3;
+    border-radius: 5px;
+    padding: 3px 8px;
+    white-space: nowrap;
+}
+
+/* ============ TEXTO ============ */
+.sic-text-primary {
+    color: var(--sic-primary) !important;
+}
+
+.sic-text-muted {
+    color: var(--sic-muted) !important;
+}
+
+.sic-text-ink {
+    color: var(--sic-ink) !important;
+}
+
+.sic-bg-primary {
+    background-color: var(--sic-primary) !important;
+}
+
+.sic-bg-surface {
+    background-color: var(--sic-surface) !important;
+}
+
+.sic-divider {
+    border-top: 1px solid var(--sic-border-light);
+}

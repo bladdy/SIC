@@ -6,9 +6,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>INVBOXV</title>
     <base href="/" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/app.css" />
     <link rel="stylesheet" href="css/chat.css?v=@DateTime.UtcNow.Ticks" />
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+    <style>
+        .btn-primary {
+            background-color: #367B82 !important;
+            border-color: #367B82 !important;
+            --bs-btn-bg: #367B82 !important;
+            --bs-btn-border-color: #367B82 !important;
+        }
+
+        .btn-primary:hover,
+        .btn-primary:focus,
+        .btn-primary:active,
+        .btn-primary.active {
+            background-color: #2c6368 !important;
+            border-color: #2c6368 !important;
+            --bs-btn-hover-bg: #2c6368 !important;
+            --bs-btn-hover-border-color: #2c6368 !important;
+            --bs-btn-active-bg: #2c6368 !important;
+            --bs-btn-active-border-color: #2c6368 !important;
+        }
+    </style>
     <link rel="stylesheet" href="css/loading.css" />
     <link rel="icon" type="image/png" href="logo.png" />
     <link href="SIC.Frontend.styles.css" rel="stylesheet" />
@@ -34,7 +58,7 @@
     <meta name="twitter:image" content="https://invboxv-app.com/logo.png" /> <!-- 🔹 misma imagen o una específica para Twitter -->
     <!-- iOS / Android Web App -->
     <meta name="apple-mobile-web-app-title" content="INVBOXV">
-    <meta name="theme-color" content="#3C6A79" />
+    <meta name="theme-color" content="#367B82" />
 
     <script>
         (function () {
@@ -80,7 +104,7 @@
             </div>
 
             <!-- Texto de progreso -->
-            <div class="loading-progress-text" style="color: #3C6A79;">Cargando...</div>
+            <div class="loading-progress-text" style="color: #367B82;">Cargando...</div>
         </div>
     </div>
 

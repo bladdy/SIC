@@ -1,9 +1,9 @@
-﻿<div class="card shadow-sm p-3 mb-0" style="border-radius: 12px;">
+<div class="sic-card p-3 mb-0">
 
     <!-- CABECERA -->
     <div class="d-flex justify-content-between align-items-start">
         <input class="form-control border-0 border-bottom border-2 px-0 py-1 fs-6 fw-semibold"
-               style="border-bottom-color: #3C6A79 !important; outline: none; transition: .2s; width: 100%;"
+               style="border-bottom-color: #367B82 !important; outline: none; transition: .2s; width: 100%;"
                value="@Pregunta.Titulo"
                @oninput="e => Pregunta.Titulo = e.Value?.ToString() ?? string.Empty" />
 
@@ -65,7 +65,7 @@
             }
 
             <button class="btn btn-custom btn-sm"
-                    style="border: 2px dashed #ced4da; background: transparent; color: #3C6A79; border-radius: 8px;"
+                    style="border: 2px dashed #ced4da; background: transparent; color: #367B82; border-radius: 8px;"
                     @onclick="AgregarOpcion">
                 <i class="bi bi-plus-lg"></i> Agregar Opción
             </button>
@@ -79,7 +79,7 @@
             @foreach (var regla in Pregunta.Reglas)
             {
                 <div @key="regla" style="margin-left: 45px; margin-top: 20px; padding-left: 20px; border-left: 3px solid #d9d9d9;">
-                    <div class="fw-semibold mb-3 d-flex justify-content-between align-items-center" style="color: #3C6A79; font-size: .9rem;">
+                    <div class="fw-semibold mb-3 d-flex justify-content-between align-items-center" style="color: #367B82; font-size: .9rem;">
                         <span>
                             <i class="bi bi-chevron-down"></i> Cuando responda
                             <strong>@regla.ValorDisparador</strong>
@@ -101,7 +101,7 @@
                         <div class="position-relative" @key="sub.Id">
 
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <small class="fw-semibold" style="color: #3C6A79;">Subpregunta</small>
+                                <small class="fw-semibold" style="color: #367B82;">Subpregunta</small>
                                 <button class="btn btn-outline-danger btn-sm"
                                         title="Eliminar Subpregunta"
                                         @onclick="() => EliminarSub(regla, sub)">
@@ -116,7 +116,7 @@
                     }
 
                     <button class="btn btn-custom btn-sm w-100 mt-2"
-                            style="border: 2px dashed #ced4da; background: transparent; color: #3C6A79; border-radius: 8px;"
+                            style="border: 2px dashed #ced4da; background: transparent; color: #367B82; border-radius: 8px;"
                             @onclick="() => AgregarSub(regla)"
                             onmouseover="this.style.background='#f8f9fa'"
                             onmouseout="this.style.background='transparent'">

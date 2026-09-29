@@ -1,8 +1,9 @@
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     margin: 0;
     padding: 0;
     height: 100%;
+    color: #26343C;
 }
 /* Agregar estas reglas en el archivo wwwroot/css/app.css */
 @keyframes rotateNumber {
@@ -45,7 +46,7 @@ html, body {
 }
 
 body {
-    background-color: #f8f9fa;
+    background-color: #F8FAFC;
 }
 
 /* Contenedor del n�mero actual */
@@ -126,11 +127,11 @@ input[type="checkbox"] {
 
     /* Checkbox con estilo personalizado */
     input[type="checkbox"].custom {
-        accent-color: #3C6A79; /* Color personalizado */
+        accent-color: #367B82; /* Color personalizado */
     }
 
 a, .btn-link {
-    color: #3C6A79;
+    color: #367B82;
 }
 
 .custom-radio {
@@ -141,59 +142,66 @@ a, .btn-link {
     accent-color: #6f42c1; /* Morado elegante */
 }
 .text-custom {
-    color: #3C6A79 !important;
+    color: #367B82 !important;
 }
 
 .btn-custom {
-    background-color: #3C6A79 !important; /* Color de fondo */
+    background-color: #367B82 !important; /* Color de fondo */
     color: white !important; /* Color del texto */
     border: none; /* Eliminar borde predeterminado */
 }
 .form-check-input:focus {
-    box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25) !important;
+    box-shadow: 0 0 0 0.25rem rgba(54, 123, 130, 0.25) !important;
 }
 
 .form-check-input:checked {
-    background-color: #3C6A79 !important;
-    border-color: #3C6A79 !important;
+    background-color: #367B82 !important;
+    border-color: #367B82 !important;
 }
 
 
     .btn-custom:hover {
-        background-color: #2e4e59 !important; /* Color de fondo al pasar el mouse (opcional) */
+        background-color: #2c6368 !important; /* Color de fondo al pasar el mouse (opcional) */
         color: white !important; /* Mantener el color blanco */
-        border-color: #2e4e59; /* Opcional: A�adir color al borde */
+        border-color: #2c6368; /* Opcional: A�adir color al borde */
     }
 
 .btn-primary {
     color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
+    background-color: #367B82;
+    border-color: #2c6368;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: #2c6368 !important;
+    border-color: #2c6368 !important;
 }
 
 /* Cambiar el color de la clase active */
 .pagination .page-item.active .page-link {
-    background-color: #3C6A79 !important; /* Color de fondo del �tem activo */
-    border-color: #3C6A79 !important; /* Color del borde del �tem activo */
+    background-color: #367B82 !important; /* Color de fondo del �tem activo */
+    border-color: #367B82 !important; /* Color del borde del �tem activo */
 }
 
     .pagination .page-item.active .page-link:hover {
-        background-color: #3C6A79; /* Color de fondo al pasar el rat�n sobre el �tem activo */
-        border-color: #3C6A79; /* Color del borde al pasar el rat�n */
+        background-color: #367B82; /* Color de fondo al pasar el rat�n sobre el �tem activo */
+        border-color: #367B82; /* Color del borde al pasar el rat�n */
     }
 
 input.form-control:focus {
-    border-color: #3C6A79 !important; /* Cambiar el color del borde */
-    box-shadow: 0 0 5px rgba(60, 106, 121, 0.5); /* Agregar resplandor */
+    border-color: #367B82 !important; /* Cambiar el color del borde */
+    box-shadow: 0 0 5px rgba(54, 123, 130, 0.5); /* Agregar resplandor */
 }
 
 select.form-control:focus {
-    border-color: #3C6A79 !important; /* Cambiar el color del borde */
-    box-shadow: 0 0 5px rgba(60, 106, 121, 0.5); /* Agregar resplandor */
+    border-color: #367B82 !important; /* Cambiar el color del borde */
+    box-shadow: 0 0 5px rgba(54, 123, 130, 0.5); /* Agregar resplandor */
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #3C6A79;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #367B82;
 }
 
 .content {

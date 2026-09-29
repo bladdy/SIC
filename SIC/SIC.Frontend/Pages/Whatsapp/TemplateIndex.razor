@@ -1,21 +1,25 @@
 ﻿@page "/whatsapp_templates"
 <PageTitle>Plantillas</PageTitle>
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
-    <h3 class="mb-2 mb-md-0">Plantillas</h3>
-    <div>
-        <a href="/whatsapp_templates/template-builder" class="btn btn-custom mt-2 mt-md-0">
-            <i class="oi oi-plus"></i> Crear Plantilla
-        </a>
-        <button class="btn btn-custom mt-2 mt-md-0"
-        @onclick="GenerateTemplates"
-        disabled="@isGenerating">
-            @(isGenerating ? "Iniciando..." : "Generar plantillas sugeridas")
-        </button>
-    </div>
-</div>
+<PageHeader Icon="bi-file-earmark-richtext"
+Title="Plantillas"
+Subtitle="Plantillas de mensajes de WhatsApp">
+    <a href="/whatsapp_templates/template-builder" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Crear Plantilla
+    </a>
+    <button class="btn btn-primary"
+    @onclick="GenerateTemplates"
+    disabled="@(isGenerating || hasGeneratedSuggested)"
+    title="@(hasGeneratedSuggested ? "Ya generaste tus plantillas sugeridas." : "")">
+        @(isGenerating
+                ? "Iniciando..."
+                : hasGeneratedSuggested
+                    ? "Plantillas generadas"
+                    : "Generar plantillas sugeridas")
+    </button>
+</PageHeader>
 
 <div class="table-responsive d-none d-md-block">
-    <table class="table table-striped table-bordered">
+    <table class="table sic-table mb-0">
         <thead>
             <tr>
                 <th>Nombre de la plantilla</th>
@@ -37,20 +41,29 @@
                         <td>
                             @if (template.Status == "APPROVED")
                             {
-                                <span class="badge bg-success">Aprobada</span>
+                                <span class="sic-badge sic-badge-success">Aprobada</span>
                             }
                             else if (template.Status == "PENDING")
                             {
-                                <span class="badge bg-warning text-dark">Pendiente</span>
+                                <span class="sic-badge sic-badge-warning">Pendiente</span>
                             }
                             else
                             {
-                                <span class="badge bg-danger">@template.Status</span>
+                                <span class="sic-badge sic-badge-danger">@template.Status</span>
                             }
                         </td>
                         <td>
                             <div class="d-flex justify-content-center gap-2">
-                                <button class="btn btn-custom" @onclick="() => OpenTemplateImage(template)"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-eye"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" /></svg></button>
+                                @if (TemplateImages.Contains(template!.Name))
+                                {
+                                    <button class="btn btn-custom" @onclick="() => 
+                                        OpenTemplateImage(template)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-eye">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                                        <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" /></svg>
+                                    </button>
+                                }
                                 @if (!TemplateImages.Contains(template.Name))
                                 {
                                     <button class="btn btn-danger" @onclick="() => DeleteTemplate(template)">
@@ -90,12 +103,12 @@
     </table>
 </div>
 
-<div class="d-block d-md-none">
+<div class="d-block d-md-none sic-mobile-card">
     @if (WhatsappTemplates?.Data != null && WhatsappTemplates.Data.Any())
     {
         @foreach (var template in WhatsappTemplates.Data)
         {
-            <div class="card mb-3 shadow-sm">
+            <div class="card mb-3">
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-2">
                         <strong>Nombre:</strong>
@@ -109,19 +122,19 @@
                         <strong>Idioma:</strong>
                         <span>@template.Language</span>
                     </div>
-                    <div class="d-flex justify-content-between mb-2">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
                         <strong>Estado:</strong>
                         @if (template.Status == "APPROVED")
                         {
-                            <span class="badge bg-success">Aprobada</span>
+                            <span class="sic-badge sic-badge-success">Aprobada</span>
                         }
                         else if (template.Status == "PENDING")
                         {
-                            <span class="badge bg-warning text-dark">Pendiente</span>
+                            <span class="sic-badge sic-badge-warning">Pendiente</span>
                         }
                         else
                         {
-                            <span class="badge bg-danger">@template.Status</span>
+                            <span class="sic-badge sic-badge-danger">@template.Status</span>
                         }
                     </div>
                     <div class="d-flex justify-content-between mb-2">
@@ -185,3 +198,5 @@
         </div>
     </div>
 }
+
+<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />

@@ -15,6 +15,7 @@ using SIC.Shared.Request;
 using SIC.Shared.Response;
 using System.Security.Claims;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
@@ -182,12 +183,6 @@ namespace SIC.Backend.Controllers
             if (!configResult.Success || configResult.Result == null)
                 return BadRequest(new { error = "Este usuario no tiene WhatsApp configurado" });
 
-            if (configResult.Result.TemplatesGenerated)
-                return Ok(new
-                {
-                    message = "Las plantillas sugeridas ya fueron generadas para esta cuenta."
-                });
-
             var templates = await _templateRepository.GetAllAsync();
 
             if (!templates.Success || templates.Result == null)
@@ -196,19 +191,28 @@ namespace SIC.Backend.Controllers
                     error = "Hubo un problema al obtener las plantillas sugeridas."
                 });
 
-            var templateJsons = templates.Result
-                .Where(t => t != null)
+            var suggestedTemplates = templates.Result
+                .Where(t => t != null && t!.IsSuggested)
                 .OrderBy(t => t!.OrderTemplate)
-                .Select(t => t!.MetaDefinitionJson!)
+                .Select(t => t!)
                 .ToList();
 
-            if (templateJsons.Count < 6)
+            if (suggestedTemplates.Count == 0)
             {
                 return BadRequest(new
                 {
-                    error = "No existen suficientes plantillas configuradas."
+                    error = "No existen plantillas sugeridas configuradas."
                 });
             }
+
+            // Si el usuario ya generó todas las plantillas sugeridas no se vuelve a generar.
+            // Se basa en la BD (copias por usuario) y no en el flag viejo TemplatesGenerated,
+            // para permitir regenerar a cuentas que generaron antes de guardarse copias.
+            if (await _templateRepository.HasAllSuggestedGeneratedAsync(userId, suggestedTemplates))
+                return Ok(new
+                {
+                    message = "Las plantillas sugeridas ya fueron generadas para esta cuenta."
+                });
 
             // Solo guardar datos primitivos para el Background
             var configId = configResult.Result.UsuarioId;
@@ -220,6 +224,7 @@ namespace SIC.Backend.Controllers
 
                 var templateService = scope.ServiceProvider.GetRequiredService<WhatsAppService>();
                 var whatsAppConfigUnitOfWork = scope.ServiceProvider.GetRequiredService<IWhatsAppConfigUnitOfWork>();
+                var templateRepository = scope.ServiceProvider.GetRequiredService<IWhatsAppTemplateRepository>();
 
                 // Obtener nuevamente la configuración desde la BD
                 var configResponse = await whatsAppConfigUnitOfWork.GetByUserIdAsync(configId);
@@ -230,28 +235,38 @@ namespace SIC.Backend.Controllers
                 var config = configResponse.Result;
 
                 var exitosos = new List<string>();
-                var fallidos = new List<(string Name, string Error)>();
+                var fallidos = new List<string>();
 
-                foreach (var templateJson in templateJsons)
+                foreach (var suggested in suggestedTemplates)
                 {
                     token.ThrowIfCancellationRequested();
 
                     try
                     {
-                        var result = await templateService.CreateTemplateAsync(config, templateJson);
+                        // Ya generada por este usuario en un intento anterior → se omite
+                        if (await templateRepository.HasCopyAsync(userId, suggested))
+                        {
+                            exitosos.Add(suggested.Name);
+                            continue;
+                        }
 
-                        if (result.Success)
-                        {
-                            exitosos.Add(result.Message ?? "Sin nombre");
-                        }
+                        var createdName = await CreateSuggestedCopyWithVariantsAsync(
+                            templateService,
+                            templateRepository,
+                            config,
+                            suggested,
+                            token);
+
+                        // Meta creó la plantilla y se guardó la copia del usuario
+                        if (createdName != null)
+                            exitosos.Add(createdName);
                         else
-                        {
-                            fallidos.Add((result.Message ?? "Sin nombre", result.Message!));
-                        }
+                            fallidos.Add(suggested.Name);
                     }
                     catch (Exception ex)
                     {
-                        fallidos.Add(("Desconocido", ex.ToString()));
+                        Console.WriteLine($"Excepción al crear la plantilla '{suggested.Name}': {ex}");
+                        fallidos.Add(suggested.Name);
                     }
 
                     await Task.Delay(TimeSpan.FromSeconds(30), token);
@@ -269,7 +284,9 @@ namespace SIC.Backend.Controllers
 
                 var message = allSucceeded
                     ? $"Las plantillas fueron generadas correctamente ({exitosos.Count} creadas)."
-                    : $"Se crearon {exitosos.Count} plantillas y fallaron {fallidos.Count}: {fallidos[0].Error}";
+                    : $"Se crearon {exitosos.Count} de {suggestedTemplates.Count} plantillas. " +
+                      $"No se pudieron crear: {string.Join(", ", fallidos)}. " +
+                      "El error viene de WhatsApp (Meta). Inténtalo nuevamente en unos minutos.";
 
                 await _hub.Clients
                     .Group($"notifications-{notificationUserId}")
@@ -283,6 +300,116 @@ namespace SIC.Backend.Controllers
             {
                 message = "La generación de plantillas inició en segundo plano."
             });
+        }
+
+        [HttpGet("has-generated-templates")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(Roles = "Admin,WeddingPlanner,User")]
+        public async Task<IActionResult> HasGeneratedTemplates()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrWhiteSpace(userId))
+                return BadRequest(new { error = "Usuario no autenticado" });
+
+            var templates = await _templateRepository.GetAllAsync();
+
+            if (!templates.Success || templates.Result == null)
+                return BadRequest(new
+                {
+                    error = "Hubo un problema al obtener las plantillas sugeridas."
+                });
+
+            var suggestedTemplates = templates.Result
+                .Where(t => t != null && t!.IsSuggested)
+                .Select(t => t!)
+                .ToList();
+
+            var hasGenerated = await _templateRepository.HasAllSuggestedGeneratedAsync(userId, suggestedTemplates);
+
+            return Ok(new { hasGenerated });
+        }
+
+        private static async Task<string?> CreateSuggestedCopyWithVariantsAsync(
+            WhatsAppService templateService,
+            IWhatsAppTemplateRepository templateRepository,
+            UsuarioWhatsAppConfig config,
+            WhatsAppTemplate suggested,
+            CancellationToken token)
+        {
+            if (string.IsNullOrWhiteSpace(suggested.MetaDefinitionJson))
+                return null;
+
+            var originalName = JsonNode.Parse(suggested.MetaDefinitionJson)?["name"]?.ToString()
+                               ?? suggested.Name;
+
+            var candidateJson = suggested.MetaDefinitionJson;
+
+            // Intento 1 con el nombre original; si Meta rechaza por nombre,
+            // se prueban variantes: nombre_2, nombre_3, ...
+            for (int attempt = 0; attempt < 5; attempt++)
+            {
+                token.ThrowIfCancellationRequested();
+
+                var candidateName = attempt == 0
+                    ? originalName
+                    : $"{originalName}_{attempt + 1}";
+
+                if (attempt > 0)
+                    candidateJson = SetJsonName(candidateJson, candidateName);
+
+                var result = await templateService.CreateTemplateAsync(config, candidateJson);
+
+                if (result.Success)
+                {
+                    await SaveSuggestedCopyAsync(templateRepository, suggested, config, candidateName, candidateJson);
+                    return candidateName;
+                }
+
+                // Si el error está relacionado con el nombre se intenta con una variante.
+                if (WhatsAppService.IsMetaTemplateNameError(result.Message ?? ""))
+                    continue;
+
+                return null;
+            }
+
+            return null;
+        }
+
+        private static string SetJsonName(string json, string name)
+        {
+            var node = JsonNode.Parse(json)?.AsObject();
+            if (node == null)
+                return json;
+
+            node["name"] = name;
+            return node.ToJsonString();
+        }
+
+        private static async Task SaveSuggestedCopyAsync(
+            IWhatsAppTemplateRepository templateRepository,
+            WhatsAppTemplate suggested,
+            UsuarioWhatsAppConfig config,
+            string createdName,
+            string metaDefinitionJson)
+        {
+            // Copia de la plantilla sugerida con todos los campos,
+            // salvo el indicador de sugerida, y asignada al usuario que la generó.
+            var copy = new WhatsAppTemplate
+            {
+                Name = createdName,
+                DisplayName = suggested.DisplayName,
+                Language = suggested.Language,
+                UsuarioId = config.UsuarioId,
+                StructureJson = suggested.StructureJson,
+                OrderTemplate = suggested.OrderTemplate,
+                Content = suggested.Content,
+                TemplateNumber = suggested.TemplateNumber,
+                MetaDefinitionJson = metaDefinitionJson,
+                IsSuggested = false
+            };
+
+            await templateRepository.CreateTemplates(copy);
         }
 
         [HttpPost("create-templates")]

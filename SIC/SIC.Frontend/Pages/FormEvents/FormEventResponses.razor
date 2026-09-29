@@ -3,21 +3,13 @@
 
 <PageTitle>Respuestas del Formulario</PageTitle>
 
-<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
-    <h3 class="mb-0">
-        Respuestas del Formulario
-        @if (!string.IsNullOrWhiteSpace(EventName))
-        {
-            <small class="text-muted fs-6 d-block">@EventName</small>
-        }
-    </h3>
+<PageHeader Icon="bi-ui-checks"
+            Title="Respuestas del Formulario"
+            Subtitle="@EventName">
     <div class="d-flex gap-2 flex-wrap">
         <button type="button" class="btn btn-custom" @onclick="Volver">
             <i class="bi bi-arrow-left"></i> Volver
         </button>
-        <a href="@($"/event/{EventCode}/form-builder")" class="btn btn-custom d-none">
-            <i class="bi bi-pencil-square"></i> Editar Formulario
-        </a>
         <button type="button" class="btn btn-custom" @onclick="GeneratePdfAsync" disabled="@GeneratingPdf">
             @if (GeneratingPdf)
             {
@@ -30,7 +22,7 @@
             Descargar PDF
         </button>
     </div>
-</div>
+</PageHeader>
 
 @if (Loading)
 {
@@ -50,8 +42,8 @@ else if (Responses == null || Responses.Count == 0)
 else
 {
     <div class="table-responsive d-none d-md-block">
-        <table class="table table-hover align-middle mb-0">
-            <thead style="background-color:#3C6A79; color:white;">
+        <table class="table sic-table table-hover align-middle mb-0">
+            <thead>
                 <tr class="text-center">
                     <th class="text-start">Invitado</th>
                     <th>Fecha</th>
@@ -103,8 +95,8 @@ else
     <div class="d-block d-md-none">
         @foreach (var response in Responses)
         {
-            <div class="card mb-3 shadow-sm">
-                <div class="card-header" style="background-color:#3C6A79; color:white;">
+            <div class="card mb-3">
+                <div class="card-header" style="background-color:#367B82; color:white;">
                     <strong>@(response.InvitationName ?? $"Invitación #{(response.InvitationId)}")</strong>
                     @if (!string.IsNullOrWhiteSpace(response.GuestName))
                     {

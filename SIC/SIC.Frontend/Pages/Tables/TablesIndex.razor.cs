@@ -183,16 +183,10 @@ namespace SIC.Frontend.Pages.Tables
                 return;
             }
 
-            var result = await SweetAlertService.FireAsync(new SweetAlertOptions
-            {
-                Title = "Eliminar esta mesa?",
-                Text = $"Se eliminara '{table.Name}'. Esta accion no se puede deshacer.",
-                Icon = SweetAlertIcon.Warning,
-                ShowCancelButton = true
-            });
-
-            if (!string.IsNullOrEmpty(result.Value))
-                await DeleTable(table);
+            _pendingAction = async () => await DeleTable(table);
+            ConfirmMessage = $"Se eliminará '{table.Name}'. Esta acción no se puede deshacer.";
+            IsConfirmVisible = true;
+            await Task.CompletedTask;
         }
 
         private async Task DeleTable(TablesEvents table)
@@ -207,18 +201,12 @@ namespace SIC.Frontend.Pages.Tables
             }
         }
 
-        private async Task ConfirmDeleteAssign(Invitation table)
+private async Task ConfirmDeleteAssign(Invitation table)
         {
-            var result = await SweetAlertService.FireAsync(new SweetAlertOptions
-            {
-                Title = "�Eliminar invitados esta mesa?",
-                Text = $"Se eliminar� los invitados de esta mesa '{table.Name}'. Esta acci�n no se puede deshacer.",
-                Icon = SweetAlertIcon.Warning,
-                ShowCancelButton = true
-            });
-
-            if (!string.IsNullOrEmpty(result.Value))
-                await DeleteAssing(table);
+            _pendingAction = async () => await DeleteAssing(table);
+            ConfirmMessage = $"Se eliminará los invitados de esta mesa '{table.Name}'. Esta acción no se puede deshacer.";
+            IsConfirmVisible = true;
+            await Task.CompletedTask;
         }
 
         private async Task DeleteAssing(Invitation table)
@@ -234,15 +222,7 @@ namespace SIC.Frontend.Pages.Tables
 
         private async Task UnassignGuest(InvitationGuest guest)
         {
-            var result = await SweetAlertService.FireAsync(new SweetAlertOptions
-            {
-                Title = "Desasignar mesa",
-                Text = $"Quitar mesa individual a '{guest.GuestName}'? Usara la mesa de su invitacion.",
-                Icon = SweetAlertIcon.Warning,
-                ShowCancelButton = true
-            });
-
-            if (!string.IsNullOrEmpty(result.Value))
+            _pendingAction = async () =>
             {
                 var response = await Repository.DeleteAsync<bool>($"api/Tables/UnassignGuest/{guest.Id}");
                 if (response.Error)
@@ -253,7 +233,27 @@ namespace SIC.Frontend.Pages.Tables
                 }
                 await SweetAlertService.FireAsync("Exito", "Mesa individual removida.", SweetAlertIcon.Success);
                 await ReloadDataAsync();
-            }
+            };
+            ConfirmMessage = $"Quitar mesa individual a '{guest.GuestName}'? Usará la mesa de su invitación.";
+            IsConfirmVisible = true;
+            await Task.CompletedTask;
+        }
+
+        private bool IsConfirmVisible;
+        private string ConfirmMessage = "";
+        private Func<Task>? _pendingAction;
+
+        private async Task OnConfirmVisibleChanged(bool visible)
+        {
+            IsConfirmVisible = visible;
+            if (!visible) _pendingAction = null;
+        }
+
+        private async Task ExecutePendingDelete()
+        {
+            var action = _pendingAction;
+            _pendingAction = null;
+            if (action != null) await action();
         }
 
         private void ShowModaEditaMesa(TablesEvents updateTableEvent)
@@ -357,15 +357,7 @@ namespace SIC.Frontend.Pages.Tables
             modaGenerarMesa = false;
             GenerateTablesDto = new();
 
-            var toast = SweetAlertService.Mixin(new SweetAlertOptions
-            {
-                Toast = true,
-                Position = SweetAlertPosition.TopEnd,
-                ShowConfirmButton = false,
-                Timer = 3000,
-                TimerProgressBar = true,
-            });
-            await toast.FireAsync("Éxito", "Mesas generadas con éxito.", SweetAlertIcon.Success);
+            await SweetAlertService.FireAsync("Éxito", "Mesas generadas con éxito.", SweetAlertIcon.Success);
 
             await ReloadDataAsync();
         }
@@ -394,15 +386,7 @@ namespace SIC.Frontend.Pages.Tables
             modaCrearOrEditaMesa = false;
             createOrEditTablesDto = new();
 
-            var toast = SweetAlertService.Mixin(new SweetAlertOptions
-            {
-                Toast = true,
-                Position = SweetAlertPosition.TopEnd,
-                ShowConfirmButton = false,
-                Timer = 3000,
-                TimerProgressBar = true,
-            });
-            await toast.FireAsync(
+            await SweetAlertService.FireAsync(
                 "Éxito",
                 IsEditMode ? "Mesa actualizada con éxito." : "Mesa creada con éxito.",
                 SweetAlertIcon.Success
@@ -486,15 +470,7 @@ namespace SIC.Frontend.Pages.Tables
                         }
                         else
                         {
-                            var toast = SweetAlertService.Mixin(new SweetAlertOptions
-                            {
-                                Toast = true,
-                                Position = SweetAlertPosition.TopEnd,
-                                ShowConfirmButton = false,
-                                Timer = 3000,
-                                TimerProgressBar = true,
-                            });
-                            await toast.FireAsync("Exito",
+                            await SweetAlertService.FireAsync("Exito",
                                 $"Se asignaron {assigned} invitado(s) correctamente.",
                                 SweetAlertIcon.Success);
                         }
@@ -552,15 +528,7 @@ namespace SIC.Frontend.Pages.Tables
                         }
                         else
                         {
-                            var toast = SweetAlertService.Mixin(new SweetAlertOptions
-                            {
-                                Toast = true,
-                                Position = SweetAlertPosition.TopEnd,
-                                ShowConfirmButton = false,
-                                Timer = 3000,
-                                TimerProgressBar = true,
-                            });
-                            await toast.FireAsync("Exito",
+                            await SweetAlertService.FireAsync("Exito",
                                 $"Se asignaron {assigned} invitacion(es) correctamente.",
                                 SweetAlertIcon.Success);
                         }

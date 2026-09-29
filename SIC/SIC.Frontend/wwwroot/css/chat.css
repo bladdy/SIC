@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    WHATSAPP CHAT
    ============================================================ */
 .chat-container {
@@ -36,7 +36,7 @@
     flex: 1;
     padding: 12px;
     overflow-y: auto;
-    background-color: #3C6A79;
+    background-color: #367B82;
     background-size: contain;
 }
 
@@ -230,7 +230,7 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: #3C6A79;
+    background: #367B82;
     color: white;
     display: flex;
     align-items: center;

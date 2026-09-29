@@ -117,8 +117,7 @@ public partial class FormEventResponses
             Icon = SweetAlertIcon.Warning,
             ShowCancelButton = true,
             ConfirmButtonText = "Sí, resetear",
-            CancelButtonText = "Cancelar",
-            ConfirmButtonColor = "#dc3545"
+            CancelButtonText = "Cancelar"
         });
 
         if (confirm.IsDismissed)
@@ -134,13 +133,6 @@ public partial class FormEventResponses
 
         await Load();
 
-        await sweetAlertService.Mixin(new SweetAlertOptions
-        {
-            Toast = true,
-            Position = SweetAlertPosition.TopEnd,
-            ShowConfirmButton = false,
-            Timer = 3000,
-            TimerProgressBar = true
-        }).FireAsync("Listo", "Respuesta eliminada. El invitado ya puede responder de nuevo.", SweetAlertIcon.Success);
+        await sweetAlertService.FireAsync("Listo", "Respuesta eliminada. El invitado ya puede responder de nuevo.", SweetAlertIcon.Success);
     }
 }

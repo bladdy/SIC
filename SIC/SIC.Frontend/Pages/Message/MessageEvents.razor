@@ -1,5 +1,9 @@
 ﻿@page "/events/message-events/{Code}"
 <PageTitle>Mensajes del evento</PageTitle>
+<PageHeader Icon="bi-chat-dots"
+            Title="Mensajes del evento"
+            Subtitle="Configura los mensajes que se envían por WhatsApp al evento">
+</PageHeader>
 <div class="d-flex justify-content-center my-4 px-3">
     @if (NewMessage != null)
     {
@@ -73,6 +77,7 @@
                         <ul>
                             <li><strong>{linkinvitacion}</strong> - Enlace de la invitación.</li>
                             <li><strong>{linkconfirmacion}</strong> - Enlace para confirmar asistencia.</li>
+                            <li><strong>{linkpersonalizado}</strong> - Enlace de la invitación personalizada.</li>
                         </ul>
 
                         <h5>🪑 Asignación</h5>

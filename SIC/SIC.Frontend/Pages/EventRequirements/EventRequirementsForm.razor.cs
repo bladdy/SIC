@@ -465,14 +465,7 @@ public partial class EventRequirementsForm
             if (hasContent) LockedRequirementIds.Add(req.RequirementId);
         }
 
-        await sweetAlertService.Mixin(new SweetAlertOptions
-        {
-            Toast = true,
-            Position = SweetAlertPosition.TopEnd,
-            ShowConfirmButton = false,
-            Timer = 3000,
-            TimerProgressBar = true
-        }).FireAsync("Guardado", "Tu información ha sido guardada exitosamente.", SweetAlertIcon.Success);
+        await sweetAlertService.FireAsync("Guardado", "Tu información ha sido guardada exitosamente.", SweetAlertIcon.Success);
 
         Saving = false;
     }

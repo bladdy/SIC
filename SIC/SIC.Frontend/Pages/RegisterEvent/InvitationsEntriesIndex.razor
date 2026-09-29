@@ -2,15 +2,16 @@
 @*/events/register-intations-by-event/{Code}"*@
 <PageTitle>Registro de invitaciones</PageTitle>
 
-<h4 class="mb-2">Registro de Invitados</h4>
-<div class="mb-2">
-    <button class="btn btn-custom" @onclick="ShowCreateModal">
-        Registrar Invitación (Escanear QR)
+<PageHeader Icon="bi-clipboard2-check"
+            Title="Registro de Invitados"
+            Subtitle="Entrada de invitaciones">
+    <button class="btn btn-primary" @onclick="ShowCreateModal">
+        <i class="bi bi-qr-code-scan"></i> Registrar Invitación (Escanear QR)
     </button>
-    <button class="btn btn-custom mx-1" @onclick="OpenSearchModal">
-        <i class="bi bi-search"></i> Buscar Invitado por Nombre
+    <button class="btn btn-primary" @onclick="OpenSearchModal">
+        <i class="bi bi-search"></i> Buscar Invitado
     </button>
-    <button class="btn btn-custom mx-1" @onclick="GeneratePdfAsync" disabled="@isGeneratingPdf">
+    <button class="btn btn-primary" @onclick="GeneratePdfAsync" disabled="@isGeneratingPdf">
         @if (isGeneratingPdf)
         {
             <span class="spinner-border spinner-border-sm" role="status"></span>
@@ -21,7 +22,7 @@
         }
         Generar PDF
     </button>
-</div>
+</PageHeader>
 @if (InvitationEntries is null)
 {
     <div class="alert alert-info">Cargando Registro de Invitados...</div>
@@ -29,16 +30,21 @@
 else
 {
     <!--<Filter PlaceHolder="Buscar Invitacion..." Callback=@FilterCallBack /> 25d366-->
-    <div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center;">
-        <input style="width:400px;" type="text" class="form-control" placeholder="Buscar Invitacion..." @bind-value="Filter">
-        <button type="button" class="btn btn-custom  mx-1" @onclick="ApplyFilterAsync"><i class="bi bi-funnel" /> Filtrar</button>
-        <button type="button" class="btn btn-custom " @onclick="CleanFilterAsync"><i class="bi bi-x-circle" /> Limpiar</button>
+    <div class="sic-toolbar">
+        <div class="sic-search">
+            <i class="bi bi-search sic-search-icon"></i>
+            <input type="text" class="form-control" placeholder="Buscar Invitacion..." @bind-value="Filter">
+        </div>
+        <div class="sic-toolbar-actions">
+            <button type="button" class="btn btn-primary" @onclick="ApplyFilterAsync"><i class="bi bi-funnel" /> Filtrar</button>
+            <button type="button" class="sic-clear" @onclick="CleanFilterAsync"><i class="bi bi-x-circle" /> Limpiar</button>
+        </div>
     </div>
 
     <!-- ====== VERSIÓN DE ESCRITORIO ====== -->
     <div class="table-responsive d-none d-md-block">
-        <table class="table table-hover align-middle mb-0">
-            <thead style="background-color:#3C6A79; color:white;">
+        <table class="table sic-table mb-0">
+            <thead>
                 <tr class="text-center">
                     <th class="text-start">Detalle del Invitado</th>
                     <th class="text-start">Mesa</th>
@@ -51,7 +57,7 @@ else
                 {
                     @foreach (var invitation in InvitationEntries)
                     {
-                        <tr class="border-top">
+                        <tr>
                             <!-- ======== COLUMNA 1: INFORMACIÓN GENERAL ======== -->
                             <td style="white-space: normal; vertical-align: top;">
                                 <div class="container-fluid">
@@ -61,7 +67,7 @@ else
                                         <div class="col-12 col-md-4 d-flex flex-column">
                                             <div>
                                                 <strong>Código:</strong>
-                                                <a style="color:#3C6A79; cursor:pointer;">
+                                                <a class="sic-text-primary" style="cursor:pointer;">
                                                     @invitation.Code
                                                 </a>
                                             </div>
@@ -128,12 +134,12 @@ else
     </div>
 
     <!-- Vista móvil tipo "detalle" -->
-    <div class="d-block d-md-none">
+    <div class="d-block d-md-none sic-mobile-card">
         @if (InvitationEntries != null && InvitationEntries.Any())
         {
             @foreach (var invitation in InvitationEntries)
             {
-                <div class="card mb-3 shadow-sm">
+                <div class="card mb-3">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <h5 class="card-title mb-0">@invitation.Invitation?.Name</h5>
@@ -186,9 +192,10 @@ else
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">
+                        <i class="bi bi-person-lines-fill me-2"></i>
                         Registrar Invitados
                     </h5>
-                    <button type="button" class="btn-close" @onclick="CloseEditModal"></button>
+                    <button type="button" class="btn-close btn-close-white" @onclick="CloseEditModal"></button>
                 </div>
                 <div class="modal-body">
 
@@ -295,10 +302,10 @@ else
 
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-custom" @onclick="UpdateInvitationEntry">
-                        Guardar
+                    <button type="submit" class="btn btn-custom btn-sm" @onclick="UpdateInvitationEntry">
+                        <i class="bi bi-check-lg me-1"></i>Guardar
                     </button>
-                    <button type="button" class="btn btn-secondary" @onclick="CloseEditModal">
+                    <button type="button" class="btn btn-secondary btn-sm" @onclick="CloseEditModal">
                         Cancelar
                     </button>
                 </div>
@@ -314,9 +321,10 @@ else
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">
+                        <i class="bi bi-upc-scan me-2"></i>
                         Registrar Invitados
                     </h5>
-                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                    <button type="button" class="btn-close btn-close-white" @onclick="CloseModal"></button>
                 </div>
                 <div class="modal-body">
                     <div id="reader" style="width:auto; height:100%;"></div>
@@ -463,10 +471,10 @@ else
 
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-custom" @onclick="SaveInvitationEntry" disabled="@(Invitation == null)">
-                        Guardar
+                    <button type="submit" class="btn btn-custom btn-sm" @onclick="SaveInvitationEntry" disabled="@(Invitation == null)">
+                        <i class="bi bi-check-lg me-1"></i>Guardar
                     </button>
-                    <button type="button" class="btn btn-secondary" @onclick="CloseModal">
+                    <button type="button" class="btn btn-secondary btn-sm" @onclick="CloseModal">
                         Cancelar
                     </button>
                 </div>
@@ -480,8 +488,10 @@ else
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Buscar Invitado por Nombre</h5>
-                    <button type="button" class="btn-close" @onclick="CloseSearchModal"></button>
+                    <h5 class="modal-title">
+                        <i class="bi bi-search me-2"></i>Buscar Invitado por Nombre
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" @onclick="CloseSearchModal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="d-flex mb-3 gap-2">
@@ -504,8 +514,8 @@ else
                     else
                     {
                         <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead style="background-color:#3C6A79; color:white;">
+                            <table class="table sic-table mb-0">
+                                <thead>
                                     <tr class="text-center">
                                         <th class="text-start">Nombre</th>
                                         <th>Móvil</th>
@@ -524,7 +534,7 @@ else
                                                 @inv.NumberConfirmedAdults / @inv.NumberConfirmedYouths / @inv.NumberConfirmedChildren
                                             </td>
                                             <td class="text-center">
-                                                <span class="badge @(inv.Status == Status.Attend ? "bg-success" : inv.Status == Status.NotAttend ? "bg-danger" : "bg-secondary")">
+                                                <span class="sic-badge @(inv.Status == Status.Attend ? "sic-badge-success" : inv.Status == Status.NotAttend ? "sic-badge-danger" : "sic-badge-gray")">
                                                     @inv.Status.GetDescription()
                                                 </span>
                                             </td>
@@ -541,7 +551,7 @@ else
                     }
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="CloseSearchModal">
+                    <button type="button" class="btn btn-secondary btn-sm" @onclick="CloseSearchModal">
                         Cancelar
                     </button>
                 </div>

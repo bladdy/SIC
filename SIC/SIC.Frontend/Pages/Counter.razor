@@ -12,12 +12,11 @@
     <!-- Modal -->
     <Modal @bind-Visible="showModal" OnSave="HandleModalSave" />
 
-    <!-- Título centrado -->
-    <h2 class="text-center mb-3 fw-bold display-5" style="color:#000;">🎲 Sorteo de Números 🎲</h2>
+    <PageHeader Icon="bi-dice-6" Title="Sorteo de Números" Subtitle="Genera y visualiza los números del sorteo." />
 
     <!-- Número actual y botón (centrado arriba) -->
     <div class="text-center mb-3">
-        <div class="number-display shadow rounded-4 d-inline-block p-4 bg-primary bg-gradient">
+        <div class="number-display shadow rounded-4 d-inline-block p-4 bg-gradient" style="background-color:#367B82;">
             <h1 class="animated-number fw-bold"
                 style="font-size: 10rem; color: #fff; text-shadow: 3px 3px 12px rgba(0,0,0,0.5);">
                 @currentNumber

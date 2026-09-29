@@ -7,9 +7,9 @@
 }
 else
 {
-    <h3>Plan: @Plan?.Name</h3>
-
-    <h3>Seleccionar Ítems para el Plan</h3>
+    <PageHeader Icon="bi-card-checklist"
+                 Title="@($"Plan: {Plan?.Name}")"
+                 Subtitle="Seleccionar ítems para el plan" />
 
     @if (Items != null)
     {
@@ -26,7 +26,7 @@ else
         </div>
     }
 
-    <button class="btn btn-custom text-white px-3 py-1 rounded mt-3"
+    <button class="btn btn-primary px-3 py-1 rounded mt-3"
             @onclick="AgregarAlPlan">
         Agregar al Plan
     </button>

@@ -189,68 +189,73 @@ public partial class EventRequirementsResponse
 
     private async Task DeleteImage(EventRequirementImage img)
     {
-        var result = await sweetAlertService.FireAsync(new SweetAlertOptions
+        _pendingAction = async () =>
         {
-            Title = "¿Eliminar imagen?",
-            Text = $"Se eliminará \"{img.OriginalName}\". Esta acción no se puede deshacer.",
-            Icon = SweetAlertIcon.Warning,
-            ShowCancelButton = true,
-            ConfirmButtonText = "Sí, eliminar",
-            CancelButtonText = "Cancelar"
-        });
-
-        if (string.IsNullOrEmpty(result.Value)) return;
-
-        var response = await repository.DeleteAsync<EventRequirementImage>($"api/EventRequirementImages/{img.Id}");
-        if (response.Error)
-        {
-            var message = await response.GetErrorMessageAsync() ?? "No se pudo eliminar la imagen.";
-            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
-            return;
-        }
-
-        foreach (var reqId in ImagesByRequirement.Keys.ToList())
-        {
-            var list = ImagesByRequirement[reqId];
-            if (list.Remove(img))
+            var response = await repository.DeleteAsync<EventRequirementImage>($"api/EventRequirementImages/{img.Id}");
+            if (response.Error)
             {
-                if (list.Count == 0) ImagesByRequirement.Remove(reqId);
-                break;
+                var message = await response.GetErrorMessageAsync() ?? "No se pudo eliminar la imagen.";
+                await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
             }
-        }
 
-        StateHasChanged();
-        await sweetAlertService.FireAsync("Eliminada", "Imagen eliminada correctamente.", SweetAlertIcon.Success);
+            foreach (var reqId in ImagesByRequirement.Keys.ToList())
+            {
+                var list = ImagesByRequirement[reqId];
+                if (list.Remove(img))
+                {
+                    if (list.Count == 0) ImagesByRequirement.Remove(reqId);
+                    break;
+                }
+            }
+
+            StateHasChanged();
+            await sweetAlertService.FireAsync("Eliminada", "Imagen eliminada correctamente.", SweetAlertIcon.Success);
+        };
+        ConfirmMessage = $"Se eliminará \"{img.OriginalName}\". Esta acción no se puede deshacer.";
+        IsConfirmVisible = true;
+        await Task.CompletedTask;
     }
 
     private async Task ClearField(int requirementId)
     {
         if (EventData == null) return;
 
-        var result = await sweetAlertService.FireAsync(new SweetAlertOptions
+        _pendingAction = async () =>
         {
-            Title = "¿Limpiar campo?",
-            Text = "Se borrará la respuesta de este campo. Si tiene imágenes, también se eliminarán del servidor. El cliente podrá volver a llenarlo.",
-            Icon = SweetAlertIcon.Warning,
-            ShowCancelButton = true,
-            ConfirmButtonText = "Sí, limpiar",
-            CancelButtonText = "Cancelar"
-        });
+            var response = await repository.DeleteAsync<object>($"api/EventRequirementAnswers/clear-field/{EventData.Id}/{requirementId}");
+            if (response.Error)
+            {
+                var message = await response.GetErrorMessageAsync() ?? "No se pudo limpiar el campo.";
+                await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
+            }
 
-        if (string.IsNullOrEmpty(result.Value)) return;
+            AnswersByRequirement.Remove(requirementId);
+            ImagesByRequirement.Remove(requirementId);
 
-        var response = await repository.DeleteAsync<object>($"api/EventRequirementAnswers/clear-field/{EventData.Id}/{requirementId}");
-        if (response.Error)
-        {
-            var message = await response.GetErrorMessageAsync() ?? "No se pudo limpiar el campo.";
-            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
-            return;
-        }
+            StateHasChanged();
+            await sweetAlertService.FireAsync("Limpiado", "El campo quedó vacío. El cliente podrá volver a llenarlo.", SweetAlertIcon.Success);
+        };
+        ConfirmMessage = "Se borrará la respuesta de este campo. Si tiene imágenes, también se eliminarán del servidor. El cliente podrá volver a llenarlo.";
+        IsConfirmVisible = true;
+        await Task.CompletedTask;
+    }
 
-        AnswersByRequirement.Remove(requirementId);
-        ImagesByRequirement.Remove(requirementId);
+    private bool IsConfirmVisible;
+    private string ConfirmMessage = "";
+    private Func<Task>? _pendingAction;
 
-        StateHasChanged();
-        await sweetAlertService.FireAsync("Limpiado", "El campo quedó vacío. El cliente podrá volver a llenarlo.", SweetAlertIcon.Success);
+    private async Task OnConfirmVisibleChanged(bool visible)
+    {
+        IsConfirmVisible = visible;
+        if (!visible) _pendingAction = null;
+    }
+
+    private async Task ExecutePendingDelete()
+    {
+        var action = _pendingAction;
+        _pendingAction = null;
+        if (action != null) await action();
     }
 }

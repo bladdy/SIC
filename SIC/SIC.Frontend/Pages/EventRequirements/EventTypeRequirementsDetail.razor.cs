@@ -83,37 +83,41 @@ public partial class EventTypeRequirementsDetail
             return;
         }
 
-        await sweetAlertService.Mixin(new SweetAlertOptions
-        {
-            Toast = true, Position = SweetAlertPosition.TopEnd,
-            ShowConfirmButton = false, Timer = 2000, TimerProgressBar = true
-        }).FireAsync("Agregado", $"'{requirement.Name}' agregado.", SweetAlertIcon.Success);
+        await sweetAlertService.FireAsync("Agregado", $"'{requirement.Name}' agregado.", SweetAlertIcon.Success);
 
         await LoadData();
     }
 
-    private async Task RemoveRequirement(EventTypeRequirementDTO item)
+private async Task RemoveRequirement(EventTypeRequirementDTO item)
     {
-        var result = await sweetAlertService.FireAsync(new SweetAlertOptions
-        {
-            Title = "Remover requisito?",
-            Text = $"Se eliminará '{item.RequirementName}' de este tipo de evento.",
-            Icon = SweetAlertIcon.Warning,
-            ShowCancelButton = true,
-            ConfirmButtonText = "Sí, remover",
-            CancelButtonText = "Cancelar"
-        });
+        _pendingTypeRequirement = item;
+        ConfirmMessage = $"Se eliminará '{item.RequirementName}' de este tipo de evento.";
+        IsConfirmVisible = true;
+        await Task.CompletedTask;
+    }
 
-        if (string.IsNullOrEmpty(result.Value)) return;
+    private bool IsConfirmVisible;
+    private string ConfirmMessage = "";
+    private EventTypeRequirementDTO? _pendingTypeRequirement;
 
-        var response = await repository.DeleteAsync<EventTypeRequirement>($"api/EventTypeRequirements/{item.Id}");
+    private async Task OnConfirmVisibleChanged(bool visible)
+    {
+        IsConfirmVisible = visible;
+        if (!visible) _pendingTypeRequirement = null;
+    }
+
+    private async Task ExecutePendingDelete()
+    {
+        if (_pendingTypeRequirement == null) return;
+        var response = await repository.DeleteAsync<EventTypeRequirement>($"api/EventTypeRequirements/{_pendingTypeRequirement.Id}");
         if (response.Error)
         {
             var message = await response.GetErrorMessageAsync();
             await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            _pendingTypeRequirement = null;
             return;
         }
-
+        _pendingTypeRequirement = null;
         await LoadData();
     }
 
@@ -159,10 +163,6 @@ public partial class EventTypeRequirementsDetail
             }
         }
 
-        await sweetAlertService.Mixin(new SweetAlertOptions
-        {
-            Toast = true, Position = SweetAlertPosition.TopEnd,
-            ShowConfirmButton = false, Timer = 2000, TimerProgressBar = true
-        }).FireAsync("Guardado", "El orden se ha actualizado.", SweetAlertIcon.Success);
+        await sweetAlertService.FireAsync("Guardado", "El orden se ha actualizado.", SweetAlertIcon.Success);
     }
 }

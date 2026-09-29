@@ -4,48 +4,54 @@
 @using Microsoft.AspNetCore.Components.Forms
 
 <PageTitle>Eventos</PageTitle>
-<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
-    <h3 class="mb-0">Eventos</h3>
-    <button class="btn btn-custom mt-2 mt-md-0" @onclick="ShowCreateModal">
-        <i class="oi oi-plus"></i> Crear Evento
+<PageHeader Icon="bi-calendar2-heart"
+            Title="Eventos"
+            Subtitle="Gestión de eventos">
+    <button class="btn btn-primary" @onclick="ShowCreateModal">
+        <i class="bi bi-plus-lg"></i> Crear Evento
     </button>
-</div>
+</PageHeader>
 
-<div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center; gap: 10px;">
-    <input style="width:400px;" type="text" class="form-control" placeholder="Buscar Evento..." @bind="Filter" />
-    <InputDate class="form-control d-none" @bind-Value="DateSelectd" style="width:150px;" />
-    <InputSelect class="form-select d-none" @bind-Value="SelectedEventType" style="width:300px;">
-        <option value="">-- Selecciona un tipo de Evento --</option>
-        @if (EventTypes != null)
-        {
-            @foreach (var type in EventTypes)
+<div class="sic-toolbar">
+    <div class="sic-search">
+        <i class="bi bi-search sic-search-icon"></i>
+        <input type="text" class="form-control" placeholder="Buscar Evento..." @bind="Filter" />
+    </div>
+    <div class="sic-toolbar-actions">
+        <InputDate class="form-control d-none" @bind-Value="DateSelectd" style="width:150px;" />
+        <InputSelect class="form-select d-none" @bind-Value="SelectedEventType" style="width:300px;">
+            <option value="">-- Selecciona un tipo de Evento --</option>
+            @if (EventTypes != null)
             {
-                <option value="@type.Id">@type.Name</option>
+                @foreach (var type in EventTypes)
+                {
+                    <option value="@type.Id">@type.Name</option>
+                }
             }
-        }
-    </InputSelect>
-    <InputSelect class="form-select d-none" @bind-Value="OrderBy" style="width:200px;">
-        <option value="">-- Ordenar por --</option>
-        <option value="FechaAsc">Fecha Ascendente </option>
-        <option value="FechaDesc">Fecha Descendente</option>
-        <option value="Nombre">Nombre Alfabético</option>
-        <option value="Evento">Tipo de Evento</option>
-        <option value="Estado">Estado</option>
-    </InputSelect>
-    <button type="button" class="btn btn-custom" @onclick="ApplyFilterAsync">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-search"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg> Buscar
-    </button>
-    <button type="button" class="btn btn-custom" @onclick="CleanFilterAsync">
-        <i class="bi bi-x-circle" /> Limpiar
-    </button>
+        </InputSelect>
+        <InputSelect class="form-select d-none" @bind-Value="OrderBy" style="width:200px;">
+            <option value="">-- Ordenar por --</option>
+            <option value="FechaAsc">Fecha Ascendente </option>
+            <option value="FechaDesc">Fecha Descendente</option>
+            <option value="Nombre">Nombre Alfabético</option>
+            <option value="Evento">Tipo de Evento</option>
+            <option value="Estado">Estado</option>
+        </InputSelect>
+        <button type="button" class="btn btn-primary" @onclick="ApplyFilterAsync">
+            <i class="bi bi-search"></i> Buscar
+        </button>
+        <button type="button" class="sic-clear" @onclick="CleanFilterAsync">
+            <i class="bi bi-x-circle" /> Limpiar
+        </button>
+    </div>
 </div>
 
 <!-- Tabla principal -->
 <GenericList MyList="Events">
     <Body>
         <div class="table-responsive d-none d-md-block">
-            <table class="table table-hover align-middle mb-0">
-                <thead style="background-color:#3C6A79; color:white;">
+            <table class="table sic-table mb-0">
+                <thead>
                     <tr class="text-center">
                         <th class="text-start">Detalle del Evento</th>
                         <th>Estado</th>
@@ -65,7 +71,7 @@
                                             <div class="col-12 col-md-4 d-flex flex-column">
                                                 <div class="mb-2">
                                                     <strong>Código:</strong>
-                                                    <a class="text-decoration-none text-primary">@even.Code</a>
+                                                    <a class="text-decoration-none sic-text-primary">@even.Code</a>
                                                 </div>
                                                 <div><strong>Tipo:</strong> @even.EventType!.Name</div>
                                                 <div><strong>@even.User!.UserType.GetDescription():</strong> @even.User!.FullName</div>
@@ -153,7 +159,7 @@
                                     </div>
                                 </td>
                                 <td class="text-center">
-                                    <span class="px-3 py-2 fs-6 badge @(even.Status == Status.Active ? "bg-success" : even.Status == Status.Cancelled ? "bg-danger" : "bg-secondary")">
+                                    <span class="badge sic-badge @(even.Status == Status.Active ? "sic-badge-success" : even.Status == Status.Cancelled ? "sic-badge-danger" : "sic-badge-gray")">
                                         @even.Status.GetDescription()
                                     </span>
                                 </td>
@@ -183,14 +189,19 @@
                 </tbody>
             </table>
         </div>
-        <div class="d-block d-md-none">
+        <div class="d-block d-md-none sic-mobile-card">
             @if (Events != null && Events.Any())
             {
                 @foreach (var even in Events)
                 {
-                    <div class="card mb-3 shadow-sm">
+                    <div class="card mb-3">
                         <div class="card-body">
-                            <h5 class="card-title fw-bold">@even.Name</h5>
+                            <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
+                                <h5 class="card-title fw-bold mb-0">@even.Name</h5>
+                                <span class="sic-badge @(even.Status == Status.Active ? "sic-badge-success" : even.Status == Status.Cancelled ? "sic-badge-danger" : "sic-badge-gray")">
+                                    @even.Status.GetDescription()
+                                </span>
+                            </div>
                             @if (!string.IsNullOrWhiteSpace(even.SubTitle))
                             {
                                 <p class="card-subtitle text-muted small mb-2">@even.SubTitle</p>
@@ -198,12 +209,6 @@
                             <p class="mb-1"><strong>@even.User!.UserType.GetDescription():</strong> @even.User!.FullName</p>
                             <p class="mb-1"><strong>Código:</strong> @even.Code</p>
                             <p class="mb-1"><strong>Tipo:</strong> @even.EventType!.Name</p>
-                            <p class="mb-1">
-                                <strong>Estado:</strong>
-                                <span class="badge @(even.Status == Status.Active ? "bg-success" : even.Status == Status.Cancelled ? "bg-danger" : "bg-secondary")">
-                                    @even.Status.GetDescription()
-                                </span>
-                            </p>
                             <p class="mb-2"><strong>Fecha:</strong> @even.Date.ToString("dd/MM/yyyy")</p>
                             <div class="d-flex gap-2 flex-wrap">
                                 <button class="btn btn-sm btn-custom flex-grow-1" @onclick="() => ShowEditModal(even)"><i class="bi bi-pencil-fill"></i> Editar</button>
@@ -265,8 +270,10 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">@((IsEditMode ? $"Editar Evento: {NewEvent.Code}" : "Crear Evento"))</h5>
-                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                    <h5 class="modal-title">
+                        <i class="bi @(IsEditMode ? "bi-pencil-square me-2" : "bi-calendar-plus me-2")"></i>@((IsEditMode ? $"Editar Evento: {NewEvent.Code}" : "Crear Evento"))
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" @onclick="CloseModal"></button>
                 </div>
                 <div class="modal-body">
                     <EditForm Model="@NewEvent" OnValidSubmit="@SaveEvent">
@@ -422,8 +429,8 @@
 
                         <!-- Footer -->
                         <div class="modal-footer">
-                            <button type="submit" class="btn btn-custom">Guardar</button>
-                            <button type="button" class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
+                            <button type="submit" class="btn btn-custom btn-sm"><i class="bi bi-check-lg me-1"></i>Guardar</button>
+                            <button type="button" class="btn btn-secondary btn-sm" @onclick="CloseModal">Cancelar</button>
                         </div>
                     </EditForm>
                 </div>
@@ -431,3 +438,5 @@
         </div>
     </div>
 }
+
+<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />

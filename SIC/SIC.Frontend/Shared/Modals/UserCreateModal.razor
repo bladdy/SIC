@@ -6,8 +6,10 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">@ModalTitle</h5>
-                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                    <h5 class="modal-title">
+                        <i class="bi bi-person-plus me-2"></i>@ModalTitle
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" @onclick="CloseModal"></button>
                 </div>
 
                 <div class="modal-body">
@@ -75,9 +77,9 @@
                             </div>
                         }
 
-                        <div class="d-flex gap-2 justify-content-end mt-3">
-                            <button class="btn btn-custom" type="submit">Guardar</button>
-                            <button class="btn btn-secondary" type="button" @onclick="CloseModal">Cancelar</button>
+                        <div class="modal-footer">
+                            <button class="btn btn-custom btn-sm" type="submit"><i class="bi bi-check-lg me-1"></i>Guardar</button>
+                            <button class="btn btn-secondary btn-sm" type="button" @onclick="CloseModal">Cancelar</button>
                         </div>
                     </EditForm>
                 </div>

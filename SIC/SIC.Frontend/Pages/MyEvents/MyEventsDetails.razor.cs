@@ -1,4 +1,4 @@
-﻿using CurrieTechnologies.Razor.SweetAlert2;
+using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -203,6 +203,15 @@ public partial class MyEventsDetails
         NewInvitation.NumberConfirmedAdults = guests.Count(g => g.GuestType == GuestType.Adult && g.Status == Status.Attend);
         NewInvitation.NumberConfirmedYouths = guests.Count(g => g.GuestType == GuestType.Youth && g.Status == Status.Attend);
         NewInvitation.NumberConfirmedChildren = guests.Count(g => g.GuestType == GuestType.Children && g.Status == Status.Attend);
+
+        if (guests.Any(g => g.Status == Status.Attend))
+        {
+            NewInvitation.Status = Status.Attend;
+        }
+        if (guests.All(g => g.Status == Status.NotAttend))
+        {
+            NewInvitation.Status = Status.NotAttend;
+        }
     }
 
     private void UpdateGuestCounters(ICollection<InvitationGuest> guests)
@@ -256,23 +265,21 @@ public partial class MyEventsDetails
 
     private async Task DeleteInvitation()
     {
-        // 🔹 Confirmación antes de eliminar
-        var confirmResult = await SweetAlertService.FireAsync(new SweetAlertOptions
-        {
-            Title = "¿Eliminar invitación?",
-            Text = "Esta acción no se puede deshacer. ¿Deseas continuar?",
-            Icon = SweetAlertIcon.Warning,
-            ShowCancelButton = true,
-            ConfirmButtonText = "Sí, eliminar",
-            CancelButtonText = "Cancelar",
-            ConfirmButtonColor = "#d33",
-            CancelButtonColor = "#3085d6"
-        });
+        ConfirmMessage = "Esta acción no se puede deshacer. ¿Deseas continuar?";
+        IsConfirmVisible = true;
+        await Task.CompletedTask;
+    }
 
-        // Si el usuario cancela, no hacer nada
-        if (confirmResult.IsDismissed)
-            return;
+    private bool IsConfirmVisible;
+    private string ConfirmMessage = "";
 
+    private async Task OnConfirmVisibleChanged(bool visible)
+    {
+        IsConfirmVisible = visible;
+    }
+
+    private async Task ExecutePendingDelete()
+    {
         // 🔹 Proceder con la eliminación
         var responseHttp = await Repository.DeleteAsync<object>($"api/Invitations/{NewInvitation.Id}");
         if (responseHttp.Error)
@@ -284,21 +291,7 @@ public partial class MyEventsDetails
 
         CloseModal();
 
-        // 🔹 Mostrar notificación tipo toast
-        var toast = SweetAlertService.Mixin(new SweetAlertOptions
-        {
-            Toast = true,
-            Position = SweetAlertPosition.TopEnd,
-            ShowConfirmButton = false,
-            Timer = 3000,
-            TimerProgressBar = true,
-        });
-
-        await toast.FireAsync(
-            "Éxito",
-            "Invitación eliminada con éxito.",
-            SweetAlertIcon.Success
-        );
+        await SweetAlertService.FireAsync("Eliminada", "Invitación eliminada con éxito.", SweetAlertIcon.Success);
 
         await LoadEvent();
         var invitationsTask = LoadInvitations(currentPage);
@@ -333,6 +326,12 @@ public partial class MyEventsDetails
             NewInvitation.TablesEvents = null;
         }
 
+        if (NewInvitation.Guests.Any(g => g.Status == Status.Attend))
+        {
+            // Al menos un Guest tiene Status.Attend
+            NewInvitation.Status = Status.Attend;
+        }
+
         if (IsEditMode)
         {
             // PUT -> Editar
@@ -355,15 +354,7 @@ public partial class MyEventsDetails
         CloseModal();
 
         // Luego mostrar la notificación
-        var toast = SweetAlertService.Mixin(new SweetAlertOptions
-        {
-            Toast = true,
-            Position = SweetAlertPosition.TopEnd,
-            ShowConfirmButton = false,
-            Timer = 3000,
-            TimerProgressBar = true,
-        });
-        await toast.FireAsync(
+        await SweetAlertService.FireAsync(
             "Éxito",
             IsEditMode ? "Inivitacion actualizada con éxito." : "Inivitacion creada con éxito.",
             SweetAlertIcon.Success
@@ -649,22 +640,15 @@ public partial class MyEventsDetails
                             $"Total procesadas: {result!.Total}\n\n" +
                             "✅ Las invitaciones se actualizaron correctamente",
                             SweetAlertIcon.Info);*/
-                    await SweetAlertService.FireAsync(new SweetAlertOptions
-                    {
-                        Title = "Invitaciones",
-                        Html = $@"<div style='text-align:left; font-size:0.95rem; line-height:1.4;'>
-                                <ul style='padding-left:1.2rem; margin:0 0 0.6rem 0;'>
-                                    <li><strong>Agregadas:</strong> {result!.Agregadas}</li>
-                                    <li><strong>Modificadas:</strong> {result!.Modificadas}</li>
-                                    <li><strong>Eliminadas:</strong> {result!.Eliminadas} </li>
-                                    <li><strong>Errores:</strong> {result!.Errores}</li>
-                                    <li><strong> Total procesadas:</strong> {result!.Total}</li>
-                                </ul>
-                                <p style = 'margin-top:0.6rem;'>✅ <strong> Las invitaciones se actualizaron correctamente </strong></p>
-                            </div> ",
-                        Icon = SweetAlertIcon.Success,
-                        ConfirmButtonText = "Aceptar"
-                    });
+                    await SweetAlertService.FireAsync(
+                            "Invitaciones",
+                            $"Agregadas: {result!.Agregadas}\n" +
+                            $"Modificadas: {result!.Modificadas}\n" +
+                            $"Eliminadas: {result!.Eliminadas}\n" +
+                            $"Errores: {result!.Errores}\n" +
+                            $"Total procesadas: {result!.Total}\n\n" +
+                            "Las invitaciones se actualizaron correctamente",
+                            SweetAlertIcon.Success);
                     CloseModalExcel();
                     await LoadInvitations(currentPage);
                 }
@@ -738,19 +722,12 @@ public partial class MyEventsDetails
             loadingWhatsappId1 = invitationId;
             var confirmResult = await SweetAlertService.FireAsync(new SweetAlertOptions
             {
-                Html = $@"
-                        <div style='text-align:center'>
-                            <p>Estas seguro de enviar la plantilla:</p>
-                            <h2 style='color:#3C6A79'><strong>{displayedName}</strong></h2>
-                            <p>¿Deseas continuar?</p>
-                        </div>
-                    ",
+                Title = "Enviar plantilla",
+                Text = $"¿Estás seguro de enviar la plantilla a '{displayedName}'? ¿Deseas continuar?",
                 Icon = SweetAlertIcon.Warning,
                 ShowCancelButton = true,
-                ConfirmButtonText = "Sí, Continuar",
-                CancelButtonText = "Cancelar",
-                ConfirmButtonColor = "#3C6A79",
-                CancelButtonColor = "#d33"
+                ConfirmButtonText = "Sí, continuar",
+                CancelButtonText = "Cancelar"
             });
 
             if (confirmResult.IsDismissed)
@@ -810,19 +787,12 @@ public partial class MyEventsDetails
             IsSendingMassive = true;
             var confirmResult = await SweetAlertService.FireAsync(new SweetAlertOptions
             {
-                Html = $@"
-                        <div style='text-align:center'>
-                            <p>Estas seguro de enviar la plantilla:</p>
-                            <h2 style='color:#3C6A79'><strong>{templateName.DisplayName}</strong></h2>
-                            <p>¿Deseas continuar?</p>
-                        </div>
-                    ",
+                Title = "Enviar plantilla",
+                Text = $"¿Estás seguro de enviar la plantilla '{templateName.DisplayName}'? ¿Deseas continuar?",
                 Icon = SweetAlertIcon.Warning,
                 ShowCancelButton = true,
-                ConfirmButtonText = "Sí, Continuar",
-                CancelButtonText = "Cancelar",
-                ConfirmButtonColor = "#3C6A79",
-                CancelButtonColor = "#d33"
+                ConfirmButtonText = "Sí, continuar",
+                CancelButtonText = "Cancelar"
             });
 
             if (confirmResult.IsDismissed)

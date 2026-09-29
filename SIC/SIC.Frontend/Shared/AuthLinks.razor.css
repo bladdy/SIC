@@ -3,9 +3,9 @@
 }
 
 .user-menu-chip {
-    background: #3C6A79;
+    background: #367B82;
     color: #fff;
-    border: 1px solid #3C6A79;
+    border: 1px solid #367B82;
     border-radius: 50rem;
     padding: 0.3rem 0.85rem 0.3rem 0.3rem;
     font-weight: 600;
@@ -15,15 +15,15 @@
 .user-menu-chip:hover,
 .user-menu-chip:focus,
 .user-menu-chip[aria-expanded="true"] {
-    background: #2e4e59;
+    background: #2c6368;
     color: #fff;
-    border-color: #2e4e59;
-    box-shadow: 0 4px 12px rgba(60, 106, 121, 0.28);
+    border-color: #2c6368;
+    box-shadow: 0 4px 12px rgba(54, 123, 130, 0.28);
 }
 
 .user-menu-chip:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 0.25rem rgba(60, 106, 121, 0.35);
+    box-shadow: 0 0 0 0.25rem rgba(54, 123, 130, 0.35);
 }
 
 .user-avatar {
@@ -34,8 +34,8 @@
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: #F2EBD9;
-    color: #3C6A79;
+    background: #F1EDF3;
+    color: #367B82;
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.02em;
@@ -44,7 +44,7 @@
 
 .user-menu-chip:hover .user-avatar,
 .user-menu-chip[aria-expanded="true"] .user-avatar {
-    background: #3C6A79;
+    background: #367B82;
     color: #fff;
 }
 
@@ -72,7 +72,7 @@
     border-radius: 1rem;
     min-width: 248px;
     padding: 0.5rem;
-    box-shadow: 0 16px 40px rgba(46, 78, 89, 0.16), 0 2px 6px rgba(46, 78, 89, 0.08);
+    box-shadow: 0 16px 40px rgba(44, 99, 104, 0.16), 0 2px 6px rgba(44, 99, 104, 0.08);
     transform-origin: top right;
     animation: user-menu-in 0.22s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -83,7 +83,7 @@
     gap: 0.75rem;
     padding: 0.62rem 0.8rem;
     border-radius: 0.75rem;
-    color: #2e4e59;
+    color: #2c6368;
     font-weight: 600;
     font-size: 0.9rem;
     transition: background 0.15s ease-out, color 0.15s ease-out;
@@ -91,8 +91,8 @@
 
 .user-menu-panel .dropdown-item:hover,
 .user-menu-panel .dropdown-item:focus {
-    background: #F2EBD9;
-    color: #3C6A79;
+    background: #F1EDF3;
+    color: #367B82;
 }
 
 .user-menu-icon {
@@ -103,8 +103,8 @@
     align-items: center;
     justify-content: center;
     border-radius: 0.65rem;
-    background: #F2EBD9;
-    color: #3C6A79;
+    background: #F1EDF3;
+    color: #367B82;
     font-size: 1rem;
     transition: background 0.15s ease-out, color 0.15s ease-out;
 }
@@ -137,7 +137,7 @@
 
 .user-menu-divider {
     margin: 0.35rem 0.5rem;
-    border-color: rgba(60, 106, 121, 0.12);
+    border-color: rgba(54, 123, 130, 0.12);
 }
 
 @keyframes user-menu-in {

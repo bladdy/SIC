@@ -58,7 +58,6 @@ namespace SIC.Frontend.Pages.Whatsapp
         }
 
         private bool IsFormComplete =>
-            !string.IsNullOrWhiteSpace(Model.BusinessId) &&
             !string.IsNullOrWhiteSpace(Model.WabaId) &&
             !string.IsNullOrWhiteSpace(Model.PhoneNumberId) &&
             !string.IsNullOrWhiteSpace(Model.PhoneNumber) &&

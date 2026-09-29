@@ -13,6 +13,11 @@
 @inject IJSRuntime JS
 @inject SweetAlertService SweetAlertService
 
+<PageHeader Icon="bi-magic"
+            Title="Crear plantilla"
+            Subtitle="Diseña una plantilla de mensaje para WhatsApp">
+</PageHeader>
+
 <div class="row">
 
     <!-- ================= LEFT PANEL ================= -->
@@ -80,8 +85,6 @@
             @bind="Model.MediaType">
                 <option value="">Sin multimedia</option>
                 <option value="IMAGE">Imagen</option>
-                <option value="VIDEO">Video</option>
-                <option value="DOCUMENT">Documento</option>
             </select>
 
             @if (!string.IsNullOrEmpty(Model.MediaType))
@@ -105,7 +108,7 @@
 
             <textarea class="form-control"
             rows="5"
-            placeholder="Ej: Hola {{1}}, tu pedido {{2}} está listo"
+            placeholder="Ej: Hola {{1}}, tu invitacion {{2}} para..."
             @ref="BodyTextarea"
             @bind="BodyText"
             @bind:event="oninput"
@@ -448,6 +451,8 @@
     }
 </style>
 
+<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Title="Salir" ConfirmButtonText="Salir" Message="ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />
+
 @code {
 
     private CreateTemplateModel Model = new();
@@ -701,26 +706,25 @@
         }
     }
 
-    private async Task DiscardTemplate()
+private async Task DiscardTemplate()
     {
 
-        // 🔹 Confirmación antes de eliminar
-        var confirmResult = await SweetAlertService.FireAsync(new SweetAlertOptions
-        {
-            Title = "Salir",
-            Text = "Si sales ahora perderás todo el progreso de la plantilla. ¿Deseas continuar?",
-            Icon = SweetAlertIcon.Warning,
-            ShowCancelButton = true,
-            ConfirmButtonText = "Salir",
-            CancelButtonText = "Cancelar",
-            ConfirmButtonColor = "#d33",
-            CancelButtonColor = "#3085d6"
-        });
+        // 🔹 Confirmación antes de salir
+        ConfirmMessage = "Si sales ahora perderás todo el progreso de la plantilla. ¿Deseas continuar?";
+        IsConfirmVisible = true;
+        await Task.CompletedTask;
+    }
 
-        // Si el usuario cancela, no hacer nada
-        if (confirmResult.IsDismissed)
-            return;
+    private bool IsConfirmVisible;
+    private string ConfirmMessage = "";
 
+    private async Task OnConfirmVisibleChanged(bool visible)
+    {
+        IsConfirmVisible = visible;
+    }
+
+    private async Task ExecutePendingDelete()
+    {
         Navigation.NavigateTo("/whatsapp_templates");
     }
 

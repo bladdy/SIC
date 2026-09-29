@@ -1,4 +1,4 @@
-﻿@page "/status-events/{Code}"
+@page "/status-events/{Code}"
 @layout LoginLayout
 
 @using SIC.Frontend.Shared
@@ -13,7 +13,7 @@ else
 {
     <div class="card shadow-lg border-0 mb-3 ">
         <!-- Header: título, subtítulo, tipo y estado -->
-        <div class="card-header text-white position-relative" style="background-color:#3C6A79;">
+        <div class="card-header text-white position-relative" style="background-color:#367B82;">
             <div class="d-flex justify-content-between align-items-stretch flex-wrap">
                 <div>
                     <h4 class="mb-0">@EventDetail.Name</h4>
@@ -26,7 +26,7 @@ else
                 <div class="text-end d-flex flex-column justify-content-end">
                     <p class="mb-1">
                         <strong>Estado:</strong>
-                        <span class="badge bg-@(EventDetail.Status == Status.Active ? "success" : "secondary")">
+                        <span class="sic-badge @(EventDetail.Status == Status.Active ? "sic-badge-success" : "sic-badge-gray")">
                             @EventDetail.Status.GetDescription()
                         </span>
                     </p>
@@ -41,7 +41,7 @@ else
             <div class="accordion" id="accordionPanelsStayOpenExample">
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="panelsStayOpen-headingOne">
-                        <button class="accordion-button collapsed" style="background-color:#3C6A79 !important; color:white;"
+                        <button class="accordion-button collapsed" style="background-color:#367B82 !important; color:white;"
                                 type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
                             <div class="w-100 d-flex justify-content-between align-items-center me-3">
 
@@ -53,13 +53,13 @@ else
                     <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingOne">
                         <div class="accordion-body row">
                             <div class="col-12 col-md-4">
-                                <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#3C6A79;">
+                                <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#367B82;">
                                     <strong>Adultos:</strong>
                                     <span>@EventDetail.NumberAdults</span>
                                 </p>
                             </div>
                             <div class="col-12 col-md-4">
-                                <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#3C6A79;">
+                                <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#367B82;">
                                     <strong>Jóvenes:</strong>
                                     <span>@EventDetail.NumberYouths</span>
                                 </p>
@@ -67,7 +67,7 @@ else
 
                             <!-- Niños -->
                             <div class="col-12 col-md-4">
-                                <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#3C6A79;">
+                                <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#367B82;">
                                     <strong>Niños:</strong>
                                     <span>@EventDetail.NumberChildren</span>
                                 </p>
@@ -205,20 +205,20 @@ else
             <div class="row text-center align-items-stretch g-1 g-md-3 mt-0 d-none">
                 <!-- Invitados -->
                 <div class="col-12 col-md-3 mb-0">
-                    <p class="d-flex justify-content-between px-3 py-1 text-white" style="background-color:#3C6A79;">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white" style="background-color:#367B82;">
                         <strong>Invitados:</strong>
                         <span>@(EventDetail.NumberAdults + EventDetail.NumberYouths + EventDetail.NumberChildren)</span>
                     </p>
                 </div>
                 <!-- Adultos -->
                 <div class="col-6 col-md-3">
-                    <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#3C6A79;">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#367B82;">
                         <strong>Adultos:</strong>
                         <span>@EventDetail.NumberAdults</span>
                     </p>
                 </div>
                 <div class="col-6 col-md-3">
-                    <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#3C6A79;">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#367B82;">
                         <strong>Jóvenes:</strong>
                         <span>@EventDetail.NumberYouths</span>
                     </p>
@@ -226,7 +226,7 @@ else
 
                 <!-- Niños -->
                 <div class="col-6 col-md-3">
-                    <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#3C6A79;">
+                    <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#367B82;">
                         <strong>Niños:</strong>
                         <span>@EventDetail.NumberChildren</span>
                     </p>
@@ -296,8 +296,8 @@ else
     ﻿﻿<div class="mb-2 gap-2 p-2" style="display: flex; flex-wrap:wrap; align-items: center;">
         <input style="width:400px;" type="text" class="form-control" placeholder="Buscar Invitacion..." @bind-value="Filter">
         <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center; justify-content: start;">
-            <button type="button" class="btn btn-custom" style="display: flex; align-items: center; gap: 4px;" @onclick="ApplyFilterAsync"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-search"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg> Buscar</button>
-            <button type="button" class="btn btn-custom" style="display: flex; align-items: center; gap: 4px;" @onclick="CleanFilterAsync"><i class="bi bi-x-circle" /> Limpiar</button>
+            <button type="button" class="btn btn-primary" style="display: flex; align-items: center; gap: 4px;" @onclick="ApplyFilterAsync"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-search"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg> Buscar</button>
+            <button type="button" class="sic-clear" style="display: flex; align-items: center; gap: 4px;" @onclick="CleanFilterAsync"><i class="bi bi-x-circle" /> Limpiar</button>
 
 
 
@@ -306,8 +306,8 @@ else
 
     <!-- ====== VERSIÓN DE ESCRITORIO ====== -->
     <div class="table-responsive d-none d-md-block">
-        <table class="table table-hover align-middle mb-0">
-            <thead style="background-color:#3C6A79; color:white;">
+        <table class="table sic-table table-hover align-middle mb-0">
+            <thead>
                 <tr class="text-center">
 
                     <th class="text-start">Detalle del Invitado</th>
@@ -390,7 +390,7 @@ else
 
                             <!-- ======== COLUMNA 2: ESTADO ======== -->
                             <td class="text-center">
-                                <span class="px-3 py-2 fs-6 badge @(invitation.Status == Status.Attend ? "bg-success" : invitation.Status == Status.NotAttend ? "bg-danger" : "bg-secondary")">
+                                <span class="px-3 py-2 fs-6 sic-badge @(invitation.Status == Status.Attend ? "sic-badge-success" : invitation.Status == Status.NotAttend ? "sic-badge-danger" : "sic-badge-gray")">
                                     @invitation.Status.GetDescription()
                                 </span>
                             </td>
@@ -420,12 +420,12 @@ else
     </div>
 
     <!-- ✅ Vista móvil tipo “detalle” -->
-    <div class="d-block d-md-none px-2" >
+    <div class="d-block d-md-none sic-mobile-card">
 
 
         @foreach (var invitation in Invitations!)
         {
-            <div class="card mb-3 shadow-sm">
+            <div class="card mb-3">
                 <div class="card-body">
 
                     <div class="d-flex justify-content-between align-items-center mb-2">
@@ -434,7 +434,7 @@ else
                             <h5 class="card-title mb-0">@invitation.Name</h5>
                         </div>
 
-                        <span class="badge bg-@(invitation.Status == Status.Attend ? "success" : invitation.Status == Status.NotAttend ? "danger" : "secondary")">
+                        <span class="sic-badge @(invitation.Status == Status.Attend ? "sic-badge-success" : invitation.Status == Status.NotAttend ? "sic-badge-danger" : "sic-badge-gray")">
                             @invitation.Status.GetDescription()
                         </span>
                     </div>
@@ -518,7 +518,7 @@ else
         filter: brightness(0) invert(1);
     }
     .steps-wrapper {
-        background-color: #3C6A79;
+        background-color: #367B82;
         padding: 12px;
         display: flex;
         justify-content: center;

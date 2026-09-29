@@ -89,43 +89,42 @@ public partial class SupplierIndex
             return;
         }
 
-        // Cerrar el modal inmediatamente al confirmar que la operación fue exitosa
+        // Cerrar el modal inmediatamente al confirmar que la operaciï¿½n fue exitosa
         CloseModal();
 
-        // Luego mostrar la notificación
-        var toast = sweetAlertService.Mixin(new SweetAlertOptions
-        {
-            Toast = true,
-            Position = SweetAlertPosition.TopEnd,
-            ShowConfirmButton = false,
-            Timer = 3000,
-            TimerProgressBar = true,
-        });
-        await toast.FireAsync(
-            "Éxito",
-            IsEditMode ? "Proveedor actualizado con éxito." : "Proveedor creado con éxito.",
+        // Luego mostrar la notificaciï¿½n
+        await sweetAlertService.FireAsync(
+            "ï¿½xito",
+            IsEditMode ? "Proveedor actualizado con ï¿½xito." : "Proveedor creado con ï¿½xito.",
             SweetAlertIcon.Success
         );
 
         await LoadSuppliers();
     }
 
-    private async Task ConfirmDelete(SIC.Shared.Entities.Supplier supplier)
+private async Task ConfirmDelete(SIC.Shared.Entities.Supplier supplier)
     {
-        var result = await sweetAlertService.FireAsync(new SweetAlertOptions
-        {
-            Title = "¿Está seguro?",
-            Text = $"Se eliminará el Proveedor '{supplier.Name}'. Esta acción no se puede deshacer.",
-            Icon = SweetAlertIcon.Warning,
-            ShowCancelButton = true,
-            ConfirmButtonText = "Sí, borrar",
-            CancelButtonText = "Cancelar"
-        });
+        _pendingSupplier = supplier;
+        ConfirmMessage = $"Se eliminarÃ¡ el Proveedor '{supplier.Name}'. Esta acciÃ³n no se puede deshacer.";
+        IsConfirmVisible = true;
+        await Task.CompletedTask;
+    }
 
-        if (!string.IsNullOrEmpty(result.Value))
-        {
-            await DeleteEventTypes(supplier);
-        }
+    private bool IsConfirmVisible;
+    private string ConfirmMessage = "";
+    private SIC.Shared.Entities.Supplier? _pendingSupplier;
+
+    private async Task OnConfirmVisibleChanged(bool visible)
+    {
+        IsConfirmVisible = visible;
+        if (!visible) _pendingSupplier = null;
+    }
+
+    private async Task ExecutePendingDelete()
+    {
+        if (_pendingSupplier == null) return;
+        await DeleteEventTypes(_pendingSupplier);
+_pendingSupplier = null;
     }
 
     private async Task DeleteEventTypes(SIC.Shared.Entities.Supplier supplier)
@@ -139,15 +138,7 @@ public partial class SupplierIndex
             return;
         }
 
-        var toast = sweetAlertService.Mixin(new SweetAlertOptions
-        {
-            Toast = true,
-            Position = SweetAlertPosition.TopEnd,
-            ShowConfirmButton = false,
-            Timer = 3000,
-            TimerProgressBar = true,
-        });
-        await toast.FireAsync("Eliminado", "El Proveedor fue borrado correctamente.", SweetAlertIcon.Success);
+        await sweetAlertService.FireAsync("Eliminado", "El Proveedor fue borrado correctamente.", SweetAlertIcon.Success);
 
         await LoadSuppliers();
     }

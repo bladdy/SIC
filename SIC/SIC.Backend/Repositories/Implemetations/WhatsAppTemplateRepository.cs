@@ -83,7 +83,7 @@ namespace SIC.Backend.Repositories.Implemetations
         public async Task<ActionResponse<IEnumerable<WhatsAppTemplate?>>> GetForUserAsync(string? userId)
         {
             var entities = await _context.WhatsAppTemplates
-                .Where(t => t.UsuarioId == userId || t.IsSuggested)
+                .Where(t => t.UsuarioId == userId)
                 .OrderBy(o => o.OrderTemplate)
                 .AsNoTracking()
                 .ToListAsync();
@@ -93,6 +93,27 @@ namespace SIC.Backend.Repositories.Implemetations
                 Success = true,
                 Result = entities
             };
+        }
+
+        public async Task<bool> HasCopyAsync(string? userId, WhatsAppTemplate suggested)
+        {
+            return await _context.WhatsAppTemplates
+                .AnyAsync(t => t.UsuarioId == userId
+                    && !t.IsSuggested
+                    && (suggested.StructureJson != null
+                        ? t.StructureJson == suggested.StructureJson
+                        : t.Name == suggested.Name));
+        }
+
+        public async Task<bool> HasAllSuggestedGeneratedAsync(string? userId, IEnumerable<WhatsAppTemplate> suggested)
+        {
+            foreach (var template in suggested)
+            {
+                if (!await HasCopyAsync(userId, template))
+                    return false;
+            }
+
+            return true;
         }
 
         public async Task<WhatsAppTemplate?> GetByNameAsync(string name, string? userId)

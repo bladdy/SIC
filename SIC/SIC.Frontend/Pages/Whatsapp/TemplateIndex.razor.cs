@@ -14,6 +14,7 @@ namespace SIC.Frontend.Pages.Whatsapp
     public partial class TemplateIndex
     {
         private bool isGenerating;
+        private bool hasGeneratedSuggested;
         [Inject] private IRepository Repository { get; set; } = default!;
 
         public WhatsappTemplates? WhatsappTemplates { get; set; } = null!;
@@ -70,19 +71,28 @@ namespace SIC.Frontend.Pages.Whatsapp
 
         private async Task DeleteTemplate(TemplateDatum template)
         {
-            var confirm = await SweetAlertService.FireAsync(new SweetAlertOptions
-            {
-                Title = "Eliminar plantilla",
-                Text = $"¿Estás seguro de que deseas eliminar la plantilla '{template.Name}'? " +
-                       "Tendrás que esperar 30 días antes de poder reutilizar el mismo nombre para crear una nueva plantilla.",
-                Icon = SweetAlertIcon.Warning,
-                ShowCancelButton = true,
-                ConfirmButtonText = "Sí, eliminar",
-                CancelButtonText = "Cancelar"
-            });
+            _pendingTemplate = template;
+            ConfirmMessage = $"¿Estás seguro de que deseas eliminar la plantilla '{template.Name}'? " +
+                             "Tendrás que esperar 30 días antes de poder reutilizar el mismo nombre para crear una nueva plantilla.";
+            IsConfirmVisible = true;
+            await Task.CompletedTask;
+        }
 
-            if (!confirm.IsConfirmed)
-                return;
+        private bool IsConfirmVisible;
+        private string ConfirmMessage = "";
+        private TemplateDatum? _pendingTemplate;
+
+        private async Task OnConfirmVisibleChanged(bool visible)
+        {
+            IsConfirmVisible = visible;
+            if (!visible) _pendingTemplate = null;
+        }
+
+        private async Task ExecutePendingDelete()
+        {
+            if (_pendingTemplate == null) return;
+            var template = _pendingTemplate;
+            _pendingTemplate = null;
 
             var url = $"api/whatsapp/chat/templates/{Uri.EscapeDataString(template.Name!)}";
 
@@ -111,6 +121,14 @@ namespace SIC.Frontend.Pages.Whatsapp
         protected override async Task OnInitializedAsync()
         {
             await LoadAllTemplates();
+            await LoadHasGeneratedTemplates();
+        }
+
+        private async Task LoadHasGeneratedTemplates()
+        {
+            var responseHttp = await Repository.GetAsync<HasGeneratedTemplatesDto>($"api/whatsapp/has-generated-templates");
+
+            hasGeneratedSuggested = !responseHttp.Error && responseHttp.Response?.HasGenerated == true;
         }
 
         private async Task LoadAllTemplates()
@@ -167,6 +185,10 @@ namespace SIC.Frontend.Pages.Whatsapp
                 }
                 else
                 {
+                    // El proceso corre en segundo plano; se deshabilita el botón
+                    // para evitar generar de nuevo mientras tanto.
+                    hasGeneratedSuggested = true;
+
                     // Cast the response to HttpResponseMessage to access Content
                     var httpResponseMessage = responseHttp.HttpResponseMessage;
                     var result = await httpResponseMessage.Content.ReadFromJsonAsync<ApiResponse>();

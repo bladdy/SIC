@@ -142,13 +142,6 @@ public partial class FormBuilder
         }
 
         Saving = false;
-        await sweetAlertService.Mixin(new SweetAlertOptions
-        {
-            Toast = true,
-            Position = SweetAlertPosition.TopEnd,
-            ShowConfirmButton = false,
-            Timer = 3000,
-            TimerProgressBar = true
-        }).FireAsync("Guardado", "Formulario guardado correctamente.", SweetAlertIcon.Success);
+        await sweetAlertService.FireAsync("Guardado", "Formulario guardado correctamente.", SweetAlertIcon.Success);
     }
 }

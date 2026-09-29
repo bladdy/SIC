@@ -101,25 +101,31 @@ namespace SIC.Frontend.Pages.Album
             PreviewImage = eventImage;
         }
 
-        private async Task ConfirmDelete(EventImage eventImage)
+private async Task ConfirmDelete(EventImage eventImage)
         {
             ClosePreview();
-            var result = await SweetAlertService.FireAsync(new SweetAlertOptions
-            {
-                Title = "�Est� seguro?",
-                Text = $"Se eliminara esta foto. Esta acci�n no se puede deshacer.",
-                Icon = SweetAlertIcon.Warning,
-                ShowCancelButton = true,
-                ConfirmButtonText = "S�, borrar",
-                CancelButtonText = "Cancelar"
-            });
+            _pendingEventImage = eventImage;
+            ConfirmMessage = "Se eliminará esta foto. Esta acción no se puede deshacer.";
+            IsConfirmVisible = true;
+            await Task.CompletedTask;
+        }
 
-            if (!string.IsNullOrEmpty(result.Value))
-            {
-                await DeleteEventImage(eventImage);
-            }
+        private bool IsConfirmVisible;
+        private string ConfirmMessage = "";
+        private EventImage? _pendingEventImage;
 
-            PreviewImage = null;
+        private async Task OnConfirmVisibleChanged(bool visible)
+        {
+            IsConfirmVisible = visible;
+            if (!visible) _pendingEventImage = null;
+        }
+
+        private async Task ExecutePendingDelete()
+        {
+            if (_pendingEventImage == null) return;
+            await DeleteEventImage(_pendingEventImage);
+            _pendingEventImage = null;
+PreviewImage = null;
         }
 
         private async Task DeleteEventImage(EventImage eventImage)
@@ -133,15 +139,7 @@ namespace SIC.Frontend.Pages.Album
                 return;
             }
 
-            var toast = SweetAlertService.Mixin(new SweetAlertOptions
-            {
-                Toast = true,
-                Position = SweetAlertPosition.TopEnd,
-                ShowConfirmButton = false,
-                Timer = 3000,
-                TimerProgressBar = true,
-            });
-            await toast.FireAsync("Eliminada", "La foto fue eliminada correctamente.", SweetAlertIcon.Success);
+            await SweetAlertService.FireAsync("Eliminada", "La foto fue eliminada correctamente.", SweetAlertIcon.Success);
 
             await LoadEventImage();
             StateHasChanged();
@@ -159,15 +157,7 @@ namespace SIC.Frontend.Pages.Album
             }
             catch (Exception)
             {
-                var toast = SweetAlertService.Mixin(new SweetAlertOptions
-                {
-                    Toast = true,
-                    Position = SweetAlertPosition.TopEnd,
-                    ShowConfirmButton = false,
-                    Timer = 3000,
-                    TimerProgressBar = true,
-                });
-                await toast.FireAsync("Error", "Algo salio mal, intentalo de nuevo m�s tarde.", SweetAlertIcon.Error);
+                await SweetAlertService.FireAsync("Error", "Algo salio mal, intentalo de nuevo m�s tarde.", SweetAlertIcon.Error);
             }
         }
 
@@ -183,15 +173,7 @@ namespace SIC.Frontend.Pages.Album
             }
             catch (Exception)
             {
-                var toast = SweetAlertService.Mixin(new SweetAlertOptions
-                {
-                    Toast = true,
-                    Position = SweetAlertPosition.TopEnd,
-                    ShowConfirmButton = false,
-                    Timer = 3000,
-                    TimerProgressBar = true,
-                });
-                await toast.FireAsync("Error", "Algo salio mal, intentalo de nuevo m�s tarde.", SweetAlertIcon.Error);
+                await SweetAlertService.FireAsync("Error", "Algo salio mal, intentalo de nuevo m�s tarde.", SweetAlertIcon.Error);
             }
         }
 

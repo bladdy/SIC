@@ -201,15 +201,7 @@ public partial class EventRequirementsAvailable
 
         CloseModal();
 
-        var toast = sweetAlertService.Mixin(new SweetAlertOptions
-        {
-            Toast = true,
-            Position = SweetAlertPosition.TopEnd,
-            ShowConfirmButton = false,
-            Timer = 3000,
-            TimerProgressBar = true,
-        });
-        await toast.FireAsync(
+        await sweetAlertService.FireAsync(
             "Éxito",
             IsEditMode ? "Requisito actualizado con éxito." : "Requisito creado con éxito.",
             SweetAlertIcon.Success
@@ -260,22 +252,29 @@ public partial class EventRequirementsAvailable
         return true;
     }
 
-    private async Task ConfirmDelete(EventRequirement req)
+private async Task ConfirmDelete(EventRequirement req)
     {
-        var result = await sweetAlertService.FireAsync(new SweetAlertOptions
-        {
-            Title = "¿Está seguro?",
-            Text = $"Se eliminará el requisito '{req.Name}'. Esta acción no se puede deshacer.",
-            Icon = SweetAlertIcon.Warning,
-            ShowCancelButton = true,
-            ConfirmButtonText = "Sí, borrar",
-            CancelButtonText = "Cancelar"
-        });
+        _pendingRequirement = req;
+        ConfirmMessage = $"Se eliminará el requisito '{req.Name}'. Esta acción no se puede deshacer.";
+        IsConfirmVisible = true;
+        await Task.CompletedTask;
+    }
 
-        if (!string.IsNullOrEmpty(result.Value))
-        {
-            await DeleteRequirement(req);
-        }
+    private bool IsConfirmVisible;
+    private string ConfirmMessage = "";
+    private EventRequirement? _pendingRequirement;
+
+    private async Task OnConfirmVisibleChanged(bool visible)
+    {
+        IsConfirmVisible = visible;
+        if (!visible) _pendingRequirement = null;
+    }
+
+    private async Task ExecutePendingDelete()
+    {
+        if (_pendingRequirement == null) return;
+        await DeleteRequirement(_pendingRequirement);
+        _pendingRequirement = null;
     }
 
     private async Task DeleteRequirement(EventRequirement req)
@@ -289,15 +288,7 @@ public partial class EventRequirementsAvailable
             return;
         }
 
-        var toast = sweetAlertService.Mixin(new SweetAlertOptions
-        {
-            Toast = true,
-            Position = SweetAlertPosition.TopEnd,
-            ShowConfirmButton = false,
-            Timer = 3000,
-            TimerProgressBar = true,
-        });
-        await toast.FireAsync("Eliminado", "El requisito fue borrado correctamente.", SweetAlertIcon.Success);
+        await sweetAlertService.FireAsync("Eliminado", "El requisito fue borrado correctamente.", SweetAlertIcon.Success);
 
         await LoadRequirements();
     }

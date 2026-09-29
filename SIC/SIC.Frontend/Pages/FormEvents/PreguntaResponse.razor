@@ -1,5 +1,5 @@
-<div class="card shadow-sm p-3 mb-3"
-     style="border-radius: 10px; @(IsFailed ? "border-color:#dc3545; border-width:2px;" : "")">
+<div class="sic-card p-3 mb-3"
+     style="@(IsFailed ? "border-color:#dc3545; border-width:2px;" : "")">
     <label class="form-label fw-semibold mb-2">
         @Pregunta.Titulo
         @if (Pregunta.Obligatoria)
@@ -109,7 +109,7 @@
             if (respuestaActual == regla.ValorDisparador && regla.SubPreguntas.Any())
             {
                 <div style="margin-left: 45px; margin-top: 16px; padding-left: 20px; border-left: 3px solid #d9d9d9;">
-                    <div class="fw-semibold mb-2" style="color: #3C6A79; font-size: .85rem;">
+                    <div class="fw-semibold mb-2" style="color: #367B82; font-size: .85rem;">
                         <i class="bi bi-chevron-down"></i> Cuando responda
                         <strong>@regla.ValorDisparador</strong>
                     </div>

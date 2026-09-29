@@ -24,12 +24,11 @@ namespace SIC.Frontend.Shared.Component.Forms
             }
             var result = await SweetAlertService.FireAsync(new SweetAlertOptions
             {
-                AllowEnterKey = true,
-                Title = "¿Estás seguro?",
-                Text = "Hay cambios sin guardar. Si continúas, se perderán los cambios.",
+                Title = "Â¿EstÃ¡s seguro?",
+                Text = "Hay cambios sin guardar. Si continÃºas, se perderÃ¡n los cambios.",
                 Icon = SweetAlertIcon.Warning,
                 ShowCancelButton = true,
-                ConfirmButtonText = "Sí, salir",
+                ConfirmButtonText = "SÃ­, salir",
                 CancelButtonText = "No, quedarme"
             });
             var confirmed = !string.IsNullOrEmpty(result.Value);

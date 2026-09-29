@@ -75,44 +75,43 @@ public partial class EventTypesIndex
             return;
         }
 
-        // Cerrar el modal inmediatamente al confirmar que la operación fue exitosa
+        // Cerrar el modal inmediatamente al confirmar que la operaciï¿½n fue exitosa
         CloseModal();
 
-        // Luego mostrar la notificación
-        var toast = sweetAlertService.Mixin(new SweetAlertOptions
-        {
-            Toast = true,
-            Position = SweetAlertPosition.TopEnd,
-            ShowConfirmButton = false,
-            Timer = 3000,
-            TimerProgressBar = true,
-        });
-        await toast.FireAsync(
-            "Éxito",
-            IsEditMode ? "Tipo de evento actualizado con éxito." : "Tipo de evento creado con éxito.",
+        // Luego mostrar la notificaciï¿½n
+        await sweetAlertService.FireAsync(
+            "ï¿½xito",
+            IsEditMode ? "Tipo de evento actualizado con ï¿½xito." : "Tipo de evento creado con ï¿½xito.",
             SweetAlertIcon.Success
         );
 
         await LoadEventTypes();
     }
 
-    private async Task ConfirmDelete(EventType eventType)
-    {
-        var result = await sweetAlertService.FireAsync(new SweetAlertOptions
+private async Task ConfirmDelete(EventType eventType)
         {
-            Title = "¿Está seguro?",
-            Text = $"Se eliminará el Tipo de evento '{eventType.Name}'. Esta acción no se puede deshacer.",
-            Icon = SweetAlertIcon.Warning,
-            ShowCancelButton = true,
-            ConfirmButtonText = "Sí, borrar",
-            CancelButtonText = "Cancelar"
-        });
-
-        if (!string.IsNullOrEmpty(result.Value))
-        {
-            await DeleteEventTypes(eventType);
+            _pendingEventType = eventType;
+            ConfirmMessage = $"Se eliminarÃ¡ el Tipo de evento '{eventType.Name}'. Esta acciÃ³n no se puede deshacer.";
+            IsConfirmVisible = true;
+            await Task.CompletedTask;
         }
-    }
+
+        private bool IsConfirmVisible;
+        private string ConfirmMessage = "";
+        private EventType? _pendingEventType;
+
+        private async Task OnConfirmVisibleChanged(bool visible)
+        {
+            IsConfirmVisible = visible;
+            if (!visible) _pendingEventType = null;
+        }
+
+        private async Task ExecutePendingDelete()
+        {
+            if (_pendingEventType == null) return;
+            await DeleteEventTypes(_pendingEventType);
+_pendingEventType = null;
+        }
 
     private async Task DeleteEventTypes(EventType eventType)
     {
@@ -125,15 +124,7 @@ public partial class EventTypesIndex
             return;
         }
 
-        var toast = sweetAlertService.Mixin(new SweetAlertOptions
-        {
-            Toast = true,
-            Position = SweetAlertPosition.TopEnd,
-            ShowConfirmButton = false,
-            Timer = 3000,
-            TimerProgressBar = true,
-        });
-        await toast.FireAsync("Eliminado", "El Tipo de evento fue borrado correctamente.", SweetAlertIcon.Success);
+        await sweetAlertService.FireAsync("Eliminado", "El Tipo de evento fue borrado correctamente.", SweetAlertIcon.Success);
 
         await LoadEventTypes();
     }

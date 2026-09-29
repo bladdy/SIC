@@ -39,8 +39,8 @@ else
         <EditForm Model="this" OnValidSubmit="SaveAll">
             @foreach (var reqSection in Sections)
             {
-                <div class="card mb-4 shadow-sm">
-                    <div class="card-header" style="background-color:#3C6A79; color:white;">
+                <div class="card mb-4">
+                    <div class="card-header" style="background-color:#367B82; color:white;">
                         <h5 class="mb-0">@reqSection.Key</h5>
                     </div>
                     <div class="card-body">
@@ -115,7 +115,7 @@ else
                                                         <div class="col">
                                                             <button type="button"
                                                                     class="btn btn-outline-secondary w-100 h-100 d-flex flex-column align-items-center gap-1 p-2 @(isSelected ? "btn-selected" : "")"
-                                                                    style="@(isSelected ? "border-color:#3C6A79; background:#eef4f6;" : "")"
+                                                                    style="@(isSelected ? "border-color:#367B82; background:#eef4f6;" : "")"
                                                                     disabled="@IsFieldLocked(req.RequirementId)"
                                                                     @onclick="() => SelectOption(req.RequirementId, option)">
                                                                 <img src="@option.ImageUrl" alt="@option.Title"

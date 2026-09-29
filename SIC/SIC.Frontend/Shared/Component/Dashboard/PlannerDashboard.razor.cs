@@ -22,7 +22,14 @@ namespace SIC.Frontend.Shared.Component.Dashboard
         {
             var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             var user = authState.User;
-            await LoadDashboard();
+            try
+            {
+                await LoadDashboard();
+            }
+            catch
+            {
+                PlannerDashboards = null;
+            }
             if (user.Identity?.IsAuthenticated ?? false)
             {
                 _userId = user.Claims.FirstOrDefault(c => c.Type.EndsWith("nameidentifier"))?.Value;

@@ -1,4 +1,4 @@
-﻿
+
 
 @page "/login"
 @layout LoginLayout
@@ -19,11 +19,11 @@ Que se vean mas claros
             <div class="mb-4">
                 <img src="logo.jpeg" alt="Logo" class="mb-3" style="width: 100px; height: 100px; border-radius: 50%;" />
 
-                <h3 class="fw-bold" style="color:#3C6A79;">Sistema de Invitación y Confirmación</h3>
+                <h3 class="fw-bold" style="color:#367B82;">Sistema de Invitación y Confirmación</h3>
                 <div class="d-flex my-3">
-                    <hr class="flex-grow-1 border-primary border-2 opacity-75" style="color:#3C6A79;">
-                    <h5 class="fw-bold mx-3 text-capitalize" style="color:#3C6A79;">INVBOXV</h5>
-                    <hr class="flex-grow-1 border-primary border-2 opacity-75" style="color:#3C6A79;">
+                    <hr class="flex-grow-1 border-primary border-2 opacity-75" style="color:#367B82;">
+                    <h5 class="fw-bold mx-3 text-capitalize" style="color:#367B82;">INVBOXV</h5>
+                    <hr class="flex-grow-1 border-primary border-2 opacity-75" style="color:#367B82;">
                 </div>
 
                 <h6 class="text-muted small">Inicia sesión para continuar</h6>
@@ -33,7 +33,7 @@ Que se vean mas claros
                 <DataAnnotationsValidator />
 
                 <div class="mb-3 text-start">
-                    <label class="form-label fw-semibold text btn-">Usuario</label>
+                    <label class="form-label fw-semibold">Usuario</label>
                     <InputText class="form-control form-control-lg rounded-3" @bind-Value="@loginDTO.Email"  />
                     <ValidationMessage For="@(() => loginDTO.Email)" />
                 </div>
@@ -44,12 +44,12 @@ Que se vean mas claros
                     <ValidationMessage For="@(() => loginDTO.Password)" />
                 </div>
 
-                <button class="btn w-100 py-2 rounded-3 fw-semibold btn-custom" type="submit">
+                <button class="btn btn-primary w-100 py-2 rounded-3 fw-semibold" type="submit">
                     Iniciar Sesión
                 </button>
 
                 <div class="mt-3 text-end">
-                    <a class="text-decoration-none" style="color:#3C6A79;" href="/RecoverPassword">¿Olvidaste tu contraseña?</a>
+                    <a class="text-decoration-none" style="color:#367B82;" href="/RecoverPassword">¿Olvidaste tu contraseña?</a>
                 </div>
 
                 <div class="mt-4 visually-hidden">

@@ -76,43 +76,42 @@ namespace SIC.Frontend.Pages.Plans
                 return;
             }
 
-            // Cerrar el modal inmediatamente al confirmar que la operación fue exitosa
+            // Cerrar el modal inmediatamente al confirmar que la operaciï¿½n fue exitosa
             CloseModal();
 
-            // Luego mostrar la notificación
-            var toast = sweetAlertService.Mixin(new SweetAlertOptions
-            {
-                Toast = true,
-                Position = SweetAlertPosition.TopEnd,
-                ShowConfirmButton = false,
-                Timer = 3000,
-                TimerProgressBar = true,
-            });
-            await toast.FireAsync(
-                "Éxito",
-                IsEditMode ? "Plan actualizado con éxito." : "Plan creado con éxito.",
+            // Luego mostrar la notificaciï¿½n
+            await sweetAlertService.FireAsync(
+                "ï¿½xito",
+                IsEditMode ? "Plan actualizado con ï¿½xito." : "Plan creado con ï¿½xito.",
                 SweetAlertIcon.Success
             );
 
             await LoadPlans();
         }
 
-        private async Task ConfirmDelete(Plan plan)
+private async Task ConfirmDelete(Plan plan)
         {
-            var result = await sweetAlertService.FireAsync(new SweetAlertOptions
-            {
-                Title = "¿Está seguro?",
-                Text = $"Se eliminará el plan '{plan.Name}'. Esta acción no se puede deshacer.",
-                Icon = SweetAlertIcon.Warning,
-                ShowCancelButton = true,
-                ConfirmButtonText = "Sí, borrar",
-                CancelButtonText = "Cancelar"
-            });
+            _pendingPlan = plan;
+            ConfirmMessage = $"Se eliminarÃ¡ el plan '{plan.Name}'. Esta acciÃ³n no se puede deshacer.";
+            IsConfirmVisible = true;
+            await Task.CompletedTask;
+        }
 
-            if (!string.IsNullOrEmpty(result.Value))
-            {
-                await DeletePlan(plan);
-            }
+        private bool IsConfirmVisible;
+        private string ConfirmMessage = "";
+        private Plan? _pendingPlan;
+
+        private async Task OnConfirmVisibleChanged(bool visible)
+        {
+            IsConfirmVisible = visible;
+            if (!visible) _pendingPlan = null;
+        }
+
+        private async Task ExecutePendingDelete()
+        {
+            if (_pendingPlan == null) return;
+            await DeletePlan(_pendingPlan);
+_pendingPlan = null;
         }
 
         private async Task DeletePlan(Plan plan)
@@ -126,15 +125,7 @@ namespace SIC.Frontend.Pages.Plans
                 return;
             }
 
-            var toast = sweetAlertService.Mixin(new SweetAlertOptions
-            {
-                Toast = true,
-                Position = SweetAlertPosition.TopEnd,
-                ShowConfirmButton = false,
-                Timer = 3000,
-                TimerProgressBar = true,
-            });
-            await toast.FireAsync("Eliminado", "El plan fue borrado correctamente.", SweetAlertIcon.Success);
+            await sweetAlertService.FireAsync("Eliminado", "El plan fue borrado correctamente.", SweetAlertIcon.Success);
 
             await LoadPlans();
         }

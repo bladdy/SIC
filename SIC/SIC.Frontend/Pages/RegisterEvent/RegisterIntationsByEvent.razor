@@ -1,20 +1,24 @@
 ﻿@page "/events/register-intations-by-event/{Code}"
-<h3>Registro de invitaciones</h3>
-
-<button class="btn btn-primary" @onclick="StartScannerAsync" disabled="@isScannerRunning">
-    Iniciar Escáner
-</button>
+<PageHeader Icon="bi-qr-code-scan"
+            Title="Registro de invitaciones"
+            Subtitle="Escaneo de QR">
+    <button class="btn btn-primary" @onclick="StartScannerAsync" disabled="@isScannerRunning">
+        <i class="bi bi-qr-code-scan"></i> Iniciar Escáner
+    </button>
+</PageHeader>
 
 <div id="reader" style="width:800px; height:800px;"></div>
 
 @if (showModal)
 {
     <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Registrar Asistentes</h5>
-                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                    <h5 class="modal-title">
+                        <i class="bi bi-person-check me-2"></i>Registrar Asistentes
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" @onclick="CloseModal"></button>
                 </div>
                 <div class="modal-body">
                     <p>QR: @qrResult</p>
@@ -28,8 +32,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" @onclick="CancelModal">Cancelar</button>
-                    <button class="btn btn-primary" @onclick="SubmitModal">Registrar</button>
+                    <button class="btn btn-secondary btn-sm" @onclick="CancelModal">Cancelar</button>
+                    <button class="btn btn-custom btn-sm" @onclick="SubmitModal"><i class="bi bi-check-lg me-1"></i>Registrar</button>
                 </div>
             </div>
         </div>

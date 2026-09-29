@@ -83,8 +83,8 @@ namespace SIC.Frontend.Pages.Message
                 {
                     Title = EventDetail!.Name,
                     SubTitle = EventDetail.SubTitle,
-                    MessageInvitation = $"¡Hola! Estás cordialmente invitado a {{EventDetail.Name}} que se celebrará el {EventDetail.Date:dddd, dd 'de' MMMM 'de' yyyy} a las {EventDetail.Date:hh:mm tt}. Por favor, confirma tu asistencia utilizando el siguiente enlace: {{linkinvitacion}}. Esperamos contar con tu presencia para compartir este momento especial.",
-                    MessageConfirmation = $"¡Gracias por confirmar tu asistencia a {EventDetail.Name}! Nos alegra saber que podrás acompañarnos en este día tan especial. Si tienes alguna pregunta o necesitas más información, no dudes en contactarnos. ¡Nos vemos pronto!"
+                    MessageInvitation = $"ï¿½Hola! Estï¿½s cordialmente invitado a {{EventDetail.Name}} que se celebrarï¿½ el {EventDetail.Date:dddd, dd 'de' MMMM 'de' yyyy} a las {EventDetail.Date:hh:mm tt}. Por favor, confirma tu asistencia utilizando el siguiente enlace: {{linkinvitacion}}. Esperamos contar con tu presencia para compartir este momento especial.",
+                    MessageConfirmation = $"ï¿½Gracias por confirmar tu asistencia a {EventDetail.Name}! Nos alegra saber que podrï¿½s acompaï¿½arnos en este dï¿½a tan especial. Si tienes alguna pregunta o necesitas mï¿½s informaciï¿½n, no dudes en contactarnos. ï¿½Nos vemos pronto!"
                 };
                 isEditOrCreate = true;
             }
@@ -117,18 +117,10 @@ namespace SIC.Frontend.Pages.Message
                 await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
                 return;
             }
-            // Luego mostrar la notificación
-            var toast = SweetAlertService.Mixin(new SweetAlertOptions
-            {
-                Toast = true,
-                Position = SweetAlertPosition.TopEnd,
-                ShowConfirmButton = false,
-                Timer = 3000,
-                TimerProgressBar = true,
-            });
-            await toast.FireAsync(
-                "Éxito",
-                isEditOrCreate ? "Los mensajes han sido creados con éxito." : "Los mensajes han sido actualizados con éxito.",
+            // Luego mostrar la notificaciï¿½n
+            await SweetAlertService.FireAsync(
+                "ï¿½xito",
+                isEditOrCreate ? "Los mensajes han sido creados con ï¿½xito." : "Los mensajes han sido actualizados con ï¿½xito.",
                 SweetAlertIcon.Success
             );
             NavigationManager.NavigateTo($"/my-events/details/{Code}");

@@ -1,18 +1,19 @@
 @page "/event-requirements/available"
 <PageTitle>Catálogo de Requisitos</PageTitle>
 
-<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
-<h3>Requisitos Disponibles</h3>
-    <button class="btn btn-custom" @onclick="ShowCreateModal">
-        <i class="oi oi-plus"></i> Crear Requisito
-    </button> 
-</div>
+<PageHeader Icon="bi-journal-text"
+            Title="Requisitos Disponibles"
+            Subtitle="Catálogo de requisitos">
+    <button class="btn btn-primary" @onclick="ShowCreateModal">
+        <i class="bi bi-plus-lg"></i> Crear Requisito
+    </button>
+</PageHeader>
 
 <GenericList MyList="Requirements">
     <Body>
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead style="background-color:#3C6A79; color:white;">
+            <table class="table sic-table table-hover align-middle mb-0">
+                <thead>
                     <tr class="text-center">
                         <th>Nombre</th>
                         <th>Sección</th>
@@ -32,21 +33,21 @@
                             <td class="text-center">
                                 @if (req.IsRequired)
                                 {
-                                    <span class="badge bg-danger">Sí</span>
+                                    <span class="sic-badge sic-badge-danger">Sí</span>
                                 }
                                 else
                                 {
-                                    <span class="badge bg-secondary">No</span>
+                                    <span class="sic-badge sic-badge-gray">No</span>
                                 }
                             </td>
                             <td class="text-center">
                                 @if (req.IsActive)
                                 {
-                                    <span class="badge bg-success">Activo</span>
+                                    <span class="sic-badge sic-badge-success">Activo</span>
                                 }
                                 else
                                 {
-                                    <span class="badge bg-warning text-dark">Inactivo</span>
+                                    <span class="sic-badge sic-badge-warning">Inactivo</span>
                                 }
                             </td>
                             <td class="text-center">
@@ -71,8 +72,10 @@
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">@(IsEditMode ? "Editar Requisito" : "Crear Requisito")</h5>
-                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                    <h5 class="modal-title">
+                        <i class="bi @(IsEditMode ? "bi-pencil-square me-2" : "bi-list-check me-2")"></i>@(IsEditMode ? "Editar Requisito" : "Crear Requisito")
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" @onclick="CloseModal"></button>
                 </div>
                 <div class="modal-body">
                     <EditForm Model="@NewRequirement" OnValidSubmit="@SaveRequirement">
@@ -240,14 +243,14 @@
                         }
 
                         <div class="modal-footer">
-                            <button type="submit" class="btn btn-custom" disabled="@Saving">
+                            <button type="submit" class="btn btn-custom btn-sm" disabled="@Saving">
                                 @if (Saving)
                                 {
                                     <span class="spinner-border spinner-border-sm me-2"></span>
                                 }
                                 Guardar
                             </button>
-                            <button type="button" class="btn btn-secondary" disabled="@Saving" @onclick="CloseModal">Cancelar</button>
+                            <button type="button" class="btn btn-secondary btn-sm" disabled="@Saving" @onclick="CloseModal">Cancelar</button>
                         </div>
                     </EditForm>
                 </div>
@@ -255,3 +258,5 @@
         </div>
     </div>
 }
+
+<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />

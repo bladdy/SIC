@@ -228,19 +228,30 @@ namespace SIC.Frontend.Pages.Events
 
         private void CloseModal() => IsModalVisible = false;
 
-        // Confirmar eliminaci�n
+        // Confirmar eliminación
         private async Task ConfirmDelete(Event evnt)
         {
-            var result = await SweetAlertService.FireAsync(new SweetAlertOptions
-            {
-                Title = "�Eliminar evento?",
-                Text = $"Se eliminar� '{evnt.Name}'. Esta acci�n no se puede deshacer.",
-                Icon = SweetAlertIcon.Warning,
-                ShowCancelButton = true
-            });
+            _pendingEvent = evnt;
+            ConfirmMessage = $"Se eliminará '{evnt.Name}'. Esta acción no se puede deshacer.";
+            IsConfirmVisible = true;
+            await Task.CompletedTask;
+        }
 
-            if (!string.IsNullOrEmpty(result.Value))
-                await DeleteEvent(evnt);
+        private bool IsConfirmVisible;
+        private string ConfirmMessage = "";
+        private Event? _pendingEvent;
+
+        private async Task OnConfirmVisibleChanged(bool visible)
+        {
+            IsConfirmVisible = visible;
+            if (!visible) _pendingEvent = null;
+        }
+
+        private async Task ExecutePendingDelete()
+        {
+            if (_pendingEvent == null) return;
+            await DeleteEvent(_pendingEvent);
+            _pendingEvent = null;
         }
 
         private async Task DeleteEvent(Event evnt)

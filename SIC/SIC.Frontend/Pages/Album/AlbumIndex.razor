@@ -27,25 +27,25 @@
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
 
             <!-- Nombre -->
-            <h2 style="margin: 0; color: #3C6A79;">
+            <h2 style="margin: 0; color: #367B82;">
                 @Event?.Name
             </h2>
 
             <!-- Botones -->
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                 <button @onclick="() => DownloadAllImages(Code!)"
-                        style="padding: 0.5rem 1rem; background-color: #3C6A79; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                        style="padding: 0.5rem 1rem; background-color: #367B82; color: white; border: none; border-radius: 6px; cursor: pointer;">
                     <i class="bi bi-download"></i> Descargar Álbum
                 </button>
                 <button @onclick="() => DownloadAllTexts(Code)"
-                        style="padding: 0.5rem 1rem; background-color: #3C6A79; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                        style="padding: 0.5rem 1rem; background-color: #367B82; color: white; border: none; border-radius: 6px; cursor: pointer;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-file-download"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2" /><path d="M12 17v-6" /><path d="M9.5 14.5l2.5 2.5l2.5 -2.5" /></svg>
                     Descargar Textos
                 </button>
 
 
                 <button @onclick="() => GenerateQR(Code!)"
-                        style="padding: 0.5rem 1rem; background-color: #3C6A79; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                        style="padding: 0.5rem 1rem; background-color: #367B82; color: white; border: none; border-radius: 6px; cursor: pointer;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
                     stroke-width="1.5"
                     ><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4" /><path d="M20 15h-1a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h1v-3" /><path d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6" /><path d="M11 21v-6l3 6v-6" /></svg>
@@ -53,7 +53,7 @@
                 </button>
                 <button @onclick="() => GenerateBanner(Code!)"
                         disabled="@IsLoadingBanner"
-                        style="padding: 0.5rem 1rem; background-color: #3C6A79; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                        style="padding: 0.5rem 1rem; background-color: #367B82; color: white; border: none; border-radius: 6px; cursor: pointer;">
                     @if (IsLoadingBanner)
                     {
                         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -70,7 +70,7 @@
                     }
                 </button>
                 <button @onclick="CopiarEventUrl" disabled="@IsCopyURl"
-                        style="padding: 0.5rem 1rem; background-color: #3C6A79; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                        style="padding: 0.5rem 1rem; background-color: #367B82; color: white; border: none; border-radius: 6px; cursor: pointer;">
                     @if (IsCopyURl)
                     {
                         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -286,7 +286,7 @@
                                 <i class="bi bi-music-note-beamed"
                                    style="
                         font-size: 60px;
-                        color: #3C6A79;
+                        color: #367B82;
                         margin-bottom: 1rem;">
                                 </i>
 
@@ -375,7 +375,7 @@
                         position: absolute;
                         top: 20px;
                         right: 80px;
-                        background-color: #3C6A79;
+                        background-color: #367B82;
                         color: white;
                         border: none;
                         border-radius: 50%;
@@ -439,7 +439,7 @@
                     <i class="bi bi-music-note-beamed"
                        style="
                             font-size: 80px;
-                            color: #3C6A79;
+                            color: #367B82;
                             margin-bottom: 1rem;
                             display: block;
                                     ">
@@ -454,3 +454,5 @@
         </div>
     </div>
 }
+
+<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />

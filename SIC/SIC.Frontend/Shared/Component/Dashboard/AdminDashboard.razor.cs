@@ -21,7 +21,14 @@ public partial class AdminDashboard
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadDashboard();
+        try
+        {
+            await LoadDashboard();
+        }
+        catch
+        {
+            AdminDashboards = null;
+        }
     }
 
     private async Task LoadDashboard()

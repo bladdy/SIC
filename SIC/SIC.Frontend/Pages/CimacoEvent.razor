@@ -1,9 +1,11 @@
-﻿@page "/photo-event/{Code}/{Qr?}"
+@page "/photo-event/{Code}/{Qr?}"
 
 @layout LoginLayout
 <PageTitle>Cimaco</PageTitle>
 
 <div class="container py-3">
+
+    <PageHeader Icon="bi-images" Title="Galería del Evento" Subtitle="Descarga y administra las fotografías del evento." />
 
     <!-- ========================= -->
     <!-- PORTADA -->
@@ -20,10 +22,12 @@
                     background-size: cover;
                     background-position: center;
                     background-repeat: no-repeat;">
-                </div>
+</div>
             </div>
-        </div>
-    }
+    </div>
+}
+
+<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />
 
     <!-- ========================= -->
     <!-- FORMULARIOS -->
@@ -106,8 +110,8 @@
                     }
                 </h4>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;" class="mb-3">
-                    <button @onclick="() => DownloadAllImages(Qr!)"
-                            style="padding: 0.5rem 1rem; background-color: #3C6A79; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                    <button class="btn btn-primary"
+                            @onclick="() => DownloadAllImages(Qr!)">
                         <i class="bi bi-download"></i> Descargar Imágenes
                     </button>
                 </div>
@@ -177,21 +181,18 @@
 
         <div style="position: relative;" @onclick:stopPropagation>
 
-            <button @onclick="() => DownloadImage(PreviewImage)"
-                    style="
+            <button class="btn btn-primary"
+                            @onclick="() => DownloadImage(PreviewImage)"
+                            style="
                         position: absolute;
                         top: -50px;
                         right: 0;
                         width: 40px;
                         height: 40px;
                         border-radius: 50%;
-                        border: none;
-                        background-color: #3C6A79;
-                        color: #fff;
                         display: flex;
                         align-items: center;
-                        justify-content: center;
-                        cursor: pointer;">
+                        justify-content: center;">
                 <i class="bi bi-download"></i>
             </button>
 

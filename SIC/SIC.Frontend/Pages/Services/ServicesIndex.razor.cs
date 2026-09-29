@@ -75,43 +75,42 @@ namespace SIC.Frontend.Pages.Services
                 return;
             }
 
-            // Cerrar el modal inmediatamente al confirmar que la operación fue exitosa
+            // Cerrar el modal inmediatamente al confirmar que la operaciï¿½n fue exitosa
             CloseModal();
 
-            // Luego mostrar la notificación
-            var toast = sweetAlertService.Mixin(new SweetAlertOptions
-            {
-                Toast = true,
-                Position = SweetAlertPosition.TopEnd,
-                ShowConfirmButton = false,
-                Timer = 3000,
-                TimerProgressBar = true,
-            });
-            await toast.FireAsync(
-                "Éxito",
-                IsEditMode ? "Servicio actualizado con éxito." : "Servicio creado con éxito.",
+            // Luego mostrar la notificaciï¿½n
+            await sweetAlertService.FireAsync(
+                "ï¿½xito",
+                IsEditMode ? "Servicio actualizado con ï¿½xito." : "Servicio creado con ï¿½xito.",
                 SweetAlertIcon.Success
             );
 
             await LoadItem();
         }
 
-        private async Task ConfirmDelete(Item item)
+private async Task ConfirmDelete(Item item)
         {
-            var result = await sweetAlertService.FireAsync(new SweetAlertOptions
-            {
-                Title = "¿Está seguro?",
-                Text = $"Se eliminará el Servicio '{item.Name}'. Esta acción no se puede deshacer.",
-                Icon = SweetAlertIcon.Warning,
-                ShowCancelButton = true,
-                ConfirmButtonText = "Sí, borrar",
-                CancelButtonText = "Cancelar"
-            });
+            _pendingItem = item;
+            ConfirmMessage = $"Se eliminarÃ¡ el Servicio '{item.Name}'. Esta acciÃ³n no se puede deshacer.";
+            IsConfirmVisible = true;
+            await Task.CompletedTask;
+        }
 
-            if (!string.IsNullOrEmpty(result.Value))
-            {
-                await DeleteItem(item);
-            }
+        private bool IsConfirmVisible;
+        private string ConfirmMessage = "";
+        private Item? _pendingItem;
+
+        private async Task OnConfirmVisibleChanged(bool visible)
+        {
+            IsConfirmVisible = visible;
+            if (!visible) _pendingItem = null;
+        }
+
+        private async Task ExecutePendingDelete()
+        {
+            if (_pendingItem == null) return;
+            await DeleteItem(_pendingItem);
+_pendingItem = null;
         }
 
         private async Task DeleteItem(Item item)
@@ -125,15 +124,7 @@ namespace SIC.Frontend.Pages.Services
                 return;
             }
 
-            var toast = sweetAlertService.Mixin(new SweetAlertOptions
-            {
-                Toast = true,
-                Position = SweetAlertPosition.TopEnd,
-                ShowConfirmButton = false,
-                Timer = 3000,
-                TimerProgressBar = true,
-            });
-            await toast.FireAsync("Eliminado", "El Servicio fue borrado correctamente.", SweetAlertIcon.Success);
+            await sweetAlertService.FireAsync("Eliminado", "El Servicio fue borrado correctamente.", SweetAlertIcon.Success);
 
             await LoadItem();
         }

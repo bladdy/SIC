@@ -12,7 +12,14 @@ public partial class UserDashboard
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadDashboard();
+        try
+        {
+            await LoadDashboard();
+        }
+        catch
+        {
+            UserDashboards = null;
+        }
     }
 
     private async Task LoadDashboard()

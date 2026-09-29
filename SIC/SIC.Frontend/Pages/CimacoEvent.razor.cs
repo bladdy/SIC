@@ -1,4 +1,4 @@
-﻿using CurrieTechnologies.Razor.SweetAlert2;
+using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -53,21 +53,27 @@ namespace SIC.Frontend.Pages
         private async Task ConfirmDelete(EventImage eventImage)
         {
             ClosePreview();
-            var result = await SweetAlertService.FireAsync(new SweetAlertOptions
-            {
-                Title = "¿Está seguro?",
-                Text = $"Se eliminara esta foto. Esta acción no se puede deshacer.",
-                Icon = SweetAlertIcon.Warning,
-                ShowCancelButton = true,
-                ConfirmButtonText = "Sí, borrar",
-                CancelButtonText = "Cancelar"
-            });
+            _pendingEventImage = eventImage;
+            ConfirmMessage = $"Se eliminará esta foto. Esta acción no se puede deshacer.";
+            IsConfirmVisible = true;
+            await Task.CompletedTask;
+        }
 
-            if (!string.IsNullOrEmpty(result.Value))
-            {
-                await DeleteEventImage(eventImage);
-            }
+        private bool IsConfirmVisible;
+        private string ConfirmMessage = "";
+        private EventImage? _pendingEventImage;
 
+        private async Task OnConfirmVisibleChanged(bool visible)
+        {
+            IsConfirmVisible = visible;
+            if (!visible) _pendingEventImage = null;
+        }
+
+        private async Task ExecutePendingDelete()
+        {
+            if (_pendingEventImage == null) return;
+            await DeleteEventImage(_pendingEventImage);
+            _pendingEventImage = null;
             PreviewImage = null;
         }
 
@@ -82,15 +88,7 @@ namespace SIC.Frontend.Pages
                 return;
             }
 
-            var toast = SweetAlertService.Mixin(new SweetAlertOptions
-            {
-                Toast = true,
-                Position = SweetAlertPosition.TopEnd,
-                ShowConfirmButton = false,
-                Timer = 3000,
-                TimerProgressBar = true,
-            });
-            await toast.FireAsync("Eliminada", "La foto fue eliminada correctamente.", SweetAlertIcon.Success);
+            await SweetAlertService.FireAsync("Eliminada", "La foto fue eliminada correctamente.", SweetAlertIcon.Success);
 
             await LoadEvent();
             StateHasChanged();
@@ -107,15 +105,7 @@ namespace SIC.Frontend.Pages
             }
             catch (Exception)
             {
-                var toast = SweetAlertService.Mixin(new SweetAlertOptions
-                {
-                    Toast = true,
-                    Position = SweetAlertPosition.TopEnd,
-                    ShowConfirmButton = false,
-                    Timer = 3000,
-                    TimerProgressBar = true,
-                });
-                await toast.FireAsync("Error", "Algo salio mal, intentalo de nuevo más tarde.", SweetAlertIcon.Error);
+                await SweetAlertService.FireAsync("Error", "Algo salio mal, intentalo de nuevo más tarde.", SweetAlertIcon.Error);
             }
         }
 
@@ -240,16 +230,7 @@ namespace SIC.Frontend.Pages
 
                 if (!responseHttp.Error)
                 {
-                    var toast = SweetAlertService.Mixin(new SweetAlertOptions
-                    {
-                        Toast = true,
-                        Position = SweetAlertPosition.TopEnd,
-                        ShowConfirmButton = false,
-                        Timer = 3000,
-                        TimerProgressBar = true
-                    });
-
-                    await toast.FireAsync(
+                    await SweetAlertService.FireAsync(
                         "Subir fotos",
                         "Las imágenes fueron subidas correctamente.",
                         SweetAlertIcon.Success
@@ -310,15 +291,7 @@ namespace SIC.Frontend.Pages
             }
             catch (Exception)
             {
-                var toast = SweetAlertService.Mixin(new SweetAlertOptions
-                {
-                    Toast = true,
-                    Position = SweetAlertPosition.TopEnd,
-                    ShowConfirmButton = false,
-                    Timer = 3000,
-                    TimerProgressBar = true,
-                });
-                await toast.FireAsync("Error", "Algo salio mal, intentalo de nuevo más tarde.", SweetAlertIcon.Error);
+                await SweetAlertService.FireAsync("Error", "Algo salio mal, intentalo de nuevo más tarde.", SweetAlertIcon.Error);
             }
         }
     }

@@ -66,7 +66,7 @@ namespace SIC.Frontend.Pages.RegisterEvent
         {
             showModal = false;
 
-            // Aquí puedes registrar los datos de adultos y niños
+            // Aquï¿½ puedes registrar los datos de adultos y niï¿½os
             //await RegistrarAsistentes(qrResult, adultos, ninos);
 
             // Luego muestras el SweetAlert
@@ -77,8 +77,7 @@ namespace SIC.Frontend.Pages.RegisterEvent
                 Icon = SweetAlertIcon.Success,
                 ShowCancelButton = true,
                 ConfirmButtonText = "Escanear otro QR",
-                CancelButtonText = "Finalizar",
-                ReverseButtons = true
+                CancelButtonText = "Finalizar"
             });
 
             if (result.IsConfirmed)
@@ -96,7 +95,7 @@ namespace SIC.Frontend.Pages.RegisterEvent
             isScannerRunning = false;
             StateHasChanged();
 
-            OpenModal(); // <-- Abre el modal para registrar adultos y niños
+            OpenModal(); // <-- Abre el modal para registrar adultos y niï¿½os
         }
 
         private async Task LoadEvent()

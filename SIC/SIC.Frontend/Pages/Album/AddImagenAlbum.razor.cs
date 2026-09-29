@@ -1,4 +1,4 @@
-﻿using CurrieTechnologies.Razor.SweetAlert2;
+using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Localization;
@@ -181,16 +181,7 @@ public partial class AddImagenAlbum
 
             if (!responseHttp.Error)
             {
-                var toast = SweetAlertService.Mixin(new SweetAlertOptions
-                {
-                    Toast = true,
-                    Position = SweetAlertPosition.TopEnd,
-                    ShowConfirmButton = false,
-                    Timer = 3000,
-                    TimerProgressBar = true
-                });
-
-                await toast.FireAsync(
+                await SweetAlertService.FireAsync(
                     "Subir fotos",
                     "Los archivos fueron subidas correctamente.",
                     SweetAlertIcon.Success
@@ -385,16 +376,7 @@ public partial class AddImagenAlbum
 
             if (!responseHttp.Error)
             {
-                var toast = SweetAlertService.Mixin(new SweetAlertOptions
-                {
-                    Toast = true,
-                    Position = SweetAlertPosition.TopEnd,
-                    ShowConfirmButton = false,
-                    Timer = 3000,
-                    TimerProgressBar = true
-                });
-
-                await toast.FireAsync(
+                await SweetAlertService.FireAsync(
                     "Enviar dedicatoria",
                     "Tu dedicatoria fue enviada correctamente.",
                     SweetAlertIcon.Success

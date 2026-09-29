@@ -1,11 +1,13 @@
 ﻿@if (Visible)
 {
-    <div class="modal" tabindex="-1" style="display:block;">
-        <div class="modal-dialog">
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" style="color:black">Configuración del Sorteo</h5>
-                    <button type="button" class="btn-close" @onclick="Close"></button>
+                    <h5 class="modal-title">
+                        <i class="bi bi-dice-6 me-2"></i>Configuración del Sorteo
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" @onclick="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div>
@@ -22,8 +24,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="Close">Cancelar</button>
-                    <button type="button" class="btn btn-primary" @onclick="Save">Guardar</button>
+                    <button type="button" class="btn btn-custom btn-sm" @onclick="Save"><i class="bi bi-check-lg me-1"></i>Guardar</button>
+                    <button type="button" class="btn btn-secondary btn-sm" @onclick="Close">Cancelar</button>
                 </div>
             </div>
         </div>

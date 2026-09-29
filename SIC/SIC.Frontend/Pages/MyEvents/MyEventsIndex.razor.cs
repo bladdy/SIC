@@ -304,15 +304,7 @@ public partial class MyEventsIndex
         CloseModal();
 
         // Luego mostrar la notificaci�n
-        var toast = sweetAlertService.Mixin(new SweetAlertOptions
-        {
-            Toast = true,
-            Position = SweetAlertPosition.TopEnd,
-            ShowConfirmButton = false,
-            Timer = 3000,
-            TimerProgressBar = true,
-        });
-        await toast.FireAsync(
+        await sweetAlertService.FireAsync(
             "Exito",
             IsEditMode ? "Evento actualizado con �xito." : "Evento creado con �xito.",
             SweetAlertIcon.Success
@@ -323,20 +315,27 @@ public partial class MyEventsIndex
 
     private async Task ConfirmDelete(Event events)
     {
-        var result = await sweetAlertService.FireAsync(new SweetAlertOptions
-        {
-            Title = "Estas seguro?",
-            Text = $"Se eliminar el evento '{events.Name}'. Esta acci�n no se puede deshacer.",
-            Icon = SweetAlertIcon.Warning,
-            ShowCancelButton = true,
-            ConfirmButtonText = "S�, borrar",
-            CancelButtonText = "Cancelar"
-        });
+        _pendingEvent = events;
+        ConfirmMessage = $"Se eliminará el evento '{events.Name}'. Esta acción no se puede deshacer.";
+        IsConfirmVisible = true;
+        await Task.CompletedTask;
+    }
 
-        if (!string.IsNullOrEmpty(result.Value))
-        {
-            await DeletePlan(events);
-        }
+    private bool IsConfirmVisible;
+    private string ConfirmMessage = "";
+    private Event? _pendingEvent;
+
+    private async Task OnConfirmVisibleChanged(bool visible)
+    {
+        IsConfirmVisible = visible;
+        if (!visible) _pendingEvent = null;
+    }
+
+    private async Task ExecutePendingDelete()
+    {
+        if (_pendingEvent == null) return;
+        await DeletePlan(_pendingEvent);
+        _pendingEvent = null;
     }
 
     private async Task DeletePlan(Event events)
@@ -350,15 +349,7 @@ public partial class MyEventsIndex
             return;
         }
 
-        var toast = sweetAlertService.Mixin(new SweetAlertOptions
-        {
-            Toast = true,
-            Position = SweetAlertPosition.TopEnd,
-            ShowConfirmButton = false,
-            Timer = 3000,
-            TimerProgressBar = true,
-        });
-        await toast.FireAsync("Eliminado", "El Evento fue borrado correctamente.", SweetAlertIcon.Success);
+        await sweetAlertService.FireAsync("Eliminado", "El Evento fue borrado correctamente.", SweetAlertIcon.Success);
 
         await LoadEvents();
     }

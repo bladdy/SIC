@@ -15,6 +15,10 @@ namespace SIC.Backend.Repositories.Interfaces
 
         Task<WhatsAppTemplate?> GetByNameAsync(string name, string? userId);
 
+        Task<bool> HasCopyAsync(string? userId, WhatsAppTemplate suggested);
+
+        Task<bool> HasAllSuggestedGeneratedAsync(string? userId, IEnumerable<WhatsAppTemplate> suggested);
+
         Task<ActionResponse<bool>> DeleteByNameAsync(string name, string userId);
 
         Task<int> GetNextTemplateNumberAsync(string userId);

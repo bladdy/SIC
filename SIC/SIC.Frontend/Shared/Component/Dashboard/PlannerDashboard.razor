@@ -72,7 +72,7 @@
                                 @if (PlannerDashboards.PendingGuests > 0)
                                 {
                                     var pendingPct = (double)PlannerDashboards.PendingGuests / PlannerDashboards.TotalGuests * 100;
-                                    <div class="progress-bar bg-warning text-dark" style="width:@pendingPct%">
+                                    <div class="progress-bar bg-warning text-white" style="width:@pendingPct%">
                                         Pendientes: @PlannerDashboards.PendingGuests
                                     </div>
                                 }
@@ -131,7 +131,7 @@
                                     }
                                     @if (e.PendingGuests > 0)
                                     {
-                                        <div class="progress-bar bg-warning text-dark"
+                                        <div class="progress-bar bg-warning text-white"
                                              style="width: @pendingPct.ToString("F2", CultureInfo.InvariantCulture)%; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                             <span class="small">@e.PendingGuests</span>
                                         </div>

@@ -86,22 +86,29 @@ namespace SIC.Frontend.Pages.Products
             IsModalVisible = true;
         }
 
-        private async Task ConfirmDelete(Product product)
+private async Task ConfirmDelete(Product product)
         {
-            var result = await sweetAlertService.FireAsync(new SweetAlertOptions
-            {
-                Title = "¿Está seguro?",
-                Text = $"Se eliminará el Producto '{product.Name}'. Esta acción no se puede deshacer.",
-                Icon = SweetAlertIcon.Warning,
-                ShowCancelButton = true,
-                ConfirmButtonText = "Sí, borrar",
-                CancelButtonText = "Cancelar"
-            });
+            _pendingProduct = product;
+            ConfirmMessage = $"Se eliminarÃ¡ el Producto '{product.Name}'. Esta acciÃ³n no se puede deshacer.";
+            IsConfirmVisible = true;
+            await Task.CompletedTask;
+        }
 
-            if (!string.IsNullOrEmpty(result.Value))
-            {
-                await DeleteEventTypes(product);
-            }
+        private bool IsConfirmVisible;
+        private string ConfirmMessage = "";
+        private Product? _pendingProduct;
+
+        private async Task OnConfirmVisibleChanged(bool visible)
+        {
+            IsConfirmVisible = visible;
+            if (!visible) _pendingProduct = null;
+        }
+
+        private async Task ExecutePendingDelete()
+        {
+            if (_pendingProduct == null) return;
+            await DeleteEventTypes(_pendingProduct);
+_pendingProduct = null;
         }
 
         private async Task DeleteEventTypes(Product product)
@@ -115,15 +122,7 @@ namespace SIC.Frontend.Pages.Products
                 return;
             }
 
-            var toast = sweetAlertService.Mixin(new SweetAlertOptions
-            {
-                Toast = true,
-                Position = SweetAlertPosition.TopEnd,
-                ShowConfirmButton = false,
-                Timer = 3000,
-                TimerProgressBar = true,
-            });
-            await toast.FireAsync("Eliminado", "El Producto fue borrado correctamente.", SweetAlertIcon.Success);
+            await sweetAlertService.FireAsync("Eliminado", "El Producto fue borrado correctamente.", SweetAlertIcon.Success);
 
             await LoadProducts();
         }
@@ -149,21 +148,13 @@ namespace SIC.Frontend.Pages.Products
                 return;
             }
 
-            // Cerrar el modal inmediatamente al confirmar que la operación fue exitosa
+            // Cerrar el modal inmediatamente al confirmar que la operaciï¿½n fue exitosa
             CloseModal();
 
-            // Luego mostrar la notificación
-            var toast = sweetAlertService.Mixin(new SweetAlertOptions
-            {
-                Toast = true,
-                Position = SweetAlertPosition.TopEnd,
-                ShowConfirmButton = false,
-                Timer = 3000,
-                TimerProgressBar = true,
-            });
-            await toast.FireAsync(
-                "Éxito",
-                IsEditMode ? "Producto actualizado con éxito." : "Producto creado con éxito.",
+            // Luego mostrar la notificaciï¿½n
+            await sweetAlertService.FireAsync(
+                "ï¿½xito",
+                IsEditMode ? "Producto actualizado con ï¿½xito." : "Producto creado con ï¿½xito.",
                 SweetAlertIcon.Success
             );
 
