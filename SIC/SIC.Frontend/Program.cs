@@ -66,6 +66,28 @@ builder.Services.AddScoped(sp =>
     return config;
 });
 
+// Esperar a que el backend esté disponible antes de iniciar la SPA
+using (var httpClient = new HttpClient { BaseAddress = new Uri(backendUrl) })
+{
+    var backendReady = false;
+    for (var attempt = 0; attempt < 30 && !backendReady; attempt++)
+    {
+        try
+        {
+            var response = await httpClient.GetAsync("swagger/index.html");
+            backendReady = response.IsSuccessStatusCode;
+        }
+        catch
+        {
+            backendReady = false;
+        }
+        if (!backendReady)
+        {
+            await Task.Delay(1000);
+        }
+    }
+}
+
 await builder.Build().RunAsync();
 
 //https://www.youtube.com/watch?v=wI95IJVHZpc
