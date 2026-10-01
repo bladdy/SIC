@@ -85,6 +85,10 @@ public class Event : IEntityWithName
     [Display(Name = "Estado")]
     public Status Status { get; set; }
 
+    // 🔹 Estado del diseño de la invitación (se gestiona solo desde la vista de respuestas)
+    [Display(Name = "Estado del diseño")]
+    public DesignStatus DesignStatus { get; set; } = DesignStatus.Pending;
+
     [Display(Name = "Cantidad de invitados")]
     public int Guests => Invitations?.Where(i => i != null && i.Guests != null).SelectMany(i => i.Guests).Count() ?? 0;
 

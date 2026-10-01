@@ -19,6 +19,8 @@ public class PaginationDTO
     public int EventTypeId { get; set; } = 0;
     public bool HasAlbum { get; set; } = false;
     public bool HasResponses { get; set; } = false;
+    public int? DesignStatus { get; set; }
+    public int? InvitationStatus { get; set; }
     //Agregar: orderby fechas asc desc
     //Nuevos filtros: Por nombre de anfitriones, por eventos, usuarios, fechas
     //Nuevos filtros Mis eventos: Por nombre de anfitriones, por eventos, fechas
