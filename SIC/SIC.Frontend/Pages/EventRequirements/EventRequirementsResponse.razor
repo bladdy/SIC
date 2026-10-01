@@ -200,6 +200,44 @@ else
     }
 }
 
+@if (!Loading && !HasError && EventData != null)
+{
+    <div class="card mb-4">
+        <div class="card-header" style="background-color:#367B82; color:white;">
+            <h5 class="mb-0"><i class="bi bi-palette me-2"></i>Estado del diseño de la invitación</h5>
+        </div>
+        <div class="card-body">
+            <div class="row align-items-end g-3">
+                <div class="col-12 col-md-4">
+                    <label class="form-label fw-semibold" for="designStatusSelect">Estado</label>
+                    <select id="designStatusSelect" class="form-select"
+                            value="@((int)CurrentDesignStatus)"
+                            @onchange="OnDesignStatusChangedAsync"
+                            disabled="@SavingDesignStatus">
+                        @foreach (var status in Enum.GetValues<DesignStatus>())
+                        {
+                            <option value="@((int)status)">@status.GetDescription()</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-12 col-md-8 d-flex align-items-center">
+                    @if (SavingDesignStatus)
+                    {
+                        <span class="text-muted">
+                            <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                            Guardando...
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="text-muted small">El cambio se guarda automáticamente al modificar el estado.</span>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @if (IsLightboxVisible && SelectedImage != null)
 {
     <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.8);">

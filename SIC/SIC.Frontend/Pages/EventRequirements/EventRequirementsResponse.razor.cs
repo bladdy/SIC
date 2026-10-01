@@ -36,6 +36,9 @@ public partial class EventRequirementsResponse
     private bool IsSelectionLightboxVisible = false;
     private (string? Title, string? ImageUrl)? SelectedSelection;
 
+    private DesignStatus CurrentDesignStatus = DesignStatus.Pending;
+    private bool SavingDesignStatus = false;
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
@@ -59,6 +62,7 @@ public partial class EventRequirementsResponse
         var ev = eventResp.Response;
         EventName = ev.Name;
         EventData = ev;
+        CurrentDesignStatus = ev.DesignStatus;
 
         if (ev.EventTypeId == null)
         {
@@ -153,6 +157,43 @@ public partial class EventRequirementsResponse
             return GetImages(req.RequirementId) is { Count: > 0 };
 
         return !string.IsNullOrWhiteSpace(GetAnswer(req.RequirementId));
+    }
+
+    private async Task OnDesignStatusChangedAsync(ChangeEventArgs e)
+    {
+        if (EventData == null) return;
+        if (!int.TryParse(e.Value?.ToString(), out var value)) return;
+
+        var newStatus = (DesignStatus)value;
+        if (newStatus == EventData.DesignStatus) return;
+
+        var previousStatus = EventData.DesignStatus;
+
+        // Actualización optimista: si el PUT falla, se revierte.
+        EventData.DesignStatus = newStatus;
+        CurrentDesignStatus = newStatus;
+        SavingDesignStatus = true;
+        StateHasChanged();
+
+        var response = await repository.PutAsync(
+            $"api/Events/design-status/{EventData.Id}",
+            new UpdateDesignStatusDTO { DesignStatus = newStatus });
+
+        SavingDesignStatus = false;
+
+        if (response.Error)
+        {
+            var message = await response.GetErrorMessageAsync() ?? "No se pudo guardar el estado del diseño.";
+
+            EventData.DesignStatus = previousStatus;
+            CurrentDesignStatus = previousStatus;
+            StateHasChanged();
+
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        await sweetAlertService.FireAsync("Guardado", "Estado del diseño actualizado correctamente.", SweetAlertIcon.Success);
     }
 
     private void OpenLightbox(EventRequirementImage image)

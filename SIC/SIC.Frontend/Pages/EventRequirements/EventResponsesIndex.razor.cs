@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using SIC.Frontend.Repositories;
 using SIC.Shared.Entities;
+using SIC.Shared.Enums;
 using System.Net;
 
 namespace SIC.Frontend.Pages.EventRequirements
@@ -25,6 +26,7 @@ namespace SIC.Frontend.Pages.EventRequirements
         private string? CopyingEventCode;
         private int currentPage = 1;
         private int totalPages;
+        private int? DesignStatusFilter;
 
         protected override async Task OnInitializedAsync()
         {
@@ -49,6 +51,11 @@ namespace SIC.Frontend.Pages.EventRequirements
         {
             var url = $"api/Events/activeResponsesTotal?PageSize={RecordsNumber ?? 15}";
 
+            if (DesignStatusFilter.HasValue)
+            {
+                url += $"&DesignStatus={DesignStatusFilter.Value}";
+            }
+
             if (!string.IsNullOrWhiteSpace(Filter))
             {
                 url += $"&Filter={Filter}";
@@ -68,6 +75,10 @@ namespace SIC.Frontend.Pages.EventRequirements
         private async Task<bool> LoadListAsync(int page)
         {
             var url = $"api/Events/activeResponses?PageNumber={page}&PageSize={RecordsNumber ?? 15}";
+            if (DesignStatusFilter.HasValue)
+            {
+                url += $"&DesignStatus={DesignStatusFilter.Value}";
+            }
             if (!string.IsNullOrWhiteSpace(Filter))
             {
                 url += $"&Filter={Filter}";
@@ -96,6 +107,12 @@ namespace SIC.Frontend.Pages.EventRequirements
             await LoadEvents(page);
         }
 
+        private async Task OnDesignStatusFilterChangedAsync(ChangeEventArgs e)
+        {
+            DesignStatusFilter = int.TryParse(e.Value?.ToString(), out var value) ? value : null;
+            await LoadEvents(1);
+        }
+
         private async Task ApplyFilterAsync()
         {
             await LoadEvents(1);
@@ -104,7 +121,18 @@ namespace SIC.Frontend.Pages.EventRequirements
         private async Task CleanFilterAsync()
         {
             Filter = string.Empty;
+            DesignStatusFilter = null;
             await LoadEvents(1);
+        }
+
+        private static string GetDesignBadgeClass(DesignStatus status)
+        {
+            return status switch
+            {
+                DesignStatus.Completed => "sic-badge-success",
+                DesignStatus.InProgress => "sic-badge-warning",
+                _ => "sic-badge-gray"
+            };
         }
 
         private async Task CopiarEventUrl(string Code)

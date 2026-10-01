@@ -8,15 +8,27 @@
 
 <div class="sic-toolbar">
     <div class="sic-search">
-        <i class="bi bi-search"></i>
+        <i class="bi bi-search sic-search-icon"></i>
         <input type="text" class="form-control" placeholder="Buscar Evento..." @bind="Filter" />
     </div>
-    <button type="button" class="btn btn-custom" @onclick="ApplyFilterAsync">
-        <i class="bi bi-search"></i> Buscar
-    </button>
-    <button type="button" class="btn btn-custom" @onclick="CleanFilterAsync">
-        <i class="bi bi-x-circle"></i> Limpiar
-    </button>
+    <div class="sic-toolbar-actions">
+        <select class="sic-select"
+                value="@(DesignStatusFilter?.ToString() ?? "")"
+                @onchange="OnDesignStatusFilterChangedAsync"
+                title="Filtrar por estado del diseño">
+            <option value="">-- Estado del diseño --</option>
+            @foreach (var status in Enum.GetValues<DesignStatus>())
+            {
+                <option value="@((int)status)">@status.GetDescription()</option>
+            }
+        </select>
+        <button type="button" class="btn btn-custom" @onclick="ApplyFilterAsync">
+            <i class="bi bi-search"></i> Buscar
+        </button>
+        <button type="button" class="btn btn-custom" @onclick="CleanFilterAsync">
+            <i class="bi bi-x-circle"></i> Limpiar
+        </button>
+    </div>
 </div>
 
 <!-- Tabla principal -->
@@ -28,6 +40,7 @@
                     <tr class="text-center">
                         <th class="text-start">Detalle del Evento</th>
                         <th>Formulario</th>
+                        <th>Estado del diseño</th>
                         <th>Fecha</th>
                         <th>Acciones</th>
                     </tr>
@@ -85,6 +98,11 @@
                                     </span>
                                 </td>
                                 <td class="text-center">
+                                    <span class="sic-badge @GetDesignBadgeClass(even.DesignStatus)">
+                                        @even.DesignStatus.GetDescription()
+                                    </span>
+                                </td>
+                                <td class="text-center">
                                     <div class="fw-semibold text-dark">@even.Date.ToString("dd/MM/yyyy")</div>
                                 </td>
                                 <td class="text-center">
@@ -97,7 +115,7 @@
                     }
                     else
                     {
-                        <tr><td colspan="4" class="text-center text-muted py-4">No hay eventos con respuestas.</td></tr>
+                        <tr><td colspan="5" class="text-center text-muted py-4">No hay eventos con respuestas.</td></tr>
                     }
                 </tbody>
             </table>
@@ -124,6 +142,12 @@
                                 </span>
                             </p>
                             <p class="mb-2"><strong>Fecha:</strong> @even.Date.ToString("dd/MM/yyyy")</p>
+                            <p class="mb-2">
+                                <strong>Estado del diseño:</strong>
+                                <span class="sic-badge @GetDesignBadgeClass(even.DesignStatus)">
+                                    @even.DesignStatus.GetDescription()
+                                </span>
+                            </p>
                             <div class="d-flex gap-2 flex-wrap">
                                 <a href="/event/@even.Code/requisitos/respuesta" class="btn btn-custom w-100">Respuestas (@even.RequirementAnswers.Count)</a>
                             </div>

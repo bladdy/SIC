@@ -60,6 +60,16 @@ public partial class MyEventsDetails
     public Event? EventDetail { get; set; }
     public List<Invitation>? Invitations { get; set; }
     public List<WhatsAppTemplate>? Templates { get; set; }
+
+    private int? InvitationStatusFilter;
+
+    private static readonly Status[] InvitationStatusOptions =
+    {
+        Status.Attend,
+        Status.NotAttend,
+        Status.Pending
+    };
+
     private List<TablesEvents> Tables = new();
     [Inject] private IRepository Repository { get; set; } = default!;
     [Inject] private SweetAlertService SweetAlertService { get; set; } = default!;
@@ -679,7 +689,15 @@ public partial class MyEventsDetails
     private async Task CleanFilterAsync()
     {
         Filter = string.Empty;
+        InvitationStatusFilter = null;
         await ApplyFilterAsync();
+    }
+
+    private async Task OnInvitationStatusFilterChangedAsync(ChangeEventArgs e)
+    {
+        InvitationStatusFilter = int.TryParse(e.Value?.ToString(), out var value) ? value : null;
+        currentPage = 1;
+        await LoadInvitations(1);
     }
 
     private async Task ApplyFilterAsync()
@@ -692,6 +710,11 @@ public partial class MyEventsDetails
     private async Task<bool> LoadListAsync(int page)
     {
         var url = $"api/Invitations/paginated?Id={EventDetail!.Id}&PageNumber={page}&RecordsNumber={(RecordsNumber == 0 ? 50 : RecordsNumber)}";
+
+        if (InvitationStatusFilter.HasValue)
+        {
+            url += $"&InvitationStatus={InvitationStatusFilter.Value}";
+        }
 
         if (!string.IsNullOrWhiteSpace(Filter))
         {
@@ -881,6 +904,11 @@ public partial class MyEventsDetails
     private async Task LoadPagesAsync()
     {
         var url = $"api/Invitations/totalRecords?Id={EventDetail!.Id}";
+
+        if (InvitationStatusFilter.HasValue)
+        {
+            url += $"&InvitationStatus={InvitationStatusFilter.Value}";
+        }
 
         if (!string.IsNullOrWhiteSpace(Filter))
         {

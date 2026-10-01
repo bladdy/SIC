@@ -217,7 +217,8 @@ namespace SIC.Frontend.Pages.Events
                 PlannerPhone = evnt.PlannerPhone,
                 EventType = evnt.EventType,
                 DeadLine = evnt.DeadLine,
-                Status = evnt.Status
+                Status = evnt.Status,
+                DesignStatus = evnt.DesignStatus
             };
 
             // Ahora el usuario tambi�n puede cambiar la asignaci�n

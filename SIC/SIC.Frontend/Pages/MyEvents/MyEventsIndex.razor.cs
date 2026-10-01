@@ -236,7 +236,8 @@ public partial class MyEventsIndex
             PlannerPhone = evnt.PlannerPhone,
             EventType = evnt.EventType,
             DeadLine = evnt.DeadLine,
-            Status = evnt.Status
+            Status = evnt.Status,
+            DesignStatus = evnt.DesignStatus
         };
 
         IsEditMode = true;
