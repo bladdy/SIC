@@ -4,6 +4,7 @@ using SIC.Backend.Services;
 using SIC.Backend.UnitOfWork.Interfaces;
 using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
+using SIC.Shared.Enums;
 using SIC.Shared.Response;
 using System.Text.Json;
 
@@ -97,6 +98,22 @@ public class EventsController : GenericController<Event>
             return Ok(response.Result);
         }
         return NotFound();
+    }
+
+    [HttpPut("design-status/{eventId}")]
+    public async Task<IActionResult> UpdateDesignStatusAsync(int eventId, [FromBody] UpdateDesignStatusDTO dto)
+    {
+        if (dto == null || !Enum.IsDefined(typeof(DesignStatus), dto.DesignStatus))
+        {
+            return BadRequest("El estado del diseño no es válido.");
+        }
+
+        var action = await _eventsUnitOfWork.UpdateDesignStatusAsync(eventId, dto.DesignStatus);
+        if (action.Success)
+        {
+            return Ok(action.Result);
+        }
+        return BadRequest(action.Message);
     }
 
     [HttpGet("infobycode/{code}")]

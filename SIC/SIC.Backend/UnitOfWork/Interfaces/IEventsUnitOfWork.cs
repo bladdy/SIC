@@ -1,5 +1,6 @@
 ﻿using SIC.Shared.DTOs;
 using SIC.Shared.Entities;
+using SIC.Shared.Enums;
 using SIC.Shared.Response;
 
 namespace SIC.Backend.UnitOfWork.Interfaces;
@@ -25,4 +26,6 @@ public interface IEventsUnitOfWork
     Task<ActionResponse<Event>> AddFullAsync(Event events);
 
     Task<ActionResponse<Event>> UpdateFullAsync(Event events);
+
+    Task<ActionResponse<bool>> UpdateDesignStatusAsync(int eventId, DesignStatus designStatus);
 }

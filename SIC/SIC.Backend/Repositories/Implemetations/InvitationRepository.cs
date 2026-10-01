@@ -79,6 +79,12 @@ namespace SIC.Backend.Repositories.Implemetations
             {
                 queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
             }
+
+            if (pagination.InvitationStatus.HasValue)
+            {
+                var invitationStatus = (Status)pagination.InvitationStatus.Value;
+                queryable = queryable.Where(x => x.Status == invitationStatus);
+            }
             return new ActionResponse<IEnumerable<Invitation>>
             {
                 Success = true,
@@ -97,6 +103,11 @@ namespace SIC.Backend.Repositories.Implemetations
             if (!string.IsNullOrWhiteSpace(pagination.Filter))
             {
                 queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
+            }
+            if (pagination.InvitationStatus.HasValue)
+            {
+                var invitationStatus = (Status)pagination.InvitationStatus.Value;
+                queryable = queryable.Where(x => x.Status == invitationStatus);
             }
             double count = await queryable.CountAsync();
             int totalPages = (int)Math.Ceiling(count / pagination.PageSize);

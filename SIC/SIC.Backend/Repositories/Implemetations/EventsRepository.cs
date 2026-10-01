@@ -322,6 +322,12 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
 
         queryable = queryable.Where(x => x.Status == Status.Active);
 
+        if (pagination.DesignStatus.HasValue)
+        {
+            var designStatus = (DesignStatus)pagination.DesignStatus.Value;
+            queryable = queryable.Where(x => x.DesignStatus == designStatus);
+        }
+
         if (!string.IsNullOrWhiteSpace(pagination.Filter))
         {
             var filter = pagination.Filter.ToLower();
@@ -366,6 +372,12 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
 
         queryable = queryable.Where(x => x.Status == Status.Active);
 
+        if (pagination.DesignStatus.HasValue)
+        {
+            var designStatus = (DesignStatus)pagination.DesignStatus.Value;
+            queryable = queryable.Where(x => x.DesignStatus == designStatus);
+        }
+
         if (!string.IsNullOrWhiteSpace(pagination.Filter))
         {
             var filter = pagination.Filter.ToLower();
@@ -385,5 +397,44 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
             Success = true,
             Result = totalPages
         };
+    }
+
+    public async Task<ActionResponse<bool>> UpdateDesignStatusAsync(int eventId, DesignStatus designStatus)
+    {
+        var exists = await _context.Events
+            .AsNoTracking()
+            .AnyAsync(x => x.Id == eventId);
+
+        if (!exists)
+        {
+            return new ActionResponse<bool>
+            {
+                Success = false,
+                Message = "El evento no existe."
+            };
+        }
+
+        try
+        {
+            // Solo se actualiza la columna DesignStatus, sin reemplazar el resto
+            // del agregado (Invitaciones, RequirementAnswers, Images, etc).
+            await _context.Events
+                .Where(x => x.Id == eventId)
+                .ExecuteUpdateAsync(s => s.SetProperty(x => x.DesignStatus, designStatus));
+
+            return new ActionResponse<bool>
+            {
+                Success = true,
+                Result = true
+            };
+        }
+        catch (Exception exception)
+        {
+            return new ActionResponse<bool>
+            {
+                Success = false,
+                Message = exception.Message
+            };
+        }
     }
 }
