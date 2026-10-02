@@ -1,11 +1,13 @@
-﻿@page "/responder"
+@page "/responder"
 
 <PageTitle>Responder Formulario</PageTitle>
 
 <div class="container py-4" style="max-width: 800px; margin: auto;">
 
     <!-- ENCABEZADO -->
-    <PageHeader Icon="bi-ui-checks" Title="@Formulario.Titulo" Subtitle="Completa los campos requeridos" />
+    <PageHeader Icon="bi-ui-checks" Title="@Formulario.Titulo" Subtitle="Completa los campos requeridos">
+        <VolverButton />
+    </PageHeader>
     <div class="mb-4"></div>
 
     @foreach (var pregunta in Formulario.Preguntas)

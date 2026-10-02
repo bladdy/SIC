@@ -1,12 +1,14 @@
-﻿@page "/album-event"
+@page "/album-event"
 
 <PageTitle>Álbum Eventos</PageTitle>
 <PageHeader Icon="bi-images"
             Title="Álbum Eventos"
             Subtitle="Galería de eventos">
+    <VolverButton />
+
 </PageHeader>
 
-<div class="sic-toolbar">
+<div class="d-flex gap-2 mb-3">
     <div class="sic-search">
         <i class="bi bi-search sic-search-icon"></i>
         <input type="text" class="form-control" placeholder="Buscar Evento..." @bind="Filter" />
@@ -32,10 +34,10 @@
             <option value="Estado">Estado</option>
         </InputSelect>
         <button type="button" class="btn btn-primary" @onclick="ApplyFilterAsync">
-            <i class="bi bi-search"></i> Buscar
+            <i class="bi bi-search"></i>
         </button>
-        <button type="button" class="sic-clear" @onclick="CleanFilterAsync">
-            <i class="bi bi-x-circle" /> Limpiar
+        <button type="button" class="btn btn-primary" @onclick="CleanFilterAsync">
+            <i class="bi bi-x-circle" />
         </button>
     </div>
 </div>
@@ -207,4 +209,4 @@
     </div>
 }
 
-<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />
+<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="@ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />

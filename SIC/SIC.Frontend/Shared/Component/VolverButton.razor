@@ -1,0 +1,12 @@
+<button type="button" class="btn btn-primary" @onclick="Volver">
+    <i class="bi bi-arrow-left"></i> Volver
+</button>
+
+@code {
+    [Inject] private IJSRuntime JsRuntime { get; set; } = default!;
+
+    private async Task Volver()
+    {
+        await JsRuntime.InvokeVoidAsync("history.back");
+    }
+}

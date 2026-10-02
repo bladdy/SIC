@@ -1,8 +1,10 @@
-﻿@page "/events/message-events/{Code}"
+@page "/events/message-events/{Code}"
 <PageTitle>Mensajes del evento</PageTitle>
 <PageHeader Icon="bi-chat-dots"
             Title="Mensajes del evento"
             Subtitle="Configura los mensajes que se envían por WhatsApp al evento">
+    <VolverButton />
+
 </PageHeader>
 <div class="d-flex justify-content-center my-4 px-3">
     @if (NewMessage != null)

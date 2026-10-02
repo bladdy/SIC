@@ -6,23 +6,25 @@
 <div class="container-fluid px-2">
 
     <PageHeader Icon="bi-people" Title="Usuarios" Subtitle="Gestión de usuarios">
+    <VolverButton />
+
         <button class="btn btn-primary" @onclick="() => ShowCreateModal(true)">
             <i class="bi bi-plus-lg"></i> Crear Usuario
         </button>
     </PageHeader>
 
     <!-- Filtros -->
-    <div class="sic-toolbar">
+    <div class="d-flex gap-2 mb-3">
         <div class="sic-search">
             <i class="bi bi-search sic-search-icon"></i>
             <input type="text" class="form-control" placeholder="Buscar usuario..." @bind-value="Filter" />
         </div>
         <div class="sic-toolbar-actions">
             <button type="button" class="btn btn-primary" @onclick="ApplyFilterAsync">
-                <i class="bi bi-funnel"></i> Filtrar
+                <i class="bi bi-funnel"></i> 
             </button>
-            <button type="button" class="sic-clear" @onclick="CleanFilterAsync">
-                <i class="bi bi-x-circle" /> Limpiar
+            <button type="button" class="btn btn-primary" @onclick="CleanFilterAsync">
+                <i class="bi bi-x-circle" /> 
             </button>
         </div>
     </div>

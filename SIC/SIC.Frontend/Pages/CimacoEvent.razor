@@ -5,7 +5,9 @@
 
 <div class="container py-3">
 
-    <PageHeader Icon="bi-images" Title="Galería del Evento" Subtitle="Descarga y administra las fotografías del evento." />
+    <PageHeader Icon="bi-images" Title="Galería del Evento" Subtitle="Descarga y administra las fotografías del evento.">
+        <VolverButton />
+    </PageHeader>
 
     <!-- ========================= -->
     <!-- PORTADA -->
@@ -27,7 +29,7 @@
     </div>
 }
 
-<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />
+<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="@ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />
 
     <!-- ========================= -->
     <!-- FORMULARIOS -->

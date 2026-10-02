@@ -1,7 +1,10 @@
 ﻿@page "/whatsapp/inbox"
 @using SIC.Frontend.Pages.Whatsapp.Components
 
-<div class="wap-container @(SelectedEventCode != null ? "inbox-open" : "")">
+<div class="wap-container position-relative @(SelectedEventCode != null ? "inbox-open" : "")">
+    <div style="position: absolute; top: 8px; right: 12px; z-index: 2000;">
+        <VolverButton />
+    </div>
 
     <!-- EVENTOS -->
     <div class="wap-events">

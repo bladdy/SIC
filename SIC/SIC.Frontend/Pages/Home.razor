@@ -21,12 +21,15 @@
         <AuthorizeView Roles="Admin">
             <Authorized>
                 <div class="d-grid gap-2 w-100 w-md-auto" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
-                    <button class="btn btn-primary" @onclick="() => ShowCreateUserModal(true)">
-                        <i class="bi bi-person-plus"></i> Crear Usuario
-                    </button>
-                    <button class="btn btn-primary" @onclick="() => ShowCreateEventModal()">
-                        <i class="bi bi-plus-lg"></i> Crear Evento
-                    </button>
+                    <div>
+                        <button class="btn btn-primary" @onclick="() => ShowCreateUserModal(true)">
+                            <i class="bi bi-person-plus"></i> Crear Usuario
+                        </button>
+                        <button class="btn btn-primary" @onclick="() => ShowCreateEventModal()">
+                            <i class="bi bi-plus-lg"></i> Crear Evento
+                        </button>
+
+                    </div>
                 </div>
             </Authorized>
         </AuthorizeView>

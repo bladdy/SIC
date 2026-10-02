@@ -1,8 +1,10 @@
-﻿@page "/my-events"
+@page "/my-events"
 <PageTitle>Mis Eventos</PageTitle>
 <PageHeader Icon="bi-calendar2-check"
             Title="Mis Eventos"
             Subtitle="Tus eventos">
+    <VolverButton />
+
     <AuthorizeView Roles="Admin">
         <Authorized>
             <button class="btn btn-primary" @onclick="ShowCreateModal">
@@ -51,13 +53,24 @@
                     <option value="Nombre">Nombre Alfabetico</option>
                     <option value="Evento">Tipo de Evento</option>
                 </InputSelect>
-
-                <button type="button" class="btn btn-primary" @onclick="ApplyFilterAsync">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-search"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg> Filtrar
-                </button>
-                <button type="button" class="btn btn-primary" @onclick="CleanFilterAsync">
-                    <i class="bi bi-x-circle" /> Limpiar
-                </button>
+                <div>
+                    <button type="button" class="btn btn-primary" @onclick="ApplyFilterAsync">
+                        <i class="bi bi-search"></i>
+                    </button>
+                    <button type="button" class="btn btn-primary" @onclick="CleanFilterAsync">
+                        <i class="bi bi-x-circle" />
+                    </button>
+                </div>
+                <select class="sic-select"
+                        value="@(StatusFilter?.ToString() ?? "")"
+                        @onchange="OnStatusFilterChangedAsync"
+                        title="Filtrar por estado">
+                    <option value="">-- Estado --</option>
+                    @foreach (var status in EventStatusOptions)
+                    {
+                        <option value="@((int)status)">@status.GetDescription()</option>
+                    }
+                </select>
             </div>
         </div>
     </Authorized>
@@ -412,5 +425,5 @@
     </div>
 }
 
-<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />
+<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="@ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />
 

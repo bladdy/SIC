@@ -55,7 +55,6 @@ public partial class MinuteByMinute
     private MbMActivity? ConfirmTargetActivity;
     private string ConfirmMessage = "";
     private string ConfirmType = "";
-    private object? ConfirmTarget;
 
     private bool IsLoading = true;
     private int NumericEventId;
@@ -253,13 +252,6 @@ public partial class MinuteByMinute
         ConfirmTargetActivity = null;
         IsConfirmVisible = false;
         await LoadMbMAsync();
-    }
-
-    private void CloseConfirmModal()
-    {
-        IsConfirmVisible = false;
-        ConfirmTargetActivity = null;
-        ConfirmTarget = null;
     }
 
     private async Task ConfirmAction()

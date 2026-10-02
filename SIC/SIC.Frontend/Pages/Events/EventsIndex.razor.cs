@@ -6,6 +6,7 @@ using Microsoft.JSInterop;
 using SIC.Frontend.Repositories;
 using SIC.Frontend.Shared.Component;
 using SIC.Shared.Entities;
+using SIC.Shared.Enums;
 using System.Net;
 
 namespace SIC.Frontend.Pages.Events
@@ -43,6 +44,21 @@ namespace SIC.Frontend.Pages.Events
         [Parameter, SupplyParameterFromQuery] public int? SelectedEventType { get; set; }
         [Parameter, SupplyParameterFromQuery] public string OrderBy { get; set; } = "";
         [Parameter, SupplyParameterFromQuery] public int? RecordsNumber { get; set; }
+
+        private int? StatusFilter;
+
+        private static readonly Status[] EventStatusOptions =
+        {
+            Status.Active,
+            Status.Pending,
+            Status.Completed
+        };
+
+        private async Task OnStatusFilterChangedAsync(ChangeEventArgs e)
+        {
+            StatusFilter = int.TryParse(e.Value?.ToString(), out var value) ? value : null;
+            await LoadEvents(1);
+        }
 
         protected override async Task OnInitializedAsync()
         {
@@ -111,6 +127,10 @@ namespace SIC.Frontend.Pages.Events
             {
                 url += $"&EventTypeId={SelectedEventType}";
             }
+            if (StatusFilter.HasValue)
+            {
+                url += $"&EventStatus={StatusFilter.Value}";
+            }
 
             var responseHttp = await repository.GetAsync<int>(url);
             if (responseHttp.Error)
@@ -142,6 +162,10 @@ namespace SIC.Frontend.Pages.Events
             if (!string.IsNullOrWhiteSpace(OrderBy))
             {
                 url += $"&OrderBy={OrderBy}";
+            }
+            if (StatusFilter.HasValue)
+            {
+                url += $"&EventStatus={StatusFilter.Value}";
             }
             var responseHttp = await repository.GetAsync<List<Event>>(url);
 
@@ -175,6 +199,7 @@ namespace SIC.Frontend.Pages.Events
         private async Task CleanFilterAsync()
         {
             Filter = string.Empty;
+            StatusFilter = null;
             await LoadEvents(1);
         }
 

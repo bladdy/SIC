@@ -8,6 +8,8 @@
 <PageHeader Icon="bi-chat-left-quote"
             Title="Respuestas del Evento"
             Subtitle="@((EventName ?? "") + (string.IsNullOrEmpty(EventCode) ? "" : $" (Código: {EventCode})"))">
+    <VolverButton />
+
 </PageHeader>
 
 @if (Loading)
@@ -288,4 +290,4 @@ else
     </div>
 }
 
-<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />
+<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="@ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />

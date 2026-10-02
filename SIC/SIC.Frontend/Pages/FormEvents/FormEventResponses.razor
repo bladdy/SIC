@@ -7,9 +7,7 @@
             Title="Respuestas del Formulario"
             Subtitle="@EventName">
     <div class="d-flex gap-2 flex-wrap">
-        <button type="button" class="btn btn-custom" @onclick="Volver">
-            <i class="bi bi-arrow-left"></i> Volver
-        </button>
+        <VolverButton />
         <button type="button" class="btn btn-custom" @onclick="GeneratePdfAsync" disabled="@GeneratingPdf">
             @if (GeneratingPdf)
             {

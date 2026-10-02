@@ -67,3 +67,26 @@ No test project exists. No CI workflows in `.github/workflows/`.
 ### Session 3 — Inbox event ownership fix
 - `MessageRepository.GetInboxAsync(string phoneNumber)` — groups last OUT message per contact, then per `EventCode` (one entry per event); filters results to only events owned by the user (looks up `UsuarioWhatsAppConfig` by `phoneNumber` → `UsuarioId` → `Events.UserId`)
 - No interface or controller changes — all logic encapsulated in the repository
+
+## Frontend migration to React Native (docs only — nothing implemented yet)
+
+A migration of `SIC.Frontend` (Blazor WASM) to Expo + React Native Web is **specified but not started**.
+Spec lives in `docs/migration/` at the repo root. Backend and `SIC.Shared` are frozen.
+
+| Doc | Contents |
+|---|---|
+| `docs/migration/README.md` | Index, decisions, Blazor→RN glossary |
+| `docs/migration/FRONTEND-ANALYSIS.md` | Full inventory of the current frontend (106 `.razor`, 191 files, 1,373.8 KB, 61 routes) |
+| `docs/migration/SPEC.md` | Target architecture, monorepo layout, deps, auth, API layer, design system |
+| `docs/migration/ROUTES-MATRIX.md` | All 61 `@page` routes → target screens, by priority tier |
+| `docs/migration/PLATFORM-MATRIX.md` | Browser-only capabilities (PDF, Excel, QR, crop, audio, Meta signup) + native alternatives |
+| `docs/migration/MIGRATION-PLAN.md` | 10 phases, 15 risks, Definition of Done, backend issues to report |
+
+Key baseline numbers: brand color `#367B82` (currently duplicated in 3 places), SignalR hub `/hubs/whatsapp-chat`
+(URL hardcoded separately from `HttpClient`), JWT in `localStorage["TOKEN_KEY"]`, single API base URL hardcoded at
+`SIC.Frontend/Program.cs:19`.
+
+Dead code intentionally excluded from the migration (P4, do not recreate): `Weather.razor`, `FormResponse.razor`,
+`Counter.razor` + `Shared/Modals/Modal.razor`, `PlanForm.razor`, `PhoneNumberInput.razor`, `EditEventModal.razor`,
+`TemplateForm.razor`, `TemplatePreview.razor`, `NavDocumentation.razor`, `AuthenticationProviderTest.cs`,
+10 unreferenced `invitations*.js`, and `PaymentService.CreatePayment(int credits)` (its endpoint does not exist).

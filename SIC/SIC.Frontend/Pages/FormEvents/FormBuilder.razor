@@ -8,9 +8,7 @@
             Title="Formulario del Evento"
             Subtitle="@EventName">
     <div class="d-flex gap-2 flex-wrap">
-        <button type="button" class="btn btn-outline-secondary" @onclick="Volver">
-            <i class="bi bi-arrow-left"></i> Volver
-        </button>
+        <VolverButton />
         <button class="btn btn-primary" @onclick="Guardar" disabled="@(Saving || Formulario.Preguntas.Count == 0)">
             @if (Saving)
             {

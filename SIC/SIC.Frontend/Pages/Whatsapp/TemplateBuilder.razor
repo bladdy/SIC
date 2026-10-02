@@ -1,4 +1,4 @@
-﻿
+
 @page "/whatsapp_templates/template-builder"
 @using CurrieTechnologies.Razor.SweetAlert2
 @using SIC.Shared.Request
@@ -16,6 +16,8 @@
 <PageHeader Icon="bi-magic"
             Title="Crear plantilla"
             Subtitle="Diseña una plantilla de mensaje para WhatsApp">
+    <VolverButton />
+
 </PageHeader>
 
 <div class="row">
@@ -451,7 +453,7 @@
     }
 </style>
 
-<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Title="Salir" ConfirmButtonText="Salir" Message="ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />
+<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Title="Salir" ConfirmButtonText="Salir" Message="@ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />
 
 @code {
 

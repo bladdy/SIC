@@ -1,4 +1,4 @@
-﻿@page "/sorteo"
+@page "/sorteo"
 @layout LoginLayout
 @using SIC.Frontend.Shared.Modals
 <div class="container-fluid min-vh-100 py-4 position-relative text-light">
@@ -12,7 +12,9 @@
     <!-- Modal -->
     <Modal @bind-Visible="showModal" OnSave="HandleModalSave" />
 
-    <PageHeader Icon="bi-dice-6" Title="Sorteo de Números" Subtitle="Genera y visualiza los números del sorteo." />
+    <PageHeader Icon="bi-dice-6" Title="Sorteo de Números" Subtitle="Genera y visualiza los números del sorteo.">
+        <VolverButton />
+    </PageHeader>
 
     <!-- Número actual y botón (centrado arriba) -->
     <div class="text-center mb-3">

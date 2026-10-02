@@ -20,7 +20,9 @@ else
 {
     <div class="container-fluid p-0 p-md-4">
 
-        <PageHeader Icon="bi-tools-kitchen-2" Title="@(Tables.FirstOrDefault()?.Event?.Name ?? "")" Subtitle="Mis mesas" />
+        <PageHeader Icon="bi-tools-kitchen-2" Title="@(Tables.FirstOrDefault()?.Event?.Name ?? "")" Subtitle="Mis mesas">
+            <VolverButton />
+        </PageHeader>
 
         <!-- Encabezado -->
         <div class="row g-1 text-center my-3">

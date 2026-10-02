@@ -1,8 +1,10 @@
-﻿@page "/whatsapp_templates"
+@page "/whatsapp_templates"
 <PageTitle>Plantillas</PageTitle>
 <PageHeader Icon="bi-file-earmark-richtext"
 Title="Plantillas"
 Subtitle="Plantillas de mensajes de WhatsApp">
+    <VolverButton />
+
     <a href="/whatsapp_templates/template-builder" class="btn btn-primary">
         <i class="bi bi-plus-lg"></i> Crear Plantilla
     </a>
@@ -199,4 +201,4 @@ Subtitle="Plantillas de mensajes de WhatsApp">
     </div>
 }
 
-<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />
+<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="@ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />

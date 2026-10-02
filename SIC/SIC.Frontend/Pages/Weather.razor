@@ -1,10 +1,12 @@
-﻿@page "/weather"
+@page "/weather"
 @inject HttpClient Http
 
 <PageTitle>Weather</PageTitle>
 
 <div class="container py-4">
-    <PageHeader Icon="bi-cloud-sun" Title="Weather" Subtitle="This component demonstrates fetching data from the server." />
+    <PageHeader Icon="bi-cloud-sun" Title="Weather" Subtitle="This component demonstrates fetching data from the server.">
+        <VolverButton />
+    </PageHeader>
 
     @if (forecasts == null)
     {

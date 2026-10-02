@@ -212,6 +212,11 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
         {
             queryable = queryable.Where(x => x.EventTypeId == pagination.EventTypeId);
         }
+        if (pagination.EventStatus.HasValue)
+        {
+            var eventStatus = (Status)pagination.EventStatus.Value;
+            queryable = queryable.Where(x => x.Status == eventStatus);
+        }
         if (!string.IsNullOrWhiteSpace(pagination.OrderBy))
         {
             queryable = queryable.OrderByDescending(x => x.Date);
@@ -253,6 +258,11 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
                 x.Host.ToLower().Contains(filter) ||
                 x.Planner!.ToLower().Contains(filter)
             );
+        }
+        if (pagination.EventStatus.HasValue)
+        {
+            var eventStatus = (Status)pagination.EventStatus.Value;
+            queryable = queryable.Where(x => x.Status == eventStatus);
         }
         if (!string.IsNullOrEmpty(pagination.OrderBy))
         {

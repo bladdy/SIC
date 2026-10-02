@@ -6,6 +6,7 @@ using Microsoft.JSInterop;
 using SIC.Frontend.Repositories;
 using SIC.Frontend.Shared.Component;
 using SIC.Shared.Entities;
+using SIC.Shared.Enums;
 using System.Net;
 using System.Security.Claims;
 
@@ -32,6 +33,22 @@ public partial class MyEventsIndex
     [Parameter, SupplyParameterFromQuery] public int? SelectedEventType { get; set; }
     [Parameter, SupplyParameterFromQuery] public string OrderBy { get; set; } = "";
     [Parameter, SupplyParameterFromQuery] public int? RecordsNumber { get; set; }
+
+    private int? StatusFilter;
+
+    private static readonly Status[] EventStatusOptions =
+    {
+        Status.Active,
+        Status.Pending,
+        Status.Completed
+    };
+
+    private async Task OnStatusFilterChangedAsync(ChangeEventArgs e)
+    {
+        StatusFilter = int.TryParse(e.Value?.ToString(), out var value) ? value : null;
+        await LoadEvents(1);
+    }
+
     public List<Event>? Events { get; set; }
     public List<EventType>? EventTypes { get; set; }
     private Event NewEvent = new();
@@ -92,6 +109,10 @@ public partial class MyEventsIndex
         if (!string.IsNullOrWhiteSpace(OrderBy))
         {
             url += $"&OrderBy={OrderBy}";
+        }
+        if (StatusFilter.HasValue)
+        {
+            url += $"&EventStatus={StatusFilter.Value}";
         }
         var responseHttp = await repository.GetAsync<List<Event>>(url);
 
@@ -164,6 +185,7 @@ public partial class MyEventsIndex
         SelectedEventType = null;
         DateSelectd = null;
         OrderBy = "";
+        StatusFilter = null;
         await ApplyFilterAsync();
     }
 
@@ -197,6 +219,10 @@ public partial class MyEventsIndex
         if (SelectedEventType != null)
         {
             url += $"&EventTypeId={SelectedEventType}";
+        }
+        if (StatusFilter.HasValue)
+        {
+            url += $"&EventStatus={StatusFilter.Value}";
         }
 
         var responseHttp = await repository.GetAsync<int>(url);

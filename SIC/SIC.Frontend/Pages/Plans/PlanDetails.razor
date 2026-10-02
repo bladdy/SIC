@@ -1,4 +1,4 @@
-﻿@page "/Plans/details/{Id}"
+@page "/Plans/details/{Id}"
 <!--chk de seleccionar todo o deshacer todo-->
 <PageTitle>Detalles del Plan</PageTitle>
 @if (_isLoading)
@@ -9,7 +9,9 @@ else
 {
     <PageHeader Icon="bi-card-checklist"
                  Title="@($"Plan: {Plan?.Name}")"
-                 Subtitle="Seleccionar ítems para el plan" />
+                 Subtitle="Seleccionar ítems para el plan">
+        <VolverButton />
+    </PageHeader>
 
     @if (Items != null)
     {

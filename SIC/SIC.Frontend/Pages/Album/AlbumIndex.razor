@@ -4,6 +4,10 @@
 
 <div style="padding: 1rem; font-family: Arial, sans-serif;">
 
+    <div class="d-flex mb-3">
+        <VolverButton />
+    </div>
+
     <!-- COVER -->
     <div style="
         width: 100%;
@@ -455,4 +459,4 @@
     </div>
 }
 
-<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />
+<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="@ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />

@@ -3,6 +3,11 @@
 <PageTitle>Detalles del Evento</PageTitle>
 <!--
 <h3 class="mb-2">Detalle del Evento</h3>-->
+<PageHeader Icon="bi-calendar2-check"
+            Title="Detalles del Evento"
+            Subtitle="@(EventDetail?.Name ?? "")">
+    <VolverButton />
+</PageHeader>
 @if (EventDetail is null)
 {
     <div class="alert alert-info">Cargando evento...</div>
@@ -66,8 +71,12 @@ else
             <div class="accordion" id="accordionPanelsStayOpenExample">
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="panelsStayOpen-headingOne">
-                        <button class="accordion-button collapsed" style="background-color:#94B9BD !important; color:#26343C;"
-                        type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+                        <button class="accordion-button collapsed" 
+                        style="background-color:#94B9BD !important; color:#26343C;"
+                        type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#panelsStayOpen-collapseOne" 
+                        aria-expanded="true" 
+                        aria-controls="panelsStayOpen-collapseOne">
                             <div class="w-100 d-flex justify-content-between align-items-center me-3">
 
                                 <strong class="text-uppercase">Invitados:</strong>
@@ -75,7 +84,8 @@ else
                             </div>
                         </button>
                     </h2>
-                    <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingOne">
+                    <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse" 
+                    aria-labelledby="panelsStayOpen-headingOne">
                         <div class="accordion-body row">
                             <div class="col-12 col-md-4">
                                 <p class="d-flex justify-content-between px-3 py-1" style="background-color:#94B9BD !important; color:#26343C;">
@@ -731,7 +741,7 @@ else
                                                                     else
                                                                     {
                                                                         <i class="bi bi-whatsapp"></i>
-                                                                        <span>Seleccionar Plantilla</span>
+                                                                        <span>Plantilla</span>
                                                                     }
                                                                 </button>
                                                                 <ul class="dropdown-menu">
@@ -1060,7 +1070,7 @@ else
 
                     }
 
-                    <div class="d-flex flex-wrap mt-3 acciones" >
+                    <div class="d-flex flex-wrap justify-content-center mt-3 acciones" >
                         @if (usarWhatsApp)
                         {
                             @if (EventDetail.User.UserWhatsAppConfigs != null)
@@ -1081,7 +1091,7 @@ else
                                             else
                                             {
                                                 <i class="bi bi-whatsapp"></i>
-                                                <span>Seleccionar Plantilla</span>
+                                                <span>Plantilla</span>
                                             }
                                         </button>
                                         <ul class="dropdown-menu">
@@ -1673,9 +1683,6 @@ else
 }
 
 <style>
-    .accordion-button::after {
-        filter: brightness(0) invert(1);
-    }
     .steps-wrapper {
         background-color: #367B82;
         padding: 12px;
@@ -1787,4 +1794,4 @@ else
 
 </style>
 
-<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />
+<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="@ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />

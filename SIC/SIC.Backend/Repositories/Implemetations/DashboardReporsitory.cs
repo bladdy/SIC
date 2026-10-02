@@ -362,6 +362,7 @@ public class DashboardReporsitory : IDashboardReporsitory
         var totalInvitations = userEvent.Invitations.Count;
         var confirmed = userEvent.Invitations.Count(i => i.Status == Status.Attend);
         var pending = userEvent.Invitations.Count(i => i.Status == Status.Pending);
+        var notAttending = userEvent.Invitations.Count(i => i.Status == Status.NotAttend);
         var adultsConfirmed = userEvent.Invitations.Where(i => i.Status == Status.Attend).Sum(i => i.NumberConfirmedAdults);
         var youthsConfirmed = userEvent.Invitations.Where(i => i.Status == Status.Attend).Sum(i => i.NumberConfirmedYouths);
         var childrenConfirmed = userEvent.Invitations.Where(i => i.Status == Status.Attend).Sum(i => i.NumberConfirmedChildren);
@@ -376,6 +377,7 @@ public class DashboardReporsitory : IDashboardReporsitory
             TotalInvitations = totalInvitations,
             Confirmed = confirmed,
             Pending = pending,
+            NotAttending = notAttending,
             AdultsConfirmed = adultsConfirmed,
             ChildrenConfirmed = childrenConfirmed,
             YoungConfirmed = youthsConfirmed,

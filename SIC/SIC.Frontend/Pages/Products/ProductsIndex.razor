@@ -2,6 +2,8 @@
 @using System.Globalization
 <PageTitle>Productos</PageTitle>
 <PageHeader Icon="bi-box-seam" Title="Productos" Subtitle="Gestión de productos">
+    <VolverButton />
+
     <button class="btn btn-primary" @onclick="ShowCreateModal">
         <i class="bi bi-plus-lg"></i> Crear Producto
     </button>
@@ -185,4 +187,4 @@
     </div>
 }
 
-<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />
+<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="@ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />

@@ -2,16 +2,18 @@
 @using SIC.Frontend.Shared.Component.Modals
 <PageTitle>Usuarios</PageTitle>
 <PageHeader Icon="bi-wallet2" Title="Créditos" Subtitle="Gestión de créditos de usuarios">
+    <VolverButton />
+
     <button class="btn btn-primary" @onclick="() => OpenModal()"><i class="bi bi-plus-lg"></i> Nuevo Crédito</button>
 </PageHeader>
-<div class="sic-toolbar">
+<div class="d-flex gap-2 mb-3">
     <div class="sic-search">
         <i class="bi bi-search sic-search-icon"></i>
         <input type="text" class="form-control" placeholder="Buscar usuario..." />
     </div>
     <div class="sic-toolbar-actions">
-        <button type="button" class="btn btn-primary" @onclick="ApplyFilterAsync"><i class="bi bi-funnel" /> Filtrar</button>
-        <button type="button" class="sic-clear" @onclick="CleanFilterAsync"><i class="bi bi-x-circle" /> Limpiar</button>
+        <button type="button" class="btn btn-primary" @onclick="ApplyFilterAsync"><i class="bi bi-funnel" /> </button>
+        <button type="button" class="btn btn-primary" @onclick="CleanFilterAsync"><i class="bi bi-x-circle" /> </button>
     </div>
 </div>
 <AddCreditModal @ref="addCreditModal" OnCreditsAdded="RefreshCreditsList" />

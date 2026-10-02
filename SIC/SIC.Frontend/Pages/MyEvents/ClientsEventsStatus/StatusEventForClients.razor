@@ -5,6 +5,9 @@
 <PageTitle>Detalles del Evento</PageTitle>
 <!--
 <h3 class="mb-2">Detalle del Evento</h3>-->
+<div class="d-flex justify-content-end px-3 pt-3 mb-0">
+    <VolverButton />
+</div>
 @if (EventDetail is null)
 {
     <div class="alert alert-info">Cargando evento...</div>
@@ -26,7 +29,10 @@ else
                 <div class="text-end d-flex flex-column justify-content-end">
                     <p class="mb-1">
                         <strong>Estado:</strong>
-                        <span class="sic-badge @(EventDetail.Status == Status.Active ? "sic-badge-success" : "sic-badge-gray")">
+                        <span class="sic-badge @(EventDetail.Status == Status.Active ? "sic-badge-success" : "sic-badge-gray")"
+                              style="@(EventDetail.Status == Status.Active
+                                          ? "background:#E8F5EE !important; color:#239463;"
+                                          : "background:#ECEEF0 !important; color:#65727B;")">
                             @EventDetail.Status.GetDescription()
                         </span>
                     </p>
@@ -41,7 +47,8 @@ else
             <div class="accordion" id="accordionPanelsStayOpenExample">
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="panelsStayOpen-headingOne">
-                        <button class="accordion-button collapsed" style="background-color:#367B82 !important; color:white;"
+                        <button class="accordion-button collapsed" 
+                        style="background-color:#94B9BD !important; color:#26343C;"
                                 type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
                             <div class="w-100 d-flex justify-content-between align-items-center me-3">
 
@@ -53,13 +60,13 @@ else
                     <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingOne">
                         <div class="accordion-body row">
                             <div class="col-12 col-md-4">
-                                <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#367B82;">
+                                <p class="d-flex justify-content-between px-3 py-1" style="background-color:#94B9BD !important; color:#26343C;">
                                     <strong>Adultos:</strong>
                                     <span>@EventDetail.NumberAdults</span>
                                 </p>
                             </div>
                             <div class="col-12 col-md-4">
-                                <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#367B82;">
+                                <p class="d-flex justify-content-between px-3 py-1" style="background-color:#94B9BD !important; color:#26343C;">
                                     <strong>Jóvenes:</strong>
                                     <span>@EventDetail.NumberYouths</span>
                                 </p>
@@ -67,7 +74,7 @@ else
 
                             <!-- Niños -->
                             <div class="col-12 col-md-4">
-                                <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#367B82;">
+                                <p class="d-flex justify-content-between px-3 py-1" style="background-color:#94B9BD !important; color:#26343C;">
                                     <strong>Niños:</strong>
                                     <span>@EventDetail.NumberChildren</span>
                                 </p>
@@ -77,7 +84,7 @@ else
                 </div>
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
-                        <button class="accordion-button collapsed bg-success" style="color:white; margin-top: 2px;" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
+                        <button class="accordion-button collapsed" style="background-color:#E8F5EE !important; color:#239463; margin-top: 2px;" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
                             <div class="w-100 d-flex justify-content-between align-items-center me-3">
 
                                 <strong>Total SÍ ASISTIRÉ:</strong>
@@ -90,7 +97,7 @@ else
                         <div class="accordion-body row">
                             <!-- Adultos (Sí asistiré) -->
                             <div class="col-12 col-md-4 m-0">
-                                <p class="d-flex justify-content-between px-3 py-1 text-white bg-success ">
+                                <p class="d-flex justify-content-between px-3 py-1" style="background-color:#E8F5EE !important; color:#239463;">
                                     <strong>Adultos:</strong>
                                     <span>@EventDetail.NumberAdultsConfirmed</span>
                                 </p>
@@ -98,7 +105,7 @@ else
 
                             <!-- Jóvenes (Sí asistiré) -->
                             <div class="col-12 col-md-4 m-0">
-                                <p class="d-flex justify-content-between px-3 py-1 text-white bg-success ">
+                                <p class="d-flex justify-content-between px-3 py-1" style="background-color:#E8F5EE !important; color:#239463;">
                                     <strong>Jóvenes:</strong>
                                     <span>@EventDetail.NumberYouthsConfirmed</span>
                                 </p>
@@ -106,7 +113,7 @@ else
 
                             <!-- Niños (Sí asistiré) -->
                             <div class="col-12 col-md-4 m-0">
-                                <p class="d-flex justify-content-between px-3 py-1 text-white bg-success ">
+                                <p class="d-flex justify-content-between px-3 py-1" style="background-color:#E8F5EE !important; color:#239463;">
                                     <strong>Niños:</strong>
                                     <span>@EventDetail.NumberChildrenConfirmed</span>
                                 </p>
@@ -116,7 +123,7 @@ else
                 </div>
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="panelsStayOpen-headingThree">
-                        <button class="accordion-button collapsed bg-danger" style="color:white; margin-top: 2px;" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+                        <button class="accordion-button collapsed" style="background-color:#FAE0E3 !important; color:#DC3545; margin-top: 2px;" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
                             <div class="w-100 d-flex justify-content-between align-items-center me-3">
 
                                 <strong>Total NO ASISTIRÉ:</strong>
@@ -128,14 +135,14 @@ else
                         <div class="accordion-body row">
                             <!-- No asistiré -->
                             <div class="col-12 col-md-4 m-0">
-                                <p class="d-flex justify-content-between px-3 py-1 text-white bg-danger ">
+                                <p class="d-flex justify-content-between px-3 py-1" style="background-color:#FAE0E3 !important; color:#DC3545;">
                                     <strong>Adultos:</strong>
                                     <span>@(EventDetail.NumberAdultsNotAttend)</span>
                                 </p>
                             </div>
                             <!-- No asistiré -->
                             <div class="col-12 col-md-4 m-0">
-                                <p class="d-flex justify-content-between px-3 py-1 text-white bg-danger ">
+                                <p class="d-flex justify-content-between px-3 py-1" style="background-color:#FAE0E3 !important; color:#DC3545;">
                                     <strong>Jóvenes:</strong>
                                     <span>@(EventDetail.NumberYouthNotAttend)</span>
                                 </p>
@@ -143,7 +150,7 @@ else
 
                             <!-- No asistiré -->
                             <div class="col-12 col-md-4 m-0">
-                                <p class="d-flex justify-content-between px-3 py-1 text-white bg-danger ">
+                                <p class="d-flex justify-content-between px-3 py-1" style="background-color:#FAE0E3 !important; color:#DC3545;">
                                     <strong>Niños:</strong>
                                     <span>@(EventDetail.NumberChildrenNotAttend)</span>
                                 </p>
@@ -153,7 +160,7 @@ else
                 </div>
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="panelsStayOpen-headingFour">
-                        <button class="accordion-button collapsed bg-warning" type="button" style="color:white; margin-top: 2px;" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseFour" aria-expanded="false" aria-controls="panelsStayOpen-collapseFour">
+                        <button class="accordion-button collapsed" type="button" style="background-color:#FFF6D9 !important; color:#FE8B00; margin-top: 2px;" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseFour" aria-expanded="false" aria-controls="panelsStayOpen-collapseFour">
                             <div class="w-100 d-flex justify-content-between align-items-center me-3">
 
                                 <strong>Invitados PENDIENTES:</strong>
@@ -166,21 +173,21 @@ else
                         <div class="accordion-body row">
                             <!-- Invitados Pendientes -->
                             <div class="col-12 col-md-4 m-0">
-                                <p class="d-flex justify-content-between px-3 py-1 text-white bg-warning">
+                                <p class="d-flex justify-content-between px-3 py-1" style="background-color:#FFF6D9 !important; color:#FE8B00;">
                                     <strong>Adultos:</strong>
                                     <span>@(EventDetail.NumberAdultsPending)</span>
                                 </p>
                             </div>
                             <!-- Invitados Pendientes -->
                             <div class="col-12 col-md-4 m-0">
-                                <p class="d-flex justify-content-between px-3 py-1 text-white bg-warning">
+                                <p class="d-flex justify-content-between px-3 py-1" style="background-color:#FFF6D9 !important; color:#FE8B00;">
                                     <strong>Jóvenes:</strong>
                                     <span>@(EventDetail.NumberYouthPending)</span>
                                 </p>
                             </div>
                             <!-- Invitados Pendientes -->
                             <div class="col-12 col-md-4 m-0">
-                                <p class="d-flex justify-content-between px-3 py-1 text-white bg-warning">
+                                <p class="d-flex justify-content-between px-3 py-1" style="background-color:#FFF6D9 !important; color:#FE8B00;">
                                     <strong>Niños:</strong>
                                     <span>@(EventDetail.NumberChildrenPending)</span>
                                 </p>
@@ -192,7 +199,7 @@ else
             <div class="row mt-2">
 
                 <div class="col-12 col-md-4 m-0">
-                    <p class="d-flex justify-content-between px-3 py-3 text-black" style="background-color: whitesmoke;">
+                    <p class="d-flex justify-content-between px-3 py-3 text-black" style="background-color: #F3F3F0; color: #26343C;">
                         <strong>Invitaciones SIN CONFIRMAR :</strong>
                         <span>@(EventDetail.Pending)</span>
                     </p>
@@ -205,20 +212,20 @@ else
             <div class="row text-center align-items-stretch g-1 g-md-3 mt-0 d-none">
                 <!-- Invitados -->
                 <div class="col-12 col-md-3 mb-0">
-                    <p class="d-flex justify-content-between px-3 py-1 text-white" style="background-color:#367B82;">
+                    <p class="d-flex justify-content-between px-3 py-1" style="background-color:#94B9BD !important; color:#26343C;">
                         <strong>Invitados:</strong>
                         <span>@(EventDetail.NumberAdults + EventDetail.NumberYouths + EventDetail.NumberChildren)</span>
                     </p>
                 </div>
                 <!-- Adultos -->
                 <div class="col-6 col-md-3">
-                    <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#367B82;">
+                    <p class="d-flex justify-content-between px-3 py-1" style="background-color:#94B9BD !important; color:#26343C;">
                         <strong>Adultos:</strong>
                         <span>@EventDetail.NumberAdults</span>
                     </p>
                 </div>
                 <div class="col-6 col-md-3">
-                    <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#367B82;">
+                    <p class="d-flex justify-content-between px-3 py-1" style="background-color:#94B9BD !important; color:#26343C;">
                         <strong>Jóvenes:</strong>
                         <span>@EventDetail.NumberYouths</span>
                     </p>
@@ -226,7 +233,7 @@ else
 
                 <!-- Niños -->
                 <div class="col-6 col-md-3">
-                    <p class="d-flex justify-content-between px-3 py-1 text-white " style="background-color:#367B82;">
+                    <p class="d-flex justify-content-between px-3 py-1" style="background-color:#94B9BD !important; color:#26343C;">
                         <strong>Niños:</strong>
                         <span>@EventDetail.NumberChildren</span>
                     </p>
@@ -240,7 +247,7 @@ else
             <div class="row text-center align-items-stretch g-1 g-md-3 mt-0 d-none">
                 <!-- (Sí asistiré) -->
                 <div class="col-12 col-md-3 m-0">
-                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-success">
+                    <p class="d-flex justify-content-between px-3 py-1" style="background-color:#E8F5EE !important; color:#239463;">
                         <strong>Total SÍ ASISTIRÉ:</strong>
                         <span>@(EventDetail.NumberAdultsConfirmed + EventDetail.NumberChildrenConfirmed + EventDetail.NumberYouthsConfirmed)</span>
                     </p>
@@ -248,7 +255,7 @@ else
 
                 <!-- Adultos (Sí asistiré) -->
                 <div class="col-6 col-md-3 m-0">
-                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-success ">
+                    <p class="d-flex justify-content-between px-3 py-1" style="background-color:#E8F5EE !important; color:#239463;">
                         <strong>Adultos:</strong>
                         <span>@EventDetail.NumberAdultsConfirmed</span>
                     </p>
@@ -256,7 +263,7 @@ else
 
                 <!-- Jóvenes (Sí asistiré) -->
                 <div class="col-6 col-md-3 m-0">
-                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-success ">
+                    <p class="d-flex justify-content-between px-3 py-1" style="background-color:#E8F5EE !important; color:#239463;">
                         <strong>Jóvenes:</strong>
                         <span>@EventDetail.NumberYouthsConfirmed</span>
                     </p>
@@ -264,7 +271,7 @@ else
 
                 <!-- Niños (Sí asistiré) -->
                 <div class="col-6 col-md-3 m-0">
-                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-success ">
+                    <p class="d-flex justify-content-between px-3 py-1" style="background-color:#E8F5EE !important; color:#239463;">
                         <strong>Niños:</strong>
                         <span>@EventDetail.NumberChildrenConfirmed</span>
                     </p>
@@ -272,7 +279,7 @@ else
 
                 <!-- No asistiré -->
                 <div class="col-12 col-md-4 m-0">
-                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-danger ">
+                    <p class="d-flex justify-content-between px-3 py-1" style="background-color:#FAE0E3 !important; color:#DC3545;">
                         <strong>Total NO ASISTIRÉ:</strong>
                         <span>@(EventDetail.NumberAdultsNotAttend + EventDetail.NumberChildrenNotAttend + EventDetail.NumberYouthNotAttend)</span>
                     </p>
@@ -280,7 +287,7 @@ else
 
                 <!-- Pendientes -->
                 <div class="col-12 col-md-4 m-0">
-                    <p class="d-flex justify-content-between px-3 py-1 text-white bg-warning ">
+                    <p class="d-flex justify-content-between px-3 py-1" style="background-color:#FFF6D9 !important; color:#FE8B00;">
                         <strong>Pendientes:</strong>
                         <span>@(EventDetail.NumberAdultsPending + EventDetail.NumberChildrenPending + EventDetail.NumberYouthPending)</span>
                     </p>
@@ -341,7 +348,12 @@ else
                                                     <div>
                                                         <strong>@guest.GuestName</strong>
                                                         (@guest.GuestType.GetDescription())
-                                                        <span class="badge rounded-pill bg-@GetStatusBadge(guest.Status)">
+                                                        <span class="badge rounded-pill"
+                                                              style="@(guest.Status == Status.Attend
+                                                                          ? "background-color:#E8F5EE !important; color:#239463;"
+                                                                          : guest.Status == Status.NotAttend
+                                                                              ? "background-color:#FAE0E3 !important; color:#DC3545;"
+                                                                              : "background-color:#FFF6D9 !important; color:#FE8B00;")">
                                                             @guest.Status.GetDescription()
                                                         </span>
                                                     </div>
@@ -390,7 +402,12 @@ else
 
                             <!-- ======== COLUMNA 2: ESTADO ======== -->
                             <td class="text-center">
-                                <span class="px-3 py-2 fs-6 sic-badge @(invitation.Status == Status.Attend ? "sic-badge-success" : invitation.Status == Status.NotAttend ? "sic-badge-danger" : "sic-badge-gray")">
+                                <span class="px-3 py-2 fs-6 sic-badge @(invitation.Status == Status.Attend ? "sic-badge-success" : invitation.Status == Status.NotAttend ? "sic-badge-danger" : "sic-badge-gray")"
+                                      style="@(invitation.Status == Status.Attend
+                                          ? "background-color:#E8F5EE !important; color:#239463;"
+                                          : invitation.Status == Status.NotAttend
+                                              ? "background-color:#FAE0E3 !important; color:#DC3545;"
+                                              : "background-color:#FFF6D9 !important; color:#FE8B00;")">
                                     @invitation.Status.GetDescription()
                                 </span>
                             </td>
@@ -434,7 +451,12 @@ else
                             <h5 class="card-title mb-0">@invitation.Name</h5>
                         </div>
 
-                        <span class="sic-badge @(invitation.Status == Status.Attend ? "sic-badge-success" : invitation.Status == Status.NotAttend ? "sic-badge-danger" : "sic-badge-gray")">
+                        <span class="px-3 py-2 fs-6 sic-badge @(invitation.Status == Status.Attend ? "sic-badge-success" : invitation.Status == Status.NotAttend ? "sic-badge-danger" : "sic-badge-gray")"
+                              style="@(invitation.Status == Status.Attend
+                                  ? "background-color:#E8F5EE !important; color:#239463;"
+                                  : invitation.Status == Status.NotAttend
+                                      ? "background-color:#FAE0E3 !important; color:#DC3545;"
+                                      : "background-color:#FFF6D9 !important; color:#FE8B00;")">
                             @invitation.Status.GetDescription()
                         </span>
                     </div>
@@ -446,7 +468,12 @@ else
                                 <div>
                                     <strong>@guest.GuestName</strong>
                                     (@guest.GuestType.GetDescription())
-                                    <span class="badge rounded-pill bg-@GetStatusBadge(guest.Status)">
+                                    <span class="badge rounded-pill"
+                                                              style="@(guest.Status == Status.Attend
+                                                                          ? "background-color:#E8F5EE !important; color:#239463;"
+                                                                          : guest.Status == Status.NotAttend
+                                                                              ? "background-color:#FAE0E3 !important; color:#DC3545;"
+                                                                              : "background-color:#FFF6D9 !important; color:#FE8B00;")">
                                         @guest.Status.GetDescription()
                                     </span>
                                 </div>
@@ -514,9 +541,6 @@ else
 }
 
 <style>
-    .accordion-button::after {
-        filter: brightness(0) invert(1);
-    }
     .steps-wrapper {
         background-color: #367B82;
         padding: 12px;

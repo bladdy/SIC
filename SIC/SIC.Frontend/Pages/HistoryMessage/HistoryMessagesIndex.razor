@@ -3,8 +3,10 @@
 <PageHeader Icon="bi-clock-history"
             Title="Historial de mensajes"
             Subtitle="Consulta el historial de envíos de WhatsApp">
+    <VolverButton />
+
 </PageHeader>
-<div class="sic-toolbar">
+<div class="d-flex gap-2 mb-3">
     <div class="d-flex gap-2">
         <div class="sic-search">
             <i class="bi bi-search sic-search-icon"></i>
@@ -17,10 +19,10 @@
         </InputSelect>
 
         <button type="button" class="btn btn-primary" @onclick="ApplyFilterAsync">
-            <i class="bi bi-funnel"></i> Filtrar
+            <i class="bi bi-search"></i>
         </button>
         <button type="button" class="btn btn-primary" @onclick="CleanFilterAsync">
-            <i class="bi bi-x-circle" /> Limpiar
+            <i class="bi bi-x-circle" />
         </button>
     </div>
 </div>

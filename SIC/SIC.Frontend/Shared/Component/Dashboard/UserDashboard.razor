@@ -30,6 +30,48 @@ else
             </div>
         </div>
 
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="mb-3 text-center">Resumen de invitados</h6>
+
+                    @if (UserDashboards.TotalInvitations > 0)
+                    {
+                        var confirmedPct = (double)UserDashboards.Confirmed / UserDashboards.TotalInvitations * 100;
+                        var pendingPct = (double)UserDashboards.Pending / UserDashboards.TotalInvitations * 100;
+                        var notAttendPct = (double)UserDashboards.NotAttending / UserDashboards.TotalInvitations * 100;
+
+                        <div class="progress" style="height: 28px; background-color:#D5DADD;">
+                            @if (UserDashboards.Confirmed > 0)
+                            {
+                                <div class="progress-bar" style="width:@confirmedPct%; background-color:#E8F5EE !important; color:#26343C;">
+                                    Confirmadas: @UserDashboards.Confirmed
+                                </div>
+                            }
+
+                            @if (UserDashboards.Pending > 0)
+                            {
+                                <div class="progress-bar" style="width:@pendingPct%; background-color:#FFF6D9 !important; color:#26343C;">
+                                    Pendientes: @UserDashboards.Pending
+                                </div>
+                            }
+
+                            @if (UserDashboards.NotAttending > 0)
+                            {
+                                <div class="progress-bar" style="width:@notAttendPct%; background-color:#FAE0E3 !important; color:#26343C;">
+                                    No asistirán: @UserDashboards.NotAttending
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted">Sin invitaciones registradas</div>
+                    }
+                </div>
+            </div>
+        </div>
+
     </div>
 }
 

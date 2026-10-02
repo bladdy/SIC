@@ -1,7 +1,9 @@
-﻿@page "/events/register-intations-by-event/{Code}"
+@page "/events/register-intations-by-event/{Code}"
 <PageHeader Icon="bi-qr-code-scan"
             Title="Registro de invitaciones"
             Subtitle="Escaneo de QR">
+    <VolverButton />
+
     <button class="btn btn-primary" @onclick="StartScannerAsync" disabled="@isScannerRunning">
         <i class="bi bi-qr-code-scan"></i> Iniciar Escáner
     </button>

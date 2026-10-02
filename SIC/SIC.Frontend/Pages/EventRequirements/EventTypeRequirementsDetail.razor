@@ -4,6 +4,8 @@
 <PageHeader Icon="bi-list-check"
             Title="@($"Requisitos: {EventTypeName}")"
             Subtitle="Configuración del formulario dinámico">
+    <VolverButton />
+
 </PageHeader>
 
 @if (Loading)
@@ -98,7 +100,7 @@ else
     </div>
 }
 
-<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />
+<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="@ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />
 
 @code {
     // Rendered via code-behind

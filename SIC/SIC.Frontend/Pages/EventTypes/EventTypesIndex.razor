@@ -1,8 +1,10 @@
-﻿@page "/events-types"
+@page "/events-types"
 <PageTitle>Tipos de Eventos</PageTitle>
 <PageHeader Icon="bi-tags"
             Title="Tipos de Eventos"
             Subtitle="Catálogo de tipos">
+    <VolverButton />
+
     <button class="btn btn-primary" @onclick="ShowCreateModal">
         <i class="bi bi-plus-lg"></i> Crear Tipo de Evento
     </button>
@@ -73,4 +75,4 @@
     </div>
 }
 
-<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />
+<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="@ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />

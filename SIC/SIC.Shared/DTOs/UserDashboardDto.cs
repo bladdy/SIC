@@ -14,6 +14,7 @@ namespace SIC.Shared.DTOs
         public int TotalInvitations { get; set; }
         public int Confirmed { get; set; }
         public int Pending { get; set; }
+        public int NotAttending { get; set; }
         public int AdultsConfirmed { get; set; }
         public int ChildrenConfirmed { get; set; }
         public int YoungConfirmed { get; set; }

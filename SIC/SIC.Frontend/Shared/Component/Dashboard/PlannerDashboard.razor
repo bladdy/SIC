@@ -60,11 +60,11 @@
 
                         @if (PlannerDashboards.TotalGuests > 0)
                         {
-                            <div class="progress" style="height: 28px;">
+                            <div class="progress" style="height: 28px; background-color:#D5DADD;">
                                 @if (PlannerDashboards.ConfirmedGuests > 0)
                                 {
                                     var confirmedPct = (double)PlannerDashboards.ConfirmedGuests / PlannerDashboards.TotalGuests * 100;
-                                    <div class="progress-bar bg-success" style="width:@confirmedPct%">
+                                    <div class="progress-bar" style="width:@confirmedPct%; background-color:#E8F5EE !important; color:#26343C;">
                                         Confirmados: @PlannerDashboards.ConfirmedGuests
                                     </div>
                                 }
@@ -72,7 +72,7 @@
                                 @if (PlannerDashboards.PendingGuests > 0)
                                 {
                                     var pendingPct = (double)PlannerDashboards.PendingGuests / PlannerDashboards.TotalGuests * 100;
-                                    <div class="progress-bar bg-warning text-white" style="width:@pendingPct%">
+                                    <div class="progress-bar" style="width:@pendingPct%; background-color:#FFF6D9 !important; color:#26343C;">
                                         Pendientes: @PlannerDashboards.PendingGuests
                                     </div>
                                 }
@@ -80,7 +80,7 @@
                                 @if (PlannerDashboards.NotAttendingGuests > 0)
                                 {
                                     var notAttendPct = (double)PlannerDashboards.NotAttendingGuests / PlannerDashboards.TotalGuests * 100;
-                                    <div class="progress-bar bg-danger" style="width:@notAttendPct%">
+                                    <div class="progress-bar" style="width:@notAttendPct%; background-color:#FAE0E3 !important; color:#26343C;">
                                         No asistirán: @PlannerDashboards.NotAttendingGuests
                                     </div>
                                 }
@@ -121,25 +121,25 @@
                                     <small>@e.ConfirmedGuests Asistirán / @e.TotalGuests invitados</small>
                                 </div>
 
-                                <div class="progress" style="height:22px;">
+                                <div class="progress" style="height:22px; background-color:#D5DADD;">
                                     @if (e.ConfirmedGuests > 0)
                                     {
-                                        <div class="progress-bar bg-success"
-                                             style="width: @confirmedPct.ToString("F2", CultureInfo.InvariantCulture)%; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                        <div class="progress-bar"
+                                             style="width: @confirmedPct.ToString("F2", CultureInfo.InvariantCulture)%; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background-color:#E8F5EE !important; color:#26343C;">
                                             <span class="small">@e.ConfirmedGuests</span>
                                         </div>
                                     }
                                     @if (e.PendingGuests > 0)
                                     {
-                                        <div class="progress-bar bg-warning text-white"
-                                             style="width: @pendingPct.ToString("F2", CultureInfo.InvariantCulture)%; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                        <div class="progress-bar"
+                                             style="width: @pendingPct.ToString("F2", CultureInfo.InvariantCulture)%; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background-color:#FFF6D9 !important; color:#26343C;">
                                             <span class="small">@e.PendingGuests</span>
                                         </div>
                                     }
                                     @if (e.NotAttendingGuests > 0)
                                     {
-                                        <div class="progress-bar bg-danger"
-                                             style="width: @notAttendPct.ToString("F2", CultureInfo.InvariantCulture)%; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                        <div class="progress-bar"
+                                             style="width: @notAttendPct.ToString("F2", CultureInfo.InvariantCulture)%; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background-color:#FAE0E3 !important; color:#26343C;">
                                             <span class="small">@e.NotAttendingGuests</span>
                                         </div>
                                     }

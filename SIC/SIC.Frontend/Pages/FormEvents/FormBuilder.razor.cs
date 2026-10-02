@@ -14,7 +14,6 @@ public partial class FormBuilder
 {
     [Inject] private IRepository repository { get; set; } = default!;
     [Inject] private SweetAlertService sweetAlertService { get; set; } = default!;
-    [Inject] private IJSRuntime JsRuntime { get; set; } = default!;
 
     [Parameter] public string EventCode { get; set; } = "";
 
@@ -98,11 +97,6 @@ public partial class FormBuilder
     private void Eliminar(PreguntaModel pregunta)
     {
         Formulario.Preguntas.Remove(pregunta);
-    }
-
-    private async Task Volver()
-    {
-        await JsRuntime.InvokeVoidAsync("history.back");
     }
 
     private async Task Guardar()

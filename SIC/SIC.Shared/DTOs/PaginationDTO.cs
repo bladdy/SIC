@@ -21,6 +21,7 @@ public class PaginationDTO
     public bool HasResponses { get; set; } = false;
     public int? DesignStatus { get; set; }
     public int? InvitationStatus { get; set; }
+    public int? EventStatus { get; set; }
     //Agregar: orderby fechas asc desc
     //Nuevos filtros: Por nombre de anfitriones, por eventos, usuarios, fechas
     //Nuevos filtros Mis eventos: Por nombre de anfitriones, por eventos, fechas

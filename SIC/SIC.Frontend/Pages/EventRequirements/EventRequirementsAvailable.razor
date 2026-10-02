@@ -4,6 +4,8 @@
 <PageHeader Icon="bi-journal-text"
             Title="Requisitos Disponibles"
             Subtitle="Catálogo de requisitos">
+    <VolverButton />
+
     <button class="btn btn-primary" @onclick="ShowCreateModal">
         <i class="bi bi-plus-lg"></i> Crear Requisito
     </button>
@@ -259,4 +261,4 @@
     </div>
 }
 
-<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />
+<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="@ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />

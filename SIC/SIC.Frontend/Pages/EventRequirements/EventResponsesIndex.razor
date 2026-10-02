@@ -4,14 +4,22 @@
 <PageHeader Icon="bi-inbox"
             Title="Respuestas de Eventos"
             Subtitle="Seguimiento de formularios por evento">
+    <VolverButton />
+
 </PageHeader>
 
-<div class="sic-toolbar">
+<div class="d-flex gap-2 mb-3">
     <div class="sic-search">
         <i class="bi bi-search sic-search-icon"></i>
         <input type="text" class="form-control" placeholder="Buscar Evento..." @bind="Filter" />
     </div>
     <div class="sic-toolbar-actions">
+        <button type="button" class="btn btn-custom" @onclick="ApplyFilterAsync">
+            <i class="bi bi-search"></i>
+        </button>
+        <button type="button" class="btn btn-custom" @onclick="CleanFilterAsync">
+            <i class="bi bi-x-circle"></i>
+        </button>
         <select class="sic-select"
                 value="@(DesignStatusFilter?.ToString() ?? "")"
                 @onchange="OnDesignStatusFilterChangedAsync"
@@ -22,12 +30,6 @@
                 <option value="@((int)status)">@status.GetDescription()</option>
             }
         </select>
-        <button type="button" class="btn btn-custom" @onclick="ApplyFilterAsync">
-            <i class="bi bi-search"></i> Buscar
-        </button>
-        <button type="button" class="btn btn-custom" @onclick="CleanFilterAsync">
-            <i class="bi bi-x-circle"></i> Limpiar
-        </button>
     </div>
 </div>
 

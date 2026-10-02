@@ -2,6 +2,8 @@
 @page "/supplier"
 <PageTitle>Proveedores</PageTitle>
 <PageHeader Icon="bi-truck" Title="Proveedores" Subtitle="Gestión de proveedores">
+    <VolverButton />
+
     <button class="btn btn-primary" @onclick="ShowCreateModal">
         <i class="bi bi-plus-lg"></i> Crear Proveedor
     </button>
@@ -104,6 +106,6 @@
     </div>
 }
 
-<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />
+<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="@ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />
 
 

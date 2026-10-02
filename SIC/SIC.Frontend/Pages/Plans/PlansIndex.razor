@@ -2,6 +2,8 @@
 
 <PageTitle>Planes</PageTitle>
 <PageHeader Icon="bi-card-checklist" Title="Planes" Subtitle="Gestión de planes y servicios">
+    <VolverButton />
+
     <button class="btn btn-primary" @onclick="ShowCreateModal">
         <i class="bi bi-plus-lg"></i> Crear Plan
     </button>
@@ -83,4 +85,4 @@
     </div>
 }
 
-<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />
+<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="@ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />

@@ -17,6 +17,8 @@ else
     <div class="container-fluid p-0 p-md-4">
 
     <PageHeader Icon="tools-kitchen-2" Title="@eventName" Subtitle="Mis mesas">
+    <VolverButton />
+
         <button class="btn btn-primary" @onclick="GeneratePdfAsync" disabled="@(isGeneratingPdf || IsBusy)">
             @if (isGeneratingPdf)
             {
@@ -522,4 +524,4 @@ else
     }
 </style>
 
-<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />
+<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="@ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />

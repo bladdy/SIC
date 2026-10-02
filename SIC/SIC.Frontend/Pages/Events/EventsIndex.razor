@@ -1,4 +1,4 @@
-﻿@page "/events"
+@page "/events"
 @using SIC.Shared.Entities
 @using SIC.Shared.Enums
 @using Microsoft.AspNetCore.Components.Forms
@@ -7,15 +7,25 @@
 <PageHeader Icon="bi-calendar2-heart"
             Title="Eventos"
             Subtitle="Gestión de eventos">
+    <VolverButton />
+
     <button class="btn btn-primary" @onclick="ShowCreateModal">
         <i class="bi bi-plus-lg"></i> Crear Evento
     </button>
 </PageHeader>
 
-<div class="sic-toolbar">
+<div class="d-flex gap-2 mb-3">
     <div class="sic-search">
         <i class="bi bi-search sic-search-icon"></i>
         <input type="text" class="form-control" placeholder="Buscar Evento..." @bind="Filter" />
+    </div>
+    <div>
+        <button type="button" class="btn btn-primary" @onclick="ApplyFilterAsync">
+            <i class="bi bi-search"></i> 
+        </button>
+        <button type="button" class="btn btn-primary" @onclick="CleanFilterAsync">
+            <i class="bi bi-x-circle" />         
+        </button>
     </div>
     <div class="sic-toolbar-actions">
         <InputDate class="form-control d-none" @bind-Value="DateSelectd" style="width:150px;" />
@@ -37,12 +47,17 @@
             <option value="Evento">Tipo de Evento</option>
             <option value="Estado">Estado</option>
         </InputSelect>
-        <button type="button" class="btn btn-primary" @onclick="ApplyFilterAsync">
-            <i class="bi bi-search"></i> Buscar
-        </button>
-        <button type="button" class="sic-clear" @onclick="CleanFilterAsync">
-            <i class="bi bi-x-circle" /> Limpiar
-        </button>
+
+        <select class="sic-select"
+                value="@(StatusFilter?.ToString() ?? "")"
+                @onchange="OnStatusFilterChangedAsync"
+                title="Filtrar por estado">
+            <option value="">-- Estado --</option>
+            @foreach (var status in EventStatusOptions)
+            {
+                <option value="@((int)status)">@status.GetDescription()</option>
+            }
+        </select>
     </div>
 </div>
 
@@ -439,4 +454,4 @@
     </div>
 }
 
-<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />
+<ConfirmModal IsVisible="IsConfirmVisible" IsVisibleChanged="OnConfirmVisibleChanged" Message="@ConfirmMessage" OnConfirmAction="ExecutePendingDelete" />

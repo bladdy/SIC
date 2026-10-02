@@ -57,11 +57,6 @@ public partial class FormEventResponses
         Loading = false;
     }
 
-    private async Task Volver()
-    {
-        await JsRuntime.InvokeVoidAsync("history.back");
-    }
-
     private async Task GeneratePdfAsync()
     {
         if (Responses == null || Responses.Count == 0)

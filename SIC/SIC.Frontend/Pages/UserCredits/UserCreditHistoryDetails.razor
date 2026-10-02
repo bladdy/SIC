@@ -2,6 +2,8 @@
 @page "/users-credits/details/{Id?}"
 <PageTitle>Historial de Creditos</PageTitle>
 <PageHeader Icon="bi-clock-history" Title="Historial de Créditos" Subtitle="Movimientos del usuario">
+    <VolverButton />
+
     <button class="btn btn-primary" @onclick="Pay">Comprar Créditos</button>
 </PageHeader>
 <GenericList MyList="userCreditHistories">
