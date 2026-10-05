@@ -612,19 +612,23 @@ namespace SIC.Backend.Services
 
             if (header != null)
             {
+                var headerObject = header.AsObject();
+
                 // ========================================
                 // HEADER TEXTO
                 // ========================================
 
-                if (model.Header?.Type == "TEXT")
+                if (!string.IsNullOrWhiteSpace(model.Header?.Text))
                 {
-                    header["format"] = "TEXT";
-                    header["text"] = model.Header.Text;
+                    headerObject["format"] = "TEXT";
+                    headerObject["text"] = model.Header!.Text;
+                    headerObject.Remove("example");
                 }
 
                 // ========================================
                 // HEADER MEDIA
                 // ========================================
+
                 else if (
                     model.MediaType == "IMAGE"
                     || model.MediaType == "VIDEO"
@@ -645,25 +649,38 @@ namespace SIC.Backend.Services
                     if (string.IsNullOrWhiteSpace(uploadedHandle))
                         throw new Exception("No se pudo obtener el media handle.");
 
-                    header["format"] = model.MediaType;
+                    headerObject["format"] = model.MediaType.Trim().ToUpperInvariant();
 
                     JsonObject exampleObject;
 
-                    if (header["example"] == null)
+                    if (headerObject["example"] == null)
                     {
                         exampleObject = new JsonObject();
 
-                        header["example"] = exampleObject;
+                        headerObject["example"] = exampleObject;
                     }
                     else
                     {
-                        exampleObject = header["example"]!.AsObject();
+                        exampleObject = headerObject["example"]!.AsObject();
                     }
 
                     exampleObject["header_handle"] = new JsonArray
                     {
                         uploadedHandle
                     };
+
+                    headerObject.Remove("text");
+                }
+
+                // ========================================
+                // HEADER INCOMPLETO
+                // ========================================
+                // Si no se pudo completar ningun formato valido, el
+                // componente se descarta en lugar de enviarlo vacio a Meta.
+
+                else if (header.Parent is JsonArray incompleteHeaderArray)
+                {
+                    incompleteHeaderArray.Remove(header);
                 }
             }
 
@@ -686,33 +703,40 @@ namespace SIC.Backend.Services
                 // BODY EXAMPLES POSITIONAL
                 // ========================================
 
-                var bodyExamples = new JsonArray();
+                // El ejemplo posicional (body_text) ya fue generado y
+                // validado por el controller, solo se normaliza aqui.
+                // No se omiten valores: saltarse uno dejaria el ejemplo
+                // con menos elementos que las variables del cuerpo y Meta
+                // rechazaria la plantilla.
 
-                var bodyParams =
-                    model.Components
-                        .FirstOrDefault(x => x.Type == "BODY")
-                        ?.BodyExampleParams;
-
-                if (bodyParams != null)
+                if (body["example"] == null)
                 {
-                    foreach (var param in bodyParams)
-                    {
-                        if (string.IsNullOrWhiteSpace(param.ExampleValue))
-                            continue;
+                    var bodyExamples = new JsonArray();
 
-                        bodyExamples.Add(param.ExampleValue);
-                    }
-                }
+                    var bodyParams =
+                        model.Components
+                            .FirstOrDefault(x =>
+                                x.Type.Equals("BODY", StringComparison.OrdinalIgnoreCase))
+                            ?.BodyExampleParams;
 
-                if (bodyExamples.Count > 0)
-                {
-                    body["example"] = new JsonObject
+                    if (bodyParams != null)
                     {
-                        ["body_text"] = new JsonArray
+                        foreach (var param in bodyParams)
                         {
-                            bodyExamples
+                            bodyExamples.Add(param.ExampleValue ?? "");
                         }
-                    };
+                    }
+
+                    if (bodyExamples.Count > 0)
+                    {
+                        body["example"] = new JsonObject
+                        {
+                            ["body_text"] = new JsonArray
+                            {
+                                bodyExamples
+                            }
+                        };
+                    }
                 }
             }
 
@@ -847,14 +871,10 @@ namespace SIC.Backend.Services
             }
 
             // ============================================
-            // PARAMETER FORMAT
-            // ============================================
-
-            requestObj["parameter_format"] = "POSITIONAL";
-
-            // ============================================
             // JSON FINAL
             // ============================================
+            // parameter_format lo define el controller (POSITIONAL) y no se
+            // modifica aqui para que el JSON enviado sea el mismo que se registro.
 
             var finalJson = requestObj.ToJsonString(
                 new JsonSerializerOptions

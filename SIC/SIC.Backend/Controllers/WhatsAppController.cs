@@ -500,6 +500,81 @@ namespace SIC.Backend.Controllers
             });
         }
 
+        private static string? GetHeaderMediaFormat(string? mediaType)
+        {
+            if (string.IsNullOrWhiteSpace(mediaType))
+                return null;
+
+            var normalized = mediaType.Trim().ToUpperInvariant();
+
+            return normalized switch
+            {
+                "IMAGE" or "VIDEO" or "DOCUMENT" => normalized,
+                _ => null
+            };
+        }
+
+        /// <summary>
+        /// Arma los valores de ejemplo posicionales del cuerpo a partir de los
+        /// placeholders {{1}}, {{2}}... del texto. Devuelve null si el cuerpo no
+        /// tiene variables. Lanza si hay placeholders no posicionales o si la
+        /// cantidad o el contenido de los ejemplos no corresponde.
+        /// </summary>
+        private static List<string>? GetPositionalBodyExample(SIC.Shared.Request.ComponentRequest bodyComponent)
+        {
+            var text = bodyComponent.Text ?? "";
+
+            var indexes = Regex
+                .Matches(text, @"\{\{\s*(\d+)\s*\}\}")
+                .Select(m => int.Parse(m.Groups[1].Value))
+                .Distinct()
+                .OrderBy(i => i)
+                .ToList();
+
+            // Placeholders que no son posicionales, p.ej. {{nombre}}
+            var namedPlaceholder = Regex
+                .Match(text, @"\{\{\s*(?!\d+\s*\}\})([^{}]*?)\s*\}\}");
+
+            if (namedPlaceholder.Success)
+            {
+                var namedValue = namedPlaceholder.Groups[1].Value;
+
+                throw new Exception(string.IsNullOrEmpty(namedValue)
+                    ? "El contenido tiene una variable vacia. Inserta las variables con el boton '+ Agregar variable'."
+                    : $"El contenido usa la variable '{{{{{namedValue}}}}}' y las variables deben ser posicionales (como {{{{1}}}}). Inserta las variables con el boton '+ Agregar variable'.");
+            }
+
+            if (indexes.Count == 0)
+                return null;
+
+            // BodyExampleParams[i] corresponde a la variable {{i+1}}
+            var exampleParams = bodyComponent.BodyExampleParams ?? new List<BodyExampleParam>();
+            var values = new List<string>();
+
+            foreach (var index in indexes)
+            {
+                var position = index - 1;
+
+                if (position < 0 || position >= exampleParams.Count)
+                {
+                    throw new Exception(
+                        $"El cuerpo usa la variable {{{{{index}}}}} pero no se capturó su valor de ejemplo.");
+                }
+
+                var value = exampleParams[position].ExampleValue;
+
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    throw new Exception(
+                        $"Falta el valor de ejemplo de la variable {{{{{index}}}}}, la plantilla no puede enviarse sin él.");
+                }
+
+                values.Add(value);
+            }
+
+            return values;
+        }
+
         private string BuildWhatsappTemplateJson(CreateTemplateModel model)
         {
             if (model.Components == null || !model.Components.Any())
@@ -510,25 +585,37 @@ namespace SIC.Backend.Controllers
             // =========================
             // HEADER
             // =========================
-            if (!string.IsNullOrEmpty(model.MediaUrl))
+            // El HEADER es opcional. Solo se agrega si esta completo:
+            // media (format + header_handle) o texto (format + text).
+            var mediaFormat = GetHeaderMediaFormat(model.MediaType);
+
+            if (mediaFormat != null && string.IsNullOrWhiteSpace(model.MediaUrl))
+                throw new Exception($"El encabezado de multimedia requiere la URL del archivo ({mediaFormat}).");
+
+            var headerText = model.Header?.Type?
+                .Equals("TEXT", StringComparison.OrdinalIgnoreCase) == true
+                    ? model.Header.Text?.Trim()
+                    : null;
+
+            if (mediaFormat != null && !string.IsNullOrWhiteSpace(model.MediaUrl))
             {
                 componentsList.Add(new Dictionary<string, object>
                 {
                     ["type"] = "HEADER",
-                    ["format"] = model.MediaType?.ToUpper(),
+                    ["format"] = mediaFormat,
                     ["example"] = new
                     {
-                        header_handle = new List<string> { model.MediaUrl }
+                        header_handle = new List<string> { model.MediaUrl!.Trim() }
                     }
                 });
             }
-            else if (model.Header != null && !string.IsNullOrWhiteSpace(model.Header.Text))
+            else if (!string.IsNullOrWhiteSpace(headerText))
             {
                 componentsList.Add(new Dictionary<string, object>
                 {
                     ["type"] = "HEADER",
                     ["format"] = "TEXT",
-                    ["text"] = model.Header.Text
+                    ["text"] = headerText
                 });
             }
 
@@ -547,26 +634,13 @@ namespace SIC.Backend.Controllers
                 ["text"] = bodyComponent.Text
             };
 
-            // Detectar variables {{param}}
-            var matches = Regex.Matches(bodyComponent.Text, "{{(.*?)}}");
+            // Detectar variables posicionales {{1}}, {{2}}, ...
+            // parameter_format es POSITIONAL, por lo que el ejemplo debe ser
+            // body_text como array de arrays: [["v1","v2","v3"]]
+            var bodyExampleValues = GetPositionalBodyExample(bodyComponent);
 
-            if (matches.Count > 0)
-            {
-                var namedParams = matches
-                    .Select(m => m.Groups[1].Value.Trim())
-                    .Distinct()
-                    .Select(p => new
-                    {
-                        param_name = p,
-                        example = "Ejemplo"
-                    })
-                    .ToList();
-
-                bodyComp["example"] = new
-                {
-                    body_text_named_params = namedParams
-                };
-            }
+            if (bodyExampleValues != null)
+                bodyComp["example"] = new { body_text = new List<List<string>> { bodyExampleValues } };
 
             componentsList.Add(bodyComp);
 
@@ -585,21 +659,20 @@ namespace SIC.Backend.Controllers
             // =========================
             // BUTTONS
             // =========================
-            var buttonsList = new List<ButtonRequest>();
-
-            var buttonsComponent = model.Components
-                .FirstOrDefault(c => c.Type.Equals("buttons", StringComparison.OrdinalIgnoreCase));
-
-            if (buttonsComponent?.Buttons != null)
-                buttonsList.AddRange(buttonsComponent.Buttons);
-
-            if (model.Buttons != null)
-                buttonsList.AddRange(model.Buttons.Select(b => new ButtonRequest
+            // model.Buttons es la fuente unica y autoritativa. Se mantiene
+            // en el mismo orden y sin filtrar para que el service pueda
+            // emparejar cada boton del JSON por indice con el modelo.
+            var buttonsList = (model.Buttons ?? new List<ButtonModel>())
+                .Select(b => new ButtonRequest
                 {
                     Type = b.Type,
                     Text = b.Text,
-                    Url = b.Url
-                }));
+                    Url = b.Url,
+                    UrlType = b.UrlType,
+                    UrlBase = b.UrlBase,
+                    DynamicExample = b.DynamicExample
+                })
+                .ToList();
 
             if (buttonsList.Any())
             {
@@ -653,7 +726,7 @@ namespace SIC.Backend.Controllers
                 name = NormalizeStrings.NormalizeTemplateName(model.Name),
                 language = model.Language,
                 category = model.Category,
-                parameter_format = "NAMED",
+                parameter_format = "POSITIONAL",
                 components = componentsList
             };
 

@@ -494,6 +494,24 @@
                 return;
             }
 
+            if (HeaderType == "TEXT" && string.IsNullOrWhiteSpace(HeaderText))
+            {
+                await SweetAlertService.FireAsync(
+                    "Error",
+                    "El encabezado está en modo texto, pero no tiene texto.",
+                    SweetAlertIcon.Error);
+                return;
+            }
+
+            if (!string.IsNullOrEmpty(Model.MediaType) && string.IsNullOrWhiteSpace(Model.MediaUrl))
+            {
+                await SweetAlertService.FireAsync(
+                    "Error",
+                    "La plantilla tiene multimedia, pero no tiene URL de archivo.",
+                    SweetAlertIcon.Error);
+                return;
+            }
+
             if (Model.BodyExamples.Any())
             {
                 var hasMissingType = false;
@@ -513,6 +531,26 @@
                     await SweetAlertService.FireAsync(
                         "Error", 
                         "Cada variable insertada debe tener una variable seleccionada en 'Muestras de variables'.", 
+                        SweetAlertIcon.Error);
+                    return;
+                }
+
+                var hasMissingExample = false;
+
+                for (int i = 0; i < count; i++)
+                {
+                    if (string.IsNullOrWhiteSpace(Model.BodyExamples[i]))
+                    {
+                        hasMissingExample = true;
+                        break;
+                    }
+                }
+
+                if (hasMissingExample)
+                {
+                    await SweetAlertService.FireAsync(
+                        "Error",
+                        "Cada variable del contenido necesita un valor de ejemplo, Meta lo exige para aprobar la plantilla.",
                         SweetAlertIcon.Error);
                     return;
                 }
