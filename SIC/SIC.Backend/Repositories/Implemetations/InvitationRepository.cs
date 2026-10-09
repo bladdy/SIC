@@ -264,6 +264,7 @@ namespace SIC.Backend.Repositories.Implemetations
         {
             var invitations = await _context.Invitations
                 .Include(i => i.Guests)
+                .ThenInclude(g => g.TablesEvents)
                 .Where(i =>
                     i.Event!.Code == code &&
                     i.Status == Status.Attend)

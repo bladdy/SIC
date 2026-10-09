@@ -238,22 +238,36 @@
                 + Agregar botón
             </button>
 
-            @foreach (var button in Model.Buttons)
+            @for (int index = 0; index < Model.Buttons.Count; index++)
             {
+                var button = Model.Buttons[index];
+                var currentIndex = index;
+
                 <div class="card p-3 mb-2">
 
-                    <select class="form-select mb-2"
-                    @bind="button.Type">
+                    <div class="d-flex align-items-start gap-2 mb-2">
 
-                        <option value="URL">
-                            Ir al sitio web
-                        </option>
+                        <select class="form-select"
+                        @bind="button.Type">
 
-                        <option value="QUICK_REPLY">
-                            Respuesta rápida
-                        </option>
+                            <option value="URL">
+                                Ir al sitio web
+                            </option>
 
-                    </select>
+                            <option value="QUICK_REPLY">
+                                Respuesta rápida
+                            </option>
+
+                        </select>
+
+                        <button type="button"
+                        class="btn btn-danger"
+                        title="Eliminar botón"
+                        @onclick="() => RemoveButton(currentIndex)">
+                            ✕
+                        </button>
+
+                    </div>
 
                     <input class="form-control mb-2"
                     placeholder="Texto del botón"
@@ -847,6 +861,11 @@ private async Task DiscardTemplate()
     private void AddButton()
     {
         Model.Buttons.Add(new ButtonModel());
+    }
+
+    private void RemoveButton(int index)
+    {
+        Model.Buttons.RemoveAt(index);
     }
 
     // ============================================

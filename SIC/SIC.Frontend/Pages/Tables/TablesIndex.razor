@@ -359,102 +359,59 @@ else
                 <div class="modal-body">
                     <ul class="nav nav-tabs mb-3">
                         <li class="nav-item">
-                            <button class="nav-link @(asignacionModo == "individual" ? "active" : "")"
-                                    @onclick='() => asignacionModo = "individual"'>Invitados</button>
-                        </li>
-                        <li class="nav-item d-none">
-                            <button class="nav-link @(asignacionModo == "herencia" ? "active" : "")"
-                                    @onclick='() => asignacionModo = "herencia"'>Invitacion</button>
+                            <button class="nav-link active">Invitados</button>
                         </li>
                     </ul>
 
-                    @if (asignacionModo == "herencia")
-                    {
-                        <div class="mb-2 d-flex justify-content-between align-items-center">
-                            <small class="text-muted">
-                                Disponibles: @(Table.Seats - Table.OccupiedSeats) lugares
-                            </small>
-                            <small class="text-muted">Seleccionados: @selectedInvitationIds.Count</small>
-                        </div>
-                        <input type="text" class="form-control mb-2"
-                                placeholder="Filtrar invitacion..."
-                                @bind="filterText"
-                                @bind:event="oninput" />
-                        <div style="max-height: 300px; overflow-y: auto;">
-                            @foreach (var inv in FilteredInvitation)
-                            {
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox"
-                                            checked="@(selectedInvitationIds.Contains(inv.Id))"
-                                            @onchange="() => ToggleInvitationSelection(inv.Id)" />
-                                    <label class="form-check-label">
-                                        @inv.Name
-                                        <small class="text-muted">
-                                            - Confirmados: @(inv.Guests?.Count(g => g.Status == Status.Attend) ?? 0)
-                                        </small>
-                                    </label>
-                                </div>
-                            }
-                            @if (!FilteredInvitation.Any())
-                            {
-                                <small class="text-muted d-block text-center py-2">No hay invitaciones disponibles</small>
-                            }
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="mb-2 d-flex justify-content-between align-items-center">
-                            <small class="text-muted">
-                                Disponibles: @(Table.Seats - Table.OccupiedSeats) lugares
-                            </small>
-                            <small class="text-muted">Seleccionados: @selectedGuestIds.Count</small>
-                        </div>
-                        <input type="text" class="form-control mb-2"
-                                placeholder="Filtrar invitado..."
-                                @bind="filterGuestText"
-                                @bind:event="oninput" />
-                        <div style="max-height: 300px; overflow-y: auto;">
-                            @{
-                                var groupedGuests = FilteredGuestsForAssignment
-                                    .GroupBy(g => g.InvitationId)
-                                    .Select(g => new
+                    <div class="mb-2 d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            Disponibles: @(Table.Seats - Table.OccupiedSeats) lugares
+                        </small>
+                        <small class="text-muted">Seleccionados: @selectedGuestIds.Count</small>
+                    </div>
+                    <input type="text" class="form-control mb-2"
+                            placeholder="Filtrar invitado..."
+                            @bind="filterGuestText"
+                            @bind:event="oninput" />
+                    <div style="max-height: 300px; overflow-y: auto;">
+                        @{
+                            var groupedGuests = FilteredGuestsForAssignment
+                                .GroupBy(g => g.InvitationId)
+                                .Select(g => new
+                                {
+                                    InvitationName = invitationsById.TryGetValue(g.Key, out var inv) ? inv.Name : "Sin invitacion",
+                                    Guests = g
+                                })
+                                .OrderBy(g => g.InvitationName);
+                        }
+                        @foreach (var group in groupedGuests)
+                        {
+                            <div class="card mb-2">
+                                <div class="card-body p-2">
+                                    <h6 class="fw-bold mb-2 small">@group.InvitationName</h6>
+                                    @foreach (var guest in group.Guests)
                                     {
-                                        InvitationName = invitationsById.TryGetValue(g.Key, out var inv) ? inv.Name : "Sin invitacion",
-                                        Guests = g
-                                    })
-                                    .OrderBy(g => g.InvitationName);
-                            }
-                            @foreach (var group in groupedGuests)
-                            {
-                                <div class="card mb-2">
-                                    <div class="card-body p-2">
-                                        <h6 class="fw-bold mb-2 small">@group.InvitationName</h6>
-                                        @foreach (var guest in group.Guests)
-                                        {
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox"
-                                                        checked="@(selectedGuestIds.Contains(guest.Id))"
-                                                        @onchange="() => ToggleGuestSelection(guest.Id)" />
-                                                <label class="form-check-label">
-                                                    @guest.GuestName
-                                                </label>
-                                            </div>
-                                        }
-                                    </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                    checked="@(selectedGuestIds.Contains(guest.Id))"
+                                                    @onchange="() => ToggleGuestSelection(guest.Id)" />
+                                            <label class="form-check-label">
+                                                @guest.GuestName
+                                            </label>
+                                        </div>
+                                    }
                                 </div>
-                            }
-                            @if (!groupedGuests.Any())
-                            {
-                                <small class="text-muted d-block text-center py-2">No hay invitados disponibles</small>
-                            }
-                        </div>
-                    }
+                            </div>
+                        }
+                        @if (!groupedGuests.Any())
+                        {
+                            <small class="text-muted d-block text-center py-2">No hay invitados disponibles</small>
+                        }
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-custom btn-sm" disabled="@(asignacionModo == "herencia" ? selectedInvitationIds.Count == 0 : selectedGuestIds.Count == 0)" @onclick="AssignTable">
-                        Asignar@(asignacionModo == "herencia"
-                            ? (selectedInvitationIds.Count > 0 ? $" ({selectedInvitationIds.Count})" : "")
-                            : (selectedGuestIds.Count > 0 ? $" ({selectedGuestIds.Count})" : ""))
+                    <button class="btn btn-custom btn-sm" disabled="@(selectedGuestIds.Count == 0)" @onclick="AssignTable">
+                        Asignar@(selectedGuestIds.Count > 0 ? $" ({selectedGuestIds.Count})" : "")
                     </button>
                     <button class="btn btn-secondary btn-sm" @onclick="CloseModaAsignarMesa">Cerrar</button>
                 </div>

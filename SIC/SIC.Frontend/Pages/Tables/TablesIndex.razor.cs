@@ -18,15 +18,11 @@ namespace SIC.Frontend.Pages.Tables
         private List<Invitation> Invitations = new();
 
         private List<TablesEvents>? Tables { get; set; }
-        private string filterText = string.Empty;
         private string filterGuestText = string.Empty;
-        private string asignacionModo = "individual";
         private HashSet<int> selectedGuestIds = new();
-        private HashSet<int> selectedInvitationIds = new();
         private List<InvitationGuest> allEventGuests = new();
 
         private CreateOrEditTablesDto createOrEditTablesDto = new();
-        private AssignTablesDto AssignTablesDto = new();
         private GenerateTablesDto GenerateTablesDto = new();
 
         private bool modaAsignarMesa = false;
@@ -46,22 +42,33 @@ namespace SIC.Frontend.Pages.Tables
 
         private bool isGeneratingPdf = false;
 
-        private IEnumerable<Invitation> FilteredInvitation =>
-            Invitations
-                .Where(i => i.Status == Status.Attend && i.TablesEventsId == null)
-                .Where(i => i.Guests?.Any(g => g.Status == Status.Attend && !g.TablesEventsId.HasValue) == true)
-                .Where(i => string.IsNullOrWhiteSpace(filterText) ||
-                            i.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase))
-                .OrderBy(i => i.Name);
-
         private IEnumerable<InvitationGuest> FilteredGuestsForAssignment =>
             allEventGuests
                 .Where(g => g.Status == Status.Attend)
                 .Where(g => !g.TablesEventsId.HasValue &&
                             !(invitationsById.TryGetValue(g.InvitationId, out var inv) && inv.TablesEventsId != null))
-                .Where(g => string.IsNullOrWhiteSpace(filterGuestText) ||
-                            g.GuestName.Contains(filterGuestText, StringComparison.OrdinalIgnoreCase))
-                .OrderBy(g => g.GuestName);
+                .Where(g => MatchesGuestFilter(g))
+                .OrderBy(g => g.GuestName ?? string.Empty);
+
+        private bool MatchesGuestFilter(InvitationGuest guest)
+        {
+            var term = filterGuestText?.Trim();
+            if (string.IsNullOrEmpty(term))
+            {
+                return true;
+            }
+
+            if (guest.GuestName?.Contains(term, StringComparison.OrdinalIgnoreCase) == true)
+            {
+                return true;
+            }
+
+            var invitationName = invitationsById.TryGetValue(guest.InvitationId, out var inv)
+                ? inv.Name
+                : null;
+
+            return invitationName?.Contains(term, StringComparison.OrdinalIgnoreCase) == true;
+        }
 
         private int totalTables;
         private int totalSeats;
@@ -201,7 +208,7 @@ namespace SIC.Frontend.Pages.Tables
             }
         }
 
-private async Task ConfirmDeleteAssign(Invitation table)
+        private async Task ConfirmDeleteAssign(Invitation table)
         {
             _pendingAction = async () => await DeleteAssing(table);
             ConfirmMessage = $"Se eliminará los invitados de esta mesa '{table.Name}'. Esta acción no se puede deshacer.";
@@ -287,13 +294,8 @@ private async Task ConfirmDeleteAssign(Invitation table)
         {
             Table = tables;
             modaAsignarMesa = true;
-            asignacionModo = "individual";
-            filterText = string.Empty;
             filterGuestText = string.Empty;
             selectedGuestIds.Clear();
-            selectedInvitationIds.Clear();
-            AssignTablesDto.TableId = tables.Id;
-            AssignTablesDto.InvitationId = 0;
             allEventGuests = Invitations
                 .SelectMany(i => i.Guests ?? Enumerable.Empty<InvitationGuest>())
                 .ToList();
@@ -302,11 +304,8 @@ private async Task ConfirmDeleteAssign(Invitation table)
         private void CloseModaAsignarMesa()
         {
             modaAsignarMesa = false;
-            asignacionModo = "individual";
-            filterText = string.Empty;
             filterGuestText = string.Empty;
             selectedGuestIds.Clear();
-            selectedInvitationIds.Clear();
             Table = null;
         }
 
@@ -315,14 +314,6 @@ private async Task ConfirmDeleteAssign(Invitation table)
             if (!selectedGuestIds.Remove(guestId))
             {
                 selectedGuestIds.Add(guestId);
-            }
-        }
-
-        private void ToggleInvitationSelection(int invitationId)
-        {
-            if (!selectedInvitationIds.Remove(invitationId))
-            {
-                selectedInvitationIds.Add(invitationId);
             }
         }
 
@@ -428,119 +419,57 @@ private async Task ConfirmDeleteAssign(Invitation table)
 
         private async Task AssignTable()
         {
-            if (asignacionModo == "individual")
+            var available = Table!.Seats - Table.OccupiedSeats;
+            if (selectedGuestIds.Count > available)
             {
-                var available = Table!.Seats - Table.OccupiedSeats;
-                if (selectedGuestIds.Count > available)
+                await SweetAlertService.FireAsync("Error",
+                    $"No hay suficientes lugares. Disponibles: {available}, seleccionados: {selectedGuestIds.Count}.",
+                    SweetAlertIcon.Error);
+                return;
+            }
+
+            var dtos = selectedGuestIds
+                .Select(guestId => new AssignGuestTableDto { GuestId = guestId, TablesEventsId = Table.Id })
+                .ToList();
+
+            modaAsignarMesa = false;
+            isSavingAssignment = true;
+            busyMessage = "Guardando asignación...";
+            StateHasChanged();
+
+            try
+            {
+                var response = await Repository.PostAsync<List<AssignGuestTableDto>, AssignBulkResultDto>(
+                    "api/Tables/AssignGuestBulk", dtos);
+
+                if (response.Error)
                 {
-                    await SweetAlertService.FireAsync("Error",
-                        $"No hay suficientes lugares. Disponibles: {available}, seleccionados: {selectedGuestIds.Count}.",
-                        SweetAlertIcon.Error);
-                    return;
+                    var message = await response.GetErrorMessageAsync();
+                    await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
                 }
-
-                var dtos = selectedGuestIds
-                    .Select(guestId => new AssignGuestTableDto { GuestId = guestId, TablesEventsId = Table.Id })
-                    .ToList();
-
-                modaAsignarMesa = false;
-                isSavingAssignment = true;
-                busyMessage = "Guardando asignación...";
-                StateHasChanged();
-
-                try
+                else
                 {
-                    var response = await Repository.PostAsync<List<AssignGuestTableDto>, AssignBulkResultDto>(
-                        "api/Tables/AssignGuestBulk", dtos);
-
-                    if (response.Error)
+                    var assigned = response.Response?.Assigned ?? 0;
+                    var skipped = response.Response?.Skipped ?? new List<string>();
+                    if (skipped.Count > 0)
                     {
-                        var message = await response.GetErrorMessageAsync();
-                        await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                        await SweetAlertService.FireAsync("Advertencia",
+                            $"Asignados: {assigned}. Omitidos: {string.Join(", ", skipped)}.",
+                            SweetAlertIcon.Warning);
                     }
                     else
                     {
-                        var assigned = response.Response?.Assigned ?? 0;
-                        var skipped = response.Response?.Skipped ?? new List<string>();
-                        if (skipped.Count > 0)
-                        {
-                            await SweetAlertService.FireAsync("Advertencia",
-                                $"Asignados: {assigned}. Omitidos: {string.Join(", ", skipped)}.",
-                                SweetAlertIcon.Warning);
-                        }
-                        else
-                        {
-                            await SweetAlertService.FireAsync("Exito",
-                                $"Se asignaron {assigned} invitado(s) correctamente.",
-                                SweetAlertIcon.Success);
-                        }
+                        await SweetAlertService.FireAsync("Exito",
+                            $"Se asignaron {assigned} invitado(s) correctamente.",
+                            SweetAlertIcon.Success);
                     }
                 }
-                finally
-                {
-                    isSavingAssignment = false;
-                }
             }
-            else
+            finally
             {
-                var totalGuests = selectedInvitationIds.Sum(invId =>
-                    invitationsById.TryGetValue(invId, out var inv)
-                        ? inv.Guests?.Count(g => g.Status == Status.Attend) ?? 0
-                        : 0);
-
-                var available = Table!.Seats - Table.OccupiedSeats;
-                if (totalGuests > available)
-                {
-                    await SweetAlertService.FireAsync("Error",
-                        $"No hay suficientes lugares. Disponibles: {available}, total invitados de las seleccionadas: {totalGuests}.",
-                        SweetAlertIcon.Error);
-                    return;
-                }
-
-                var dtos = selectedInvitationIds
-                    .Select(invId => new AssignTablesDto { InvitationId = invId, TableId = Table.Id })
-                    .ToList();
-
-                modaAsignarMesa = false;
-                isSavingAssignment = true;
-                busyMessage = "Guardando asignación...";
-                StateHasChanged();
-
-                try
-                {
-                    var response = await Repository.PostAsync<List<AssignTablesDto>, AssignBulkResultDto>(
-                        "api/Tables/AssignBulk", dtos);
-
-                    if (response.Error)
-                    {
-                        var message = await response.GetErrorMessageAsync();
-                        await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
-                    }
-                    else
-                    {
-                        var assigned = response.Response?.Assigned ?? 0;
-                        var skipped = response.Response?.Skipped ?? new List<string>();
-                        if (skipped.Count > 0)
-                        {
-                            await SweetAlertService.FireAsync("Advertencia",
-                                $"Asignadas: {assigned}. Omitidas: {string.Join(", ", skipped)}.",
-                                SweetAlertIcon.Warning);
-                        }
-                        else
-                        {
-                            await SweetAlertService.FireAsync("Exito",
-                                $"Se asignaron {assigned} invitacion(es) correctamente.",
-                                SweetAlertIcon.Success);
-                        }
-                    }
-                }
-                finally
-                {
-                    isSavingAssignment = false;
-                }
+                isSavingAssignment = false;
             }
 
-            AssignTablesDto = new();
             await ReloadDataAsync();
         }
     }
