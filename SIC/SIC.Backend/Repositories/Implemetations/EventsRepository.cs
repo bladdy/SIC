@@ -330,7 +330,7 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
             .AsNoTracking()
             .AsQueryable();
 
-        queryable = queryable.Where(x => x.Status == Status.Active);
+        queryable = queryable.Where(x => x.Status == Status.Active && x.InvitationInvboxv == true);
 
         if (pagination.DesignStatus.HasValue)
         {
@@ -351,7 +351,8 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
         }
 
         var events = await queryable
-            .OrderBy(x => x.Name)
+            .OrderBy(x => x.DesignStatus)
+            .ThenBy(x => x.Name)
             .ToListAsync();
 
         foreach (var even in events)
@@ -359,12 +360,7 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
             even.FormComplete = even.RequirementAnswers.Any();
         }
 
-        var ordered = events
-            .OrderByDescending(x => x.FormComplete)
-            .ThenBy(x => x.Name)
-            .ToList();
-
-        var pageItems = ordered
+        var pageItems = events
             .Skip((pagination.PageNumber - 1) * pagination.PageSize)
             .Take(pagination.PageSize)
             .ToList();
@@ -380,7 +376,7 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
     {
         var queryable = _context.Events.Include(e => e.EventType).AsQueryable();
 
-        queryable = queryable.Where(x => x.Status == Status.Active);
+        queryable = queryable.Where(x => x.Status == Status.Active && x.InvitationInvboxv == true);
 
         if (pagination.DesignStatus.HasValue)
         {
