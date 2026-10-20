@@ -1,7 +1,7 @@
 @page "/sorteo"
 @layout LoginLayout
 @using SIC.Frontend.Shared.Modals
-<div class="container-fluid min-vh-100 py-4 position-relative text-light">
+<div class="container-fluid min-vh-100 py-4 position-relative text-light" style="background-color:#004a99;">
 
     <!-- Botón Configuración esquina superior derecha -->
     <button @onclick="ShowModal"
@@ -12,13 +12,9 @@
     <!-- Modal -->
     <Modal @bind-Visible="showModal" OnSave="HandleModalSave" />
 
-    <PageHeader Icon="bi-dice-6" Title="Sorteo de Números" Subtitle="Genera y visualiza los números del sorteo.">
-        <VolverButton />
-    </PageHeader>
-
     <!-- Número actual y botón (centrado arriba) -->
     <div class="text-center mb-3">
-        <div class="number-display shadow rounded-4 d-inline-block p-4 bg-gradient" style="background-color:#367B82;">
+        <div class="rounded-4 d-inline-block p-4" style="background-color:#004a99;">
             <h1 class="animated-number fw-bold"
                 style="font-size: 10rem; color: #fff; text-shadow: 3px 3px 12px rgba(0,0,0,0.5);">
                 @currentNumber
@@ -28,7 +24,7 @@
         <div class="mt-4">
             @if (drawnNumbers.Count < quantity)
             {
-                <button class="btn btn-success btn-lg px-5 py-2 fw-bold"
+                <button class="btn btn-primary btn-lg px-5 py-2 fw-bold"
                         @onclick="PickNextNumber"
                         disabled="@isAnimating">
                     🎯 Siguiente Número
@@ -42,13 +38,13 @@
     </div>
 
     <!-- Lista de números generados (debajo, en columnas de 15) -->
-    <div class="card shadow-sm border-0 bg-light text-dark mx-auto" style="max-width: 90%;">
+    <div class="card shadow-sm border-0 mx-auto" style="max-width: 90%;background-color:#004a99;">
         <div class="card-body">
             <h4 class="text-center mb-1 fw-bold">Números Generados</h4>
 
             @if (drawnNumbers.Count == 0)
             {
-                <p class="text-center text-muted">Aún no se ha generado ningún número.</p>
+                <p class="text-center">Aún no se ha generado ningún número.</p>
             }
             else
             {
@@ -62,7 +58,7 @@
                                 <ul class="list-group small-list">
                                     @foreach (var item in group)
                                     {
-                                        <li class="list-group-item text-center fw-bold fs-2 py-1">
+                                        <li class="list-group-item text-center fw-bold fs-2 py-1 text-white" style="background-color:#004a99;">
                                             @(item.index + 1).- (@item.num)
                                         </li>
                                     }
