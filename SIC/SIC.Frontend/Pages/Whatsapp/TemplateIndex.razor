@@ -1,4 +1,5 @@
 @page "/whatsapp_templates"
+@using SIC.Shared.DTOs
 <PageTitle>Plantillas</PageTitle>
 <PageHeader Icon="bi-file-earmark-richtext"
 Title="Plantillas"
@@ -55,17 +56,14 @@ Subtitle="Plantillas de mensajes de WhatsApp">
                             }
                         </td>
                         <td>
-                            <div class="d-flex justify-content-center gap-2">
-                                @if (TemplateImages.Contains(template!.Name))
-                                {
-                                    <button class="btn btn-custom" @onclick="() => 
-                                        OpenTemplateImage(template)">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
-                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-eye">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
-                                        <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" /></svg>
-                                    </button>
-                                }
+                            <div class="d-flex justify-content-start gap-2">
+                                
+                                <button class="btn btn-custom" @onclick="() => OpenTemplatePreview(template)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-eye">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                                    <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" /></svg>
+                                </button>
                                 @if (!TemplateImages.Contains(template.Name))
                                 {
                                     <button class="btn btn-danger" @onclick="() => DeleteTemplate(template)">
@@ -140,10 +138,19 @@ Subtitle="Plantillas de mensajes de WhatsApp">
                         }
                     </div>
                     <div class="d-flex justify-content-between mb-2">
-                        <strong>Ver Plantilla:</strong>
                         <div class="d-flex justify-content-end gap-2">
 
-                            <button class="btn btn-custom" @onclick="() => OpenTemplateImage(template)"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-eye"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" /></svg></button>
+                            <button class="btn btn-custom" 
+                            @onclick="() => OpenTemplatePreview(template)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" 
+                                height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
+                                class="icon icon-tabler icons-tabler-outline icon-tabler-eye">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                    <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                                    <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />
+                                </svg>
+                            </button>
                             @if (!TemplateImages.Contains(template.Name))
                             {
                                 <button class="btn btn-danger" @onclick="() => DeleteTemplate(template)">
@@ -181,20 +188,51 @@ Subtitle="Plantillas de mensajes de WhatsApp">
     }
 </div>
 
-@if (!string.IsNullOrEmpty(SelectedImageUrl))
+@if (SelectedTemplate != null)
 {
-    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.8);" @onclick="CloseTemplateImage">
-        <div class="modal-dialog modal-dialog-centered modal-lg" @onclick:stopPropagation>
-            <div class="modal-content bg-transparent border-0">
-                <div class="modal-header border-0">
-                    <small class="text-white text-truncate me-2">@SelectedImageName</small>
-                    <button type="button" class="btn-close btn-close-white" @onclick="CloseTemplateImage"></button>
+    <div class="template-backdrop" @onclick="CloseTemplatePreview"></div>
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.85);">
+        <div class="modal-dialog modal-dialog-centered" @onclick:stopPropagation style="max-width: 380px;">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; background: white;">
+                <div class="modal-header border-0 pb-2" style="background-color: #075e54; border-radius: 16px 16px 0 0;">
+                    <div class="d-flex align-items-center justify-content-between w-100">
+                        <span class="fw-bold text-white me-2">@SelectedTemplate.Name</span>
+                        
+                        <button type="button" class="btn-close btn-close-white ms-2" @onclick="CloseTemplatePreview"></button>
+                    </div>
                 </div>
-                <div class="modal-body text-center p-0">
-                    <img src="@SelectedImageUrl" alt="@SelectedImageName" class="img-fluid" style="max-height:75vh;" />
-                </div>
-                <div class="modal-footer border-0 justify-content-center">
-                    <button type="button" class="btn btn-secondary" @onclick="CloseTemplateImage">Cerrar</button>
+                <div class="modal-body p-3" style="background-color: #367B82;">
+                    <div class="template-bubble">
+                        @if (HasImage(SelectedTemplate))
+                        {
+                            <div class="template-header-image">
+                                <img src="@GetHeaderImageUrl(SelectedTemplate)" alt="Header"/>
+                            </div>
+                        }
+
+                        @foreach (var component in (SelectedTemplate.Components ?? new List<Component>()))
+                        {
+                            if (string.Equals(component.Type, "BODY", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <div class="template-body">
+                                    @RenderBodyText(component)
+                                </div>
+                            }
+                            else if (string.Equals(component.Type, "FOOTER", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <div class="template-footer">
+                                    @component.Text
+                                </div>
+                            }
+                        }
+
+                        @if (HasButtons(SelectedTemplate))
+                        {
+                            <div class="template-buttons mt-3">
+                                <button class="template-btn">Boton(es)</button>
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
         </div>

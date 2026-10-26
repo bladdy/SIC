@@ -7,6 +7,7 @@ using SIC.Shared.Response;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using static System.Net.WebRequestMethods;
 
 namespace SIC.Frontend.Pages.Whatsapp
@@ -31,42 +32,60 @@ namespace SIC.Frontend.Pages.Whatsapp
             "save_the_date"
         };
 
-        private string? SelectedImageUrl;
-        private string? SelectedImageName;
+        private TemplateDatum? SelectedTemplate;
 
-        private string? GetTemplateImageUrl(string? templateName)
+        private void OpenTemplatePreview(TemplateDatum template)
         {
-            if (string.IsNullOrWhiteSpace(templateName)) return null;
-
-            var name = templateName.Trim().ToLower();
-            if (TemplateImages.Contains(name))
-                return $"{NavigationManager.BaseUri}template-img/{name}.jpg";
-
-            var match = TemplateImages.FirstOrDefault(img => name.StartsWith(img));
-            return match == null
-                ? null
-                : $"{NavigationManager.BaseUri}template-img/{match}.jpg";
+            SelectedTemplate = template;
         }
 
-        private async Task OpenTemplateImage(TemplateDatum template)
+        private void CloseTemplatePreview()
         {
-            var url = GetTemplateImageUrl(template.Name);
-            if (url == null)
+            SelectedTemplate = null;
+        }
+
+        private bool HasImage(TemplateDatum template)
+        {
+            return template.Components?.Any(c =>
+                string.Equals(c.Type, "HEADER", StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(c.Format, "IMAGE", StringComparison.OrdinalIgnoreCase)) == true;
+        }
+
+        private bool HasButtons(TemplateDatum template)
+        {
+            return template.Components?.Any(c =>
+                string.Equals(c.Type, "BUTTONS", StringComparison.OrdinalIgnoreCase)) == true;
+        }
+
+        private string GetHeaderImageUrl(TemplateDatum template)
+        {
+            var header = template.Components?.FirstOrDefault(c =>
+                string.Equals(c.Type, "HEADER", StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(c.Format, "IMAGE", StringComparison.OrdinalIgnoreCase));
+
+            return header?.Example?.HeaderHandle?.FirstOrDefault() ?? string.Empty;
+        }
+
+        private MarkupString RenderBodyText(Component component)
+        {
+            var text = component.Text ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(text))
+                return new MarkupString("");
+
+            var bodyText = component.Example?.BodyText?.FirstOrDefault();
+            if (bodyText != null)
             {
-                await SweetAlertService.FireAsync("Sin imagen",
-                    $"No hay imagen disponible para la plantilla '{template.Name}'.",
-                    SweetAlertIcon.Info);
-                return;
+                for (int i = 0; i < bodyText.Count; i++)
+                {
+                    text = text.Replace($"{{{{{i + 1}}}}}", bodyText[i] ?? string.Empty);
+                }
             }
 
-            SelectedImageUrl = url;
-            SelectedImageName = template.Name;
-        }
-
-        private void CloseTemplateImage()
-        {
-            SelectedImageUrl = null;
-            SelectedImageName = null;
+            text = text.Replace("\n", "<br>");
+            // Convertir *texto* en negritas
+            text = Regex.Replace(text, @"\*(.*?)\*", "<strong>$1</strong>");
+            return new MarkupString(text);
         }
 
         private async Task DeleteTemplate(TemplateDatum template)
