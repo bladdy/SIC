@@ -169,6 +169,36 @@ public class InvitationsController : GenericController<Invitation>
         }
     }
 
+    [HttpGet("generatedpdf-comments")]
+    public async Task<IActionResult> GetCommentsPdf(string evento)
+    {
+        try
+        {
+            var response = await _invitationUnitOfWork.GetInvitationsWithCommentsAsync(evento);
+            var invitaciones = response.Result?.ToList();
+
+            if (invitaciones == null || !invitaciones.Any())
+                return NotFound("No hay invitaciones con comentarios.");
+
+            var eventoEntity = invitaciones.First().Event!;
+            var nombreEvento = eventoEntity.Name;
+            var subTitulo = eventoEntity.SubTitle;
+            var fechaLarga = eventoEntity.Date.FormatearFechaLargaEspanol();
+
+            var pdfBytes = _boletaService.GenerarPdfComentarios(nombreEvento, subTitulo, fechaLarga, invitaciones);
+
+            return File(
+                pdfBytes,
+                "application/pdf",
+                $"comentarios-{evento}.pdf"
+            );
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
     [HttpGet("qr")]
     public async Task<IActionResult> GetQRCodeAsync(string codigo, string evento)
     {

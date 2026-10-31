@@ -1,0 +1,224 @@
+@page "/documentation/documentacion-planner-comprar-creditos"
+@using SIC.Frontend.Models
+@using SIC.Frontend.Services
+@layout DocumentationLayout
+@inject DocumentationState DocumentationState
+
+<PageTitle>27.- DOCUMENTACION PLANNER</PageTitle>
+
+<div class="welcome-page">
+
+    <div class="alert-callout">
+        <div>
+
+            <h5>
+                Tomar en cuenta lo siguiente
+            </h5>
+            <p>
+                Para <strong>crear un evento en INVBOXV APP</strong>, es indispensable contar con <strong>créditos disponibles</strong> en tu cuenta. Recuerda que <strong>1 Crédito = 1 Evento</strong>.
+            </p>
+            <br />
+            <p>
+                Si tu saldo de créditos se encuentra en <strong>0</strong>, el sistema no te permitirá crear un nuevo evento.
+            </p>
+            <br />
+            <p>
+                Para resolverlo, podrás <strong>comprar créditos adicionales</strong>, ya sea de manera <strong>individual o mediante alguno de los paquetes disponibles</strong>, según tus necesidades.
+            </p>
+            <br />
+            <p>
+                A continuación, te mostraremos <strong>paso a paso cómo comprar y agregar nuevos créditos a tu cuenta de INVBOXV APP</strong>.
+            </p>
+        </div>
+    </div>
+
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/1-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Para comenzar, ingresa a <strong>invboxv-app.com</strong> desde una computadora o laptop para facilitar el proceso de configuración. Captura el usuario y la contraseña que te fueron proporcionados y haz clic en <strong>«Iniciar Sesión»</strong> para acceder a tu Panel de Invitados.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/10/259-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            En el menú principal, selecciona la opción <strong>MIS COMPRAS</strong>. Al dar clic, se abrirá la sección donde podrás consultar y administrar tus créditos.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/10/260-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            En el <strong>Historial de Créditos</strong> podrás consultar tus <strong>créditos disponibles</strong>, así como las fechas en las que fueron comprados o utilizados.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/10/261-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            En esta pantalla podrás visualizar los diferentes <strong>paquetes de créditos disponibles</strong>.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/10/262-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Selecciona el paquete que mejor se adapte a tus necesidades y continúa con el proceso de compra.
+        </p>
+    </div>
+    <div class="alert-callout">
+        <div>
+
+            <h5>
+                Tomar en cuenta lo siguiente
+            </h5>
+            <p>
+                <strong>INVBOXV APP no almacena los datos de tu tarjeta ni la información bancaria ingresada durante el pago.</strong>
+            </p>
+            <br />
+            <p>
+                El proceso de pago se realiza directamente mediante <strong>Stripe</strong>, un servicio externo especializado en procesamiento de pagos. INVBOXV utiliza esta plataforma para facilitar y procesar las compras realizadas por nuestros clientes.
+            </p>
+            <br />
+            <p>
+                Antes de finalizar, verifica que el <strong>correo electrónico sea correcto</strong>, ya que ahí recibirás el comprobante correspondiente a tu compra.
+            </p>
+        </div>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/10/263-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Una vez realizada la compra, recibirás un <strong>correo electrónico</strong> en la dirección que registraste durante el proceso de pago, con la información correspondiente a la operación.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/10/264-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            También puedes verificar tus créditos disponibles directamente en el botón <strong>CREAR EVENTO</strong>, donde se mostrará la cantidad de créditos que tienes disponibles para crear nuevos eventos.
+        </p>
+    </div>
+    <div class="success-callout">
+
+        <div>
+
+            <h5>
+                Proceso Completado!!!
+            </h5>
+
+            <p>
+                Al guardar: Se creará el evento dentro de tu cuenta. Se descontará automáticamente 1 crédito de tu Wallet.
+            </p>
+            <br />
+            <p>
+                El movimiento quedará registrado en tu historial de créditos. El evento aparecerá en la sección Mis Eventos para que puedas comenzar su configuración y administración.
+            </p>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    .welcome-page { max-width: 1000px; margin: 0 auto; padding-bottom: 4rem; }
+    .welcome-hero { margin-bottom: 3rem; }
+    .welcome-badge { display: inline-flex; align-items: center; padding: .4rem .9rem; border-radius: 999px; background: #EAF4F5; color: #367B82; font-size: .8rem; font-weight: 600; margin-bottom: 1rem; }
+    .welcome-hero h1 { font-size: 3rem; font-weight: 800; line-height: 1.1; margin-bottom: 1rem; color: #111827; }
+    .welcome-description { font-size: 1.15rem; color: #6b7280; max-width: 750px; line-height: 1.8; }
+    .welcome-card { background: white; border: 1px solid #e5e7eb; border-radius: 20px; padding: 2rem; margin-bottom: 2rem; }
+    .section-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+    .section-number { width: 42px; height: 42px; border-radius: 50%; background: #367B82; color: white; display: flex; justify-content: center; align-items: center; font-weight: 700; }
+    .section-header h2 { margin: 0; font-size: 1.8rem; color: #111827; }
+    .welcome-card p { font-size: 1rem; line-height: 2; color: #374151; margin-bottom: 1rem; }
+    .success-callout { display: flex; gap: 1.5rem; padding: 2rem; border-radius: 20px; background: linear-gradient( 135deg, #EAF4F5, #D7E8EA ); border: 1px solid #CFDFE2; margin-bottom: 2rem; }
+    .alert-callout { display: flex; gap: 1.5rem; padding: 2rem; border-radius: 20px; background: linear-gradient( 135deg, #fefce8, #fef3c7 ); border: 1px solid #fde68a; margin-bottom: 2rem; }
+        .alert-callout h3 { margin-bottom: .5rem; color: #2c6368; }
+        .alert-callout p { margin: 0; line-height: 1.8; }
+    .callout-icon { font-size: 2.5rem; }
+    .success-callout h3 { margin-bottom: .5rem; color: #2c6368; }
+    .success-callout p { margin: 0; line-height: 1.8; }
+    .next-step { border-top: 1px solid #e5e7eb; padding-top: 2rem; }
+        .next-step span { font-size: .85rem; text-transform: uppercase; color: #9ca3af; letter-spacing: .1em; }
+        .next-step h4 { margin-top: .5rem; margin-bottom: .5rem; font-size: 1.4rem; }
+        .next-step p { color: #6b7280; }
+    .hero-image-container { display: flex; justify-content: center; margin: 2rem 0 2.5rem; }
+    .hero-image { width: 100%; max-width: 900px; height: auto; border-radius: 20px; border: 1px solid #e5e7eb; box-shadow: 0 10px 30px rgba(0,0,0,.08); }
+</style>

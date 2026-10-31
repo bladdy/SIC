@@ -1,0 +1,668 @@
+@page "/documentation/documentacion-planner-crear-plantilla"
+@using SIC.Frontend.Models
+@using SIC.Frontend.Services
+@layout DocumentationLayout
+@inject DocumentationState DocumentationState
+
+<PageTitle>29.- DOCUMENTACION PLANNER</PageTitle>
+
+<div class="welcome-page">
+
+    <div class="alert-callout">
+        <div>
+
+            <h5>
+                Tomar en cuenta lo siguiente
+            </h5>
+            <p>
+                Antes de crear una plantilla personalizada en <strong>INVBOXV APP</strong>, es importante considerar que <strong>META es la encargada de revisar, aprobar o rechazar las plantillas</strong>, de acuerdo con sus políticas de WhatsApp Business Platform.
+            </p>
+            <br />
+            <p>
+                <strong>INVBOXV APP no interviene en el proceso de aprobación.</strong>
+            </p>
+            <br />
+            <p>
+                Puedes crear dos tipos de plantillas:
+            </p>
+            <p>
+                <strong>1. Plantilla Estática</strong>
+            </p>
+            <p>
+                Es aquella en la que <strong>todos los invitados reciben exactamente el mismo mensaje</strong>, sin modificaciones en el contenido.
+            </p>
+            <br />
+            <p>
+                <strong>2. Plantilla Dinámica</strong>
+            </p>
+            <p>
+                Es aquella que permite <strong>personalizar automáticamente la información de cada invitado</strong> mediante variables o tokens.
+            </p>
+            <br />
+            <p>
+                Por ejemplo, cada mensaje puede incluir el nombre del invitado, la cantidad de pases asignados, su enlace personalizado u otros datos disponibles en el sistema.
+            </p>
+            <br />
+            <h5>
+                Tiempo de aprobación
+            </h5>
+            <p>
+                Una vez creada y enviada la plantilla para su revisión, <strong>META puede tardar aproximadamente 24 horas en aprobarla</strong>, aunque este tiempo puede variar.
+            </p>
+            <br />
+            <p>
+                Cuando la plantilla aparezca con el estado <strong>APROBADA</strong>, podrás utilizarla para realizar <strong>envíos masivos desde INVBOXV APP</strong>, siempre que tu cuenta cumpla con las condiciones y límites de envío establecidos por META.
+            </p>
+            <br />
+            <p>
+                <strong>Importante:</strong> Te recomendamos crear tus plantillas con anticipación para evitar retrasos en el envío de tus invitaciones y recordatorios.
+            </p>
+        </div>
+    </div>
+
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/1-1024x576.jpg"
+                 alt="Crear Plantilla INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Para comenzar, ingresa a <strong>invboxv-app.com</strong> desde una computadora o laptop para facilitar el proceso de configuración. Captura el usuario y la contraseña que te fueron proporcionados y haz clic en <strong>«Iniciar Sesión»</strong> para acceder a tu Panel de Invitados.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/10/275-1024x576.jpg"
+                 alt="Crear Plantilla INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Ingresamos a la sección <strong>Plantillas</strong> del menú principal y damos clic para acceder.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/10/276-1024x576.jpg"
+                 alt="Crear Plantilla INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            En esta pantalla podemos visualizar todas nuestras <strong>plantillas sugeridas</strong>.
+        </p>
+        <p>
+            Para crear una plantilla personalizada, damos clic en el botón <strong>Crear Plantilla</strong>.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/10/277-1024x576.jpg"
+                 alt="Crear Plantilla INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Se abrirá una pantalla dividida en dos secciones:
+        </p>
+        <ul>
+            <li><strong>Lado izquierdo:</strong> encontraremos los campos que debemos completar para crear nuestra plantilla.</li>
+            <li><strong>Lado derecho:</strong> tendremos una vista previa de cómo se visualizará el mensaje que recibirán nuestros invitados.</li>
+        </ul>
+        <div class="alert-callout">
+            <div>
+                <h5>
+                    Tomar en cuenta lo siguiente
+                </h5>
+                <p>
+                    Primero veremos un ejemplo de cómo crear una <strong>plantilla estática</strong>, en la que todos los invitados recibirán exactamente el mismo mensaje, sin variaciones en su contenido.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/10/278-1024x576.jpg"
+                 alt="Crear Plantilla INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Comenzamos completando los datos generales:
+        </p>
+        <ul>
+            <li><strong>Nombre de la plantilla:</strong> debe escribirse en minúsculas, sin espacios. Si necesitas separar palabras, utiliza un guion bajo (_).</li>
+            <li><strong>Nombre para mostrar:</strong> puedes utilizar mayúsculas, minúsculas y espacios. Este nombre te ayudará a identificar la plantilla al momento de enviarla.</li>
+            <li><strong>Idioma:</strong> seleccionamos Español. Si el mensaje está dirigido a personas que hablan otro idioma, podemos elegir el correspondiente.</li>
+            <li><strong>Encabezado:</strong> para este ejemplo recomendamos seleccionar <strong>Sin Encabezado</strong>, aunque puedes elegir otra opción.</li>
+            <li><strong>Multimedia:</strong> seleccionamos <strong>Sin Multimedia</strong>.</li>
+        </ul>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/10/279-1024x576.jpg"
+                 alt="Crear Plantilla INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            En el apartado <strong>Contenido</strong>, escribiremos el mensaje general que deseamos enviar a nuestros invitados.
+        </p>
+        <p>
+            Este texto será exactamente el mismo para todas las personas que reciban la plantilla.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/10/280-1024x576.jpg"
+                 alt="Crear Plantilla INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            En la <strong>vista previa</strong> podemos observar cómo se visualizará el mensaje.
+        </p>
+        <p>
+            Como se trata de una plantilla estática, toda la información será igual para los invitados, sin ninguna variación.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/10/281-1024x576.jpg"
+                 alt="Crear Plantilla INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Ahora agregaremos botones para que el mensaje tenga coherencia con las respuestas que esperamos recibir.
+        </p>
+        <p>
+            Seleccionamos <strong>Respuesta Rápida</strong> y escribimos las opciones correspondientes, por ejemplo:
+        </p>
+        <ul>
+            <li><strong>SÍ ASISTIRÉ</strong></li>
+            <li><strong>NO ASISTIRÉ</strong></li>
+        </ul>
+        <p>
+            Una vez terminada nuestra plantilla, damos clic en <strong>Enviar a Revisión</strong>.
+        </p>
+        <div class="alert-callout">
+            <div>
+                <h5>
+                    Tomar en cuenta lo siguiente
+                </h5>
+                <p>
+                    Una vez enviada la plantilla a revisión de <strong>META</strong>, no podrás modificar esa solicitud desde este proceso.
+                </p>
+                <p>
+                    Si necesitas realizar cambios, deberás crear una nueva plantilla con un nombre diferente, por ejemplo, agregando <strong>_2</strong> al nombre original.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/10/282-1024x576.jpg"
+                 alt="Crear Plantilla INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Aparecerá una ventana indicando que la plantilla fue <strong>enviada correctamente a revisión</strong>.
+        </p>
+        <p>
+            Damos clic en <strong>OK</strong> para continuar.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/10/283-1024x576.jpg"
+                 alt="Crear Plantilla INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Regresamos a la sección de plantillas y podemos observar que nuestra nueva plantilla ya aparece registrada con el estado <strong>PENDIENTE</strong>.
+        </p>
+        <p>
+            Esto significa que está esperando la revisión y aprobación de META.
+        </p>
+        <div class="alert-callout">
+            <div>
+                <h5>
+                    Tomar en cuenta lo siguiente
+                </h5>
+                <p>
+                    Las <strong>plantillas sugeridas</strong> cuentan con un botón para visualizar su contenido y no pueden eliminarse desde esta sección.
+                </p>
+                <p>
+                    En cambio, las <strong>plantillas personalizadas que hayas creado</strong> cuentan con una opción para eliminarlas cuando ya no las necesites.
+                </p>
+            </div>
+        </div>
+        <div class="alert-callout">
+            <div>
+                <h5>
+                    Tomar en cuenta lo siguiente
+                </h5>
+                <p>
+                    Ahora aprenderemos a crear una <strong>plantilla dinámica</strong>, que permite enviar información diferente a cada invitado mediante variables.
+                </p>
+                <p>
+                    Por ejemplo, podemos personalizar el nombre, la cantidad de invitados, el número de mesa o el enlace de acceso, utilizando los datos registrados en el <strong>Dashboard de Invitados</strong>.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/10/284-1024x576.jpg"
+                 alt="Crear Plantilla INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Comenzamos escribiendo el <strong>nombre de la plantilla</strong> y el <strong>nombre para mostrar</strong>.
+        </p>
+        <p>
+            Dejamos configurado el idioma en Español y seleccionamos <strong>Sin Encabezado</strong>.
+        </p>
+        <p>
+            En esta ocasión, utilizaremos una <strong>imagen en el apartado Multimedia</strong> para acompañar nuestro mensaje.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/10/285-1024x576.jpg"
+                 alt="Crear Plantilla INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            En el campo correspondiente a multimedia, podemos colocar la <strong>URL de la imagen o miniatura</strong> que deseamos mostrar en la parte superior del mensaje.
+        </p>
+        <p>
+            De esta manera, la plantilla tendrá una presentación más visual y atractiva.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/10/286-1024x576.jpg"
+                 alt="Crear Plantilla INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Ahora utilizaremos las <strong>variables dinámicas</strong>, que permiten insertar automáticamente información personalizada de cada invitado.
+        </p>
+        <p>
+            En el apartado <strong>Contenido</strong>, escribimos nuestro mensaje y agregamos una variable donde queremos que aparezca información diferente.
+        </p>
+        <p>
+            En <strong>Muestra de Variables</strong>, colocamos un texto de ejemplo para que META pueda identificar el tipo de información que contendrá ese campo.
+        </p>
+        <p>
+            En este caso, seleccionamos <strong>Subtítulo del Evento</strong>.
+        </p>
+        <p>
+            En el lado derecho podemos observar cómo se refleja esta información en la vista previa.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/10/287-1024x576.jpg"
+                 alt="Crear Plantilla INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Podemos agregar tantas variables como permita la configuración de la plantilla.
+        </p>
+        <p>
+            Al seleccionar una variable, aparecerán las diferentes opciones disponibles.
+        </p>
+        <p>
+            Por ejemplo, seleccionamos <strong>Mesa</strong> y en el campo de muestra escribimos un número de referencia, como <strong>21</strong>.
+        </p>
+        <p>
+            Este número es únicamente un ejemplo para la revisión de META.
+        </p>
+        <p>
+            Al momento del envío, cada invitado recibirá el <strong>número de mesa que tenga asignado en el Dashboard de Invitados</strong>, no necesariamente el número utilizado como muestra.
+        </p>
+        <p>
+            Por eso se conocen como <strong>variables dinámicas</strong>.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/10/288-1024x576.jpg"
+                 alt="Crear Plantilla INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Ahora podemos visualizar nuestra plantilla con el contenido terminado.
+        </p>
+        <p>
+            En la <strong>vista previa del lado derecho</strong> observamos cómo se mostrará el mensaje con las variables configuradas.
+        </p>
+        <p>
+            Cuando se envíe, cada invitado recibirá la información correspondiente a sus propios datos registrados en INVBOXV APP.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/10/289-1024x576.jpg"
+                 alt="Crear Plantilla INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Ahora agregaremos un <strong>botón dinámico</strong>.
+        </p>
+        <p>
+            Seleccionamos la opción de botón tipo <strong>Sitio Web</strong> y escribimos el texto que deseamos mostrar.
+        </p>
+        <p>
+            En este ejemplo utilizaremos <strong>PASE DE ACCESO</strong>.
+        </p>
+        <p>
+            Posteriormente, seleccionamos la opción <strong>Dinámica</strong> para configurar un enlace personalizado.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/10/290-1024x576.jpg"
+                 alt="Crear Plantilla INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            En el primer campo colocamos la <strong>URL base</strong> y en el siguiente campo agregamos un ejemplo del enlace que incluye el <strong>código del invitado</strong>.
+        </p>
+        <p>
+            La finalidad es que cada invitación tenga su propio código de identificación y que el botón dirija al invitado a su pase correspondiente.
+        </p>
+        <p>
+            De esta manera, evitamos que todos reciban exactamente el mismo enlace de acceso.
+        </p>
+        <p>
+            Podemos observar el botón <strong>PASE DE ACCESO</strong> en la vista previa.
+        </p>
+        <p>
+            Al finalizar, damos clic en <strong>Enviar a Revisión</strong>.
+        </p>
+        <div class="alert-callout">
+            <div>
+                <h5>
+                    Tomar en cuenta lo siguiente
+                </h5>
+                <p>
+                    Si deseas utilizar el pase de acceso generado desde nuestro <strong>Panel de Invitados de INVBOXV APP</strong>, deberás configurar el enlace correspondiente a ese pase.
+                </p>
+                <p>
+                    <strong>URL base:</strong>
+                </p>
+                <p><code>https://www.invboxv-app.com/invitacion/</code></p>
+                <p>
+                    <strong>URL de ejemplo con código:</strong>
+                </p>
+                <p><code>https://www.invboxv-app.com/invitacion/CODIGO</code></p>
+                <p>
+                    <strong>Importante:</strong> El código mostrado es solamente un ejemplo. El sistema deberá sustituirlo por el código único correspondiente a cada invitado mediante la configuración dinámica.
+                </p>
+                <p>
+                    Verifica que el dominio y la ruta coincidan con la URL real configurada en tu plataforma antes de enviar la plantilla a revisión.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/10/291-1024x576.jpg"
+                 alt="Crear Plantilla INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Una vez enviada la plantilla, aparecerá una ventana indicando que el proceso se realizó correctamente.
+        </p>
+        <p>
+            Damos clic en <strong>OK</strong>.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/10/292-1024x576.jpg"
+                 alt="Crear Plantilla INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Regresamos a la sección de plantillas y podemos observar que nuestra <strong>plantilla dinámica</strong> ya fue creada y aparece con el estado <strong>PENDIENTE</strong>.
+        </p>
+        <p>
+            También podemos apreciar que la <strong>plantilla estática</strong> creada anteriormente ya cambió al estado <strong>APROBADA</strong>.
+        </p>
+        <p>
+            Esto significa que META autorizó su uso.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/10/293-1024x576.jpg"
+                 alt="Crear Plantilla INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Ahora ingresamos al <strong>Dashboard de Invitados</strong> y damos clic en el botón para seleccionar plantillas.
+        </p>
+        <p>
+            Podemos observar las plantillas personalizadas que acabamos de crear, siempre que se encuentren disponibles para su envío según su estado de aprobación.
+        </p>
+        <div class="alert-callout">
+            <div>
+                <h5>
+                    Tomar en cuenta lo siguiente
+                </h5>
+                <p>
+                    Debes tomar en cuenta que únicamente las <strong>plantillas sugeridas</strong> están vinculadas a los indicadores de seguimiento numerados del <strong>1 al 5</strong> en el Dashboard de Invitados.
+                </p>
+                <p>
+                    Las <strong>plantillas personalizadas</strong> no se reflejan en esos indicadores de seguimiento.
+                </p>
+                <p>
+                    Sin embargo, también puedes utilizarlas para realizar <strong>envíos masivos</strong>, una vez que hayan sido aprobadas por META y se cumplan las condiciones de envío de la cuenta.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="success-callout">
+        <div>
+            <h5>
+                Proceso Completado!!!
+            </h5>
+            <p>
+                ¡Listo! De esta manera puedes crear diferentes <strong>plantillas estáticas y dinámicas en INVBOXV APP</strong>, adaptándolas a las necesidades de cada evento.
+            </p>
+            <br />
+            <p>
+                Puedes crear múltiples plantillas personalizadas, siempre que cumplan con las políticas de <strong>META y WhatsApp Business Platform</strong> y sean aprobadas para su utilización.
+            </p>
+            <br />
+            <p>
+                Recuerda que <strong>META es quien revisa, aprueba o rechaza las plantillas</strong>, mientras que INVBOXV APP te proporciona las herramientas para crearlas, administrarlas y utilizarlas en el envío de tus invitaciones y mensajes.
+            </p>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    .welcome-page { max-width: 1000px; margin: 0 auto; padding-bottom: 4rem; }
+    .welcome-hero { margin-bottom: 3rem; }
+    .welcome-badge { display: inline-flex; align-items: center; padding: .4rem .9rem; border-radius: 999px; background: #EAF4F5; color: #367B82; font-size: .8rem; font-weight: 600; margin-bottom: 1rem; }
+    .welcome-hero h1 { font-size: 3rem; font-weight: 800; line-height: 1.1; margin-bottom: 1rem; color: #111827; }
+    .welcome-description { font-size: 1.15rem; color: #6b7280; max-width: 750px; line-height: 1.8; }
+    .welcome-card { background: white; border: 1px solid #e5e7eb; border-radius: 20px; padding: 2rem; margin-bottom: 2rem; }
+    .section-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+    .section-number { width: 42px; height: 42px; border-radius: 50%; background: #367B82; color: white; display: flex; justify-content: center; align-items: center; font-weight: 700; }
+    .section-header h2 { margin: 0; font-size: 1.8rem; color: #111827; }
+    .welcome-card p { font-size: 1rem; line-height: 2; color: #374151; margin-bottom: 1rem; }
+    .success-callout { display: flex; gap: 1.5rem; padding: 2rem; border-radius: 20px; background: linear-gradient( 135deg, #EAF4F5, #D7E8EA ); border: 1px solid #CFDFE2; margin-bottom: 2rem; }
+    .alert-callout { display: flex; gap: 1.5rem; padding: 2rem; border-radius: 20px; background: linear-gradient( 135deg, #fefce8, #fef3c7 ); border: 1px solid #fde68a; margin-bottom: 2rem; }
+        .alert-callout h3 { margin-bottom: .5rem; color: #2c6368; }
+        .alert-callout p { margin: 0; line-height: 1.8; }
+    .callout-icon { font-size: 2.5rem; }
+    .success-callout h3 { margin-bottom: .5rem; color: #2c6368; }
+    .success-callout p { margin: 0; line-height: 1.8; }
+    .next-step { border-top: 1px solid #e5e7eb; padding-top: 2rem; }
+        .next-step span { font-size: .85rem; text-transform: uppercase; color: #9ca3af; letter-spacing: .1em; }
+        .next-step h4 { margin-top: .5rem; margin-bottom: .5rem; font-size: 1.4rem; }
+        .next-step p { color: #6b7280; }
+    .hero-image-container { display: flex; justify-content: center; margin: 2rem 0 2.5rem; }
+    .hero-image { width: 100%; max-width: 900px; height: auto; border-radius: 20px; border: 1px solid #e5e7eb; box-shadow: 0 10px 30px rgba(0,0,0,.08); }
+</style>

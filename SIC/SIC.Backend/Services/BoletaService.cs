@@ -1099,5 +1099,92 @@ namespace SIC.Backend.Services
 
             return ms.ToArray();
         }
+
+        public byte[] GenerarPdfComentarios(string nombreEvento, string subTitulo, string fechaLarga, List<Invitation> invitaciones)
+        {
+            using var ms = new MemoryStream();
+
+            var document = new Document(PageSize.A4, 40, 40, 40, 40);
+            PdfWriter.GetInstance(document, ms);
+            document.Open();
+            invitaciones = [.. invitaciones.OrderBy(i => i.Name)];
+            // ==============================
+            // 🎨 COLORES
+            // ==============================
+            var borderColor = new BaseColor(222, 226, 230);
+            var headerColor = new BaseColor(60, 106, 121);
+            // ==============================
+            // 🔠 FUENTES
+            // ==============================
+            var fontTitle = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16);
+            var fontSubtitle = FontFactory.GetFont(FontFactory.HELVETICA_OBLIQUE, 12, BaseColor.DarkGray);
+            var fontDate = FontFactory.GetFont(FontFactory.HELVETICA, 10, BaseColor.Gray);
+            var fontHeader = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10, BaseColor.White);
+            var fontCell = FontFactory.GetFont(FontFactory.HELVETICA, 10);
+            // ==============================
+            // 📝 TÍTULO
+            // ==============================
+            var title = new Paragraph($"DEDICATORIAS: {nombreEvento}", fontTitle)
+            {
+                Alignment = Element.ALIGN_CENTER,
+                SpacingAfter = 4
+            };
+            document.Add(title);
+
+            if (!string.IsNullOrWhiteSpace(subTitulo))
+            {
+                document.Add(new Paragraph(subTitulo, fontSubtitle)
+                {
+                    Alignment = Element.ALIGN_CENTER,
+                    SpacingAfter = 4
+                });
+            }
+
+            document.Add(new Paragraph($"Fecha: {fechaLarga}", fontDate)
+            {
+                Alignment = Element.ALIGN_CENTER,
+                SpacingAfter = 8
+            });
+
+            // ==============================
+            // 📋 TABLA
+            // ==============================
+            var table = new PdfPTable(2)
+            {
+                WidthPercentage = 100
+            };
+
+            table.SetWidths(new float[] { 3, 7 });
+
+            void AddHeader(string text)
+            {
+                var cell = new PdfPCell(new Phrase(text, fontHeader))
+                {
+                    BackgroundColor = headerColor,
+                    HorizontalAlignment = Element.ALIGN_CENTER,
+                    Padding = 4,
+                    BorderColor = borderColor
+                };
+                table.AddCell(cell);
+            }
+
+            AddHeader("Nombre");
+            AddHeader("Dedicatorias");
+
+            // ==============================
+            // 👥 FILAS
+            // ==============================
+            foreach (var item in invitaciones)
+            {
+                table.AddCell(new PdfPCell(new Phrase(item.Name ?? "", fontCell)) { Padding = 4 });
+                table.AddCell(new PdfPCell(new Phrase(item.Comments ?? "", fontCell)) { Padding = 4 });
+            }
+
+            document.Add(table);
+
+            document.Close();
+
+            return ms.ToArray();
+        }
     }
 }

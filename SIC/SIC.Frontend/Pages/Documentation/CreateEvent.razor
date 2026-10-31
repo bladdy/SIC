@@ -1,0 +1,623 @@
+﻿@page "/documentation/crear-evento"
+@using SIC.Frontend.Models
+@using SIC.Frontend.Services
+@layout DocumentationLayout
+@inject DocumentationState DocumentationState
+
+<PageTitle>CREAR EVENTO</PageTitle>
+
+<div class="welcome-page">
+
+    <div class="alert-callout">
+
+        <div>
+
+            <h5>
+                Tomar en cuenta lo siguiente
+            </h5>
+            <p>
+                La creación de eventos dentro de <strong>INVBOXV APP</strong> funciona mediante un sistema de <strong>Créditos</strong>.
+            </p>
+            <br />
+            <p>
+                <strong>1 Crédito = 1 Evento</strong>
+            </p>
+            <br />
+            <p>
+                Para poder crear un nuevo evento, es necesario contar con al menos un crédito disponible en tu <strong>Wallet</strong>. Una vez que completes y guardes el formulario de creación, el sistema realizará automáticamente las siguientes acciones:
+            </p>
+            <br />
+             <ul>
+                <li>Creará el evento dentro de tu cuenta.</li>
+                <li>Descontará 1 crédito de tu Wallet.</li>
+                <li>Registrará el movimiento en tu historial de créditos.</li>
+                <li>Activará el evento para que puedas comenzar a configurarlo y administrar a tus invitados.</li>
+             </ul>
+            <br />
+            <p>
+                Te recomendamos verificar siempre tus creditos disponibles antes de iniciar la creación de un nuevo evento. De esta manera podrás completar el proceso sin interrupciones y llevar un mejor control de los eventos generados desde tu cuenta.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/1-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Para comenzar, ingresa a <strong>invboxv-app.com</strong> desde una computadora o laptop para facilitar el proceso de configuración. Captura el usuario y la contraseña que te fueron proporcionados y haz clic en <strong>«Iniciar Sesión»</strong> para acceder a tu Panel de Invitados.
+        </p>
+
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/40-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            En la sección Mis Eventos, la pantalla aparecerá vacía cuando aún no tengas eventos registrados en tu cuenta.
+        </p>
+        <br />
+        <p>
+            Para crear tu primer evento, verifica que cuentas con créditos disponibles en tu Wallet. En el botón «Crear Evento (1)», el número que aparece entre paréntesis indica la cantidad de créditos disponibles para utilizar.
+        </p>
+        <br />
+
+        <p>
+            Recuerda que 1 Crédito equivale a 1 Evento.
+        </p>
+        <br />
+
+        <p>
+            Una vez confirmado que tienes créditos disponibles, haz clic en «Crear Evento» para continuar.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/41-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            A continuación, se mostrará el formulario de creación del evento.
+        </p>
+        <br />
+        <p>
+            Selecciona el tipo de evento que deseas registrar (Boda, XV Años, Cumpleaños, Evento Corporativo, etc.) y completa cada uno de los campos solicitados con la información correspondiente.
+        </p>
+        <br />
+        <p>
+            Te recomendamos revisar cuidadosamente todos los datos antes de guardar, ya que esta información será utilizada posteriormente en diferentes funciones del sistema.
+        </p>
+    </div>
+    <div class="alert-callout">
+        <div>
+
+            <h5>
+                Tomar en cuenta lo siguiente
+            </h5>
+            <h5>
+                Configuración de la URL de la Invitación
+            </h5>
+            <p>
+                En el campo URL de la Invitación deberás indicar el enlace de la invitación digital que utilizarás para tu evento
+            </p>
+            <br />
+            <p>
+                INVBOXV APP es compatible con tres tipos de invitaciones
+            </p>
+        </div>
+    </div>
+
+
+
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/42-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+        <h6 style="text-decoration:underline;">
+            INVITACIONES GENERICAS
+        </h6>
+        <p>
+            Son invitaciones digitales que no contienen nombres personalizados, cantidades de invitados ni pases asignados. Pueden haber sido creadas por cualquier negocio o proveedor especializado en invitaciones digitales.
+        </p>
+        <br />
+        <p>
+            En el campo «URL Invitación», deberás colocar el enlace de la invitación que te proporcione el negocio o proveedor que realizó la invitación digital.
+        </p>
+        <br />
+        <p>
+            En la opción «Invitación INVBOXV», deja la casilla sin marcar, ya que la invitación no fue creada por INVBOXV.
+        </p>
+        <br />
+        <p>
+            Ya solo hay que finalizar en el botón de GUARDAR.
+        </p>
+    </div>
+
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/43-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+        <h6 style="text-decoration:underline;">
+            INVITACIONES PERSONALIZADAS REALIZADAS  NO POR INVBOXV
+        </h6>
+        <p>
+            Son invitaciones digitales que sí contienen información personalizada para cada invitado, como nombre, número de pases, cantidad de invitados o accesos, pero fueron creadas por una empresa o proveedor diferente a INVBOXV.
+        </p>
+        <br />
+        <p>
+            Importante: En este caso, deja completamente vacío el campo «URL Invitación» y no marques la casilla «Invitación INVBOXV».
+        </p>
+        <br />
+        <p>
+            Esto se debe a que cada invitado tendrá un enlace personalizado diferente. Los enlaces individuales no se agregarán en este formulario; posteriormente se cargarán uno por uno mediante el archivo de Excel, junto con la información correspondiente de cada invitado.
+        </p>
+        <br />
+        <p>
+            Ya solo hay que finalizar en el botón de GUARDAR
+        </p>
+    </div>
+
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/44-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+        <h6 style="text-decoration:underline;">
+            INVITACIONES INVBOXV
+        </h6>
+        <p>
+            Son las invitaciones digitales desarrolladas por INVBOXV y pueden incluir información personalizada para cada invitado, como nombres, número de pases, mesas, boletos o cualquier otro dato asignado.
+        </p>
+        <br />
+        <p>
+            Si tu invitación fue desarrollada por INVBOXV, deberás marcar la casilla «Invitación INVBOXV» ubicada en la parte inferior de la URL.
+        </p>
+        <br />
+        <p>
+            En el campo «URL Invitación» puedes colocar el enlace que te proporcionaremos cuando tu invitación esté terminada.
+        </p>
+        <br />
+        <p>
+            ¿Aún no tienes el enlace? No hay problema. Puedes dejar el campo «URL Invitación» vacío y agregarlo posteriormente, antes de realizar el envío de las invitaciones a tus invitados.
+        </p>
+        <br />
+        <p>
+            Una vez que hayas completado la información del evento y realizado la configuración correspondiente, haz clic en «Guardar» para crear el evento.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/45-1-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+        
+    </div>
+    
+    <div class="success-callout">
+
+        <div>
+
+            <h5>
+                Proceso Completado!!!
+            </h5>
+
+            <p>
+                Al guardar: Se creará el evento dentro de tu cuenta. Se descontará automáticamente 1 crédito de tu Wallet.
+            </p>
+            <br />
+            <p>
+                El movimiento quedará registrado en tu historial de créditos. El evento aparecerá en la sección Mis Eventos para que puedas comenzar su configuración y administración.
+            </p>
+        </div>
+
+    </div>
+</div>
+
+
+<style>
+    .welcome-page {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding-bottom: 4rem;
+    }
+
+    .welcome-hero {
+        margin-bottom: 3rem;
+    }
+
+    .welcome-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: .4rem .9rem;
+        border-radius: 999px;
+        background: #EAF4F5;
+        color: #367B82;
+        font-size: .8rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .welcome-hero h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 1rem;
+        color: #111827;
+    }
+
+    .welcome-description {
+        font-size: 1.15rem;
+        color: #6b7280;
+        max-width: 750px;
+        line-height: 1.8;
+    }
+
+    .welcome-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .section-number {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #367B82;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 700;
+    }
+
+    .section-header h2 {
+        margin: 0;
+        font-size: 1.8rem;
+        color: #111827;
+    }
+
+    .welcome-card p {
+        font-size: 1rem;
+        line-height: 2;
+        color: #374151;
+        margin-bottom: 1rem;
+    }
+
+    .success-callout {
+        display: flex;
+        gap: 1.5rem;
+        padding: 2rem;
+        border-radius: 20px;
+        background: linear-gradient( 135deg, #EAF4F5, #D7E8EA );
+        border: 1px solid #CFDFE2;
+        margin-bottom: 2rem;
+    }
+
+    .alert-callout {
+        display: flex;
+        gap: 1.5rem;
+        padding: 2rem;
+        border-radius: 20px;
+        background: linear-gradient( 135deg, #fefce8, #fef3c7 );
+        border: 1px solid #fde68a;
+        margin-bottom: 2rem;
+    }
+
+        .alert-callout h3 {
+            margin-bottom: .5rem;
+            color: #2c6368;
+        }
+
+        .alert-callout p {
+            margin: 0;
+            line-height: 1.8;
+        }
+
+    .callout-icon {
+        font-size: 2.5rem;
+    }
+
+    .success-callout h3 {
+        margin-bottom: .5rem;
+        color: #2c6368;
+    }
+
+    .success-callout p {
+        margin: 0;
+        line-height: 1.8;
+    }
+
+    .next-step {
+        border-top: 1px solid #e5e7eb;
+        padding-top: 2rem;
+    }
+
+        .next-step span {
+            font-size: .85rem;
+            text-transform: uppercase;
+            color: #9ca3af;
+            letter-spacing: .1em;
+        }
+
+        .next-step h4 {
+            margin-top: .5rem;
+            margin-bottom: .5rem;
+            font-size: 1.4rem;
+        }
+
+        .next-step p {
+            color: #6b7280;
+        }
+
+    .hero-image-container {
+        display: flex;
+        justify-content: center;
+        margin: 2rem 0 2.5rem;
+    }
+
+    .hero-image {
+        width: 100%;
+        max-width: 900px;
+        height: auto;
+        border-radius: 20px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    }
+
+    .welcome-page {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding-bottom: 4rem;
+    }
+
+    .welcome-hero {
+        margin-bottom: 3rem;
+    }
+
+    .welcome-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: .4rem .9rem;
+        border-radius: 999px;
+        background: #EAF4F5;
+        color: #367B82;
+        font-size: .8rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .welcome-hero h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 1rem;
+        color: #111827;
+    }
+
+    .welcome-description {
+        font-size: 1.15rem;
+        color: #6b7280;
+        max-width: 750px;
+        line-height: 1.8;
+    }
+
+    .welcome-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .section-number {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #367B82;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 700;
+    }
+
+    .section-header h2 {
+        margin: 0;
+        font-size: 1.8rem;
+        color: #111827;
+    }
+
+    .welcome-card p {
+        font-size: 1rem;
+        line-height: 2;
+        color: #374151;
+        margin-bottom: 1rem;
+    }
+
+    .success-callout {
+        display: flex;
+        gap: 1.5rem;
+        padding: 2rem;
+        border-radius: 20px;
+        background: linear-gradient( 135deg, #EAF4F5, #D7E8EA );
+        border: 1px solid #CFDFE2;
+        margin-bottom: 2rem;
+    }
+
+    .alert-callout {
+        display: flex;
+        gap: 1.5rem;
+        padding: 2rem;
+        border-radius: 20px;
+        background: linear-gradient( 135deg, #fefce8, #fef3c7 );
+        border: 1px solid #fde68a;
+        margin-bottom: 2rem;
+    }
+
+        .alert-callout h3 {
+            margin-bottom: .5rem;
+            color: #2c6368;
+        }
+
+        .alert-callout p {
+            margin: 0;
+            line-height: 1.8;
+        }
+
+    .callout-icon {
+        font-size: 2.5rem;
+    }
+
+    .success-callout h3 {
+        margin-bottom: .5rem;
+        color: #2c6368;
+    }
+
+    .success-callout p {
+        margin: 0;
+        line-height: 1.8;
+    }
+
+    .next-step {
+        border-top: 1px solid #e5e7eb;
+        padding-top: 2rem;
+    }
+
+        .next-step span {
+            font-size: .85rem;
+            text-transform: uppercase;
+            color: #9ca3af;
+            letter-spacing: .1em;
+        }
+
+        .next-step h4 {
+            margin-top: .5rem;
+            margin-bottom: .5rem;
+            font-size: 1.4rem;
+        }
+
+        .next-step p {
+            color: #6b7280;
+        }
+
+    .create-event-layout {
+        display: flex;
+        gap: 32px;
+        align-items: flex-start;
+    }
+
+    /* texto ocupa más espacio */
+    .create-event-text {
+        flex: 2;
+        min-width: 0;
+    }
+
+    /* imagen a la derecha */
+    .create-event-image-container {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+    }
+
+    /* imagen vertical: que no explote el layout */
+    .create-event-image {
+        width: 100%;
+        max-width: 320px;
+        height: auto;
+        object-fit: contain;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    }
+
+    /* responsive */
+    @@media (max-width: 900px) {
+        .create-event-layout {
+            flex-direction: column;
+        }
+
+        .create-event-image {
+            max-width: 100%;
+        }
+    }
+</style>

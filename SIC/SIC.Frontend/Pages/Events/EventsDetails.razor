@@ -428,6 +428,17 @@ else
                             <span>Lista de asistentes (PDF)</span>
                         }
                     </button>
+                    <button class="btn btn-sm btn-custom" @onclick="GenerateCommentsPdfAsync" disabled="@IsGeneratingCommentsPdf">
+                        @if (IsGeneratingCommentsPdf)
+                        {
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            <span> Generando... </span>
+                        }
+                        else
+                        {
+                            <span>Dedicatorias (PDF)</span>
+                        }
+                    </button>
                     @if (EventDetail.User.UserType == UserType.Admin)
                     {
                         <a href="@($"/event/{EventDetail.Code}/form-builder")" class="btn btn-sm btn-custom">Información adicional</a>

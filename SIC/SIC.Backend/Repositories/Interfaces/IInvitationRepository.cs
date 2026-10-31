@@ -27,6 +27,7 @@ namespace SIC.Backend.Repositories.Interfaces
         Task<ActionResponse<InvitationConfirmationDto>> UpdateForConfirmarionFullAsync(InvitationConfirmationDto confirmationDto);
         Task<ActionResponse<ResponseInvitationDTO>> UpdateForConfirmationListFullAsync(ResponseInvitationDTO invitations);
         Task<ActionResponse<IEnumerable<Invitation>>> GetAllAsync(string code);
+        Task<ActionResponse<IEnumerable<Invitation>>> GetInvitationsWithCommentsAsync(string code);
         Task<ActionResponse<IEnumerable<Invitation>>> SearchByNameAsync(string eventCode, string filter);
     }
 }

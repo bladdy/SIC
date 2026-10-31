@@ -1,0 +1,361 @@
+@page "/documentation/documentacion-planner-album-digital"
+@using SIC.Frontend.Models
+@using SIC.Frontend.Services
+@layout DocumentationLayout
+@inject DocumentationState DocumentationState
+
+<PageTitle>25.- DOCUMENTACION PLANNER</PageTitle>
+
+<div class="welcome-page">
+
+    <div class="alert-callout">
+        <div>
+
+            <h5>
+                Tomar en cuenta lo siguiente
+            </h5>
+            <p>
+                El <strong>Álbum Digital</strong> está disponible exclusivamente para eventos que hayan sido realizados mediante invitaciones de <strong>INVBOXV</strong> o que hayan adquirido este servicio de manera individual con un costo adicional.
+            </p>
+            <br />
+            <p>
+                Dentro del Álbum Digital existen <strong>dos interfaces diferentes</strong>:
+            </p>
+            <p>
+                <strong>Interfaz del Planner</strong><br />
+                El planner podrá consultar todo el material que los invitados hayan compartido en el álbum y tendrá la posibilidad de <strong>visualizar y descargar</strong> las fotografías, reels, audios y textos recibidos.
+            </p>
+            <br />
+            <p>
+                <strong>Interfaz del Invitado</strong><br />
+                Los invitados podrán ingresar al álbum para <strong>subir y compartir sus fotografías, reels, audios o textos</strong> relacionados con el evento. Desde esta interfaz no tendrán la opción de descargar el material compartido.
+            </p>
+            <br />
+            <h5>
+                Entrega del material al cliente
+            </h5>
+            <p>
+                Como planner, es importante considerar que el material recopilado en el Álbum Digital debe ser entregado posteriormente al cliente correspondiente.
+            </p>
+            <br />
+            <p>
+                Una vez finalizado el evento, el planner podrá descargar el material desde su interfaz y compartirlo con el cliente de la manera que resulte más práctica para ambas partes.
+            </p>
+            <br />
+            <p>
+                El material puede entregarse, por ejemplo, mediante:
+            </p>
+            <ul>
+                <li>📧 <strong>Correo electrónico</strong></li>
+                <li>💬 <strong>WhatsApp</strong></li>
+                <li>📁 Cualquier otro medio acordado con el cliente</li>
+            </ul>
+            <br />
+            <p>
+                De esta manera, el planner puede centralizar y administrar todo el contenido recibido de los invitados y posteriormente entregarlo al cliente como parte de los recuerdos de su evento.
+            </p>
+        </div>
+    </div>
+
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/1-1024x576.jpg"
+                 alt="Album Digital INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Para comenzar, ingresa a <strong>invboxv-app.com</strong> desde una computadora o laptop para facilitar el proceso de configuración. Captura el usuario y la contraseña que te fueron proporcionados y haz clic en <strong>«Iniciar Sesión»</strong> para acceder a tu Panel de Invitados.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/09/215-1024x576.jpg"
+                 alt="Album Digital INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Haz clic en el botón <strong>«Álbum»</strong> y automáticamente se abrirá una nueva ventana.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/09/216-1024x576.jpg"
+                 alt="Album Digital INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            En esta pantalla, en el botón <strong>Descargar Álbum</strong>, podrás descargar todo el material multimedia que hayan compartido los invitados, como <strong>fotos, audios y videos</strong>.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/09/217-1024x576.jpg"
+                 alt="Album Digital INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            En el botón <strong>Descargar Texto</strong>, podrás descargar únicamente las <strong>dedicatorias y textos en formato PDF</strong>.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/09/218-1024x576.jpg"
+                 alt="Album Digital INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            En el siguiente botón podrás descargar el <strong>QR en formato PNG</strong>, para utilizarlo donde lo consideres conveniente, ya sea en un diseño, material impreso o cualquier otro medio.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/09/219-1024x576.jpg"
+                 alt="Album Digital INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Aquí podemos visualizar el <strong>QR en PNG</strong>, listo para utilizarlo donde lo necesites.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/09/220-1024x576.jpg"
+                 alt="Album Digital INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            El siguiente botón permite descargar un <strong>diseño genérico para cualquier tipo de evento</strong>, que podrás utilizar para colocar el QR y facilitar que tus invitados compartan sus recuerdos.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/09/221-1024x576.jpg"
+                 alt="Album Digital INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Podemos ver que el diseño puede imprimirse y <strong>recortarse por la mitad</strong>, para obtener un tótem triangular, o también <strong>recortarse en cuatro partes</strong>, dependiendo de la presentación que prefiera el cliente.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/09/222-1024x576.jpg"
+                 alt="Album Digital INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Al final encontraremos el botón <strong>Compartir Enlace</strong>. Al darle clic, el enlace se copiará automáticamente y podrás pegarlo en WhatsApp, como se muestra en la siguiente imagen.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/09/223-1024x576.jpg"
+                 alt="Album Digital INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            En el lado izquierdo podemos ver únicamente el enlace. En el lado derecho, puedes generar un texto con ayuda de <strong>ChatGPT o cualquier generador de textos</strong>, agregar el enlace y enviarlo a tus invitados después del evento.
+        </p>
+        <div class="alert-callout">
+            <div>
+                <h5>
+                    Tomar en cuenta lo siguiente
+                </h5>
+                <p>
+                    Los invitados tendrán hasta <strong>7 días después del evento</strong> para subir y descargar el material que hayan compartido.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/09/224-1024x576.jpg"
+                 alt="Album Digital INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Una vez que los invitados comiencen a subir su material, podrás <strong>visualizarlo y descargarlo</strong>. Por ejemplo, en esta sección podemos ver las <strong>fotos</strong> compartidas durante el evento.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/09/225-1024x576.jpg"
+                 alt="Album Digital INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            En la siguiente sección encontramos los <strong>REELS</strong>, que pueden tener una duración aproximada de <strong>15 segundos</strong>, dependiendo del formato y las características del archivo que se haya subido.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/09/226-1024x576.jpg"
+                 alt="Album Digital INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            En esta sección encontraremos los <strong>audios y las dedicatorias de voz</strong> que hayan compartido los invitados.
+        </p>
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/09/227-1024x576.jpg"
+                 alt="Album Digital INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Y, por último, tendremos las <strong>dedicatorias y buenos deseos en formato de texto</strong>, compartidos por los invitados.
+        </p>
+    </div>
+    <div class="success-callout">
+        <div>
+
+            <h5>
+                Proceso Completado!!!
+            </h5>
+
+            <p>
+                De esta manera, tendrás un <strong>material muy completo con los recuerdos del evento</strong>, recopilado con la ayuda de tus invitados y disponible para conservar y compartir después de la celebración.
+            </p>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    .welcome-page { max-width: 1000px; margin: 0 auto; padding-bottom: 4rem; }
+    .welcome-hero { margin-bottom: 3rem; }
+    .welcome-badge { display: inline-flex; align-items: center; padding: .4rem .9rem; border-radius: 999px; background: #EAF4F5; color: #367B82; font-size: .8rem; font-weight: 600; margin-bottom: 1rem; }
+    .welcome-hero h1 { font-size: 3rem; font-weight: 800; line-height: 1.1; margin-bottom: 1rem; color: #111827; }
+    .welcome-description { font-size: 1.15rem; color: #6b7280; max-width: 750px; line-height: 1.8; }
+    .welcome-card { background: white; border: 1px solid #e5e7eb; border-radius: 20px; padding: 2rem; margin-bottom: 2rem; }
+    .section-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+    .section-number { width: 42px; height: 42px; border-radius: 50%; background: #367B82; color: white; display: flex; justify-content: center; align-items: center; font-weight: 700; }
+    .section-header h2 { margin: 0; font-size: 1.8rem; color: #111827; }
+    .welcome-card p { font-size: 1rem; line-height: 2; color: #374151; margin-bottom: 1rem; }
+    .success-callout { display: flex; gap: 1.5rem; padding: 2rem; border-radius: 20px; background: linear-gradient( 135deg, #EAF4F5, #D7E8EA ); border: 1px solid #CFDFE2; margin-bottom: 2rem; }
+    .alert-callout { display: flex; gap: 1.5rem; padding: 2rem; border-radius: 20px; background: linear-gradient( 135deg, #fefce8, #fef3c7 ); border: 1px solid #fde68a; margin-bottom: 2rem; }
+        .alert-callout h3 { margin-bottom: .5rem; color: #2c6368; }
+        .alert-callout p { margin: 0; line-height: 1.8; }
+    .callout-icon { font-size: 2.5rem; }
+    .success-callout h3 { margin-bottom: .5rem; color: #2c6368; }
+    .success-callout p { margin: 0; line-height: 1.8; }
+    .next-step { border-top: 1px solid #e5e7eb; padding-top: 2rem; }
+        .next-step span { font-size: .85rem; text-transform: uppercase; color: #9ca3af; letter-spacing: .1em; }
+        .next-step h4 { margin-top: .5rem; margin-bottom: .5rem; font-size: 1.4rem; }
+        .next-step p { color: #6b7280; }
+    .hero-image-container { display: flex; justify-content: center; margin: 2rem 0 2.5rem; }
+    .hero-image { width: 100%; max-width: 900px; height: auto; border-radius: 20px; border: 1px solid #e5e7eb; box-shadow: 0 10px 30px rgba(0,0,0,.08); }
+</style>

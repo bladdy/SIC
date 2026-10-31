@@ -1,0 +1,1192 @@
+﻿@page "/documentation/planner-configuracion-whtasapp"
+@using SIC.Frontend.Models
+@using SIC.Frontend.Services
+@layout DocumentationLayout
+@inject DocumentationState DocumentationState
+
+<PageTitle>CONFIGURAR Y VINCULAR TU WHATSAPP BUSINESS CON INVBOXV APP</PageTitle>
+
+<div class="welcome-page">
+
+    <div class="welcome-hero">
+
+        <p class="welcome-description">
+            Sigue las instrucciones de esta guía para vincular correctamente tu número de WhatsApp Business con INVBOXV APP y comenzar a gestionar tus eventos de forma automática.
+        </p>
+
+    </div>
+    <div class="alert-callout">
+
+        <div>
+
+            <h5>
+                Tomar en cuenta lo siguiente
+            </h5>
+
+            <p>
+                Te recomendamos utilizar un número de <strong>WhatsApp Business exclusivo para el envío de tus invitaciones</strong>, de preferencia configurado en un dispositivo independiente, como un <strong>celular o tablet</strong>.
+            </p>
+            <br />
+            <p>
+                Esto te permitirá mantener <strong>separados y organizados</strong> los mensajes de tu negocio y los envíos relacionados con tus eventos e invitados, evitando mezclar ambas actividades en un mismo WhatsApp Business.
+            </p>
+            <br />
+            <p>
+                Además, al contar con un WhatsApp Business destinado exclusivamente para el sistema, podrás <strong>delegar fácilmente la administración y el envío de invitaciones a una asistente o persona de tu equipo</strong>, sin necesidad de compartir el acceso a tu WhatsApp Business principal del negocio.
+            </p>
+            <br />
+            <p>
+                De esta manera, tendrás una operación más <strong>organizada, segura y sencilla de administrar</strong>.
+            </p>
+
+
+        </div>
+
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/1-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Para comenzar, ingresa a <strong>invboxv-app.com</strong> desde una computadora o laptop para facilitar el proceso de configuración. Captura el usuario y la contraseña que te fueron proporcionados y haz clic en <strong>«Iniciar Sesión»</strong> para acceder a tu Panel de Invitados.
+        </p>
+
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/2-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Dirígete al menú <strong>WhatsApp</strong> y selecciona la opción <strong>Configuración</strong>. Este procedimiento solo se realiza una vez y permitirá vincular tu cuenta de <strong>WhatsApp Business</strong> con <strong>INVBOXV APP</strong>.
+        </p>
+
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/3-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Haz clic en la opción <strong>Configuración</strong> para desplegar las herramientas disponibles para la integración de WhatsApp Business.
+        </p>
+
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/4-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Presiona el botón <strong>«Conectar WhatsApp API»</strong> para iniciar el proceso de vinculación entre tu cuenta de WhatsApp Business y tu Panel de Invitados.
+        </p>
+
+    </div>
+    <div class="alert-callout">
+
+        <div>
+
+            <h5>
+                Tomar en cuenta lo siguiente
+            </h5>
+            <p>
+                No es necesario capturar información manualmente dentro de INVBOXV APP. Una vez completada la integración con Meta, toda la información de tu cuenta se sincronizará automáticamente.
+            </p>
+
+
+        </div>
+
+    </div>
+
+
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/5-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Se abrirá una ventana donde podrás seleccionar tu perfil de Facebook. Si ya tienes una sesión iniciada en Facebook, este paso puede omitirse automáticamente.
+        </p>
+
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/6-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Meta solicitará que confirmes tu identidad ingresando tu contraseña de Facebook. Si ya tienes una sesión activa, este paso no será necesario.
+        </p>
+
+    </div>
+
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/7-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            En esta pantalla observarás que la conexión se realizará con el portafolio comercial <strong>JONATHAN GAONA</strong>. Esto se debe a que actualmente <strong>INVBOXV APP</strong> opera bajo dicho portafolio empresarial registrado en Meta.
+        </p>
+        <br />
+        <p>
+            Estamos trabajando para que próximamente el nombre mostrado durante el proceso sea directamente <strong>INVBOXV APP</strong>.
+        </p>
+
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/8-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Selecciona la lada de tu país e ingresa el número de <strong>WhatsApp Business</strong> que deseas conectar.
+        </p>
+
+    </div>
+
+
+
+    <div class="alert-callout">
+
+        <div>
+
+            <h5>
+                Tomar en cuenta lo siguiente
+            </h5>
+            <p>
+                Este número debe estar activo en otro dispositivo, ya sea un teléfono celular o una Tablet, porque META te enviara un msn de confirmación.
+            </p>
+
+
+        </div>
+
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/9-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+
+        <p>
+            Después de ingresar correctamente la lada y el número de teléfono, haz clic en <strong>«Continuar»</strong> para avanzar al siguiente paso.
+        </p>
+
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/10-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+        <p>
+            Verifica que la información mostrada por Meta sea correcta: nombre comercial, logotipo y número telefónico.
+        </p>
+        <br />
+        <p>
+            Si todos los datos son correctos, haz clic en  <strong>«Continuar»</strong>.
+        </p>
+
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/11-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+        <p>
+            Ahora deberás seleccionar un <strong>Portafolio Comercial</strong> existente o crear uno nuevo.
+        </p>
+        <br />
+        <p>
+            Un <strong>Portafolio Comercial de META</strong> es un espacio donde puedes administrar y organizar los activos digitales de tu negocio, como páginas de Facebook, cuentas de Instagram y números de WhatsApp Business.
+        </p>
+        <p>
+            Si anteriormente has realizado campañas publicitarias en Facebook o Instagram, es muy probable que ya cuentes con un Portafolio Comercial creado, de lo contrario selecciona Crear uno nuevo.
+        </p>
+
+    </div>
+
+    <div class="alert-callout">
+
+        <div>
+
+            <h5>
+                Tomar en cuenta lo siguiente
+            </h5>
+            <p>
+                Si todavía no cuentas con un <strong>Portafolio Comercial de META</strong>, podrás crear uno durante el proceso de vinculación de WhatsApp Business.
+            </p>
+            <br />
+            <p>
+                Para hacerlo, META te solicitará algunos datos básicos, como el nombre de tu negocio, tu <strong>nombre y apellido, y un correo electrónico comercial</strong>.
+            </p>
+            <br />
+            <p>
+                Es importante proporcionar información correcta y utilizar un correo electrónico al que tengas acceso.
+            </p>
+            <br />
+            <p>
+                Una vez completados los datos, podrás continuar con la creación del portafolio y el proceso de vinculación de tu cuenta de <strong>WhatsApp Business con INVBOXV APP</strong>.
+            </p>
+            <br />
+            <p>
+                <strong>Importante</strong>: META podría solicitar información adicional o una verificación del negocio, dependiendo de las características de tu cuenta.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/12-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+        <p>
+            Una vez seleccionado el Portafolio Comercial, Meta comenzará el proceso de asociación entre tu cuenta de WhatsApp Business y dicho portafolio.
+        </p>
+
+    </div>
+
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/13-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+        <p>
+
+            Meta generará un código QR que utilizarás para vincular tu aplicación de WhatsApp Business con la plataforma.
+        </p>
+
+    </div>
+
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/14-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+        <p>
+
+            A partir de este momento, los siguientes pasos se realizarán desde el dispositivo donde tienes instalado WhatsApp Business.
+        </p>
+        <br />
+        <p>
+
+            Abre la cámara o el lector QR de WhatsApp Business y escanea el código mostrado en tu computadora.
+        </p>
+        <br />
+        <p>
+
+            Cuando aparezca la opción <strong>«Conectarte a la plataforma para empresas»</strong>, presiona <strong>Continuar</strong>.
+        </p>
+    </div>
+
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/15-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+        <p>
+
+            WhatsApp te preguntará si deseas compartir el historial de chats con la plataforma.
+        </p>
+        <br />
+        <p>
+
+            Presiona Confirmar y espera unos segundos mientras se establece la conexión.
+        </p>
+        <br />
+        <p>
+
+            Cuando aparezca el mensaje <strong>«Te conectaste a JONATHAN GAONA»</strong>, presiona <strong>Aceptar</strong>.
+        </p>
+        <br />
+        <p>
+
+            Finalmente, utiliza la flecha de regreso en la parte superior izquierda para salir de la sección de Plataforma para Empresas.
+        </p>
+    </div>
+
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/16-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+        <p>
+
+            Regresa a la computadora y selecciona la <strong>Zona Horaria</strong> correspondiente a tu ubicación.
+        </p>
+        
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/17-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+        <p>
+
+            Una vez seleccionada la zona horaria correcta, haz clic en <strong>«Siguiente»</strong>.
+        </p>
+
+    </div>
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/18-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+        <p>
+
+            Meta mostrará una pantalla donde se solicitarán los permisos necesarios para que tu Portafolio Comercial, WhatsApp Business e INVBOXV APP puedan trabajar de forma conjunta.
+        </p>
+        <br />
+        <p>
+
+            Haz clic en <strong>«Continuar»</strong>.
+        </p>
+
+    </div>
+
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/19-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+        <p>
+
+            Tu cuenta se encuentra en proceso de conexión. Espera unos segundos mientras Meta completa la configuración.
+        </p>
+
+
+    </div>
+
+
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/20-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+        <p>
+
+
+            ¡Felicidades! Tu cuenta de WhatsApp Business ha sido conectada correctamente con INVBOXV APP. Haz clic en <strong>«Finalizar»</strong> para concluir el proceso.
+        </p>
+
+
+    </div>
+
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/21-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+        <p>
+            Actualiza o refresca la página del sistema para que INVBOXV APP sincronice automáticamente toda la información configurada durante el proceso.
+        </p>
+
+
+    </div>
+
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/22-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+        <p>
+            Ahora configuraremos el método de pago requerido por Meta para el envío de mensajes mediante WhatsApp Business.
+        </p>
+
+
+    </div>
+
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/24-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+        <p>
+            Dentro del Portafolio Comercial, localiza el menú lateral izquierdo y selecciona la opción <strong>«Cuentas de WhatsApp»</strong>.
+        </p>
+
+
+    </div>
+
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/25-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+        <p>
+            Selecciona el número de WhatsApp que acabas de integrar y haz clic en <strong>«Configuración de Pago»</strong>.
+        </p>
+
+
+    </div>
+
+
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/26-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+        <p>
+            Si aún no tienes un método de pago registrado, Meta mostrará el mensaje correspondiente. Haz clic en <strong>«Agregar método de pago»</strong>.
+        </p>
+    </div>
+
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/27-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+        <p>
+            Selecciona correctamente tu moneda, país y zona horaria para garantizar una configuración adecuada de la facturación.
+        </p>
+    </div>
+
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/28-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+        <p>
+            Verifica que toda la información sea correcta y haz clic en <strong>«Siguiente»</strong>.
+        </p>
+    </div>
+
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/29-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+        <p>
+            Selecciona la opción <strong>Tarjeta de Débito o Crédito</strong> como método de pago y continúa con el proceso.
+        </p>
+    </div>
+
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/30-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+        <p>
+            Ingresa los datos solicitados por Meta y presiona <strong>«Guardar»</strong> para registrar tu método de pago.
+        </p>
+    </div>
+    <div class="alert-callout">
+
+        <div>
+
+            <h5>
+                Tomar en cuenta lo siguiente
+            </h5>
+            <p>
+                INVBOXV APP no solicita, almacena ni tiene acceso a la información de tus tarjetas bancarias.
+            </p>
+            <br />
+            <p>
+                Toda la información financiera es capturada directamente en los servidores seguros de Meta y se encuentra protegida mediante sistemas de cifrado y seguridad.
+            </p>
+ 
+        </div>
+
+    </div>
+
+
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/31-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+        <p>
+            Meta confirmará que tu método de pago fue agregado correctamente.
+        </p>
+        <br/>  
+        <p>
+            Posteriormente, completa la información adicional solicitada y responde las preguntas relacionadas con el uso comercial de la cuenta.
+        </p>
+        <br />
+        <p>
+            Recomendamos dejar la configuración sugerida por Meta para facilitar futuras facturas o comprobantes fiscales.
+        </p>
+    </div>
+
+
+    <div class="welcome-card">
+        <div class="section-header">
+            <h2 id="whatsapp-chat">
+                SIGUIENTE PASO...
+            </h2>
+        </div>
+        <div class="hero-image-container">
+
+            <img src="https://invboxv.com/wp-content/uploads/2026/08/32-1024x576.jpg"
+                 alt="Mis Eventos INVBOXV APP"
+                 class="hero-image" />
+
+        </div>
+        <p>
+            Finalmente, podrás visualizar la pantalla donde aparecerá tu método de pago registrado correctamente dentro de tu cuenta de WhatsApp Business.
+        </p>
+        <br />
+        <p>
+            En este punto puedes cerrar la ventana o pestaña.
+        </p>
+        <br />
+    </div>
+
+    <div class="success-callout">
+
+        <div>
+
+            <h5>
+                Proceso Completado!!!
+            </h5>
+
+            <p>
+                Tu integración con <strong>INVBOXV APP</strong> está lista para utilizarse. Ahora podrás aprovechar todas las funciones disponibles dentro de la plataforma, incluyendo el envío masivo de invitaciones, confirmaciones automáticas, recordatorios, seguimiento de invitados y muchas otras herramientas diseñadas para optimizar la gestión de tus eventos.
+            </p>
+
+        </div>
+
+    </div>
+    <div class="next-step">
+
+        <span>Siguiente sección</span>
+
+        <h4>Inicio</h4>
+
+        <p>
+            Conoce el dashboard principal y aprende a monitorear tus eventos en tiempo real.
+        </p>
+
+    </div>
+
+    @code {
+
+        protected override void OnInitialized()
+        {
+            DocumentationState.Set(new DocumentationContext
+            {
+                Breadcrumbs =
+            [
+            new()
+                {
+                    Text = "Panel de Bienvenida",
+                    Url = "/documentation/welcome"
+                }
+                ],
+
+                        TocItems =
+                    [
+                    new()
+            {
+            Text = "Bienvenido a INVBOXV APP",
+            Anchor = "#welcome"
+            },
+            new()
+            {
+            Text = "Gracias por ser parte de INVBOXV APP",
+            Anchor = "#gracias"
+            }
+            ],
+
+                NextPage = new()
+                {
+                    Text = "Inicio",
+                    Url = "/documentation/home"
+                }
+            });
+        }
+
+    }
+</div>
+<style>
+    .welcome-page {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding-bottom: 4rem;
+    }
+
+    .welcome-hero {
+        margin-bottom: 3rem;
+    }
+
+    .welcome-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: .4rem .9rem;
+        border-radius: 999px;
+        background: #EAF4F5;
+        color: #367B82;
+        font-size: .8rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .welcome-hero h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 1rem;
+        color: #111827;
+    }
+
+    .welcome-description {
+        font-size: 1.15rem;
+        color: #6b7280;
+        max-width: 750px;
+        line-height: 1.8;
+    }
+
+    .welcome-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .section-number {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #367B82;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 700;
+    }
+
+    .section-header h2 {
+        margin: 0;
+        font-size: 1.8rem;
+        color: #111827;
+    }
+
+    .welcome-card p {
+        font-size: 1rem;
+        line-height: 2;
+        color: #374151;
+        margin-bottom: 1rem;
+    }
+
+    .success-callout {
+        display: flex;
+        gap: 1.5rem;
+        padding: 2rem;
+        border-radius: 20px;
+        background: linear-gradient( 135deg, #EAF4F5, #D7E8EA );
+        border: 1px solid #CFDFE2;
+        margin-bottom: 2rem;
+    }
+
+    .alert-callout {
+        display: flex;
+        gap: 1.5rem;
+        padding: 2rem;
+        border-radius: 20px;
+        background: linear-gradient( 135deg, #fefce8, #fef3c7 );
+        border: 1px solid #fde68a;
+        margin-bottom: 2rem;
+    }
+
+        .alert-callout h3 {
+            margin-bottom: .5rem;
+            color: #2c6368;
+        }
+
+        .alert-callout p {
+            margin: 0;
+            line-height: 1.8;
+        }
+
+    .callout-icon {
+        font-size: 2.5rem;
+    }
+
+    .success-callout h3 {
+        margin-bottom: .5rem;
+        color: #2c6368;
+    }
+
+    .success-callout p {
+        margin: 0;
+        line-height: 1.8;
+    }
+
+    .next-step {
+        border-top: 1px solid #e5e7eb;
+        padding-top: 2rem;
+    }
+
+        .next-step span {
+            font-size: .85rem;
+            text-transform: uppercase;
+            color: #9ca3af;
+            letter-spacing: .1em;
+        }
+
+        .next-step h4 {
+            margin-top: .5rem;
+            margin-bottom: .5rem;
+            font-size: 1.4rem;
+        }
+
+        .next-step p {
+            color: #6b7280;
+        }
+
+    .hero-image-container {
+        display: flex;
+        justify-content: center;
+        margin: 2rem 0 2.5rem;
+    }
+
+    .hero-image {
+        width: 100%;
+        max-width: 900px;
+        height: auto;
+        border-radius: 20px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    }
+
+    .welcome-page {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding-bottom: 4rem;
+    }
+
+    .welcome-hero {
+        margin-bottom: 3rem;
+    }
+
+    .welcome-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: .4rem .9rem;
+        border-radius: 999px;
+        background: #EAF4F5;
+        color: #367B82;
+        font-size: .8rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .welcome-hero h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 1rem;
+        color: #111827;
+    }
+
+    .welcome-description {
+        font-size: 1.15rem;
+        color: #6b7280;
+        max-width: 750px;
+        line-height: 1.8;
+    }
+
+    .welcome-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .section-number {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #367B82;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 700;
+    }
+
+    .section-header h2 {
+        margin: 0;
+        font-size: 1.8rem;
+        color: #111827;
+    }
+
+    .welcome-card p {
+        font-size: 1rem;
+        line-height: 2;
+        color: #374151;
+        margin-bottom: 1rem;
+    }
+
+    .success-callout {
+        display: flex;
+        gap: 1.5rem;
+        padding: 2rem;
+        border-radius: 20px;
+        background: linear-gradient( 135deg, #EAF4F5, #D7E8EA );
+        border: 1px solid #CFDFE2;
+        margin-bottom: 2rem;
+    }
+
+    .alert-callout {
+        display: flex;
+        gap: 1.5rem;
+        padding: 2rem;
+        border-radius: 20px;
+        background: linear-gradient( 135deg, #fefce8, #fef3c7 );
+        border: 1px solid #fde68a;
+        margin-bottom: 2rem;
+    }
+
+        .alert-callout h3 {
+            margin-bottom: .5rem;
+            color: #2c6368;
+        }
+
+        .alert-callout p {
+            margin: 0;
+            line-height: 1.8;
+        }
+
+    .callout-icon {
+        font-size: 2.5rem;
+    }
+
+    .success-callout h3 {
+        margin-bottom: .5rem;
+        color: #2c6368;
+    }
+
+    .success-callout p {
+        margin: 0;
+        line-height: 1.8;
+    }
+
+    .next-step {
+        border-top: 1px solid #e5e7eb;
+        padding-top: 2rem;
+    }
+
+        .next-step span {
+            font-size: .85rem;
+            text-transform: uppercase;
+            color: #9ca3af;
+            letter-spacing: .1em;
+        }
+
+        .next-step h4 {
+            margin-top: .5rem;
+            margin-bottom: .5rem;
+            font-size: 1.4rem;
+        }
+
+        .next-step p {
+            color: #6b7280;
+        }
+
+    .create-event-layout {
+        display: flex;
+        gap: 32px;
+        align-items: flex-start;
+    }
+
+    /* texto ocupa más espacio */
+    .create-event-text {
+        flex: 2;
+        min-width: 0;
+    }
+
+    /* imagen a la derecha */
+    .create-event-image-container {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+    }
+
+    /* imagen vertical: que no explote el layout */
+    .create-event-image {
+        width: 100%;
+        max-width: 320px;
+        height: auto;
+        object-fit: contain;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    }
+
+    /* responsive */
+    @@media (max-width: 900px) {
+        .create-event-layout {
+            flex-direction: column;
+        }
+
+        .create-event-image {
+            max-width: 100%;
+        }
+    }
+</style>

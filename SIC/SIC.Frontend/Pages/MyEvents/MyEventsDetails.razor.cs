@@ -31,6 +31,7 @@ public partial class MyEventsDetails
     private bool IsCopyURl = false;
     private bool IsCopyMesasURl = false;
     private bool IsProcessList = false;
+    private bool IsGeneratingCommentsPdf = false;
 
     private bool HasSelectedInvitations = false;
 
@@ -417,6 +418,32 @@ public partial class MyEventsDetails
         finally
         {
             IsProcessList = false;
+        }
+    }
+
+    private async Task GenerateCommentsPdfAsync()
+    {
+        try
+        {
+            IsGeneratingCommentsPdf = true;
+
+            var content = await Repository.GetFileAsync($"api/Invitations/generatedpdf-comments?evento={EventDetail!.Code}");
+
+            if (content != null && content.Length > 0)
+            {
+                await JsRuntime.DownloadFileAsync(
+                    $"dedicatorias-{EventDetail.Name}.pdf",
+                    content,
+                    "application/pdf");
+            }
+            else
+            {
+                await SweetAlertService.FireAsync("Comentarios (PDF)", "No hay invitaciones con comentarios para generar el PDF.", SweetAlertIcon.Info);
+            }
+        }
+        finally
+        {
+            IsGeneratingCommentsPdf = false;
         }
     }
 

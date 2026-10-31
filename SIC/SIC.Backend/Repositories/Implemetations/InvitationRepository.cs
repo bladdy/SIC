@@ -22,6 +22,21 @@ namespace SIC.Backend.Repositories.Implemetations
             _context = context;
         }
 
+        public async Task<ActionResponse<IEnumerable<Invitation>>> GetInvitationsWithCommentsAsync(string code)
+        {
+            var invitations = await _context.Invitations
+                .Include(i => i.Event)
+                .Where(i => i.Event!.Code == code && !string.IsNullOrWhiteSpace(i.Comments))
+                .OrderBy(i => i.Name)
+                .ToListAsync();
+
+            return new ActionResponse<IEnumerable<Invitation>>
+            {
+                Success = true,
+                Result = invitations
+            };
+        }
+
         public async Task<ActionResponse<IEnumerable<Invitation>>> SearchByNameAsync(string eventCode, string filter)
         {
             var queryable = _context.Invitations

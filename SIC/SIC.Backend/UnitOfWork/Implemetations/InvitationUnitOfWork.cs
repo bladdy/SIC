@@ -40,6 +40,8 @@ namespace SIC.Backend.UnitOfWork.Implemetations
 
         public async Task<ActionResponse<IEnumerable<Invitation>>> GetAllAsync(string code) => await _invitationstRepository.GetAllAsync(code);
 
+        public async Task<ActionResponse<IEnumerable<Invitation>>> GetInvitationsWithCommentsAsync(string code) => await _invitationstRepository.GetInvitationsWithCommentsAsync(code);
+
         public async Task<ActionResponse<IEnumerable<Invitation>>> SearchByNameAsync(string eventCode, string filter) => await _invitationstRepository.SearchByNameAsync(eventCode, filter);
     }
 }
